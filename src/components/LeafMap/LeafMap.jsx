@@ -23,6 +23,7 @@ import {
   DEFAULT_MAP_ZOOM,
   DEFAULT_MAP_ZOOM_MAX
 } from '../defaults'
+import { getBasemapConfig } from '../../utils/themeHelper'
 
 const LeafMap = () => {
   const dispatch = useDispatch()
@@ -196,10 +197,7 @@ const LeafMap = () => {
         <TileLayer
           key={_effectiveTheme} // Force re-mount when theme changes
           className="map-tiles"
-          url={
-            _appConfig.BASEMAP_URL ||
-            'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
-          }
+          url={getBasemapConfig(_appConfig, _effectiveTheme)?.url}
           maxNativeZoom={18}
           minNativeZoom={2}
           maxZoom={
