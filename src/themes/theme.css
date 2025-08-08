@@ -16,7 +16,7 @@
 
   /* LayerList Component */
   --layer-list-bg: rgba(34, 34, 34, 0.8);
-  --layer-list-title-border-bottom: #373d4d;
+  --layer-list-title-border-bottom: #353d4f;
 
   /* Content Component */
   --content-color: #d3d3d3;
@@ -24,9 +24,9 @@
   /* LeftContent Component */
   --left-content-bg: #12171a;
   --left-content-tab-color: #fff;
-  --left-content-tab-bg: #373d4d;
-  --left-content-tab-border-bottom: #373d4d;
-  --left-content-tab-border-top: #373d4d;
+  --left-content-tab-bg: #353d4f;
+  --left-content-tab-border-bottom: #353d4f;
+  --left-content-tab-border-top: #353d4f;
   --left-content-tab-selected-border-bottom: var(--e84-brand-green);
   --left-content-disable-search-overlay-bg: #12171a;
 
@@ -43,7 +43,7 @@
   --right-content-count-button-hover-color: #fff;
   --right-content-draw-geom-message-bg: rgba(34, 34, 34, 0.8);
   --right-content-draw-geom-message-color: #fff;
-  --right-content-draw-geom-message-text-title-color: #abb0c0;
+  --right-content-draw-geom-message-text-title-color: #a9b0c1;
   --right-content-draw-geom-message-cancel-button-bg: transparent;
   --right-content-draw-geom-message-cancel-button-color: white;
   --right-content-draw-geom-message-cancel-button-border: #a9b0c1;
@@ -62,7 +62,7 @@
   --heat-map-symbology-values-mid-border-right: rgba(255, 255, 255, 0.5);
 
   /* LayerLegend Component */
-  --layer-legend-bg: #13171a;
+  --layer-legend-bg: #12171a;
   --layer-legend-opacity: 0.9;
 
   /* LoadingAnimation Component */
