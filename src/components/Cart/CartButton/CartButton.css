@@ -11,16 +11,16 @@
   padding: 10px;
   font-size: 16px;
   font-weight: bold;
-  border-color: var(--cart-button-border);
-  color: var(--cart-button-color);
+  border-color: #76829c;
+  color: #a9b0c1;
   user-select: none;
 }
 
 .cartButtonEnabled {
   cursor: pointer;
-  color: var(--cart-button-enabled-color);
-  background-color: var(--cart-button-enabled-bg);
-  border-color: var(--cart-button-enabled-border);
+  color: #12171a;
+  background-color: #6cc24a;
+  border-color: #6cc24a;
 }
 
 .cartCountContainer {
@@ -28,8 +28,8 @@
   height: 30px;
   padding-left: 3px;
   padding-right: 3px;
-  background-color: var(--cart-button-count-container-bg);
-  color: var(--cart-button-count-container-color);
+  background-color: #5d626d;
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -39,5 +39,5 @@
 }
 
 .cartCountContainerEnabled {
-  background-color: var(--cart-button-count-container-enabled-bg);
+  background-color: #4f8f36;
 }

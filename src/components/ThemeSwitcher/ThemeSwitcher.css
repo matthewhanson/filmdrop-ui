@@ -15,9 +15,9 @@
 }
 
 .theme-switcher:hover {
-  background: var(--theme-switcher-hover-bg);
-  border-color: var(--theme-switcher-hover-border);
-  color: var(--theme-switcher-hover-color);
+  background: #6cc24a;
+  border-color: #6cc24a;
+  color: #12171a;
 }
 
 .theme-switcher:focus {

@@ -1,5 +1,5 @@
 .cartModal {
-  background-color: var(--cart-modal-bg);
+  background-color: #00000090;
   height: 100%;
   width: 100%;
   display: flex;
@@ -16,7 +16,7 @@
   width: 95%;
   min-height: 300px;
   min-width: 500px;
-  background-color: var(--cart-modal-contents-bg);
+  background-color: #13171a;
   border-radius: 5px;
 }
 
@@ -26,8 +26,8 @@
   height: 50px;
   width: 100%;
   align-items: center;
-  background-color: var(--cart-modal-top-bar-bg);
-  color: var(--cart-modal-top-bar-color);
+  background-color: #6cc24a;
+  color: #000;
   display: flex;
   flex-direction: row;
   font-size: 18px;
@@ -42,8 +42,8 @@
 }
 
 .closeCartModal {
-  background-color: var(--cart-modal-close-bg);
-  color: var(--cart-modal-close-color);
+  background-color: transparent;
+  color: #000;
   border: 0px;
   font-size: 24px;
   cursor: pointer;

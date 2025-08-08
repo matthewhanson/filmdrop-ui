@@ -2,9 +2,9 @@
 @import 'leaflet-draw/dist/leaflet.draw.css';
 
 .LeafMap {
-  color: var(--leaf-map-color);
+  color: #222;
   width: 100%;
-  background-color: var(--leaf-map-bg);
+  background-color: lightblue;
   position: relative;
 }
 

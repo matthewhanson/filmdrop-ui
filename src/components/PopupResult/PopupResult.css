@@ -52,7 +52,7 @@
 }
 
 .popupResultDetailsHrefLink:hover {
-  color: var(--popup-result-details-href-link-hover-color);
+  color: #fff;
 }
 
 /* width */
@@ -63,15 +63,15 @@
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: var(--popup-result-webkit-scrollbar-track-bg);
+  background: #dedede;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: var(--popup-result-webkit-scrollbar-thumb-bg);
+  background: #888;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--popup-result-webkit-scrollbar-thumb-hover-bg);
+  background: #555;
 }

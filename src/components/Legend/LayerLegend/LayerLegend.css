@@ -41,7 +41,7 @@
 }
 
 .searchAreaLegendSymbol {
-  border-color: var(--layer-legend-search-area-legend-symbol-border-color);
+  border-color: #00c07b;
   border-style: dashed;
 }
 
@@ -52,14 +52,14 @@
 }
 
 .sceneLegendSymbol {
-  border-color: var(--layer-legend-scene-legend-symbol-border-color);
-  background-color: var(--layer-legend-scene-legend-symbol-bg);
+  border-color: #3183f5;
+  background-color: #3183f52e;
   border-style: solid;
 }
 
 .sceneInCartLegendSymbol {
-  border-color: var(--layer-legend-scene-in-cart-legend-symbol-border-color);
-  background-color: var(--layer-legend-scene-in-cart-legend-symbol-bg);
+  border-color: #ad5c11;
+  background-color: #ad5c1129;
   border-style: solid;
 }
 

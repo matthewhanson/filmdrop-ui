@@ -1,5 +1,5 @@
 .collectionDropdown .MuiInput-underline:before {
-  border-color: var(--collection-dropdown-mui-input-underline-border);
+  border-color: #76829c;
 }
 
 .collectionDropdown svg {
@@ -7,20 +7,19 @@
 }
 
 #collectionDropdown {
-  border-color: var(--collection-dropdown-border-color);
+  border-color: white;
   color: var(--collection-dropdown-color);
   background-color: var(--collection-dropdown-bg);
 }
 
 #collectionDropdown option {
-  background-color: var(--collection-dropdown-option-bg) !important;
+  background-color: #12171a !important;
 }
 
 .collectionDropdown.error-true select {
-  color: var(--collection-dropdown-error-true-select-color) !important;
+  color: #bc3131 !important;
   font-weight: bold;
-  border-bottom: 1px solid
-    var(--collection-dropdown-error-true-select-border-bottom);
+  border-bottom: 1px solid #bc3131;
 }
 
 .collectionDropdown div[label='Collection'] {

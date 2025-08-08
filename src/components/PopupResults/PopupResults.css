@@ -17,7 +17,7 @@
   align-items: center;
   justify-content: center;
   min-height: 50px;
-  border-bottom: var(--popup-results-header-border-bottom) 3px solid;
+  border-bottom: #353d4f 3px solid;
 }
 
 .popupHeaderTop {
@@ -37,9 +37,9 @@
 }
 
 .popupHeaderBottomButton {
-  background-color: var(--popup-results-header-bottom-button-bg);
-  color: var(--popup-results-header-bottom-button-color);
-  border: 1px solid var(--popup-results-header-bottom-button-border);
+  background-color: transparent;
+  color: #a9b0c1;
+  border: 1px solid #a9b0c1;
   border-radius: 5px;
   height: 32px;
   font-size: 16px;
@@ -54,17 +54,17 @@
   user-select: none;
 }
 .popupHeaderBottomButton:hover {
-  background-color: var(--popup-results-header-bottom-button-hover-bg);
-  color: var(--popup-results-header-bottom-button-hover-color);
+  background-color: #252f36;
+  color: #fff;
 }
 .popupHeaderBottomButtonDisabled {
-  color: var(--popup-results-header-bottom-button-disabled-color);
-  border: 1px solid var(--popup-results-header-bottom-button-disabled-border);
+  color: #646566;
+  border: 1px solid #646566;
   cursor: default;
 }
 .popupHeaderBottomButtonDisabled:hover {
-  background-color: var(--popup-results-header-bottom-button-disabled-hover-bg);
-  color: var(--popup-results-header-bottom-button-disabled-hover-color);
+  background-color: transparent;
+  color: #646566;
 }
 
 .popupResultsBottom {
@@ -78,9 +78,9 @@
 }
 
 .popupResultsBottomButton {
-  background-color: var(--popup-results-bottom-button-bg);
-  color: var(--popup-results-bottom-button-color);
-  border: 1px solid var(--popup-results-bottom-button-border);
+  background-color: transparent;
+  color: #a9b0c1;
+  border: 1px solid #a9b0c1;
   border-radius: 5px;
   height: 32px;
   font-size: 16px;
@@ -95,8 +95,8 @@
   user-select: none;
 }
 .popupResultsBottomButton:hover {
-  background-color: var(--popup-results-bottom-button-hover-bg);
-  color: var(--popup-results-bottom-button-hover-color);
+  background-color: #252f36;
+  color: #fff;
 }
 
 .popupResultsContent {
@@ -122,7 +122,7 @@
   align-items: center;
   justify-content: center;
   min-height: 50px;
-  border-top: var(--popup-results-footer-border-top) 3px solid;
+  border-top: #353d4f 3px solid;
 }
 
 .popupFooterControls {
@@ -138,7 +138,7 @@
 }
 
 .popupFooterButton {
-  background-color: var(--popup-results-footer-button-bg);
+  background-color: transparent;
   color: var(--popup-results-footer-button-color);
   border: 0px;
   font-weight: bold;
@@ -156,8 +156,8 @@
 }
 
 .popupFooterButton:hover {
-  background-color: var(--popup-results-footer-button-hover-bg);
-  color: var(--popup-results-footer-button-hover-color);
+  background-color: #252f36;
+  color: #fff;
 }
 
 .popupFooterButtonRight {

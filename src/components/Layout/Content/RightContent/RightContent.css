@@ -1,7 +1,7 @@
 .RightContent {
   width: calc(100% - 300px);
   height: 100%;
-  background-color: var(--right-content-bg);
+  background-color: #12171a;
   display: flex;
   position: absolute;
   left: 300px;
@@ -12,7 +12,7 @@
   bottom: 10px;
   left: 12px;
   z-index: 6;
-  background: var(--right-content-zoom-notice-bg);
+  background: #353d4f;
   padding: 6px 15px;
   border-radius: 2px;
   font-size: 0.75em;
@@ -24,16 +24,16 @@
 
 .zoomInText {
   all: unset;
-  color: var(--right-content-zoom-in-text-color);
+  color: #6cc24a;
   cursor: pointer;
   transition: border-color 0.33s ease-in-out;
-  border-bottom: 1px solid var(--right-content-zoom-in-text-border-bottom);
+  border-bottom: 1px solid transparent;
   display: inline-block;
   margin-left: 10px;
 }
 
 .zoomInText:hover {
-  border-color: var(--right-content-zoom-in-text-hover-border-color);
+  border-color: #6cc24a;
 }
 
 @keyframes fadeIn {
@@ -55,8 +55,8 @@
 }
 
 .actionButton {
-  background-color: var(--right-content-action-button-bg);
-  color: var(--right-content-action-button-color);
+  background-color: #6cc24a;
+  color: #12171a;
   border: 0px;
   border-radius: 6px;
   font-size: 18px;
@@ -76,24 +76,24 @@
 }
 
 .actionButton:hover {
-  background-color: var(--right-content-action-button-hover-bg);
+  background-color: #35731c;
   color: var(--right-content-action-button-hover-color);
 }
 
 .actionButton a {
-  color: var(--right-content-action-button-a-color);
+  color: #12171a;
   text-decoration: none;
 }
 
 .actionButtonDisabled {
-  background-color: var(--right-content-action-button-disabled-bg);
-  color: var(--right-content-action-button-disabled-color);
+  background-color: #d3d3d3;
+  color: #676767;
   cursor: default;
 }
 
 .actionButtonDisabled:hover {
-  background-color: var(--right-content-action-button-disabled-hover-bg);
-  color: var(--right-content-action-button-disabled-hover-color);
+  background-color: #d3d3d3;
+  color: #676767;
   cursor: default;
 }
 
@@ -170,13 +170,13 @@
 }
 
 .disabledCountButton {
-  color: var(--right-content-disabled-count-button-color);
-  border: 1px solid var(--right-content-disabled-count-button-border);
+  color: #7f828a;
+  border: 1px solid #7f828a;
   cursor: default;
 }
 .disabledCountButton:hover {
-  color: var(--right-content-disabled-count-button-hover-color);
-  background-color: var(--right-content-disabled-count-button-hover-bg);
+  color: #7f828a;
+  background-color: transparent;
 }
 
 .countButtonCancelText {
@@ -246,7 +246,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: var(--right-content-app-loading-container-bg);
+  background: rgb(53, 61, 79);
   color: var(--right-content-app-loading-container-color);
   z-index: 499;
   opacity: 0.75;
@@ -257,17 +257,17 @@
   position: absolute;
   bottom: 0;
   right: 0;
-  background-color: var(--right-content-map-attribution-bg);
+  background-color: #12171a;
   padding: 4px 6px;
 }
 
 .mapAttribution a {
-  color: var(--right-content-map-attribution-a-color);
+  color: #19a1d7;
   text-decoration: none;
 }
 
 .mapAttribution span {
-  color: var(--right-content-map-attribution-span-color);
+  color: #bbb;
 }
 
 .mapAttribution a:hover {
@@ -279,19 +279,19 @@ div[data-tooltip-id='attribution-tooltip'] {
   bottom: 0;
   right: 10px;
   z-index: 1;
-  color: var(--right-content-attribution-tooltip-data-color);
+  color: #a9b0c1;
 }
 
 div#attribution-tooltip {
   z-index: 999;
   white-space: nowrap;
   padding: 2px;
-  background-color: var(--right-content-attribution-tooltip-bg);
+  background-color: #12171a;
 }
 
 .layerListButton {
   position: absolute;
-  background-color: var(--right-content-layer-list-button-bg);
+  background-color: #fff;
   background-clip: padding-box;
   top: 130px;
   left: 10px;
@@ -300,18 +300,18 @@ div#attribution-tooltip {
   width: 30px;
   cursor: pointer;
   border-radius: 4px;
-  border: solid 2px var(--right-content-layer-list-button-border);
+  border: solid 2px rgba(0, 0, 0, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .layerListButton:hover {
-  background-color: var(--right-content-layer-list-button-hover-bg);
+  background-color: #f4f4f4;
 }
 
 .layerListButtonIcon {
-  color: var(--right-content-layer-list-button-icon-color);
+  color: #555;
 }
 
 .LoadingImageryOverlayText {
@@ -323,10 +323,10 @@ div#attribution-tooltip {
   padding: 10px;
   display: flex;
   flex-direction: row;
-  background-color: var(--right-content-loading-imagery-overlay-text-bg);
+  background-color: rgba(34, 34, 34, 0.8);
   padding: 8px 10px;
   border-radius: 5px;
-  color: var(--right-content-loading-imagery-overlay-text-color);
+  color: #fff;
   align-items: center;
   justify-content: center;
 }

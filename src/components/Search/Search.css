@@ -67,8 +67,8 @@
   height: 32px;
   max-width: 100px;
   margin-right: 10px;
-  background-color: var(--search-by-geom-options-button-bg);
-  color: var(--search-by-geom-options-button-color);
+  background-color: #4f5768;
+  color: #ffffff;
   padding: 15px 15px;
   text-align: center;
   text-decoration: none;
@@ -81,7 +81,7 @@
   border-radius: 5px;
 }
 .searchByGeomOptionsButton:hover {
-  background-color: var(--search-by-geom-options-button-hover-bg);
+  background-color: #373c48;
 }
 
 .searchByGeomOptionsButtonDisabled {
@@ -89,13 +89,13 @@
   cursor: default;
 }
 .searchByGeomOptionsButtonDisabled:hover {
-  background-color: var(--search-by-geom-options-button-disabled-hover-bg);
+  background-color: #4f5768;
 }
 
 .searchByGeomOptions {
   margin-top: 8px;
   font-size: 14px;
-  color: var(--search-by-geom-options-color);
+  color: #a9b0c1;
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -140,7 +140,7 @@
 }
 
 input[class$='-MuiInputBase-root-MuiInput-root']::before {
-  border-bottom-color: var(--search-input-border-bottom) !important;
+  border-bottom-color: #76829c !important;
 }
 
 input[class$='-MuiInputBase-input-MuiInput-input'] {
@@ -152,11 +152,11 @@ input[class$='-MuiInputBase-input-MuiInput-input'] {
 /* Material-UI Switch Component Overrides */
 
 .Search .MuiSwitch-switchBase {
-  color: var(--search-mui-switch-base-color);
+  color: #ffffff;
 }
 
 .Search .MuiSwitch-switchBase.Mui-checked {
-  color: var(--search-mui-switch-base-checked-color);
+  color: #ffffff;
 }
 
 .Search .MuiSwitch-track {
@@ -164,7 +164,7 @@ input[class$='-MuiInputBase-input-MuiInput-input'] {
 }
 
 .Search .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track {
-  background-color: var(--search-mui-switch-track-checked-bg);
+  background-color: #6cc24a;
 }
 
 /* Leaflet Search Icon Overrides */
@@ -195,7 +195,7 @@ input[class$='-MuiInputBase-input-MuiInput-input'] {
 
 .tooltip_style {
   font-weight: 600;
-  background-color: var(--search-tooltip-style-bg);
+  background-color: #6cc24a;
   border: 0 none;
   text-align: center;
   line-height: 15px;
@@ -207,11 +207,11 @@ input[class$='-MuiInputBase-input-MuiInput-input'] {
 }
 
 .tooltip_style:before {
-  border-top-color: var(--search-tooltip-style-border-top-color);
+  border-top-color: #6cc24a;
 }
 
 .tooltip_style:after {
-  border-bottom-color: var(--search-tooltip-style-border-bottom-color);
+  border-bottom-color: #6cc24a;
 }
 
 .tooltip_style span {
@@ -231,7 +231,7 @@ input[class$='-MuiInputBase-input-MuiInput-input'] {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: var(--search-label-style-bg);
+  background: transparent;
   color: var(--search-label-style-color);
   box-shadow: none;
   text-shadow: 0px 1px 3px var(--search-label-style-text-shadow);

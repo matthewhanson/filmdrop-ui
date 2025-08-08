@@ -6,8 +6,8 @@
 }
 
 .downloadButton {
-  background-color: var(--export-button-download-button-bg);
-  color: var(--export-button-download-button-color);
+  background-color: #4f5768;
+  color: white;
   cursor: pointer;
   border: 1px solid var(--export-button-download-button-border);
   border-radius: 5px;
@@ -16,5 +16,5 @@
 }
 
 .downloadButton:hover {
-  background-color: var(--export-button-download-button-hover-bg);
+  background-color: #373c48;
 }

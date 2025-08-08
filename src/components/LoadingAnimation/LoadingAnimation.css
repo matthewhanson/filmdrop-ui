@@ -16,7 +16,7 @@
 .animated-loader svg path {
   stroke: var(--loading-animation-animated-loader-svg-path-stroke);
   stroke-width: 5;
-  fill: var(--loading-animation-animated-loader-svg-path-fill);
+  fill: transparent;
   stroke-dasharray: 250;
   animation: strokePath 2s linear infinite;
 }

@@ -69,7 +69,7 @@
   display: flex;
   align-items: center;
   border-radius: 6px;
-  background: var(--page-header-link-bg);
+  background: transparent;
   transition: all 0.33s ease-in-out;
 }
 
@@ -81,9 +81,9 @@
 
 .pageHeaderLink:hover {
   cursor: pointer;
-  border: 1px var(--page-header-link-hover-border) solid;
-  background: var(--page-header-link-hover-bg);
-  color: var(--page-header-link-hover-color);
+  border: 1px #6cc24a solid;
+  background: #6cc24a;
+  color: #12171a;
 }
 
 .cartButtonHeaderBar {
@@ -91,17 +91,17 @@
 }
 
 .logoutButton {
-  background-color: var(--page-header-logout-button-bg);
-  color: var(--page-header-logout-button-color);
+  background-color: #4f5768;
+  color: white;
   padding: 10px;
   font-size: 16px;
   cursor: pointer;
-  border: 1px solid var(--page-header-logout-button-border);
+  border: 1px solid #a9b0c1;
   border-radius: 5px;
 }
 
 .logoutButton:hover {
-  background-color: var(--page-header-logout-button-hover-bg);
+  background-color: #353d4f;
 }
 
 @media screen and (max-width: 950px) {
