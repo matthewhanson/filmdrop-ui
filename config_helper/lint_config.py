@@ -45,7 +45,7 @@ def lint_config(file_path):
         "CONFIG_COLORMAP": str,
         "BASEMAP": dict,
         "THEME_SWITCHING_ENABLED": bool,
-        "DEFAULT_THEME": str,
+        "THEME_DEFAULT": str,
         "SEARCH_BY_GEOM_ENABLED": bool,
         "CART_ENABLED": bool,
         "BRAND_LOGO": dict,

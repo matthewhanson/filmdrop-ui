@@ -144,7 +144,7 @@ export function initializeTheme(appConfig) {
     }
   }
 
-  const defaultTheme = appConfig.DEFAULT_THEME || 'dark'
+  const defaultTheme = appConfig.THEME_DEFAULT || 'dark'
 
   let currentTheme = getThemeFromStorage()
   if (!currentTheme) {
