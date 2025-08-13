@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+### Added
+
+- Added config option `MAP_ZOOM_MAX` to limit map zooming. ([413](https://github.com/Element84/filmdrop-ui/pull/413))
+- Added config option `TILE_LAYER_PARAMS` to allow per-collection layer tiling parameters for leaflet. ([413](https://github.com/Element84/filmdrop-ui/pull/413))
+- Dark/Light/System theming ability. ([434](https://github.com/Element84/filmdrop-ui/pull/434))
+
 ### Fixed
 
 - Cloud slider not expanding to fill available space. ([416](https://github.com/Element84/filmdrop-ui/pull/416))
@@ -24,8 +30,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 
 - Client-side validation to login form fields
-- Added config option `MAP_ZOOM_MAX` to limit map zooming.
-- Added config option `TILE_LAYER_PARAMS` to allow per-collection layer tiling parameters for leaflet.
 
 ### Fixed
 
