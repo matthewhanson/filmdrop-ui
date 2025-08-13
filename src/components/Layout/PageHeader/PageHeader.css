@@ -1,8 +1,7 @@
 .PageHeader {
   width: 100%;
   height: 64px;
-  background-color: var(--page-header-bg);
-  color: var(--page-header-color);
+  background-color: var(--page-header-background);
   display: flex;
   align-items: stretch;
   justify-content: space-between;
@@ -63,13 +62,14 @@
 .pageHeaderLink {
   margin-left: 0px;
   margin-right: 10px;
-  border: 1px var(--page-header-link-border) solid;
+  border: 1px var(--page-header-button-border) solid;
+  color: var(--page-header-button-color);
   padding: 5px 20px;
   font-weight: bold;
   display: flex;
   align-items: center;
   border-radius: 6px;
-  background: transparent;
+  background: var(--page-header-button-background);
   transition: all 0.33s ease-in-out;
 }
 
@@ -81,9 +81,9 @@
 
 .pageHeaderLink:hover {
   cursor: pointer;
-  border: 1px #6cc24a solid;
-  background: #6cc24a;
-  color: #12171a;
+  border: 1px var(--page-header-button-border-hover) solid;
+  background: var(--page-header-button-background-hover);
+  color: var(--page-header-button-color-hover);
 }
 
 .cartButtonHeaderBar {

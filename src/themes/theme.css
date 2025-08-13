@@ -1,242 +1,252 @@
 /* ------------------- DEFAULT THEME (DARK) ------------------- */
 :root {
-  /* Dark mode theme colors */
-  --e84-brand-green: #6cc24a;
+  /* Dark Color Palette */
+  --brand-accent-primary: #6cc24a;
+  --brand-accent-primary-dark: #35731c;
+  --transparent: transparent;
+  --white: #ffffff;
 
-  /* CloudSlider Component */
-  --cloud-slider-mui-slider-thumb-color: #76829c;
+  --gray-1: #dedede;
+  --gray-2: #d3d3d3;
+  --gray-3: #9b9b9b;
+  --gray-4: #676767;
 
-  /* CollectionDropdown Component */
-  --collection-dropdown-svg-color: rgba(255, 255, 255, 0.5);
-  --collection-dropdown-color: white;
-  --collection-dropdown-bg: #12171a;
+  --blue-gray-1: #a9b0c1;
+  --blue-gray-2: #76829c;
+  --blue-gray-3: #4f5768;
+  --blue-gray-4: #353d4f;
+  --blue-gray-5: #12171a;
 
-  /* ExportButton Component */
-  --export-button-download-button-border: #a9b0c1;
+  --black-alpha-70: rgba(0, 0, 0, 0.7);
+  --black-alpha-80: rgba(0, 0, 0, 0.8);
+  --gray-alpha-80: rgba(34, 34, 34, 0.8);
 
-  /* LayerList Component */
-  --layer-list-bg: rgba(34, 34, 34, 0.8);
-  --layer-list-title-border-bottom: #353d4f;
+  /* App */
+  --app-background-disabled: var(--black-alpha-70);
+  --app-background-loading: var(--blue-gray-4);
+  --app-color-loading: var(--gray-2);
 
-  /* Content Component */
-  --content-color: #d3d3d3;
+  /* Login */
+  --login-page-background: var(--blue-gray-5);
+  --login-container-background: var(--blue-gray-4);
+  --login-color: var(--white);
 
-  /* LeftContent Component */
-  --left-content-bg: #12171a;
-  --left-content-tab-color: #fff;
-  --left-content-tab-bg: #353d4f;
-  --left-content-tab-border-bottom: #353d4f;
-  --left-content-tab-border-top: #353d4f;
-  --left-content-tab-selected-border-bottom: var(--e84-brand-green);
-  --left-content-disable-search-overlay-bg: #12171a;
+  /* Header */
+  --page-header-background: var(--blue-gray-5);
+  --page-header-button-background: var(--transparent);
+  --page-header-button-background-hover: var(--brand-accent-primary);
+  --page-header-button-color: var(--blue-gray-1);
+  --page-header-button-color-hover: var(--blue-gray-5);
+  --page-header-button-border: var(--blue-gray-2);
+  --page-header-button-border-hover: var(--brand-accent-primary);
 
-  /* RightContent Component */
-  --right-content-app-loading-container-color: #d3d3d3;
-  --right-content-action-button-hover-color: #dedede;
-  --right-content-result-count-bg: rgba(34, 34, 34, 0.8);
-  --right-content-result-count-color: #fff;
-  --right-content-result-count-strong-color: #a9b0c1;
-  --right-content-count-button-bg: transparent;
-  --right-content-count-button-color: #a9b0c1;
-  --right-content-count-button-border: #a9b0c1;
-  --right-content-count-button-hover-bg: #252f36;
-  --right-content-count-button-hover-color: #fff;
-  --right-content-draw-geom-message-bg: rgba(34, 34, 34, 0.8);
-  --right-content-draw-geom-message-color: #fff;
-  --right-content-draw-geom-message-text-title-color: #a9b0c1;
-  --right-content-draw-geom-message-cancel-button-bg: transparent;
-  --right-content-draw-geom-message-cancel-button-color: white;
-  --right-content-draw-geom-message-cancel-button-border: #a9b0c1;
+  /* Content */
+  --page-content-color: var(--gray-2);
 
-  /* PageHeader Component */
-  --page-header-bg: #12171a;
-  --page-header-color: #a9b0c1;
-  --page-header-link-border: #76829c;
+  /* Side Panel */
+  --side-panel-background: var(--blue-gray-5);
+  --side-panel-background-disabled: var(--blue-gray-5);
+  --side-panel-heading-color: var(--white);
+  --side-panel-horizontal-divider-color: var(--blue-gray-4);
+  --side-panel-link-color: var(--gray-2);
+  --side-panel-link-color-hover: var(--white);
 
-  /* HeatMapSymbology Component */
-  --heat-map-symbology-gradient-border-bottom: rgba(255, 255, 255, 0.5);
-  --heat-map-symbology-values-color: white;
-  --heat-map-symbology-values-bg: rgba(18, 23, 26, 0.5);
-  --heat-map-symbology-values-min-border-left: rgba(255, 255, 255, 0.5);
-  --heat-map-symbology-values-max-border-right: rgba(255, 255, 255, 0.5);
-  --heat-map-symbology-values-mid-border-right: rgba(255, 255, 255, 0.5);
+  --side-panel-tab-background: var(--blue-gray-4);
+  --side-panel-tab-color: var(--white);
+  --side-panel-tab-border: var(--blue-gray-4);
+  --side-panel-tab-bottom-selected: var(--brand-accent-primary);
 
-  /* LayerLegend Component */
-  --layer-legend-bg: #12171a;
-  --layer-legend-opacity: 0.9;
+  --side-panel-dropdown-underline: var(--blue-gray-2);
+  --side-panel-dropdown-arrow-color: var(--blue-gray-2);
+  --side-panel-dropdown-border: var(--white);
+  --side-panel-dropdown-color: var(--white);
+  --side-panel-dropdown-background: var(--blue-gray-5);
 
-  /* LoadingAnimation Component */
-  --loading-animation-animated-loader-svg-path-stroke: #ccc;
+  --side-panel-datepicker-icon-color: var(--blue-gray-4);
 
-  /* PopupResult Component */
-  --popup-result-details-row-key-color: #fff;
-  --popup-result-details-href-link-color: #d3d3d3;
+  --side-panel-slider-input-color: var(--white);
+  --side-panel-slider-input-underline: var(--blue-gray-2);
+  --side-panel-slider-track: var(--blue-gray-2);
+  --side-panel-slider-rail: var(--blue-gray-2);
+  --side-panel-slider-thumb: var(--blue-gray-2);
 
-  /* PopupResults Component */
-  --popup-results-footer-button-color: #a9b0c1;
-  --popup-results-footer-button-border: #dedede;
+  --side-panel-button-color: var(--white);
+  --side-panel-button-background: var(--blue-gray-3);
+  --side-panel-button-background-hover: var(--blue-gray-4);
+  --side-panel-button-secondary-color: var(--blue-gray-5);
+  --side-panel-button-secondary-background: var(--gray-1);
+  --side-panel-button-secondary-background-hover: var(--gray-3);
+  --side-panel-button-border: var(--blue-gray-1);
 
-  /* Search Component */
-  --search-button-container-border-top: #4f5768;
-  --search-container-color: #ffffff;
-  --search-container-label-color: #fff;
-  --search-by-geom-options-button-border: #a9b0c1;
-  --search-input-color: white;
-  --search-label-style-color: rgba(255, 255, 255, 0.7);
-  --search-label-style-text-shadow: rgba(0, 0, 0, 0.8);
-  --search-mui-switch-track-bg: #dedede;
+  --side-panel-switch-thumb: var(--white);
+  --side-panel-switch-track-background: var(--gray-1);
+  --side-panel-switch-track-background-checked: var(--brand-accent-primary);
 
-  /* ThemeSwitcher Component */
-  --theme-switcher-border: #76829c;
-  --theme-switcher-bg: transparent;
-  --theme-switcher-color: #a9b0c1;
+  /* Map Overlays*/
+  --map-info-overlay-background: var(--gray-alpha-80);
+  --map-info-overlay-color: var(--white);
+  --map-info-overlay-button-background: var(--transparent);
+  --map-info-overlay-button-color: var(--blue-gray-1);
+  --map-info-overlay-button-border: var(--blue-gray-1);
+  --map-info-overlay-button-background-hover: var(--transparent);
+  --map-info-overlay-button-color-hover: var(--white);
+  --map-info-overlay-heading-color: var(--blue-gray-1);
+  --map-info-overlay-heading-border: var(--blue-gray-3);
 
-  /* UploadGeojsonModal Component */
-  --upload-geojson-modal-bg: rgba(0, 0, 0, 0.7);
-  --upload-geojson-modal-container-bg: #353d4f;
-  --upload-geojson-modal-container-color: #dedede;
-  --upload-geojson-modal-action-button-bg: #4f5768;
-  --upload-geojson-modal-action-button-color: white;
-  --upload-geojson-modal-action-button-border: #a9b0c1;
-  --upload-geojson-modal-action-button-hover-bg: #353d4f;
-  --upload-geojson-modal-drop-zone-bg: #4f5768;
-  --upload-geojson-modal-drop-zone-color: #ffffff;
+  --map-alert-overlay-primary-background: var(--blue-gray-4);
+  --map-alert-overlay-primary-color: var(--gray-1);
+  --map-alert-overlay-secondary-background: var(--blue-gray-3);
+  --map-alert-overlay-secondary-color: var(--white);
+  --map-alert-overlay-accent-color: var(--brand-accent-primary);
 
-  /* ViewSelector Component */
-  --view-selector-button-border: #a9b0c1;
+  --map-attribution-overlay-color: var(--gray-1);
+  --map-attribution-overlay-tooltip-color: var(--blue-gray-1);
+
+  /* Aggregation */
+  --hex-heatmap-legend: var(--gray-1);
+  --hex-label-color: var(--white);
+  --hex-label-shadow: var(--black-alpha-80);
+  --grid-cell-tooltip: var(--brand-accent-primary);
+
+  /* Action Button */
+  --action-button-background: var(--brand-accent-primary);
+  --action-button-background-hover: var(--brand-accent-primary-dark);
+  --action-button-color: var(--blue-gray-5);
+  --action-button-color-hover: var(--gray-1);
+  --action-button-color-disabled: var(--gray-4);
+  --action-button-background-disabled: var(--gray-2);
 }
 
-/* Default theme (dark) map tiles styling */
+/* Make map tiles dark for dark theme */
 .map-tiles {
   filter: brightness(1.125) invert(1) contrast(0.9) hue-rotate(0deg) saturate(0);
 }
 
 /* ------- LIGHT THEME (OVERRIDES DEFAULT DARK THEME) --------- */
 :root[data-theme='light'] {
-  /* Light mode theme colors */
-  --light-mode-gray-1: #f0f0f0;
-  --light-mode-gray-2: #d3d3d3;
-  --light-mode-gray-3: #b6b6b6;
-  --light-mode-color-dark: #000000;
-  --light-mode-color-light: #ffffff;
-  --light-mode-accent-1: #76829c;
-  --light-mode-accent-2: #4f5768;
-  --light-mode-accent-3: #373c48;
-  --light-mode-transparent: transparent;
-  --light-mode-transparent-white: rgba(255, 255, 255, 0.7);
-  --e84-brand-green: #6cc24a;
+  /* Light Color Palette */
+  --brand-accent-primary: #6cc24a;
+  --brand-accent-primary-dark: #35731c;
+  --transparent: transparent;
 
-  /* CloudSlider Component Overrides */
-  --cloud-slider-mui-slider-thumb-color: var(--light-mode-color-light);
+  --light-background-primary: #ffffff;
+  --light-background-secondary: #f8f9fa;
+  --light-background-tertiary: #e9ecef;
+  --light-surface-elevated: #ffffff;
+  --light-surface-subtle: #f1f3f5;
 
-  /* CollectionDropdown Component Overrides */
-  --collection-dropdown-bg: var(--light-mode-gray-1);
-  --collection-dropdown-color: var(--light-mode-color-dark);
-  --collection-dropdown-svg-color: var(--light-mode-color-dark);
+  --light-text-primary: #212529;
+  --light-text-secondary: #495057;
+  --light-text-tertiary: #6c757d;
+  --light-text-muted: #adb5bd;
 
-  /* ExportButton Component Overrides */
-  --export-button-download-button-border: var(--light-mode-color-dark);
+  --light-border-primary: #dee2e6;
+  --light-border-secondary: #e9ecef;
+  --light-border-subtle: #ced4da;
+  --light-border-focus: #86b7fe;
 
-  /* LayerList Component Overrides */
-  --layer-list-bg: var(--light-mode-color-light);
-  --layer-list-title-border-bottom: var(--light-mode-gray-1);
+  --light-overlay-background: rgba(255, 255, 255, 0.95);
+  --light-disabled-overlay: rgba(108, 117, 125, 0.6);
+  --light-shadow-subtle: rgba(0, 0, 0, 0.1);
+  --light-shadow-medium: rgba(0, 0, 0, 0.15);
 
-  /* Content Component Overrides */
-  --content-color: var(--light-mode-color-dark);
+  /* App */
+  --app-background-disabled: var(--light-disabled-overlay);
+  --app-background-loading: var(--light-background-tertiary);
+  --app-color-loading: var(--light-text-secondary);
 
-  /* LeftContent Component Overrides */
-  --left-content-bg: var(--light-mode-gray-1);
-  --left-content-tab-bg: var(--light-mode-gray-2);
-  --left-content-tab-border-top: var(--light-mode-gray-2);
-  --left-content-tab-border-bottom: var(--light-mode-gray-2);
-  --left-content-tab-selected-border-bottom: var(--e84-brand-green);
-  --left-content-tab-color: var(--light-mode-color-dark);
-  --left-content-disable-search-overlay-bg: var(--light-mode-gray-1);
+  /* Login */
+  --login-page-background: var(--light-background-secondary);
+  --login-container-background: var(--light-surface-elevated);
+  --login-color: var(--light-text-primary);
 
-  /* RightContent Component Overrides */
-  --right-content-app-loading-container-color: var(--light-mode-color-light);
-  --right-content-action-button-hover-color: var(--light-mode-color-light);
-  --right-content-result-count-bg: var(--light-mode-gray-1);
-  --right-content-result-count-color: var(--light-mode-color-dark);
-  --right-content-result-count-strong-color: var(--light-mode-accent-2);
-  --right-content-count-button-bg: var(--light-mode-accent-2);
-  --right-content-count-button-color: var(--light-mode-color-light);
-  --right-content-count-button-border: var(--light-mode-color-dark);
-  --right-content-count-button-hover-bg: var(--light-mode-accent-3);
-  --right-content-count-button-hover-color: var(--light-mode-color-light);
-  --right-content-draw-geom-message-bg: var(--light-mode-gray-1);
-  --right-content-draw-geom-message-color: var(--light-mode-color-dark);
-  --right-content-draw-geom-message-text-title-color: var(
-    --light-mode-accent-2
+  /* Header */
+  --page-header-background: var(--light-surface-elevated);
+  --page-header-button-background: var(--transparent);
+  --page-header-button-background-hover: var(--brand-accent-primary);
+  --page-header-button-color: var(--light-text-secondary);
+  --page-header-button-color-hover: var(--light-background-primary);
+  --page-header-button-border: var(--light-border-primary);
+  --page-header-button-border-hover: var(--brand-accent-primary);
+
+  /* Content */
+  --page-content-color: var(--light-text-secondary);
+
+  /* Side Panel */
+  --side-panel-background: var(--light-background-secondary);
+  --side-panel-background-disabled: var(--light-background-secondary);
+  --side-panel-heading-color: var(--light-text-primary);
+  --side-panel-horizontal-divider-color: var(--light-border-primary);
+  --side-panel-link-color: var(--light-text-secondary);
+  --side-panel-link-color-hover: var(--light-text-primary);
+
+  --side-panel-tab-background: var(--light-background-tertiary);
+  --side-panel-tab-color: var(--light-text-primary);
+  --side-panel-tab-border: var(--light-border-secondary);
+  --side-panel-tab-bottom-selected: var(--brand-accent-primary);
+
+  --side-panel-dropdown-underline: var(--light-border-primary);
+  --side-panel-dropdown-arrow-color: var(--light-text-tertiary);
+  --side-panel-dropdown-border: var(--light-border-primary);
+  --side-panel-dropdown-color: var(--light-text-primary);
+  --side-panel-dropdown-background: var(--light-surface-elevated);
+
+  --side-panel-datepicker-icon-color: var(--light-text-tertiary);
+
+  --side-panel-slider-input-color: var(--light-text-primary);
+  --side-panel-slider-input-underline: var(--light-border-primary);
+  --side-panel-slider-track: var(--brand-accent-primary);
+  --side-panel-slider-rail: var(--light-border-subtle);
+  --side-panel-slider-thumb: var(--light-surface-elevated);
+  --side-panel-slider-thumb: var(--brand-accent-primary);
+
+  --side-panel-button-color: var(--light-text-primary);
+  --side-panel-button-background: var(--light-surface-elevated);
+  --side-panel-button-background-hover: var(--light-background-tertiary);
+  --side-panel-button-secondary-color: var(--light-background-primary);
+  --side-panel-button-secondary-background: var(--brand-accent-primary);
+  --side-panel-button-secondary-background-hover: var(
+    --brand-accent-primary-dark
   );
-  --right-content-draw-geom-message-cancel-button-bg: var(
-    --light-mode-transparent
-  );
-  --right-content-draw-geom-message-cancel-button-color: var(
-    --light-mode-color-dark
-  );
-  --right-content-draw-geom-message-cancel-button-border: var(
-    --light-mode-accent-2
-  );
+  --side-panel-button-border: var(--light-border-primary);
 
-  /* PageHeader Component Overrides */
-  --page-header-bg: var(--light-mode-gray-1);
-  --page-header-link-border: var(--light-mode-color-dark);
-  --page-header-color: var(--light-mode-color-dark);
+  --side-panel-switch-thumb: var(--light-surface-elevated);
+  --side-panel-switch-track-background: var(--light-border-subtle);
+  --side-panel-switch-track-background-checked: var(--brand-accent-primary);
 
-  /* HeatMapSymbology Component Overrides */
-  --heat-map-symbology-gradient-border-bottom: var(--light-mode-color-dark);
-  --heat-map-symbology-values-min-border-left: var(--light-mode-color-dark);
-  --heat-map-symbology-values-mid-border-right: var(--light-mode-color-dark);
-  --heat-map-symbology-values-max-border-right: var(--light-mode-color-dark);
-  --heat-map-symbology-values-color: var(--light-mode-color-dark);
-  --heat-map-symbology-values-bg: var(--light-mode-gray-1);
+  /* Map Overlays*/
+  --map-info-overlay-background: var(--light-overlay-background);
+  --map-info-overlay-color: var(--light-text-primary);
+  --map-info-overlay-button-background: var(--transparent);
+  --map-info-overlay-button-color: var(--light-text-secondary);
+  --map-info-overlay-button-border: var(--light-border-primary);
+  --map-info-overlay-button-background-hover: var(--light-background-tertiary);
+  --map-info-overlay-button-color-hover: var(--light-text-primary);
+  --map-info-overlay-heading-color: var(--light-text-secondary);
+  --map-info-overlay-heading-border: var(--light-border-secondary);
 
-  /* LayerLegend Component Overrides */
-  --layer-legend-bg: var(--light-mode-gray-1);
-  --layer-legend-opacity: 1;
+  --map-alert-overlay-primary-background: var(--light-surface-elevated);
+  --map-alert-overlay-primary-color: var(--light-text-primary);
+  --map-alert-overlay-secondary-background: var(--light-background-tertiary);
+  --map-alert-overlay-secondary-color: var(--light-text-primary);
+  --map-alert-overlay-accent-color: var(--brand-accent-primary);
 
-  /* LoadingAnimation Component Overrides */
-  --loading-animation-animated-loader-svg-path-stroke: var(
-    --light-mode-color-light
-  );
+  --map-attribution-overlay-color: var(--light-text-tertiary);
+  --map-attribution-overlay-tooltip-color: var(--light-text-secondary);
 
-  /* PopupResult Component Overrides */
-  --popup-result-details-row-key-color: var(--light-mode-color-dark);
-  --popup-result-details-href-link-color: var(--light-mode-color-dark);
+  /* Aggregation */
+  --hex-heatmap-legend: var(--light-text-primary);
+  --hex-label-color: var(--light-text-primary);
+  --hex-label-shadow: var(--light-shadow-medium);
+  --grid-cell-tooltip: var(--brand-accent-primary);
 
-  /* PopupResults Component Overrides */
-  --popup-results-footer-button-color: var(--light-mode-color-dark);
-  --popup-results-footer-button-border: var(--light-mode-gray-3);
-
-  /* Search Component Overrides */
-  --search-container-label-color: var(--light-mode-color-dark);
-  --search-container-color: var(--light-mode-color-dark);
-  --search-input-color: var(--light-mode-color-dark);
-  --search-mui-switch-track-bg: var(--light-mode-accent-1);
-  --search-by-geom-options-button-border: var(--light-mode-color-dark);
-  --search-button-container-border-top: var(--light-mode-gray-3);
-  --search-label-style-color: var(--light-mode-color-dark);
-  --search-label-style-text-shadow: var(--light-mode-color-light);
-
-  /* ThemeSwitcher Component Overrides */
-  --theme-switcher-border: var(--light-mode-color-dark);
-  --theme-switcher-bg: var(--light-mode-transparent);
-  --theme-switcher-color: var(--light-mode-color-dark);
-
-  /* UploadGeojsonModal Component Overrides */
-  --upload-geojson-modal-bg: var(--light-mode-transparent-white);
-  --upload-geojson-modal-container-bg: var(--light-mode-gray-2);
-  --upload-geojson-modal-container-color: var(--light-mode-color-dark);
-  --upload-geojson-modal-action-button-bg: var(--light-mode-accent-2);
-  --upload-geojson-modal-action-button-color: var(--light-mode-color-light);
-  --upload-geojson-modal-action-button-border: var(--light-mode-color-dark);
-  --upload-geojson-modal-action-button-hover-bg: var(--light-mode-accent-3);
-  --upload-geojson-modal-drop-zone-bg: var(--light-mode-gray-3);
-  --upload-geojson-modal-drop-zone-color: var(--light-mode-color-dark);
-
-  /* ViewSelector Component Overrides */
-  --view-selector-button-border: var(--light-mode-color-dark);
+  /* Action Button */
+  --action-button-background: var(--brand-accent-primary);
+  --action-button-background-hover: var(--brand-accent-primary-dark);
+  --action-button-color: var(--light-background-primary);
+  --action-button-color-hover: var(--light-background-primary);
+  --action-button-color-disabled: var(--light-text-muted);
+  --action-button-background-disabled: var(--light-border-secondary);
 }
 
 /* Invert logo colors for light theme */
@@ -247,4 +257,22 @@
 /* No map tile styling for light theme */
 :root[data-theme='light'] .map-tiles {
   filter: none;
+}
+
+/* Add green ripple effects to MUI component thumbs for light theme */
+:root[data-theme='light'] .cloudSlider .MuiSlider-thumb:hover,
+:root[data-theme='light'] .cloudSlider .MuiSlider-thumb.Mui-focusVisible {
+  box-shadow: 0px 0px 0px 8px rgba(108, 194, 74, 0.15);
+}
+
+:root[data-theme='light'] .cloudSlider .MuiSlider-thumb:active {
+  box-shadow: 0px 0px 0px 14px rgba(108, 194, 74, 0.15);
+}
+
+:root[data-theme='light'] .Search .MuiSwitch-switchBase:hover {
+  background-color: rgba(108, 194, 74, 0.15);
+}
+
+:root[data-theme='light'] .Search .MuiSwitch-switchBase.Mui-checked:hover {
+  background-color: rgba(108, 194, 74, 0.15);
 }

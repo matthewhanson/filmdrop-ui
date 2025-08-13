@@ -1,22 +1,22 @@
 .LayerList {
   position: absolute;
-  top: 130px;
+  top: 131px;
   left: 54px;
   z-index: 1;
-  background-color: var(--layer-list-bg);
+  background-color: var(--map-info-overlay-background);
   background-clip: padding-box;
   border-radius: 4px;
-  border: solid 2px rgba(0, 0, 0, 0.2);
   min-width: 200px;
   max-width: 400px;
   max-height: 300px;
   font-size: 16px;
   display: flex;
   flex-direction: column;
+  color: var(--map-info-overlay-color);
 }
 
 .LayerListTitle {
-  border-bottom: solid 2px var(--layer-list-title-border-bottom);
+  border-bottom: solid 2px var(--map-info-overlay-heading-border);
   height: 35px;
   margin-bottom: 8px;
   display: flex;
@@ -74,7 +74,7 @@
 }
 
 .LayerListLayerContainer input:checked ~ .LayerListCheckmark {
-  background-color: #81c05b;
+  background-color: var(--action-button-background);
 }
 
 .LayerListCheckmark:after {

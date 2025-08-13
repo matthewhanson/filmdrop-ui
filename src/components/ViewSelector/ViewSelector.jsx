@@ -27,13 +27,13 @@ const ViewSelector = () => {
             aria-label="outlined primary button group"
           >
             <Button
-              color={selectedBtn === 'scene' ? 'secondary' : 'primary'}
+              color={selectedBtn === 'scene' ? 'primary' : 'secondary'}
               onClick={() => setSelectedBtn('scene')}
             >
               Scene
             </Button>
             <Button
-              color={selectedBtn === 'mosaic' ? 'secondary' : 'primary'}
+              color={selectedBtn === 'mosaic' ? 'primary' : 'secondary'}
               onClick={() => setSelectedBtn('mosaic')}
             >
               Mosaic

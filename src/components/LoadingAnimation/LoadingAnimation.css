@@ -14,7 +14,7 @@
 }
 
 .animated-loader svg path {
-  stroke: var(--loading-animation-animated-loader-svg-path-stroke);
+  stroke: var(--app-color-loading);
   stroke-width: 5;
   fill: transparent;
   stroke-dasharray: 250;

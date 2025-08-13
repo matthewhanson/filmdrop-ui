@@ -14,10 +14,10 @@ const UploadGeojsonModal = () => {
     padding: '20px',
     borderWidth: 2,
     borderRadius: 2,
-    borderColor: '#6cc24a',
+    borderColor: 'var(--map-alert-overlay-accent-color)',
     borderStyle: 'dashed',
-    backgroundColor: 'var(--upload-geojson-modal-drop-zone-bg',
-    color: 'var(--upload-geojson-modal-drop-zone-color',
+    backgroundColor: 'var(--map-alert-overlay-secondary-background)',
+    color: 'var(--map-alert-overlay-secondary-color)',
     outline: 'none',
     transition: 'border .24s ease-in-out',
     height: '80px',
@@ -27,11 +27,11 @@ const UploadGeojsonModal = () => {
   }
 
   const focusedStyle = {
-    borderColor: '#6cc24a'
+    borderColor: 'var(--map-alert-overlay-accent-color)'
   }
 
   const acceptStyle = {
-    borderColor: '#00e676'
+    borderColor: 'var(--map-alert-overlay-accent-color)'
   }
 
   const rejectStyle = {

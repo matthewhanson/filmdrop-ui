@@ -17,7 +17,7 @@
   align-items: center;
   justify-content: center;
   min-height: 50px;
-  border-bottom: #353d4f 3px solid;
+  border-bottom: var(--side-panel-horizontal-divider-color) 3px solid;
 }
 
 .popupHeaderTop {
@@ -122,7 +122,7 @@
   align-items: center;
   justify-content: center;
   min-height: 50px;
-  border-top: #353d4f 3px solid;
+  border-top: var(--side-panel-horizontal-divider-color) 3px solid;
 }
 
 .popupFooterControls {
@@ -138,13 +138,13 @@
 }
 
 .popupFooterButton {
-  background-color: transparent;
-  color: var(--popup-results-footer-button-color);
+  background-color: var(--side-panel-button-background);
+  color: var(--side-panel-button-color);
   border: 0px;
   font-weight: bold;
   height: 30px;
   width: 30px;
-  border: var(--popup-results-footer-button-border) solid 1px;
+  border: var(--side-panel-button-border) solid 1px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -156,8 +156,7 @@
 }
 
 .popupFooterButton:hover {
-  background-color: #252f36;
-  color: #fff;
+  background-color: var(--side-panel-button-background-hover);
 }
 
 .popupFooterButtonRight {
