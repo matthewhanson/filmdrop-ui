@@ -167,8 +167,34 @@ input[class$='-MuiInputBase-input-MuiInput-input'] {
 }
 
 .leaflet-control-geosearch a.leaflet-bar-part:after {
+  top: 8px;
+  left: 8px;
   height: 10px !important;
   width: 10px !important;
+}
+
+/* Leaflet Search Button and Form Overrides */
+
+.leaflet-control-geosearch .leaflet-bar-part {
+  border-radius: 2px; /* Fill gap between top corners of background and border */
+}
+
+.leaflet-geosearch-button.active .leaflet-bar-part {
+  border-radius: 2px; /* Fill gap between top corners of background and border */
+}
+
+.leaflet-control-geosearch form {
+  left: 42px; /* Match offset of nearby elevated map overlays */
+  border-radius: 4px; /* Match radius of nearby elevated map overlays */
+  box-shadow: none; /* Remove box shadow for consistency with other map overlays */
+}
+
+.leaflet-geosearch-button form.open {
+  border-radius: 4px; /* Match radius of nearby elevated map overlays */
+}
+
+.leaflet-touch .leaflet-control-geosearch .results.active:after {
+  border-left: none; /* Remove lonely left border on search results */
 }
 
 .leaflet-control-geosearch.leaflet-geosearch-bar {
