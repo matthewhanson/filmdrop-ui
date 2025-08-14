@@ -1,5 +1,5 @@
-/* ------------------- DEFAULT THEME (DARK) ------------------- */
-:root {
+/* ------------------- DARK THEME ------------------- */
+:root[data-theme='filmdrop-dark'] {
   /* Dark Color Palette */
   --brand-accent-primary: #6cc24a;
   --brand-accent-primary-dark: #35731c;
@@ -118,12 +118,12 @@
 }
 
 /* Make map tiles dark for dark theme */
-.map-tiles {
+:root[data-theme='filmdrop-dark'] .map-tiles {
   filter: brightness(1.125) invert(1) contrast(0.9) hue-rotate(0deg) saturate(0);
 }
 
-/* ------- LIGHT THEME (OVERRIDES DEFAULT DARK THEME) --------- */
-:root[data-theme='light'] {
+/* ------------------- LIGHT THEME ------------------- */
+:root[data-theme='filmdrop-light'] {
   /* Light Color Palette */
   --brand-accent-primary: #6cc24a;
   --brand-accent-primary-dark: #35731c;
@@ -250,29 +250,33 @@
 }
 
 /* Invert logo colors for light theme */
-:root[data-theme='light'] .headerLogoImage {
+:root[data-theme='filmdrop-light'] .headerLogoImage {
   filter: invert(1);
 }
 
 /* No map tile styling for light theme */
-:root[data-theme='light'] .map-tiles {
+:root[data-theme='filmdrop-light'] .map-tiles {
   filter: none;
 }
 
 /* Add green ripple effects to MUI component thumbs for light theme */
-:root[data-theme='light'] .cloudSlider .MuiSlider-thumb:hover,
-:root[data-theme='light'] .cloudSlider .MuiSlider-thumb.Mui-focusVisible {
+:root[data-theme='filmdrop-light'] .cloudSlider .MuiSlider-thumb:hover,
+:root[data-theme='filmdrop-light']
+  .cloudSlider
+  .MuiSlider-thumb.Mui-focusVisible {
   box-shadow: 0px 0px 0px 8px rgba(108, 194, 74, 0.15);
 }
 
-:root[data-theme='light'] .cloudSlider .MuiSlider-thumb:active {
+:root[data-theme='filmdrop-light'] .cloudSlider .MuiSlider-thumb:active {
   box-shadow: 0px 0px 0px 14px rgba(108, 194, 74, 0.15);
 }
 
-:root[data-theme='light'] .Search .MuiSwitch-switchBase:hover {
+:root[data-theme='filmdrop-light'] .Search .MuiSwitch-switchBase:hover {
   background-color: rgba(108, 194, 74, 0.15);
 }
 
-:root[data-theme='light'] .Search .MuiSwitch-switchBase.Mui-checked:hover {
+:root[data-theme='filmdrop-light']
+  .Search
+  .MuiSwitch-switchBase.Mui-checked:hover {
   background-color: rgba(108, 194, 74, 0.15);
 }

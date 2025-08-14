@@ -19,13 +19,16 @@ export function calculateEffectiveTheme(userPreference) {
     case 'system':
       return getSystemTheme()
     default:
-      return 'dark' // Fallback to dark theme
+      throw new Error(
+        `Invalid theme preference: "${userPreference}". Must be 'light', 'dark', or 'system'.`
+      )
   }
 }
 
 export function applyTheme(theme) {
   if (typeof document !== 'undefined') {
-    document.documentElement.setAttribute('data-theme', theme)
+    const themeValue = theme === 'filmdrop' ? 'filmdrop' : `filmdrop-${theme}`
+    document.documentElement.setAttribute('data-theme', themeValue)
   }
 }
 
@@ -52,7 +55,9 @@ export function getNextTheme(currentTheme) {
     case 'system':
       return 'light'
     default:
-      return 'dark' // Fallback to dark theme
+      throw new Error(
+        `Invalid current theme: "${currentTheme}". Must be 'light', 'dark', or 'system'.`
+      )
   }
 }
 
@@ -133,10 +138,89 @@ export function getBrandLogoConfig(appConfig, effectiveTheme) {
   }
 }
 
+function validateThemeCSS(switchingEnabled) {
+  if (typeof document === 'undefined') {
+    return // Skip validation in non-browser environments
+  }
+
+  let hasFilmdropRootSelector = false
+  let hasFilmdropDarkThemeSelector = false
+  let hasFilmdropLightThemeSelector = false
+
+  try {
+    // Check all loaded stylesheets
+    for (let i = 0; i < document.styleSheets.length; i++) {
+      const stylesheet = document.styleSheets[i]
+
+      try {
+        // Check all CSS rules in this stylesheet
+        const rules = stylesheet.cssRules || stylesheet.rules
+        for (let j = 0; j < rules.length; j++) {
+          const rule = rules[j]
+
+          if (rule.selectorText) {
+            if (
+              rule.selectorText.includes(':root[data-theme="filmdrop"]') ||
+              rule.selectorText.includes(":root[data-theme='filmdrop']")
+            ) {
+              hasFilmdropRootSelector = true
+            }
+            if (
+              rule.selectorText.includes(':root[data-theme="filmdrop-dark"]') ||
+              rule.selectorText.includes(":root[data-theme='filmdrop-dark']")
+            ) {
+              hasFilmdropDarkThemeSelector = true
+            }
+            if (
+              rule.selectorText.includes(
+                ':root[data-theme="filmdrop-light"]'
+              ) ||
+              rule.selectorText.includes(":root[data-theme='filmdrop-light']")
+            ) {
+              hasFilmdropLightThemeSelector = true
+            }
+          }
+        }
+      } catch (e) {
+        // Skip stylesheets that can't be accessed (CORS restrictions)
+        continue
+      }
+    }
+  } catch (e) {
+    console.warn('Unable to validate CSS rules:', e.message)
+    return
+  }
+
+  if (switchingEnabled) {
+    if (!hasFilmdropDarkThemeSelector) {
+      throw new Error(
+        'THEME_SWITCHING_ENABLED is true but no :root[data-theme="filmdrop-dark"] CSS rule found. ' +
+          'Theme switching requires :root[data-theme="filmdrop-dark"] and :root[data-theme="filmdrop-light"] selectors.'
+      )
+    }
+    if (!hasFilmdropLightThemeSelector) {
+      throw new Error(
+        'THEME_SWITCHING_ENABLED is true but no :root[data-theme="filmdrop-light"] CSS rule found. ' +
+          'Theme switching requires :root[data-theme="filmdrop-dark"] and :root[data-theme="filmdrop-light"] selectors.'
+      )
+    }
+  } else {
+    if (!hasFilmdropRootSelector) {
+      throw new Error(
+        'THEME_SWITCHING_ENABLED is false but no :root[data-theme="filmdrop"] CSS rule found. ' +
+          'Single theme mode requires a :root[data-theme="filmdrop"] selector with CSS variables.'
+      )
+    }
+  }
+}
+
 export function initializeTheme(appConfig) {
   const switchingEnabled = appConfig.THEME_SWITCHING_ENABLED === true
 
+  validateThemeCSS(switchingEnabled)
+
   if (!switchingEnabled) {
+    applyTheme('filmdrop')
     return {
       currentTheme: null, // Not used if not switching themes
       effectiveTheme: null, // Not used if not switching themes
@@ -144,7 +228,12 @@ export function initializeTheme(appConfig) {
     }
   }
 
-  const defaultTheme = appConfig.THEME_DEFAULT || 'dark'
+  const defaultTheme = appConfig.THEME_DEFAULT || 'system'
+  if (!['light', 'dark', 'system'].includes(defaultTheme)) {
+    throw new Error(
+      `Invalid THEME_DEFAULT: "${defaultTheme}". Must be 'light', 'dark', or 'system'.`
+    )
+  }
 
   let currentTheme = getThemeFromStorage()
   if (!currentTheme) {
