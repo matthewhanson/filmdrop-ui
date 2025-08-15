@@ -46,17 +46,15 @@ export function saveThemeToStorage(theme) {
 }
 
 export function getNextTheme(currentTheme) {
-  // Get next theme in the sequence: light → dark → system → light
+  // Get next theme in the sequence: light → dark → light
   switch (currentTheme) {
     case 'light':
       return 'dark'
     case 'dark':
-      return 'system'
-    case 'system':
       return 'light'
     default:
       throw new Error(
-        `Invalid current theme: "${currentTheme}". Must be 'light', 'dark', or 'system'.`
+        `Invalid current theme: "${currentTheme}". Must be 'light' or 'dark'.`
       )
   }
 }
@@ -228,19 +226,31 @@ export function initializeTheme(appConfig) {
     }
   }
 
-  const defaultTheme = appConfig.THEME_DEFAULT || 'system'
-  if (!['light', 'dark', 'system'].includes(defaultTheme)) {
+  const fallbackTheme = appConfig.THEME_DEFAULT || 'dark'
+  if (!['light', 'dark'].includes(fallbackTheme)) {
     throw new Error(
-      `Invalid THEME_DEFAULT: "${defaultTheme}". Must be 'light', 'dark', or 'system'.`
+      `Invalid THEME_DEFAULT: "${fallbackTheme}". Must be 'light' or 'dark'.`
     )
   }
 
   let currentTheme = getThemeFromStorage()
-  if (!currentTheme) {
-    currentTheme = defaultTheme
+
+  // If no stored preference or stored preference is old 'system' value,
+  // detect system theme or fall back to THEME_DEFAULT
+  if (
+    !currentTheme ||
+    currentTheme === 'system' ||
+    !['light', 'dark'].includes(currentTheme)
+  ) {
+    try {
+      currentTheme = getSystemTheme()
+    } catch (error) {
+      // If system detection fails, use fallback
+      currentTheme = fallbackTheme
+    }
   }
 
-  const effectiveTheme = calculateEffectiveTheme(currentTheme)
+  const effectiveTheme = currentTheme // No longer need calculateEffectiveTheme since we only use light/dark
 
   return {
     currentTheme,

@@ -10,7 +10,6 @@ import * as themeHelper from '../../utils/themeHelper'
 // Mock the theme helper functions
 vi.mock('../../utils/themeHelper', () => ({
   getNextTheme: vi.fn(),
-  calculateEffectiveTheme: vi.fn(),
   applyTheme: vi.fn(),
   saveThemeToStorage: vi.fn()
 }))
@@ -22,9 +21,6 @@ vi.mock('../../assets/sun-icon.svg?react', () => ({
 vi.mock('../../assets/moon-icon.svg?react', () => ({
   default: () => <div data-testid="moon-icon">MoonIcon</div>
 }))
-vi.mock('../../assets/system-icon.svg?react', () => ({
-  default: () => <div data-testid="system-icon">SystemIcon</div>
-}))
 
 const createTestStore = (initialState = {}) => {
   return configureStore({
@@ -33,7 +29,7 @@ const createTestStore = (initialState = {}) => {
     },
     preloadedState: {
       mainSlice: {
-        currentTheme: 'system',
+        currentTheme: 'dark',
         effectiveTheme: 'dark',
         ...initialState
       }
@@ -74,14 +70,6 @@ describe('ThemeSwitcher', () => {
     expect(icon).toBeInTheDocument()
   })
 
-  it('displays correct icon for system theme', () => {
-    const store = createTestStore({ currentTheme: 'system' })
-    renderWithProvider(<ThemeSwitcher />, store)
-
-    const icon = screen.getByTestId('system-icon')
-    expect(icon).toBeInTheDocument()
-  })
-
   it('has correct accessibility attributes', () => {
     const store = createTestStore({ currentTheme: 'light' })
     renderWithProvider(<ThemeSwitcher />, store)
@@ -102,7 +90,6 @@ describe('ThemeSwitcher', () => {
 
     // Mock the helper functions
     themeHelper.getNextTheme.mockReturnValue('dark')
-    themeHelper.calculateEffectiveTheme.mockReturnValue('dark')
 
     renderWithProvider(<ThemeSwitcher />, store)
 
@@ -110,7 +97,6 @@ describe('ThemeSwitcher', () => {
     fireEvent.click(button)
 
     expect(themeHelper.getNextTheme).toHaveBeenCalledWith('light')
-    expect(themeHelper.calculateEffectiveTheme).toHaveBeenCalledWith('dark')
     expect(themeHelper.applyTheme).toHaveBeenCalledWith('dark')
     expect(themeHelper.saveThemeToStorage).toHaveBeenCalledWith('dark')
   })
@@ -119,7 +105,6 @@ describe('ThemeSwitcher', () => {
     const store = createTestStore({ currentTheme: 'light' })
 
     themeHelper.getNextTheme.mockReturnValue('dark')
-    themeHelper.calculateEffectiveTheme.mockReturnValue('dark')
 
     renderWithProvider(<ThemeSwitcher />, store)
 
@@ -132,18 +117,17 @@ describe('ThemeSwitcher', () => {
   })
 
   it('cycles through themes correctly', () => {
-    const store = createTestStore({ currentTheme: 'system' })
+    const store = createTestStore({ currentTheme: 'dark' })
 
-    // Mock cycling from system to light
+    // Mock cycling from dark to light
     themeHelper.getNextTheme.mockReturnValue('light')
-    themeHelper.calculateEffectiveTheme.mockReturnValue('light')
 
     renderWithProvider(<ThemeSwitcher />, store)
 
     const button = screen.getByTestId('theme-switcher-button')
     fireEvent.click(button)
 
-    expect(themeHelper.getNextTheme).toHaveBeenCalledWith('system')
+    expect(themeHelper.getNextTheme).toHaveBeenCalledWith('dark')
 
     const state = store.getState()
     expect(state.mainSlice.currentTheme).toBe('light')

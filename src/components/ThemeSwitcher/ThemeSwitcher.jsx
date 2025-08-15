@@ -6,13 +6,11 @@ import {
 } from '../../redux/slices/mainSlice'
 import {
   getNextTheme,
-  calculateEffectiveTheme,
   applyTheme,
   saveThemeToStorage
 } from '../../utils/themeHelper'
 import SunIcon from '../../assets/sun-icon.svg?react'
 import MoonIcon from '../../assets/moon-icon.svg?react'
-import SystemIcon from '../../assets/system-icon.svg?react'
 import './ThemeSwitcher.css'
 
 const ThemeSwitcher = () => {
@@ -23,15 +21,12 @@ const ThemeSwitcher = () => {
     // Get the next theme in the cycle
     const nextTheme = getNextTheme(currentTheme)
 
-    // Calculate what the effective theme should be
-    const newEffectiveTheme = calculateEffectiveTheme(nextTheme)
-
-    // Update Redux state
+    // Update Redux state (effectiveTheme is same as currentTheme now)
     dispatch(setCurrentTheme(nextTheme))
-    dispatch(setEffectiveTheme(newEffectiveTheme))
+    dispatch(setEffectiveTheme(nextTheme))
 
     // Apply theme to DOM
-    applyTheme(newEffectiveTheme)
+    applyTheme(nextTheme)
 
     // Save preference to localStorage
     saveThemeToStorage(nextTheme)
@@ -43,8 +38,6 @@ const ThemeSwitcher = () => {
         return <SunIcon />
       case 'dark':
         return <MoonIcon />
-      case 'system':
-        return <SystemIcon />
       default:
         return <MoonIcon />
     }
@@ -56,8 +49,6 @@ const ThemeSwitcher = () => {
         return 'Light mode'
       case 'dark':
         return 'Dark mode'
-      case 'system':
-        return 'System mode'
       default:
         return 'Dark mode'
     }

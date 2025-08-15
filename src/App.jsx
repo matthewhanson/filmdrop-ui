@@ -17,11 +17,7 @@ import {
   setCurrentTheme,
   setEffectiveTheme
 } from './redux/slices/mainSlice'
-import {
-  initializeTheme,
-  applyTheme,
-  setupSystemThemeListener
-} from './utils/themeHelper'
+import { initializeTheme, applyTheme } from './utils/themeHelper'
 
 function App() {
   const dispatch = useDispatch()
@@ -36,9 +32,7 @@ function App() {
   const _authTokenExists = useSelector(
     (state) => state.mainSlice.authTokenExists
   )
-  const _currentTheme = useSelector((state) => state.mainSlice.currentTheme)
   const [showLogin, setShowLogin] = useState(false)
-  const [switchingEnabled, setSwitchingEnabled] = useState(false)
 
   useEffect(() => {
     if (localStorage.getItem('APP_AUTH_TOKEN')) {
@@ -69,8 +63,6 @@ function App() {
       const { currentTheme, effectiveTheme, switchingEnabled } =
         initializeTheme(_appConfig)
 
-      setSwitchingEnabled(switchingEnabled)
-
       if (switchingEnabled) {
         dispatch(setCurrentTheme(currentTheme))
         dispatch(setEffectiveTheme(effectiveTheme))
@@ -78,17 +70,6 @@ function App() {
       }
     }
   }, [_appConfig, dispatch])
-
-  useEffect(() => {
-    if (switchingEnabled && _currentTheme === 'system') {
-      const cleanup = setupSystemThemeListener((newSystemTheme) => {
-        dispatch(setEffectiveTheme(newSystemTheme))
-        applyTheme(newSystemTheme)
-      })
-
-      return cleanup
-    }
-  }, [switchingEnabled, _currentTheme, dispatch])
 
   return (
     <React.StrictMode>
