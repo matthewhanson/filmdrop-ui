@@ -33,6 +33,7 @@
 
 .cloudSlider .MuiInput-root {
   width: 42px;
+  color: var(--side-panel-slider-input-color);
 }
 .cloudSlider .MuiInput-underline:before {
   border-bottom-color: var(--side-panel-slider-input-underline);
