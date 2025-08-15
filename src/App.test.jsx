@@ -30,7 +30,6 @@ describe('App', () => {
       // Mock theme initialization to avoid CSS validation errors in tests
       vi.spyOn(ThemeHelper, 'initializeTheme').mockReturnValue({
         currentTheme: null,
-        effectiveTheme: null,
         switchingEnabled: false
       })
     })

@@ -113,8 +113,7 @@ The file `config_helper/config.example.json` is included in this repository as r
 | SHOW_ITEM_AUTO_ZOOM     | If set to `true`, switch will render in `Filters` list to let the user toggle if the map automatically centers on item footprint when selected item is changed. Default when initialized is auto-zoom not enabled, user must opt-in by turning on (choice will persist for app session).                                                                                                                                                                                                                               | Optional |
 | STAC_LINK_ENABLED       | If set to `true`, STAC Item link will render in Item Details.                                                                                                                                                                                                                                                                                                                                                                                                                                                          | Optional |
 | SUPPORTS_AGGREGATIONS   | If included and set to `false` aggregation features are disabled and API calls are not made to load the optional aggregations from the STAC API.                                                                                                                                                                                                                                                                                                                                                                       | Optional |
-| THEME_DEFAULT           | String value (`"light"`, `"dark"`, or `"system"`). Only used when `THEME_SWITCHING_ENABLED` is `true`. Sets the default theme when no user preference is stored. Defaults to `"system"` if not specified. Has no effect when theme switching is disabled.                                                                                                                                                                                                                                                              | Optional |
-| THEME_SWITCHING_ENABLED | If set to `true`, enables user theme switching between light/dark/system modes via a theme switcher button in the header. If false (default), single theme mode is used. See [CSS Theme Configuration](#css-theme-configuration) section below for required CSS structure.                                                                                                                                                                                                                                             | Optional |
+| THEME_SWITCHING_ENABLED | If set to `true`, enables user theme switching between light and dark modes via a theme switcher button in the header. The application automatically detects the current system mode (light or dark) on startup and falls back to light theme if detection fails. If false (default), single theme mode is used. See [CSS Theme Configuration](#css-theme-configuration) section below for required CSS structure.                                                                                                     | Optional |
 | TILE_LAYER_PARAMS       | Per-collection configuration of `Leaflet.tileLayer`. See [Leaflet docs](https://leafletjs.com/reference.html#tilelayer-option) or example in [config.example.json](config_helper/config.example.json)                                                                                                                                                                                                                                                                                                                  | Optional |
 
 #### CSS Theme Configuration
@@ -123,14 +122,13 @@ FilmDrop-UI supports two theming modes that require different CSS structures in
 `src/themes/theme.css`. Mismatched configuration and CSS will result in error messages.
 
 - Theme Switching Mode (`THEME_SWITCHING_ENABLED: true`): Enables users to switch
-  between light, dark, and system (follows OS preference) themes by clicking a button.
-  Requires the following explicit theme selectors in `src/themes/theme.css`.
+  between light and dark themes by clicking a button. Requires the following explicit
+  theme selectors in `src/themes/theme.css`.
   - `:root[data-theme='filmdrop-dark']` - Contains the dark theme variables.
   - `:root[data-theme='filmdrop-light']` - Contains the light theme variables.
 
 - Single Theme Mode (`THEME_SWITCHING_ENABLED: false` or not set): Theme switching is
-  disabled and the single `'filmdrop'` theme is always applied. Requires a single
-  explicit theme selector in `src/themes/theme.css`.
+  disabled. Requires a single explicit theme selector in `src/themes/theme.css`.
   - `:root[data-theme='filmdrop']` - Contains variables for the single theme.
 
 #### BASEMAP Configuration Examples

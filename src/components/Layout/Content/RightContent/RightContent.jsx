@@ -66,7 +66,7 @@ const RightContent = () => {
   )
   const _appName = useSelector((state) => state.mainSlice.appName)
   const _showLayerList = useSelector((state) => state.mainSlice.showLayerList)
-  const _effectiveTheme = useSelector((state) => state.mainSlice.effectiveTheme)
+  const _currentTheme = useSelector((state) => state.mainSlice.currentTheme)
 
   const dispatch = useDispatch()
 
@@ -144,14 +144,14 @@ const RightContent = () => {
   }
 
   useEffect(() => {
-    const basemapConfig = getBasemapConfig(_appConfig, _effectiveTheme)
+    const basemapConfig = getBasemapConfig(_appConfig, _currentTheme)
     if (basemapConfig?.attribution) {
       const output = sanitizeAttribution(String(basemapConfig.attribution))
       setmapAttribution(output)
     } else {
       setmapAttribution(null)
     }
-  }, [_appConfig, _effectiveTheme])
+  }, [_appConfig, _currentTheme])
 
   function sanitizeAttribution(dirty) {
     const clean = {

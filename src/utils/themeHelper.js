@@ -6,23 +6,7 @@ export function getSystemTheme() {
       ? 'dark'
       : 'light'
   }
-  // Fallback to dark if matchMedia is not available
-  return 'dark'
-}
-
-export function calculateEffectiveTheme(userPreference) {
-  switch (userPreference) {
-    case 'light':
-      return 'light'
-    case 'dark':
-      return 'dark'
-    case 'system':
-      return getSystemTheme()
-    default:
-      throw new Error(
-        `Invalid theme preference: "${userPreference}". Must be 'light', 'dark', or 'system'.`
-      )
-  }
+  return 'light'
 }
 
 export function applyTheme(theme) {
@@ -45,45 +29,7 @@ export function saveThemeToStorage(theme) {
   }
 }
 
-export function getNextTheme(currentTheme) {
-  // Get next theme in the sequence: light → dark → light
-  switch (currentTheme) {
-    case 'light':
-      return 'dark'
-    case 'dark':
-      return 'light'
-    default:
-      throw new Error(
-        `Invalid current theme: "${currentTheme}". Must be 'light' or 'dark'.`
-      )
-  }
-}
-
-export function setupSystemThemeListener(callback) {
-  if (typeof window !== 'undefined' && window.matchMedia) {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-
-    const handleChange = (e) => {
-      const newSystemTheme = e.matches ? 'dark' : 'light'
-      callback(newSystemTheme)
-    }
-
-    // Use the newer addEventListener if available, fallback to addListener
-    if (mediaQuery.addEventListener) {
-      mediaQuery.addEventListener('change', handleChange)
-      return () => mediaQuery.removeEventListener('change', handleChange)
-    } else if (mediaQuery.addListener) {
-      mediaQuery.addListener(handleChange)
-      return () => mediaQuery.removeListener(handleChange)
-    }
-  }
-
-  // Return a no-op cleanup function if no listener was set up
-  return () => {}
-}
-
-export function getBasemapConfig(appConfig, effectiveTheme) {
-  // Return null if no BASEMAP configuration exists
+export function getBasemapConfig(appConfig, currentTheme) {
   if (!appConfig.BASEMAP) {
     return null
   }
@@ -96,17 +42,14 @@ export function getBasemapConfig(appConfig, effectiveTheme) {
     }
   }
 
-  // Theme switching enabled and not single basemap mode - use the effective theme
-  if (appConfig.THEME_SWITCHING_ENABLED === true && effectiveTheme) {
-    return appConfig.BASEMAP[effectiveTheme]
+  if (appConfig.THEME_SWITCHING_ENABLED === true && currentTheme) {
+    return appConfig.BASEMAP[currentTheme]
   }
 
-  // No valid basemap found for the current theme
   return null
 }
 
-export function getBrandLogoConfig(appConfig, effectiveTheme) {
-  // Check if brand logo is configured
+export function getBrandLogoConfig(appConfig, currentTheme) {
   if (!appConfig.BRAND_LOGO) {
     return null
   }
@@ -114,16 +57,14 @@ export function getBrandLogoConfig(appConfig, effectiveTheme) {
   const config = appConfig.BRAND_LOGO
   let logoImage = config.image
 
-  // Theme-specific logo selection (only when theme switching is enabled)
-  if (appConfig.THEME_SWITCHING_ENABLED === true && effectiveTheme) {
-    if (effectiveTheme === 'light' && config.image_light) {
+  if (appConfig.THEME_SWITCHING_ENABLED === true && currentTheme) {
+    if (currentTheme === 'light' && config.image_light) {
       logoImage = config.image_light
-    } else if (effectiveTheme === 'dark' && config.image_dark) {
+    } else if (currentTheme === 'dark' && config.image_dark) {
       logoImage = config.image_dark
     }
   }
 
-  // If no valid image found, return null (do not render logo)
   if (!logoImage) {
     return null
   }
@@ -218,43 +159,24 @@ export function initializeTheme(appConfig) {
   validateThemeCSS(switchingEnabled)
 
   if (!switchingEnabled) {
-    applyTheme('filmdrop')
     return {
-      currentTheme: null, // Not used if not switching themes
-      effectiveTheme: null, // Not used if not switching themes
+      currentTheme: 'filmdrop',
       switchingEnabled: false
     }
   }
 
-  const fallbackTheme = appConfig.THEME_DEFAULT || 'dark'
-  if (!['light', 'dark'].includes(fallbackTheme)) {
-    throw new Error(
-      `Invalid THEME_DEFAULT: "${fallbackTheme}". Must be 'light' or 'dark'.`
-    )
-  }
-
   let currentTheme = getThemeFromStorage()
 
-  // If no stored preference or stored preference is old 'system' value,
-  // detect system theme or fall back to THEME_DEFAULT
-  if (
-    !currentTheme ||
-    currentTheme === 'system' ||
-    !['light', 'dark'].includes(currentTheme)
-  ) {
+  if (!currentTheme) {
     try {
       currentTheme = getSystemTheme()
     } catch (error) {
-      // If system detection fails, use fallback
-      currentTheme = fallbackTheme
+      currentTheme = 'light'
     }
   }
 
-  const effectiveTheme = currentTheme // No longer need calculateEffectiveTheme since we only use light/dark
-
   return {
     currentTheme,
-    effectiveTheme,
     switchingEnabled: true
   }
 }

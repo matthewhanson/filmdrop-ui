@@ -12,11 +12,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import CartModal from './components/Cart/CartModal/CartModal'
 import { InitializeAppFromConfig } from './utils/configHelper'
 import Login from './components/Login/Login'
-import {
-  setauthTokenExists,
-  setCurrentTheme,
-  setEffectiveTheme
-} from './redux/slices/mainSlice'
+import { setauthTokenExists, setCurrentTheme } from './redux/slices/mainSlice'
 import { initializeTheme, applyTheme } from './utils/themeHelper'
 
 function App() {
@@ -60,14 +56,13 @@ function App() {
 
   useEffect(() => {
     if (_appConfig) {
-      const { currentTheme, effectiveTheme, switchingEnabled } =
-        initializeTheme(_appConfig)
+      const { currentTheme, switchingEnabled } = initializeTheme(_appConfig)
 
       if (switchingEnabled) {
         dispatch(setCurrentTheme(currentTheme))
-        dispatch(setEffectiveTheme(effectiveTheme))
-        applyTheme(effectiveTheme)
       }
+
+      applyTheme(currentTheme)
     }
   }, [_appConfig, dispatch])
 

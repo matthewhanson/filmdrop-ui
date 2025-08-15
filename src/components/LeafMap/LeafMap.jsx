@@ -29,7 +29,7 @@ const LeafMap = () => {
   const dispatch = useDispatch()
   const _appConfig = useSelector((state) => state.mainSlice.appConfig)
   const _cartItems = useSelector((state) => state.mainSlice.cartItems)
-  const _effectiveTheme = useSelector((state) => state.mainSlice.effectiveTheme)
+  const _currentTheme = useSelector((state) => state.mainSlice.currentTheme)
   // set map ref to itself with useRef
   const mapRef = useRef()
 
@@ -195,9 +195,9 @@ const LeafMap = () => {
       >
         {/* set basemap layers here: */}
         <TileLayer
-          key={_effectiveTheme} // Force re-mount when theme changes
+          key={_currentTheme} // Force re-mount when theme changes
           className="map-tiles"
-          url={getBasemapConfig(_appConfig, _effectiveTheme)?.url}
+          url={getBasemapConfig(_appConfig, _currentTheme)?.url}
           maxNativeZoom={18}
           minNativeZoom={2}
           maxZoom={

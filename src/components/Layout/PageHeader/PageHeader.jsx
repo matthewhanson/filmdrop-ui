@@ -10,7 +10,7 @@ import { getBrandLogoConfig } from '../../../utils/themeHelper'
 
 const PageHeader = () => {
   const _appConfig = useSelector((state) => state.mainSlice.appConfig)
-  const _effectiveTheme = useSelector((state) => state.mainSlice.effectiveTheme)
+  const _currentTheme = useSelector((state) => state.mainSlice.currentTheme)
 
   function onDashboardClick() {
     window.open(_appConfig.DASHBOARD_BTN_URL, '_blank')
@@ -25,7 +25,7 @@ const PageHeader = () => {
   }
 
   // Get brand logo configuration
-  const brandLogoConfig = getBrandLogoConfig(_appConfig, _effectiveTheme)
+  const brandLogoConfig = getBrandLogoConfig(_appConfig, _currentTheme)
 
   return (
     <div className="PageHeader" data-testid="testPageHeader">

@@ -9,7 +9,6 @@ import * as themeHelper from '../../utils/themeHelper'
 
 // Mock the theme helper functions
 vi.mock('../../utils/themeHelper', () => ({
-  getNextTheme: vi.fn(),
   applyTheme: vi.fn(),
   saveThemeToStorage: vi.fn()
 }))
@@ -30,7 +29,6 @@ const createTestStore = (initialState = {}) => {
     preloadedState: {
       mainSlice: {
         currentTheme: 'dark',
-        effectiveTheme: 'dark',
         ...initialState
       }
     }
@@ -50,7 +48,7 @@ describe('ThemeSwitcher', () => {
     const store = createTestStore()
     renderWithProvider(<ThemeSwitcher />, store)
 
-    const button = screen.getByTestId('theme-switcher-button')
+    const button = screen.getByRole('button', { name: /Switch theme/i })
     expect(button).toBeInTheDocument()
   })
 
@@ -74,7 +72,7 @@ describe('ThemeSwitcher', () => {
     const store = createTestStore({ currentTheme: 'light' })
     renderWithProvider(<ThemeSwitcher />, store)
 
-    const button = screen.getByTestId('theme-switcher-button')
+    const button = screen.getByRole('button', { name: /Switch theme/i })
     expect(button).toHaveAttribute(
       'aria-label',
       'Switch theme. Currently Light mode'
@@ -88,15 +86,11 @@ describe('ThemeSwitcher', () => {
   it('calls theme switching functions when clicked', () => {
     const store = createTestStore({ currentTheme: 'light' })
 
-    // Mock the helper functions
-    themeHelper.getNextTheme.mockReturnValue('dark')
-
     renderWithProvider(<ThemeSwitcher />, store)
 
-    const button = screen.getByTestId('theme-switcher-button')
+    const button = screen.getByRole('button', { name: /Switch theme/i })
     fireEvent.click(button)
 
-    expect(themeHelper.getNextTheme).toHaveBeenCalledWith('light')
     expect(themeHelper.applyTheme).toHaveBeenCalledWith('dark')
     expect(themeHelper.saveThemeToStorage).toHaveBeenCalledWith('dark')
   })
@@ -104,33 +98,27 @@ describe('ThemeSwitcher', () => {
   it('updates Redux state when clicked', () => {
     const store = createTestStore({ currentTheme: 'light' })
 
-    themeHelper.getNextTheme.mockReturnValue('dark')
-
     renderWithProvider(<ThemeSwitcher />, store)
 
-    const button = screen.getByTestId('theme-switcher-button')
+    const button = screen.getByRole('button', { name: /Switch theme/i })
     fireEvent.click(button)
 
     const state = store.getState()
     expect(state.mainSlice.currentTheme).toBe('dark')
-    expect(state.mainSlice.effectiveTheme).toBe('dark')
   })
 
   it('cycles through themes correctly', () => {
     const store = createTestStore({ currentTheme: 'dark' })
 
-    // Mock cycling from dark to light
-    themeHelper.getNextTheme.mockReturnValue('light')
-
     renderWithProvider(<ThemeSwitcher />, store)
 
-    const button = screen.getByTestId('theme-switcher-button')
+    const button = screen.getByRole('button', { name: /Switch theme/i })
     fireEvent.click(button)
 
-    expect(themeHelper.getNextTheme).toHaveBeenCalledWith('dark')
+    expect(themeHelper.applyTheme).toHaveBeenCalledWith('light')
+    expect(themeHelper.saveThemeToStorage).toHaveBeenCalledWith('light')
 
     const state = store.getState()
     expect(state.mainSlice.currentTheme).toBe('light')
-    expect(state.mainSlice.effectiveTheme).toBe('light')
   })
 })
