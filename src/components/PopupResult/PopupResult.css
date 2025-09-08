@@ -55,23 +55,34 @@
   color: var(--side-panel-link-color-hover);
 }
 
-/* width */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+.enhancedDetailsButtonRow {
+  margin-top: 16px;
+  align-items: center;
 }
 
-/* Track */
-::-webkit-scrollbar-track {
-  background: #dedede;
+.enhancedDetailsButton {
+  background-color: var(--side-panel-button-background);
+  border: 1px solid var(--side-panel-button-border);
+  color: var(--side-panel-button-color);
+  padding: 12px 24px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  width: 100%;
+  max-width: 200px;
 }
 
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: #888;
+.enhancedDetailsButton:hover {
+  background-color: var(--side-panel-button-background-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
+.enhancedDetailsButton:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
 }

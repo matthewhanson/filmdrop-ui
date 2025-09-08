@@ -1,11 +1,15 @@
-import { React, useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import './PopupResult.css'
-import { useSelector } from 'react-redux'
-import { processDisplayFieldValues } from '../../utils/dataHelper'
+import { useSelector, useDispatch } from 'react-redux'
+
+import { setshowEnhancedDetailsModal } from '../../redux/slices/mainSlice'
 import { debounceTitilerOverlay, zoomToItemExtent } from '../../utils/mapHelper'
+import { buildAutoDisplayFieldList } from '../../utils/fieldGrouping.js'
+import FieldRenderer from './FieldRenderer'
 
 const PopupResult = (props) => {
+  const dispatch = useDispatch()
   const _appConfig = useSelector((state) => state.mainSlice.appConfig)
   const _selectedCollectionData = useSelector(
     (state) => state.mainSlice.selectedCollectionData
@@ -14,6 +18,31 @@ const PopupResult = (props) => {
     (state) => state.mainSlice.autoCenterOnItemChanged
   )
   const [thumbnailURL, setthumbnailURL] = useState(null)
+
+  // Memoized callback for enhanced details button
+  const handleEnhancedDetailsClick = useCallback(() => {
+    dispatch(setshowEnhancedDetailsModal(true))
+  }, [dispatch])
+
+  // Memoized display fields computation
+  const displayFields = useMemo(() => {
+    if (
+      _appConfig.POPUP_DISPLAY_FIELDS &&
+      _selectedCollectionData?.id &&
+      _selectedCollectionData.id in _appConfig.POPUP_DISPLAY_FIELDS
+    ) {
+      return _appConfig.POPUP_DISPLAY_FIELDS[_selectedCollectionData.id]
+    }
+    // Only show auto-discovered fields if POPUP_DISPLAY_FIELDS is not configured
+    if (!_appConfig.POPUP_DISPLAY_FIELDS) {
+      return buildAutoDisplayFieldList(props.result)
+    }
+    return []
+  }, [
+    _appConfig.POPUP_DISPLAY_FIELDS,
+    _selectedCollectionData?.id,
+    props.result
+  ])
 
   useEffect(() => {
     if (props.result) {
@@ -49,7 +78,7 @@ const PopupResult = (props) => {
       }
     >
       {props.result ? (
-        <div>
+        <div role="region" aria-label="Item details">
           <div className="popupResultThumbnailContainer">
             {thumbnailURL ? (
               <picture>
@@ -96,32 +125,28 @@ const PopupResult = (props) => {
                 {props.result.id}
               </span>
             </div>
-            {_appConfig.POPUP_DISPLAY_FIELDS &&
-              _selectedCollectionData.id in _appConfig.POPUP_DISPLAY_FIELDS &&
-              _appConfig.POPUP_DISPLAY_FIELDS[_selectedCollectionData.id].map(
-                (field) => (
-                  <div className="detailRow" key={field + '1'}>
-                    <span
-                      className="popupResultDetailsRowKey"
-                      key={field + '2'}
-                    >
-                      {field.charAt(0).toUpperCase() + field.slice(1) + ':'}
-                    </span>
-                    <span
-                      className="popupResultDetailsRowValue"
-                      key={field + '3'}
-                    >
-                      {field === 'eo:cloud_cover'
-                        ? Math.round(props.result?.properties[field] * 100) /
-                            100 +
-                          ' %'
-                        : processDisplayFieldValues(
-                            props.result?.properties[field]
-                          )}
-                    </span>
-                  </div>
-                )
-              )}
+            {/* Render fields using the reusable FieldRenderer component */}
+            {displayFields.map((field) => (
+              <FieldRenderer
+                key={field}
+                field={field}
+                item={props.result}
+                className="detailRow"
+              />
+            ))}
+
+            {/* Enhanced Details Button */}
+            <div className="detailRow enhancedDetailsButtonRow">
+              <button
+                className="enhancedDetailsButton"
+                onClick={handleEnhancedDetailsClick}
+                data-testid="testEnhancedDetailsButton"
+                type="button"
+                aria-label="View enhanced details for this item"
+              >
+                View Enhanced Details
+              </button>
+            </div>
           </div>
         </div>
       ) : null}
@@ -130,7 +155,17 @@ const PopupResult = (props) => {
 }
 
 PopupResult.propTypes = {
-  result: PropTypes.object
+  result: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    properties: PropTypes.object,
+    collection: PropTypes.string,
+    links: PropTypes.arrayOf(
+      PropTypes.shape({
+        rel: PropTypes.string,
+        href: PropTypes.string
+      })
+    )
+  })
 }
 
 export default PopupResult

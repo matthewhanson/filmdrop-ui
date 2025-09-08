@@ -34,6 +34,7 @@ const initialState = {
   appConfig: null,
   cartItems: [],
   showCartModal: false,
+  showEnhancedDetailsModal: false,
   mappedScenes: [],
   imageOverlayLoading: false,
   showMapAttribution: true,
@@ -148,6 +149,9 @@ export const mainSlice = createSlice({
     setshowCartModal: (state, action) => {
       state.showCartModal = action.payload
     },
+    setshowEnhancedDetailsModal: (state, action) => {
+      state.showEnhancedDetailsModal = action.payload
+    },
     setmappedScenes: (state, action) => {
       state.mappedScenes = action.payload
     },
@@ -220,6 +224,7 @@ export const { setapplicationAlertSeverity } = mainSlice.actions
 export const { setappConfig } = mainSlice.actions
 export const { setcartItems } = mainSlice.actions
 export const { setshowCartModal } = mainSlice.actions
+export const { setshowEnhancedDetailsModal } = mainSlice.actions
 export const { setmappedScenes } = mainSlice.actions
 export const { setimageOverlayLoading } = mainSlice.actions
 export const { setshowMapAttribution } = mainSlice.actions
