@@ -3,6 +3,8 @@
  * Handles semantic grouping and filtering of STAC fields
  */
 
+import { getCollectionFieldPriorities } from './fieldPriorities.js'
+
 /**
  * SEMANTIC FIELD GROUPING
  *
@@ -124,8 +126,6 @@ export function buildAutoDisplayFieldList(item) {
   const props = item.properties
   const keys = Object.keys(props)
 
-  // Import here to avoid circular dependency
-  const { getCollectionFieldPriorities } = require('./fieldPriorities.js')
   const priorities = getCollectionFieldPriorities(item)
 
   // Start with dynamic priorities scored per item
