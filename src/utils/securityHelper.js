@@ -1,13 +1,11 @@
 /**
- * SECURITY HELPER MODULE
- * Provides input sanitization and XSS prevention utilities
+ * Input sanitization and XSS prevention
  */
 
 import DOMPurify from 'dompurify'
 
 /**
- * SECURITY CONFIGURATION
- * Strict sanitization settings to prevent XSS attacks
+ * Sanitization configuration
  */
 const SANITIZE_CONFIG = {
   // Allow only safe HTML tags for formatting

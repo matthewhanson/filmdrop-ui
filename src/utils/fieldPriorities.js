@@ -1,15 +1,14 @@
 import { getStacFieldType } from './fieldDiscovery.js'
 
 /**
- * FIELD PRIORITIES MODULE
- * Handles field priority management and sorting for display order
+ * Field priority management and sorting
  */
 
 /**
- * Sort fields by priority for display
- * @param {Object} fields - Object of field names to values
- * @param {Array} fieldPriorities - Array of field names in priority order
- * @returns {Array} Sorted array of [field, value] tuples
+ * Sort fields by priority
+ * @param {Object} fields - Field names to values
+ * @param {Array} fieldPriorities - Field names in priority order
+ * @returns {Array} Sorted [field, value] tuples
  */
 export function sortFieldsByPriority(fields, fieldPriorities) {
   return Object.entries(fields).sort(([a], [b]) => {
@@ -23,61 +22,9 @@ export function sortFieldsByPriority(fields, fieldPriorities) {
 }
 
 /**
- * DYNAMIC FIELD PRIORITY GENERATION
- *
- * Generates field priorities for display order using dynamic scoring based on field types,
- * presence, and semantic importance. This enables intelligent field ordering without
- * hardcoded priority lists, adapting to different STAC collections and data structures.
- *
- * @param {string|Object} collection - Collection ID string or STAC item object
- * @returns {Array} Array of field names in priority order (highest to lowest priority)
- *
- * PRIORITY GENERATION STRATEGY:
- *
- * 1. INPUT VALIDATION: Handles both collection ID strings and STAC item objects
- *    - Collection ID: Returns generic priority list
- *    - STAC Item: Computes dynamic priorities from actual data
- *
- * 2. DYNAMIC SCORING: Scores fields based on multiple factors
- *    - Field Type Importance: Grid, coordinate, and percentage fields get higher scores
- *    - Field Presence: Fields with actual values get priority over missing fields
- *    - Semantic Importance: Core STAC fields (datetime, platform) get base priority
- *    - Value Complexity: Simple scalar values preferred over complex objects
- *
- * 3. SCORING ALGORITHM: Each field receives a score based on:
- *    - Base score: 100 for core fields, 50 for extension fields
- *    - Type bonus: +50 for grid/coordinate/percentage fields
- *    - Presence bonus: +25 for fields with actual values
- *    - Complexity penalty: -25 for complex objects/arrays
- *
- * 4. SORTING: Fields sorted by score (highest first), then alphabetically
- *
- * FIELD TYPE SCORING:
- *
- * HIGH PRIORITY (+50 bonus):
- * - grid: MGRS, WRS, UTM grid systems
- * - coordinate: Geographic coordinates, bounding boxes
- * - percentage: Cloud cover, quality metrics
- *
- * MEDIUM PRIORITY (base score):
- * - shape: Dimensions, sizes
- * - processing: Algorithm information
- * - boolean: True/false flags
- *
- * LOW PRIORITY (base score):
- * - standard: General text, numbers
- * - transform: Transformation matrices
- *
- * CORE STAC FIELDS (always prioritized):
- * - datetime: Acquisition time
- * - platform: Satellite/platform name
- * - instruments: Instrument specifications
- * - eo:cloud_cover: Cloud coverage percentage
- * - gsd: Ground sample distance
- * - proj:epsg: Coordinate system
- * - proj:centroid: Geographic center
- *
- * OUTPUT: Array of field names ordered by priority for optimal display
+ * Generate field priorities for display order
+ * @param {string|Object} collection - Collection ID or STAC item
+ * @returns {Array} Field names in priority order
  */
 export function getCollectionFieldPriorities(collection) {
   // Backward-compatible signature: allow either an item object or a collection id
@@ -149,7 +96,9 @@ export function getCollectionFieldPriorities(collection) {
           default:
             break
         }
-      } catch (_) {}
+      } catch (error) {
+        console.warn('Field type discovery failed for field:', field, error)
+      }
 
       // Prefer concise scalar values over large objects/arrays for overview
       if (
@@ -173,7 +122,8 @@ export function getCollectionFieldPriorities(collection) {
         return a.localeCompare(b)
       })
       .slice(0, keys.length)
-  } catch (_) {
+  } catch (error) {
+    console.warn('Field priority calculation failed:', error)
     return [
       'datetime',
       'platform',

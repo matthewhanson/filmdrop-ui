@@ -33,12 +33,12 @@ describe('fieldFormatting', () => {
         22.959924,
         mockStacItem
       )
-      expect(result).toBeDefined()
+      expect(result).toBe('22.96%')
     })
 
     it('should handle null values gracefully', () => {
       const result = formatStacFieldEnhanced('test:field', null, mockStacItem)
-      expect(result).toBeDefined()
+      expect(result).toBe('n/a')
     })
 
     it('should format boolean values correctly', () => {

@@ -1,7 +1,7 @@
 /**
  * ENHANCED FIELD RENDERER
  * React component for rendering STAC fields using React components instead of HTML strings
- * Eliminates dangerouslySetInnerHTML usage in the modal
+ * Eliminates dangerouslySetInnerHTML usage
  */
 
 import React, { useMemo } from 'react'
@@ -24,28 +24,18 @@ const EnhancedFieldRenderer = ({ field, value, item }) => {
     return extractFieldComponents(field, value, item, fieldType)
   }, [field, value, item, fieldType])
 
-  // If no components were extracted, fall back to standard formatting
+  // If no components were extracted, fall back to simple text rendering
   if (!components || components.length === 0) {
-    return (
-      <div className="field-value">
-        <div className="field-value-container">
-          <span className="field-value-text">{String(value || '')}</span>
-        </div>
-      </div>
-    )
+    return String(value || '')
   }
 
   return (
-    <div className="field-value">
-      <div className="field-value-container">
-        <FieldDisplay
-          fieldType={fieldType}
-          components={components}
-          field={field}
-          item={item}
-        />
-      </div>
-    </div>
+    <FieldDisplay
+      fieldType={fieldType}
+      components={components}
+      field={field}
+      item={item}
+    />
   )
 }
 

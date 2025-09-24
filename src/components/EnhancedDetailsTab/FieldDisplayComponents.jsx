@@ -49,11 +49,7 @@ export const GridFieldDisplay = ({ components, field, spec }) => {
         ? `WRS-${String(comp.value).toUpperCase()}`
         : String(comp.value)
 
-      return (
-        <span className="field-value-text">
-          {sanitizeFieldValue(displayValue, false)}
-        </span>
-      )
+      return sanitizeFieldValue(displayValue, false)
     }
   }
 
@@ -76,7 +72,7 @@ export const GridFieldDisplay = ({ components, field, spec }) => {
     })
 
   return (
-    <span className="field-value-text">
+    <>
       <span className="grid-system-name">{systemName}:</span>
       <br />
       {parts.map((part, index) => (
@@ -85,7 +81,7 @@ export const GridFieldDisplay = ({ components, field, spec }) => {
           {index < parts.length - 1 && <br />}
         </span>
       ))}
-    </span>
+    </>
   )
 }
 
@@ -108,11 +104,7 @@ export const CoordinateFieldDisplay = ({ components, spec }) => {
         ? c.lon.toFixed(6)
         : sanitizeFieldValue(c.lon, false)
 
-    return (
-      <span className="field-value-text">
-        Lat: {lat}°, Lon: {lon}°
-      </span>
-    )
+    return `Lat: ${lat}°, Lon: ${lon}°`
   }
 
   if (c.type === 'bbox') {
@@ -133,18 +125,10 @@ export const CoordinateFieldDisplay = ({ components, spec }) => {
         ? c.maxLat.toFixed(6)
         : sanitizeFieldValue(c.maxLat, false)
 
-    return (
-      <span className="field-value-text">
-        BBox: [{minLon}, {minLat}] – [{maxLon}, {maxLat}]
-      </span>
-    )
+    return `BBox: [${minLon}, ${minLat}] – [${maxLon}, ${maxLat}]`
   }
 
-  return (
-    <span className="field-value-text">
-      {sanitizeFieldValue(c.value ?? '', false)}
-    </span>
-  )
+  return sanitizeFieldValue(c.value ?? '', false)
 }
 
 /**
@@ -166,18 +150,10 @@ export const ShapeFieldDisplay = ({ components, spec }) => {
         ? c.height.toLocaleString()
         : sanitizeFieldValue(c.height, false)
 
-    return (
-      <span className="field-value-text">
-        Shape: {width} × {height} px
-      </span>
-    )
+    return `Shape: ${width} × ${height} px`
   }
 
-  return (
-    <span className="field-value-text">
-      {sanitizeFieldValue(c.value ?? '', false)}
-    </span>
-  )
+  return sanitizeFieldValue(c.value ?? '', false)
 }
 
 /**
@@ -188,7 +164,7 @@ export const BooleanFieldDisplay = ({ components, spec }) => {
   if (!components || components.length === 0) return null
 
   const value = components[0].value
-  return <span className="field-value-text">{value ? 'Yes' : 'No'}</span>
+  return value ? 'Yes' : 'No'
 }
 
 /**
@@ -198,11 +174,7 @@ export const BooleanFieldDisplay = ({ components, spec }) => {
 export const PercentageFieldDisplay = ({ components, spec }) => {
   if (!components || components.length === 0) return null
 
-  return (
-    <span className="field-value-text">
-      {sanitizeFieldValue(components[0].value, false)}%
-    </span>
-  )
+  return `${sanitizeFieldValue(components[0].value, false)}%`
 }
 
 /**
@@ -215,7 +187,7 @@ export const StandardFieldDisplay = ({ components, field, spec }) => {
   const value = components[0]?.value ?? ''
   const sanitizedValue = sanitizeFieldValue(value, false)
 
-  return <span className="field-value-text">{sanitizedValue}</span>
+  return sanitizedValue
 }
 
 /**

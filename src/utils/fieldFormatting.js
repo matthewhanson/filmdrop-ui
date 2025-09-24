@@ -1,18 +1,17 @@
 import StacFields from '@radiantearth/stac-fields'
-import { getStacFieldType, getFieldSpec } from './fieldDiscovery.js'
+import { getStacFieldType } from './fieldDiscovery.js'
 import { sanitizeFieldValue, validateFieldSecurity } from './securityHelper.js'
 
 /**
- * FIELD FORMATTING MODULE
- * Handles value formatting, component extraction, and HTML generation
+ * Field value formatting and HTML generation
  */
 
 /**
- * Main entry point - automatically formats ANY STAC field
- * @param {string} field - The field name
- * @param {any} value - The field value
- * @param {object} item - The full STAC item
- * @returns {string} Formatted field value with HTML
+ * Formats STAC field with HTML
+ * @param {string} field - Field name
+ * @param {any} value - Field value
+ * @param {object} item - STAC item
+ * @returns {string} Formatted HTML
  */
 export function formatStacFieldEnhanced(field, value, item) {
   if (!item?.properties) {
@@ -52,41 +51,12 @@ export function formatStacFieldEnhanced(field, value, item) {
 }
 
 /**
- * UNIVERSAL COMPONENT EXTRACTOR
- *
- * Extracts meaningful, displayable components from any STAC field type by delegating
- * to specialized extractors based on the discovered field type. This enables consistent
- * component extraction across all field types without hardcoded field lists.
- *
- * @param {string} field - The field name (e.g., 'eo:cloud_cover', 'proj:centroid')
- * @param {any} value - The field value to extract components from
- * @param {Object} item - The STAC item containing the field
- * @param {string} fieldType - The discovered field type from discoverFieldType()
- * @returns {Array} Array of component objects with {label, value, unit} properties
- *
- * COMPONENT EXTRACTION STRATEGY:
- *
- * Each specialized extractor follows a consistent pattern:
- * 1. Analyze the field name and value structure
- * 2. Break down complex values into logical subcomponents
- * 3. Apply appropriate formatting and units
- * 4. Return standardized component objects
- *
- * COMPONENT OBJECT STRUCTURE:
- * - label: Human-readable component name
- * - value: Formatted component value
- * - unit: Unit of measurement (if applicable)
- * - type: Component type for styling
- *
- * SPECIALIZED EXTRACTORS:
- * - extractGridComponents: Handles MGRS, WRS, UTM grid systems
- * - extractCoordinateComponents: Handles lat/lon, bbox coordinates
- * - extractShapeComponents: Handles dimensions, shapes, sizes
- * - extractTransformComponents: Handles transformation matrices
- * - extractProcessingComponents: Handles processing information
- * - extractBooleanComponents: Handles true/false values
- * - extractPercentageComponents: Handles percentages and ratios
- * - extractStandardComponents: Handles general text/numbers
+ * Extract components from STAC field
+ * @param {string} field - Field name
+ * @param {any} value - Field value
+ * @param {Object} item - STAC item
+ * @param {string} fieldType - Field type
+ * @returns {Array} Component objects
  */
 function extractFieldComponents(field, value, item, fieldType) {
   switch (fieldType) {
@@ -110,86 +80,22 @@ function extractFieldComponents(field, value, item, fieldType) {
 }
 
 /**
- * GRID COMPONENT EXTRACTOR
- *
- * Extracts individual components from grid reference systems (MGRS, WRS, UTM) by analyzing
- * the STAC item properties and breaking down complex grid values into displayable subcomponents.
- * This handles the complexity of grid systems that often contain multiple related fields.
- *
- * @param {string} field - The field name being processed
- * @param {any} value - The field value (may be complex or simple)
- * @param {Object} item - The STAC item containing all properties
- * @returns {Array} Array of grid component objects
- *
- * EXTRACTION STRATEGY:
- *
- * 1. PROPERTY SCANNING: Scans all item properties for grid-related fields
- *    - MGRS fields: utm_zone, latitude_band, grid_square
- *    - WRS fields: wrs_type, wrs_path, wrs_row
- *    - Generic: tile, zone, grid:code
- *
- * 2. COMPONENT CREATION: For each grid property found:
- *    - Generates human-readable label using generateDynamicLabel()
- *    - Infers grid system type using inferGridSystem()
- *    - Creates standardized component object
- *
- * 3. VALUE PARSING: If no properties found, attempts to parse the value string
- *    - Handles composite strings like "MGRS-14R-NU"
- *    - Breaks down into individual components
- *
- * GRID SYSTEMS HANDLED:
- *
- * - MGRS (Military Grid Reference System): UTM zones, latitude bands, grid squares
- * - WRS (Worldwide Reference System): Landsat path/row system
- * - UTM (Universal Transverse Mercator): Zone-based coordinate system
- * - Generic grid systems: Tile identifiers, zone codes
- *
- * COMPONENT OBJECT STRUCTURE:
- * - label: Human-readable component name (e.g., "Utm Zone", "Grid Square")
- * - value: The component value (e.g., 14, "R", "NU")
- * - system: Grid system type (e.g., "MGRS", "WRS", "UTM")
- * - source: Original property name for reference
+ * Extract grid components
+ * @param {string} field - Field name
+ * @param {any} value - Field value
+ * @param {Object} item - STAC item
+ * @returns {Array} Grid component objects
  */
 function extractGridComponents(field, value, item) {
   const components = []
 
   // STEP 1: PROPERTY SCANNING - Look for grid-related properties in the item
-  // This handles cases where grid information is spread across multiple fields
-  Object.entries(item.properties).forEach(([propName, propValue]) => {
-    const propLower = propName.toLowerCase()
-
-    // Identify grid-related properties by name patterns
-    if (
-      propLower.includes('utm_zone') || // MGRS UTM zone (e.g., 14)
-      propLower.includes('latitude_band') || // MGRS latitude band (e.g., R)
-      propLower.includes('grid_square') || // MGRS grid square (e.g., NU)
-      propLower.includes('wrs_type') || // WRS system type (e.g., WRS-2)
-      propLower.includes('wrs_path') || // WRS path number (e.g., 027)
-      propLower.includes('wrs_row') || // WRS row number (e.g., 039)
-      propLower.includes('tile') || // Generic tile identifiers
-      propLower.includes('zone') || // Generic zone references
-      propLower === 'grid:code' // Explicit grid code field
-    ) {
-      // SECURITY: Sanitize property name and value
-      const sanitizedPropName = sanitizeFieldValue(propName, false)
-      const sanitizedPropValue = sanitizeFieldValue(propValue, false)
-
-      // Generate human-readable label from sanitized property name
-      const label = generateDynamicLabel(sanitizedPropName)
-      // Infer which grid system this belongs to (using sanitized values)
-      const system = inferGridSystem(sanitizedPropName, sanitizedPropValue)
-
-      components.push({
-        label,
-        value: sanitizedPropValue,
-        system,
-        source: sanitizedPropName
-      })
-    }
-  })
+  const propertyComponents = extractGridComponentsFromProperties(
+    item.properties
+  )
+  components.push(...propertyComponents)
 
   // STEP 2: VALUE PARSING - If no components found, try to parse the value itself
-  // This handles cases where grid information is in a single composite string
   if (components.length === 0 && typeof value === 'string') {
     const parsed = parseGridValue(value)
     if (parsed) {
@@ -198,6 +104,74 @@ function extractGridComponents(field, value, item) {
   }
 
   return components
+}
+
+/**
+ * Extract grid components from STAC item properties
+ * @param {Object} properties - STAC item properties
+ * @returns {Array} Array of grid component objects
+ */
+function extractGridComponentsFromProperties(properties) {
+  const components = []
+  const gridPropertyPatterns = [
+    'utm_zone',
+    'latitude_band',
+    'grid_square',
+    'wrs_type',
+    'wrs_path',
+    'wrs_row',
+    'tile',
+    'zone',
+    'grid:code'
+  ]
+
+  Object.entries(properties).forEach(([propName, propValue]) => {
+    if (isGridProperty(propName, gridPropertyPatterns)) {
+      const component = createGridComponent(propName, propValue)
+      if (component) {
+        components.push(component)
+      }
+    }
+  })
+
+  return components
+}
+
+/**
+ * Check if a property name matches grid property patterns
+ * @param {string} propName - Property name to check
+ * @param {Array} patterns - Array of grid property patterns
+ * @returns {boolean} True if property matches grid patterns
+ */
+function isGridProperty(propName, patterns) {
+  const propLower = propName.toLowerCase()
+  return patterns.some(
+    (pattern) => propLower.includes(pattern) || propLower === pattern
+  )
+}
+
+/**
+ * Create a grid component object from property name and value
+ * @param {string} propName - Property name
+ * @param {any} propValue - Property value
+ * @returns {Object|null} Grid component object or null if invalid
+ */
+function createGridComponent(propName, propValue) {
+  // SECURITY: Sanitize property name and value
+  const sanitizedPropName = sanitizeFieldValue(propName, false)
+  const sanitizedPropValue = sanitizeFieldValue(propValue, false)
+
+  // Generate human-readable label from sanitized property name
+  const label = generateDynamicLabel(sanitizedPropName)
+  // Infer which grid system this belongs to (using sanitized values)
+  const system = inferGridSystem(sanitizedPropName, sanitizedPropValue)
+
+  return {
+    label,
+    value: sanitizedPropValue,
+    system,
+    source: sanitizedPropName
+  }
 }
 
 /**
@@ -361,61 +335,29 @@ function extractPercentageComponents(field, value, item) {
 }
 
 /**
- * UNIVERSAL HTML GENERATOR
- *
- * Creates consistent, formatted HTML output for any STAC field type by delegating
- * to specialized HTML generators based on the discovered field type. This ensures
- * consistent formatting across all field types while allowing type-specific optimizations.
- *
- * @param {string} fieldType - The discovered field type from discoverFieldType()
- * @param {Array} components - Array of component objects from extractFieldComponents()
- * @param {string} field - The original field name
- * @param {Object} item - The STAC item containing the field
- * @returns {string} Formatted HTML string for display
- *
- * HTML GENERATION STRATEGY:
- *
- * 1. FIELD SPECIFICATION: Retrieves STAC field specification for metadata
- * 2. TYPE DELEGATION: Routes to specialized HTML generator based on field type
- * 3. CONSISTENT OUTPUT: Each generator returns standardized HTML format
- * 4. FALLBACK HANDLING: Falls back to standard formatting for unknown types
- *
- * SPECIALIZED GENERATORS:
- *
- * - generateGridHtml: Handles MGRS, WRS, UTM grid systems with subfield optimization
- * - generateCoordinateHtml: Handles lat/lon, bbox coordinates with proper formatting
- * - generateShapeHtml: Handles dimensions, shapes with size formatting
- * - generateTransformHtml: Handles transformation matrices with technical display
- * - generateProcessingHtml: Handles processing information with version display
- * - generateBooleanHtml: Handles true/false values with Yes/No formatting
- * - generatePercentageHtml: Handles percentages with proper unit display
- *
- * HTML OUTPUT FORMAT:
- * - Grid fields: Structured display with system identification
- * - Coordinate fields: Formatted lat/lon with degree symbols
- * - Shape fields: Dimension display with proper units
- * - Boolean fields: Human-readable Yes/No
- * - Percentage fields: Formatted percentages with % symbol
- * - Standard fields: Basic text formatting with units
+ * Generate HTML for field components
+ * @param {string} fieldType - Field type
+ * @param {Array} components - Component objects
+ * @param {string} field - Field name
+ * @param {Object} item - STAC item
+ * @returns {string} Formatted HTML
  */
 function generateFieldHtml(fieldType, components, field, item) {
-  const spec = getFieldSpec(field, item)
-
   switch (fieldType) {
     case 'grid':
-      return generateGridHtml(components, field, spec)
+      return generateGridHtml(components, field)
     case 'coordinate':
-      return generateCoordinateHtml(components, spec)
+      return generateCoordinateHtml(components)
     case 'shape':
-      return generateShapeHtml(components, spec)
+      return generateShapeHtml(components)
     case 'transform':
-      return generateTransformHtml(components, spec)
+      return generateTransformHtml(components)
     case 'processing':
-      return generateProcessingHtml(components, spec)
+      return generateProcessingHtml(components)
     case 'boolean':
-      return generateBooleanHtml(components, spec)
+      return generateBooleanHtml(components)
     case 'percentage':
-      return generatePercentageHtml(components, spec)
+      return generatePercentageHtml(components)
     default:
       return formatStacField(field, components[0]?.value, item)
   }
@@ -424,7 +366,7 @@ function generateFieldHtml(fieldType, components, field, item) {
 /**
  * Generate grid text dynamically
  */
-function generateGridHtml(components, currentField, spec) {
+function generateGridHtml(components, currentField) {
   if (components.length === 0) return ''
   const currentLower = (currentField || '').toLowerCase()
 
@@ -457,12 +399,13 @@ function generateGridHtml(components, currentField, spec) {
     if (comp) {
       // Minimal formatting: special case for wrs_type to show WRS-<type>
       if (currentLower.includes('wrs_type')) {
-        return `WRS-${String(comp.value).toUpperCase()}`
+        const sanitizedValue = sanitizeFieldValue(comp.value, false)
+        return `WRS-${String(sanitizedValue).toUpperCase()}`
       }
       if (currentLower === 'grid:code') {
-        return String(comp.value)
+        return sanitizeFieldValue(comp.value, false)
       }
-      return String(comp.value)
+      return sanitizeFieldValue(comp.value, false)
     }
   }
 
@@ -490,7 +433,7 @@ function generateGridHtml(components, currentField, spec) {
 /**
  * Generate coordinate text dynamically
  */
-function generateCoordinateHtml(components, spec) {
+function generateCoordinateHtml(components) {
   if (components.length === 0) return ''
   const c = components[0]
   if (c.type === 'centroid') {
@@ -531,7 +474,7 @@ function generateCoordinateHtml(components, spec) {
 /**
  * Generate shape text dynamically
  */
-function generateShapeHtml(components, spec) {
+function generateShapeHtml(components) {
   if (components.length === 0) return ''
   const c = components[0]
   if (c.type === 'shape') {
@@ -552,11 +495,31 @@ function generateShapeHtml(components, spec) {
 /**
  * Generate transform text dynamically
  */
-function generateTransformHtml(components, spec) {
+function generateTransformHtml(components) {
   if (components.length === 0) return ''
   const c = components[0]
   if (c.type === 'transform') {
-    return `Pixel Size: ${c.pixelSizeX} × ${Math.abs(c.pixelSizeY)} m; Origin: (${c.originX.toLocaleString()}, ${c.originY.toLocaleString()})`
+    const pixelSizeX = sanitizeFieldValue(
+      typeof c.pixelSizeX === 'number'
+        ? c.pixelSizeX.toLocaleString()
+        : c.pixelSizeX,
+      false
+    )
+    const pixelSizeY = sanitizeFieldValue(
+      typeof c.pixelSizeY === 'number'
+        ? Math.abs(c.pixelSizeY).toLocaleString()
+        : c.pixelSizeY,
+      false
+    )
+    const originX = sanitizeFieldValue(
+      typeof c.originX === 'number' ? c.originX.toLocaleString() : c.originX,
+      false
+    )
+    const originY = sanitizeFieldValue(
+      typeof c.originY === 'number' ? c.originY.toLocaleString() : c.originY,
+      false
+    )
+    return `Pixel Size: ${pixelSizeX} × ${pixelSizeY} m; Origin: (${originX}, ${originY})`
   }
   return String(c.value ?? '')
 }
@@ -564,18 +527,21 @@ function generateTransformHtml(components, spec) {
 /**
  * Generate processing text dynamically
  */
-function generateProcessingHtml(components, spec) {
+function generateProcessingHtml(components) {
   if (components.length === 0) return ''
   const parts = components
     .filter((c) => c.type === 'software')
-    .map((c) => `${c.name} (${c.version})`)
+    .map(
+      (c) =>
+        `${sanitizeFieldValue(c.name, false)} (${sanitizeFieldValue(c.version, false)})`
+    )
   return parts.join(', ')
 }
 
 /**
  * Generate boolean HTML
  */
-function generateBooleanHtml(components, spec) {
+function generateBooleanHtml(components) {
   if (components.length === 0) return ''
 
   const value = components[0].value
@@ -585,7 +551,7 @@ function generateBooleanHtml(components, spec) {
 /**
  * Generate percentage HTML
  */
-function generatePercentageHtml(components, spec) {
+function generatePercentageHtml(components) {
   if (components.length === 0) return ''
 
   return `${components[0].value}%`

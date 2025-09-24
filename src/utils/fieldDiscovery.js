@@ -1,67 +1,44 @@
 import StacFields from '@radiantearth/stac-fields'
 
 /**
- * FIELD DISCOVERY MODULE
- * Handles field type detection, metadata discovery, and field specification lookup
+ * Field type detection and metadata discovery
  */
 
+// Cache for field type discovery to improve performance
+const fieldTypeCache = new Map()
+const fieldSpecCache = new Map()
+const fieldMetadataCache = new Map()
+
+// Cache size limits to prevent memory leaks
+const MAX_CACHE_SIZE = 1000
+
 /**
- * UNIVERSAL FIELD TYPE DISCOVERY
- *
- * Automatically determines the semantic type of a STAC field based on heuristic analysis
- * of the field name, value content, and item context. This enables dynamic formatting
- * without hardcoded field lists.
- *
- * @param {string} field - The field name (e.g., 'eo:cloud_cover', 'proj:centroid')
+ * Clear caches when they get too large
+ */
+function clearCachesIfNeeded() {
+  if (fieldTypeCache.size > MAX_CACHE_SIZE) {
+    fieldTypeCache.clear()
+  }
+  if (fieldSpecCache.size > MAX_CACHE_SIZE) {
+    fieldSpecCache.clear()
+  }
+  if (fieldMetadataCache.size > MAX_CACHE_SIZE) {
+    fieldMetadataCache.clear()
+  }
+}
+
+/**
+ * Discovers field type based on field name and value patterns
+ * @param {string} field - The field name
  * @param {any} value - The field value to analyze
  * @param {Object} item - The STAC item containing the field
- * @returns {string} The discovered field type: 'grid', 'coordinate', 'shape', 'transform', 'processing', 'boolean', 'percentage', or 'standard'
- *
- * DISCOVERY LOGIC:
- *
- * 1. GRID SYSTEMS: Detects reference system fields like MGRS, WRS, UTM
- *    - Field names: 'mgrs:utm_zone', 'landsat:wrs_path', 'grid:code'
- *    - Value patterns: 'MGRS-14R-NU', 'WRS-2: Path: 027 Row: 039'
- *    - Used for: Military Grid Reference System, Worldwide Reference System, UTM zones
- *
- * 2. COORDINATES: Detects spatial coordinate and geometry fields
- *    - Field names: 'proj:centroid', 'proj:bbox', 'geometry:coordinates'
- *    - Value patterns: [lat, lon] arrays, [minX, minY, maxX, maxY] bounding boxes
- *    - Used for: Geographic coordinates, bounding boxes, geometry centers
- *
- * 3. SHAPES: Detects dimensional and shape-related fields
- *    - Field names: 'proj:shape', 'raster:bands', 'dimensions'
- *    - Value patterns: [width, height] arrays, pixel dimensions
- *    - Used for: Image dimensions, raster shapes, spatial extents
- *
- * 4. TRANSFORMS: Detects geometric transformation fields
- *    - Field names: 'proj:transform', 'affine:matrix', 'geotransform'
- *    - Value patterns: Transformation matrices, affine parameters
- *    - Used for: Coordinate transformations, geometric corrections
- *
- * 5. PROCESSING: Detects algorithm and processing-related fields
- *    - Field names: 's2:processing_baseline', 'algorithm:name', 'method:type'
- *    - Value patterns: Version strings, algorithm identifiers
- *    - Used for: Processing versions, algorithm specifications
- *
- * 6. BOOLEAN: Detects true/false fields
- *    - Value type: boolean (true/false)
- *    - Used for: Flags, toggles, presence indicators
- *
- * 7. PERCENTAGE: Detects percentage and ratio fields
- *    - Field names: 'eo:cloud_cover', 'quality:percentage', 'coverage:ratio'
- *    - Value patterns: Numbers between 0-1, percentage strings
- *    - Used for: Cloud cover, quality metrics, coverage ratios
- *
- * 8. STANDARD: Default fallback for unrecognized fields
- *    - Used for: General text, numbers, dates, unknown formats
+ * @returns {string} Field type: 'grid', 'coordinate', 'shape', 'transform', 'processing', 'boolean', 'percentage', or 'standard'
  */
 function discoverFieldType(field, value, item) {
   const fieldLower = field.toLowerCase()
   const valueStr = String(value)
 
-  // GRID SYSTEMS: Military Grid Reference System (MGRS), Worldwide Reference System (WRS), UTM
-  // These systems use specific naming conventions and value patterns for spatial referencing
+  // Grid systems (MGRS, WRS, UTM)
   if (
     fieldLower.includes('grid') || // Generic grid references
     fieldLower.includes('mgrs') || // Military Grid Reference System
@@ -80,8 +57,7 @@ function discoverFieldType(field, value, item) {
     return 'grid'
   }
 
-  // COORDINATES: Geographic coordinates, bounding boxes, geometry centers
-  // Check field name first, then fall back to array length patterns
+  // Coordinates
   if (
     fieldLower.includes('centroid') || // Geometric center points
     fieldLower.includes('bbox') || // Bounding boxes
@@ -94,7 +70,7 @@ function discoverFieldType(field, value, item) {
     return 'coordinate'
   }
 
-  // Additional coordinate detection for arrays (only if not already identified as shape)
+  // Array coordinates (2 or 4 elements)
   if (
     Array.isArray(value) &&
     (value.length === 2 || value.length === 4) &&
@@ -105,55 +81,49 @@ function discoverFieldType(field, value, item) {
     return 'coordinate'
   }
 
-  // SHAPES: Image dimensions, raster shapes, spatial extents
-  // Typically represent width/height or other dimensional properties
-  // Check field name first for explicit shape indicators
+  // Shapes (dimensions, sizes)
   if (
-    fieldLower.includes('shape') || // Shape definitions
-    fieldLower.includes('size') || // Size specifications
-    fieldLower.includes('dimension') || // Dimensional properties
-    fieldLower.includes('width') || // Width measurements
-    fieldLower.includes('height') || // Height measurements
-    fieldLower.includes('pixel') || // Pixel-related dimensions
-    fieldLower.includes('resolution') // Resolution specifications
+    fieldLower.includes('shape') ||
+    fieldLower.includes('size') ||
+    fieldLower.includes('dimension') ||
+    fieldLower.includes('width') ||
+    fieldLower.includes('height') ||
+    fieldLower.includes('pixel') ||
+    fieldLower.includes('resolution')
   ) {
     return 'shape'
   }
 
-  // TRANSFORMS: Geometric transformations, affine matrices, coordinate transformations
-  // Used for converting between coordinate systems or applying geometric corrections
+  // Transforms (matrices, projections)
   if (
-    fieldLower.includes('transform') || // Transformation matrices
-    fieldLower.includes('matrix') || // Transformation matrices
-    fieldLower.includes('affine') || // Affine transformations
-    fieldLower.includes('projection') || // Projection parameters
-    fieldLower.includes('epsg') || // EPSG coordinate system codes
+    fieldLower.includes('transform') ||
+    fieldLower.includes('matrix') ||
+    fieldLower.includes('affine') ||
+    fieldLower.includes('projection') ||
+    fieldLower.includes('epsg') ||
     (Array.isArray(value) && value.length === 6) // 6-element transformation arrays
   ) {
     return 'transform'
   }
 
-  // PROCESSING: Algorithm specifications, processing versions, method descriptions
-  // Indicates how data was processed or which algorithms were used
+  // Processing (algorithms, versions)
   if (
-    fieldLower.includes('processing') || // Processing information
-    fieldLower.includes('software') || // Software specifications
-    fieldLower.includes('algorithm') || // Algorithm specifications
-    fieldLower.includes('workflow') || // Processing workflows
-    fieldLower.includes('version') || // Version information
+    fieldLower.includes('processing') ||
+    fieldLower.includes('software') ||
+    fieldLower.includes('algorithm') ||
+    fieldLower.includes('workflow') ||
+    fieldLower.includes('version') ||
     (typeof value === 'object' && value !== null && value.name) // Named objects
   ) {
     return 'processing'
   }
 
-  // BOOLEAN: True/false values for flags, toggles, presence indicators
-  // Simple type check for boolean values
+  // BOOLEAN: Check for True/false values for flags, toggles, presence indicators
   if (typeof value === 'boolean') {
     return 'boolean'
   }
 
-  // PERCENTAGE: Cloud cover, quality metrics, coverage ratios
-  // Numbers between 0-1 or fields with percentage-related names
+  // Percentages (0-1 range): Cloud cover, quality metrics, coverage ratios
   if (
     fieldLower.includes('percentage') || // Explicit percentage fields
     fieldLower.includes('cover') || // Cloud cover, snow cover, etc.
@@ -168,53 +138,90 @@ function discoverFieldType(field, value, item) {
 }
 
 /**
- * Public wrapper to discover a field's high-level type for UI logic
+ * Get field type with caching
  */
 export function getStacFieldType(field, value, item) {
+  const cacheKey = `${field}:${typeof value}:${Array.isArray(value) ? value.length : 'scalar'}`
+  if (fieldTypeCache.has(cacheKey)) {
+    return fieldTypeCache.get(cacheKey)
+  }
+
   try {
-    return discoverFieldType(field, value, item)
-  } catch (_) {
-    return 'standard'
+    const fieldType = discoverFieldType(field, value, item)
+    clearCachesIfNeeded()
+    fieldTypeCache.set(cacheKey, fieldType)
+
+    return fieldType
+  } catch (error) {
+    console.warn('Field type discovery failed for field:', field, error)
+    const fallbackType = 'standard'
+    clearCachesIfNeeded()
+    fieldTypeCache.set(cacheKey, fallbackType)
+    return fallbackType
   }
 }
 
 /**
- * Get field specification from STAC registry
+ * Get field specification with caching
  */
 export function getFieldSpec(field, item) {
+  if (fieldSpecCache.has(field)) {
+    return fieldSpecCache.get(field)
+  }
+
   try {
-    return StacFields.Registry.getSpecification(field)
+    const spec = StacFields.Registry.getSpecification(field)
+    clearCachesIfNeeded()
+    fieldSpecCache.set(field, spec)
+
+    return spec
   } catch (error) {
-    return null
+    const fallbackSpec = {}
+    clearCachesIfNeeded()
+    fieldSpecCache.set(field, fallbackSpec)
+    return fallbackSpec
   }
 }
 
 /**
- * Get comprehensive field metadata including tooltip information
+ * Get field metadata with caching
  */
 export function getFieldMetadata(field, item = null) {
+  if (fieldMetadataCache.has(field)) {
+    return fieldMetadataCache.get(field)
+  }
+
   try {
     const spec = StacFields.Registry.getSpecification(field)
     const tooltipContent =
       spec?.description || spec?.explain || spec?.title || null
     const hasTooltip = !!tooltipContent
 
-    return {
+    const metadata = {
       hasTooltip,
       tooltipContent,
       tooltipSource: hasTooltip ? 'registry' : null
     }
+
+    clearCachesIfNeeded()
+    fieldMetadataCache.set(field, metadata)
+
+    return metadata
   } catch (error) {
-    return {
+    const fallbackMetadata = {
       hasTooltip: false,
       tooltipContent: null,
       tooltipSource: null
     }
+
+    clearCachesIfNeeded()
+    fieldMetadataCache.set(field, fallbackMetadata)
+    return fallbackMetadata
   }
 }
 
 /**
- * Get tooltip information for a field
+ * Get tooltip info for a field
  */
 export function getFieldTooltipInfo(field, item = null) {
   const metadata = getFieldMetadata(field, item)
@@ -228,7 +235,7 @@ export function getFieldTooltipInfo(field, item = null) {
 }
 
 /**
- * Check if a field is supported by the STAC registry
+ * Check if field is supported
  */
 export function isFieldSupported(field) {
   try {
@@ -240,7 +247,7 @@ export function isFieldSupported(field) {
 }
 
 /**
- * Discover field metadata for a given field and collection
+ * Discover field metadata
  */
 export function discoverFieldMetadata(field, collection) {
   try {
@@ -262,7 +269,7 @@ export function discoverFieldMetadata(field, collection) {
 }
 
 /**
- * Generate a fallback label for unknown fields
+ * Generate fallback label for unknown fields
  */
 export function getFallbackFieldLabel(field) {
   return field

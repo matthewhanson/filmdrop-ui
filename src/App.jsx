@@ -5,7 +5,6 @@ import './themes/theme.css'
 import Content from './components/Layout/Content/Content'
 import PageHeader from './components/Layout/PageHeader/PageHeader'
 import UploadGeojsonModal from './components/UploadGeojsonModal/UploadGeojsonModal'
-import EnhancedDetailsModal from './components/EnhancedDetailsModal/EnhancedDetailsModal'
 import SystemMessage from './components/SystemMessage/SystemMessage'
 import { GetCollectionsService } from './services/get-collections-service'
 import { LoadConfigIntoStateService } from './services/get-config-service'
@@ -26,9 +25,6 @@ function App() {
   )
   const _appConfig = useSelector((state) => state.mainSlice.appConfig)
   const _showCartModal = useSelector((state) => state.mainSlice.showCartModal)
-  const _showEnhancedDetailsModal = useSelector(
-    (state) => state.mainSlice.showEnhancedDetailsModal
-  )
   const _authTokenExists = useSelector(
     (state) => state.mainSlice.authTokenExists
   )
@@ -87,9 +83,6 @@ function App() {
             ) : null}
             {_showApplicationAlert ? <SystemMessage></SystemMessage> : null}
             {_showCartModal ? <CartModal></CartModal> : null}
-            {_showEnhancedDetailsModal ? (
-              <EnhancedDetailsModal></EnhancedDetailsModal>
-            ) : null}
           </div>
         )
       ) : (

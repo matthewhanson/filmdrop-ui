@@ -67,6 +67,9 @@ const RightContent = () => {
   const _appName = useSelector((state) => state.mainSlice.appName)
   const _showLayerList = useSelector((state) => state.mainSlice.showLayerList)
   const _currentTheme = useSelector((state) => state.mainSlice.currentTheme)
+  const _isEnhancedDetailsExpanded = useSelector(
+    (state) => state.mainSlice.isEnhancedDetailsExpanded
+  )
 
   const dispatch = useDispatch()
 
@@ -188,7 +191,9 @@ const RightContent = () => {
   }
 
   return (
-    <div className="RightContent">
+    <div
+      className={`RightContent ${_isEnhancedDetailsExpanded ? 'expanded' : ''}`}
+    >
       <LeafMap></LeafMap>
       {_showZoomNotice && (
         <div className="ZoomNotice">

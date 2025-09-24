@@ -2,6 +2,11 @@
   height: 100%;
   width: 300px;
   background-color: var(--side-panel-background);
+  transition: width 0.3s ease-in-out;
+}
+
+.LeftContent.expanded {
+  width: 800px;
 }
 
 .LeftContentTabs {
@@ -14,7 +19,7 @@
 }
 
 .LeftContentTab {
-  width: 50%;
+  width: 33.33%;
   height: 100%;
   display: flex;
   align-items: center;
@@ -30,6 +35,24 @@
   border-bottom: 4px solid var(--side-panel-tab-border);
   border-top: 4px solid var(--side-panel-tab-border);
   font-weight: bold;
+  transition: width 0.3s ease-in-out;
+}
+
+/* Enhanced Details tab when collapsed (icon-only) */
+.LeftContentTab.enhanced-collapsed {
+  width: 60px;
+  min-width: 60px;
+}
+
+/* Enhanced Details tab when expanded */
+.LeftContentTab.enhanced-expanded {
+  width: 50%;
+}
+
+/* When Enhanced Details is collapsed, other tabs take up remaining space */
+.LeftContentTabs:has(.enhanced-collapsed)
+  .LeftContentTab:not(.enhanced-collapsed) {
+  width: calc((100% - 60px) / 2);
 }
 
 .LeftContentTabSelected {
@@ -75,12 +98,14 @@
   left: 0px;
 }
 
-.popupResultsEmptyPrimaryText {
+.popupResultsEmptyPrimaryText,
+.enhancedDetailsTabEmptyPrimaryText {
   font-weight: bold;
   margin-bottom: 20px;
 }
 
-.popupResultsEmptySecondaryText {
+.popupResultsEmptySecondaryText,
+.enhancedDetailsTabEmptySecondaryText {
   font-size: 14px;
   max-width: 80%;
 }

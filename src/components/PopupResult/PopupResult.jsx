@@ -1,12 +1,13 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import PropTypes from 'prop-types'
 import './PopupResult.css'
 import { useSelector, useDispatch } from 'react-redux'
-
-import { setshowEnhancedDetailsModal } from '../../redux/slices/mainSlice'
+import { processDisplayFieldValues } from '../../utils/dataHelper'
+import {
+  settabSelected,
+  setIsEnhancedDetailsExpanded
+} from '../../redux/slices/mainSlice'
 import { debounceTitilerOverlay, zoomToItemExtent } from '../../utils/mapHelper'
-import { buildAutoDisplayFieldList } from '../../utils/fieldGrouping.js'
-import FieldRenderer from './FieldRenderer'
 
 const PopupResult = (props) => {
   const dispatch = useDispatch()
@@ -21,28 +22,9 @@ const PopupResult = (props) => {
 
   // Memoized callback for enhanced details button
   const handleEnhancedDetailsClick = useCallback(() => {
-    dispatch(setshowEnhancedDetailsModal(true))
+    dispatch(settabSelected('enhanced'))
+    dispatch(setIsEnhancedDetailsExpanded(true))
   }, [dispatch])
-
-  // Memoized display fields computation
-  const displayFields = useMemo(() => {
-    if (
-      _appConfig.POPUP_DISPLAY_FIELDS &&
-      _selectedCollectionData?.id &&
-      _selectedCollectionData.id in _appConfig.POPUP_DISPLAY_FIELDS
-    ) {
-      return _appConfig.POPUP_DISPLAY_FIELDS[_selectedCollectionData.id]
-    }
-    // Only show auto-discovered fields if POPUP_DISPLAY_FIELDS is not configured
-    if (!_appConfig.POPUP_DISPLAY_FIELDS) {
-      return buildAutoDisplayFieldList(props.result)
-    }
-    return []
-  }, [
-    _appConfig.POPUP_DISPLAY_FIELDS,
-    _selectedCollectionData?.id,
-    props.result
-  ])
 
   useEffect(() => {
     if (props.result) {
@@ -78,7 +60,7 @@ const PopupResult = (props) => {
       }
     >
       {props.result ? (
-        <div role="region" aria-label="Item details">
+        <div>
           <div className="popupResultThumbnailContainer">
             {thumbnailURL ? (
               <picture>
@@ -125,15 +107,32 @@ const PopupResult = (props) => {
                 {props.result.id}
               </span>
             </div>
-            {/* Render fields using the reusable FieldRenderer component */}
-            {displayFields.map((field) => (
-              <FieldRenderer
-                key={field}
-                field={field}
-                item={props.result}
-                className="detailRow"
-              />
-            ))}
+            {_appConfig.POPUP_DISPLAY_FIELDS &&
+              _selectedCollectionData.id in _appConfig.POPUP_DISPLAY_FIELDS &&
+              _appConfig.POPUP_DISPLAY_FIELDS[_selectedCollectionData.id].map(
+                (field) => (
+                  <div className="detailRow" key={field + '1'}>
+                    <span
+                      className="popupResultDetailsRowKey"
+                      key={field + '2'}
+                    >
+                      {field.charAt(0).toUpperCase() + field.slice(1) + ':'}
+                    </span>
+                    <span
+                      className="popupResultDetailsRowValue"
+                      key={field + '3'}
+                    >
+                      {field === 'eo:cloud_cover'
+                        ? Math.round(props.result?.properties[field] * 100) /
+                            100 +
+                          ' %'
+                        : processDisplayFieldValues(
+                            props.result?.properties[field]
+                          )}
+                    </span>
+                  </div>
+                )
+              )}
 
             {/* Enhanced Details Button */}
             <div className="detailRow enhancedDetailsButtonRow">
@@ -155,17 +154,7 @@ const PopupResult = (props) => {
 }
 
 PopupResult.propTypes = {
-  result: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    properties: PropTypes.object,
-    collection: PropTypes.string,
-    links: PropTypes.arrayOf(
-      PropTypes.shape({
-        rel: PropTypes.string,
-        href: PropTypes.string
-      })
-    )
-  })
+  result: PropTypes.object
 }
 
 export default PopupResult

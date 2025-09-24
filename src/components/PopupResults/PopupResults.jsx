@@ -9,7 +9,7 @@ import {
   setimageOverlayLoading,
   setselectedPopupResultIndex
 } from '../../redux/slices/mainSlice'
-import { ChevronRight, ChevronLeft } from '@mui/icons-material'
+import PopupFooter from '../PopupFooter/PopupFooter.jsx'
 import {
   isSceneInCart,
   numberOfSelectedInCart,
@@ -145,31 +145,12 @@ const PopupResults = (props) => {
               </div>
             ) : null}
           </div>
-          <div className="popupFooter">
-            <div className="popupFooterControls">
-              <div className="popupFooterControlLeft">
-                {_selectedPopupResultIndex + 1 + ' of ' + props.results.length}
-              </div>
-              <div className="popupFooterButtonsGroup">
-                <div className="popupFooterPrev popupFooterIconContainer">
-                  <button
-                    onClick={() => onPrevClick()}
-                    className="popupFooterButton popupFooterButtonLeft"
-                  >
-                    <ChevronLeft></ChevronLeft>
-                  </button>
-                </div>
-                <div className="popupFooterNext popupFooterIconContainer ">
-                  <button
-                    className="popupFooterButton popupFooterButtonRight"
-                    onClick={() => onNextClick()}
-                  >
-                    <ChevronRight></ChevronRight>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+          <PopupFooter
+            currentIndex={_selectedPopupResultIndex}
+            totalCount={props.results.length}
+            onPrevClick={onPrevClick}
+            onNextClick={onNextClick}
+          />
         </div>
       ) : (
         <div className="popupResultsEmpty">

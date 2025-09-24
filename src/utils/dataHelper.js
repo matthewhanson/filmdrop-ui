@@ -80,3 +80,39 @@ export function setScenesForCartLayer() {
   }
   addDataToLayer(cartGeojson, 'cartFootprintsLayer', options, true)
 }
+
+export function processDisplayFieldValues(value) {
+  switch (true) {
+    case value === null:
+    case value === undefined:
+      return 'No Data'
+    case typeof value === 'boolean':
+    case typeof value === 'number':
+    case typeof value === 'string':
+      return value.toString()
+    case Array.isArray(value):
+      return value.map(processDisplayFieldValues).join(', ')
+    case typeof value === 'object':
+      return formatNestedObjectDisplayFieldValues(value)
+    default:
+      return 'Unsupported Type'
+  }
+}
+
+function formatNestedObjectDisplayFieldValues(inputObject) {
+  function formatValue(value) {
+    if (Array.isArray(value)) {
+      return `[${value.map(formatValue).join(', ')}]`
+    } else if (typeof value === 'object') {
+      return `{${formatObject(value)}}`
+    } else {
+      return value
+    }
+  }
+  function formatObject(obj) {
+    return Object.entries(obj)
+      .map(([key, value]) => `${key}: ${formatValue(value)}`)
+      .join(', ')
+  }
+  return `${formatObject(inputObject)}`
+}
