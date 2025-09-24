@@ -408,7 +408,9 @@
             { "name": "nir08" },
             { "name": "scl" },
             { "name": "aot" },
-            { "name": "wvp" }
+            { "name": "wvp" },
+            { "name": "cloud" },
+            { "name": "snow" }
           ]
         },
         {
@@ -441,7 +443,9 @@
           "fields": [
             { "name": "granule_metadata" },
             { "name": "tileinfo_metadata" },
-            { "name": "thumbnail" }
+            { "name": "product_metadata" },
+            { "name": "thumbnail" },
+            { "name": "preview" }
           ]
         }
       ]
@@ -645,12 +649,24 @@
         {
           "name": "Spatial Reference",
           "fields": [{ "name": "proj:epsg" }, { "name": "proj:centroid" }]
+        },
+        {
+          "name": "Imagery Properties",
+          "fields": [{ "name": "gsd" }]
+        },
+        {
+          "name": "Scientific Reference",
+          "fields": [{ "name": "sci:doi" }]
         }
       ],
       "asset_groups": [
         {
           "name": "COGs",
           "fields": [{ "name": "image" }]
+        },
+        {
+          "name": "Metadata",
+          "fields": [{ "name": "metadata" }]
         }
       ]
     },
