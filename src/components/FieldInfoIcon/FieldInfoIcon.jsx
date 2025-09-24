@@ -16,8 +16,8 @@ const StyledInfoIcon = styled(InfoIcon)(({ theme }) => ({
   }
 }))
 
-const FieldInfoIcon = ({ field, item, tooltipPlacement = 'left' }) => {
-  const metadata = getFieldMetadata(field, item)
+const FieldInfoIcon = ({ field, tooltipPlacement = 'left' }) => {
+  const metadata = getFieldMetadata(field)
 
   if (!metadata?.hasTooltip || !metadata?.tooltipContent) return null
 
@@ -59,7 +59,6 @@ const FieldInfoIcon = ({ field, item, tooltipPlacement = 'left' }) => {
 
 FieldInfoIcon.propTypes = {
   field: PropTypes.string.isRequired,
-  item: PropTypes.object,
   tooltipPlacement: PropTypes.oneOf([
     'bottom-end',
     'bottom-start',

@@ -43,7 +43,7 @@ export function formatStacFieldEnhanced(field, value, item) {
 
   // Step 3: Generate HTML using universal formatter (sanitization happens in HTML generation)
   if (components && components.length > 0) {
-    return generateFieldHtml(fieldType, components, sanitizedField, item)
+    return generateFieldHtml(fieldType, components, sanitizedField)
   }
 
   // Fallback to standard formatting (with sanitization)
@@ -63,17 +63,17 @@ function extractFieldComponents(field, value, item, fieldType) {
     case 'grid':
       return extractGridComponents(field, value, item)
     case 'coordinate':
-      return extractCoordinateComponents(field, value, item)
+      return extractCoordinateComponents(field, value)
     case 'shape':
-      return extractShapeComponents(field, value, item)
+      return extractShapeComponents(field, value)
     case 'transform':
-      return extractTransformComponents(field, value, item)
+      return extractTransformComponents(field, value)
     case 'processing':
-      return extractProcessingComponents(field, value, item)
+      return extractProcessingComponents(field, value)
     case 'boolean':
-      return extractBooleanComponents(field, value, item)
+      return extractBooleanComponents(field, value)
     case 'percentage':
-      return extractPercentageComponents(field, value, item)
+      return extractPercentageComponents(field, value)
     default:
       return null
   }
@@ -177,7 +177,7 @@ function createGridComponent(propName, propValue) {
 /**
  * Extract coordinate components dynamically
  */
-function extractCoordinateComponents(field, value, item) {
+function extractCoordinateComponents(field, value) {
   const components = []
 
   if (field === 'proj:centroid' && value && typeof value === 'object') {
@@ -219,7 +219,7 @@ function extractCoordinateComponents(field, value, item) {
 /**
  * Extract shape components dynamically
  */
-function extractShapeComponents(field, value, item) {
+function extractShapeComponents(field, value) {
   const components = []
 
   if (field === 'proj:shape' && Array.isArray(value) && value.length >= 2) {
@@ -237,7 +237,7 @@ function extractShapeComponents(field, value, item) {
 /**
  * Extract transform components dynamically
  */
-function extractTransformComponents(field, value, item) {
+function extractTransformComponents(field, value) {
   const components = []
 
   if (field === 'proj:transform' && Array.isArray(value) && value.length >= 6) {
@@ -259,7 +259,7 @@ function extractTransformComponents(field, value, item) {
 /**
  * Extract processing components dynamically
  */
-function extractProcessingComponents(field, value, item) {
+function extractProcessingComponents(field, value) {
   const components = []
 
   if (
@@ -300,7 +300,7 @@ function extractProcessingComponents(field, value, item) {
 /**
  * Extract boolean components
  */
-function extractBooleanComponents(field, value, item) {
+function extractBooleanComponents(field, value) {
   return [
     {
       type: 'boolean',
@@ -313,7 +313,7 @@ function extractBooleanComponents(field, value, item) {
 /**
  * Extract percentage components
  */
-function extractPercentageComponents(field, value, item) {
+function extractPercentageComponents(field, value) {
   const fieldLower = field.toLowerCase()
   if (typeof value === 'number') {
     if (value >= 0 && value <= 1) {
@@ -339,10 +339,9 @@ function extractPercentageComponents(field, value, item) {
  * @param {string} fieldType - Field type
  * @param {Array} components - Component objects
  * @param {string} field - Field name
- * @param {Object} item - STAC item
  * @returns {string} Formatted HTML
  */
-function generateFieldHtml(fieldType, components, field, item) {
+function generateFieldHtml(fieldType, components, field) {
   switch (fieldType) {
     case 'grid':
       return generateGridHtml(components, field)
@@ -359,7 +358,7 @@ function generateFieldHtml(fieldType, components, field, item) {
     case 'percentage':
       return generatePercentageHtml(components)
     default:
-      return formatStacField(field, components[0]?.value, item)
+      return formatStacField(field, components[0]?.value, null)
   }
 }
 
@@ -650,7 +649,7 @@ export function getFieldLabel(field, item = null) {
   }
 }
 
-export function getFieldUnit(field, item = null) {
+export function getFieldUnit(field) {
   try {
     const spec = StacFields.Registry.getSpecification(field)
     return spec?.unit || null

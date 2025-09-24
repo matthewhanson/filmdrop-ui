@@ -20,7 +20,7 @@ const FieldItem = ({ field, value, item, layout = 'default' }) => {
       <span className="field-value-inline">
         <EnhancedFieldRenderer field={field} value={value} item={item} />
       </span>
-      <FieldInfoIcon field={field} item={item} tooltipPlacement="top-start" />
+      <FieldInfoIcon field={field} tooltipPlacement="top-start" />
     </div>
   )
 }

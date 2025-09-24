@@ -31,10 +31,9 @@ function clearCachesIfNeeded() {
  * Discovers field type based on field name and value patterns
  * @param {string} field - The field name
  * @param {any} value - The field value to analyze
- * @param {Object} item - The STAC item containing the field
  * @returns {string} Field type: 'grid', 'coordinate', 'shape', 'transform', 'processing', 'boolean', 'percentage', or 'standard'
  */
-function discoverFieldType(field, value, item) {
+function discoverFieldType(field, value) {
   const fieldLower = field.toLowerCase()
   const valueStr = String(value)
 
@@ -147,7 +146,7 @@ export function getStacFieldType(field, value, item) {
   }
 
   try {
-    const fieldType = discoverFieldType(field, value, item)
+    const fieldType = discoverFieldType(field, value)
     clearCachesIfNeeded()
     fieldTypeCache.set(cacheKey, fieldType)
 
@@ -164,7 +163,7 @@ export function getStacFieldType(field, value, item) {
 /**
  * Get field specification with caching
  */
-export function getFieldSpec(field, item) {
+export function getFieldSpec(field) {
   if (fieldSpecCache.has(field)) {
     return fieldSpecCache.get(field)
   }
@@ -186,7 +185,7 @@ export function getFieldSpec(field, item) {
 /**
  * Get field metadata with caching
  */
-export function getFieldMetadata(field, item = null) {
+export function getFieldMetadata(field) {
   if (fieldMetadataCache.has(field)) {
     return fieldMetadataCache.get(field)
   }
@@ -223,8 +222,8 @@ export function getFieldMetadata(field, item = null) {
 /**
  * Get tooltip info for a field
  */
-export function getFieldTooltipInfo(field, item = null) {
-  const metadata = getFieldMetadata(field, item)
+export function getFieldTooltipInfo(field) {
+  const metadata = getFieldMetadata(field)
   return metadata.hasTooltip
     ? {
         content: metadata.tooltipContent,

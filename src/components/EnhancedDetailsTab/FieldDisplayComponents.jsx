@@ -6,14 +6,13 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { getFieldSpec } from '../../utils/fieldDiscovery.js'
 import { sanitizeFieldValue } from '../../utils/securityHelper.js'
 
 /**
  * Grid Field Display Component
  * Renders MGRS, WRS, UTM grid systems with individual subfield values
  */
-export const GridFieldDisplay = ({ components, field, spec }) => {
+export const GridFieldDisplay = ({ components, field }) => {
   if (!components || components.length === 0) return null
 
   const currentLower = (field || '').toLowerCase()
@@ -89,7 +88,7 @@ export const GridFieldDisplay = ({ components, field, spec }) => {
  * Coordinate Field Display Component
  * Renders lat/lon coordinates and bounding boxes
  */
-export const CoordinateFieldDisplay = ({ components, spec }) => {
+export const CoordinateFieldDisplay = ({ components }) => {
   if (!components || components.length === 0) return null
 
   const c = components[0]
@@ -135,7 +134,7 @@ export const CoordinateFieldDisplay = ({ components, spec }) => {
  * Shape Field Display Component
  * Renders image dimensions and shapes
  */
-export const ShapeFieldDisplay = ({ components, spec }) => {
+export const ShapeFieldDisplay = ({ components }) => {
   if (!components || components.length === 0) return null
 
   const c = components[0]
@@ -160,7 +159,7 @@ export const ShapeFieldDisplay = ({ components, spec }) => {
  * Boolean Field Display Component
  * Renders true/false values as Yes/No
  */
-export const BooleanFieldDisplay = ({ components, spec }) => {
+export const BooleanFieldDisplay = ({ components }) => {
   if (!components || components.length === 0) return null
 
   const value = components[0].value
@@ -171,7 +170,7 @@ export const BooleanFieldDisplay = ({ components, spec }) => {
  * Percentage Field Display Component
  * Renders percentage values with % symbol
  */
-export const PercentageFieldDisplay = ({ components, spec }) => {
+export const PercentageFieldDisplay = ({ components }) => {
   if (!components || components.length === 0) return null
 
   return `${sanitizeFieldValue(components[0].value, false)}%`
@@ -181,7 +180,7 @@ export const PercentageFieldDisplay = ({ components, spec }) => {
  * Standard Field Display Component
  * Renders general text, numbers, dates, and other standard values
  */
-export const StandardFieldDisplay = ({ components, field, spec }) => {
+export const StandardFieldDisplay = ({ components }) => {
   if (!components || components.length === 0) return null
 
   const value = components[0]?.value ?? ''
@@ -194,30 +193,20 @@ export const StandardFieldDisplay = ({ components, field, spec }) => {
  * Universal Field Display Component
  * Routes to appropriate specialized component based on field type
  */
-export const FieldDisplay = ({ fieldType, components, field, item }) => {
-  const spec = getFieldSpec(field, item)
-
+export const FieldDisplay = ({ fieldType, components, field }) => {
   switch (fieldType) {
     case 'grid':
-      return (
-        <GridFieldDisplay components={components} field={field} spec={spec} />
-      )
+      return <GridFieldDisplay components={components} field={field} />
     case 'coordinate':
-      return <CoordinateFieldDisplay components={components} spec={spec} />
+      return <CoordinateFieldDisplay components={components} />
     case 'shape':
-      return <ShapeFieldDisplay components={components} spec={spec} />
+      return <ShapeFieldDisplay components={components} />
     case 'boolean':
-      return <BooleanFieldDisplay components={components} spec={spec} />
+      return <BooleanFieldDisplay components={components} />
     case 'percentage':
-      return <PercentageFieldDisplay components={components} spec={spec} />
+      return <PercentageFieldDisplay components={components} />
     default:
-      return (
-        <StandardFieldDisplay
-          components={components}
-          field={field}
-          spec={spec}
-        />
-      )
+      return <StandardFieldDisplay components={components} />
   }
 }
 
@@ -231,8 +220,7 @@ GridFieldDisplay.propTypes = {
       source: PropTypes.string
     })
   ).isRequired,
-  field: PropTypes.string.isRequired,
-  spec: PropTypes.object
+  field: PropTypes.string.isRequired
 }
 
 CoordinateFieldDisplay.propTypes = {
@@ -247,8 +235,7 @@ CoordinateFieldDisplay.propTypes = {
       maxLat: PropTypes.number,
       value: PropTypes.any
     })
-  ).isRequired,
-  spec: PropTypes.object
+  ).isRequired
 }
 
 ShapeFieldDisplay.propTypes = {
@@ -259,8 +246,7 @@ ShapeFieldDisplay.propTypes = {
       height: PropTypes.number,
       value: PropTypes.any
     })
-  ).isRequired,
-  spec: PropTypes.object
+  ).isRequired
 }
 
 BooleanFieldDisplay.propTypes = {
@@ -268,8 +254,7 @@ BooleanFieldDisplay.propTypes = {
     PropTypes.shape({
       value: PropTypes.bool
     })
-  ).isRequired,
-  spec: PropTypes.object
+  ).isRequired
 }
 
 PercentageFieldDisplay.propTypes = {
@@ -277,8 +262,7 @@ PercentageFieldDisplay.propTypes = {
     PropTypes.shape({
       value: PropTypes.any
     })
-  ).isRequired,
-  spec: PropTypes.object
+  ).isRequired
 }
 
 StandardFieldDisplay.propTypes = {
@@ -286,14 +270,11 @@ StandardFieldDisplay.propTypes = {
     PropTypes.shape({
       value: PropTypes.any
     })
-  ).isRequired,
-  field: PropTypes.string.isRequired,
-  spec: PropTypes.object
+  ).isRequired
 }
 
 FieldDisplay.propTypes = {
   fieldType: PropTypes.string.isRequired,
   components: PropTypes.array.isRequired,
-  field: PropTypes.string.isRequired,
-  item: PropTypes.object.isRequired
+  field: PropTypes.string.isRequired
 }

@@ -30,12 +30,7 @@ const EnhancedFieldRenderer = ({ field, value, item }) => {
   }
 
   return (
-    <FieldDisplay
-      fieldType={fieldType}
-      components={components}
-      field={field}
-      item={item}
-    />
+    <FieldDisplay fieldType={fieldType} components={components} field={field} />
   )
 }
 

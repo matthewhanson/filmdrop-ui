@@ -76,12 +76,12 @@ describe('fieldDiscovery', () => {
 
   describe('getFieldSpec', () => {
     it('should return specification for known fields', () => {
-      const result = getFieldSpec('eo:cloud_cover', mockStacItem)
+      const result = getFieldSpec('eo:cloud_cover')
       expect(result).toBeDefined()
     })
 
     it('should return null for unknown fields', () => {
-      const result = getFieldSpec('unknown:field', mockStacItem)
+      const result = getFieldSpec('unknown:field')
       // Note: getFieldSpec returns empty object for unknown fields, not null
       expect(result).toBeDefined()
     })
@@ -89,14 +89,14 @@ describe('fieldDiscovery', () => {
 
   describe('getFieldMetadata', () => {
     it('should return metadata for fields with tooltips', () => {
-      const result = getFieldMetadata('eo:cloud_cover', mockStacItem)
+      const result = getFieldMetadata('eo:cloud_cover')
       expect(result).toHaveProperty('hasTooltip')
       expect(result).toHaveProperty('tooltipContent')
       expect(result).toHaveProperty('tooltipSource')
     })
 
     it('should handle fields without tooltips', () => {
-      const result = getFieldMetadata('unknown:field', mockStacItem)
+      const result = getFieldMetadata('unknown:field')
       expect(result.hasTooltip).toBe(false)
       expect(result.tooltipContent).toBeNull()
     })

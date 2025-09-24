@@ -94,7 +94,7 @@ describe('fieldFormatting', () => {
   describe('getFieldLabel', () => {
     it('should return human-readable labels', () => {
       const result = getFieldLabel('eo:cloud_cover')
-      expect(result).toBeDefined()
+      expect(result).toBe('Cloud Cover')
     })
 
     it('should handle unknown fields gracefully', () => {
