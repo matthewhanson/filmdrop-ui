@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+- Resolves moderate vulnerabilities in npm packages
+  - Upgrades `vite` from 5.x to 7.17
+    - and associated peer deps
+  - Upgrades `remark-preset-lint-markdown-style-guide` from 5.1.3 to 6.0.1
+    - Triggered a config change for `remark-lint-list-item-indent` value
+  - Upgrades `dompurify` from 3.2.4 to 3.2.6
+  - Upgrades `h3-js` from 4.1.0 to 4.2.1
+  - Upgrades `react-tooltip` from 5.26.3 to 5.29.1
+
 ## 6.0.0 - 2025-08-25
 
 ### Added
@@ -419,7 +428,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 
-- Move mosaic-specific tiler parameters (`mosaic_asset` and `mosaic_color_formula`) into REACT_APP_MOSAIC_TILER_PARAMS (new), and rename them to `assets` and `color_formula` to align with scene view tiler parameters.
+- Move mosaic-specific tiler parameters (`mosaic_asset` and `mosaic_color_formula`) into REACT_APP_MOSAIC_TILER_PARAMS (new),
+  and rename them to `assets` and `color_formula` to align with scene view tiler parameters.
 - Rename REACT_APP_TILER_URL to REACT_APP_SCENE_TILER_URL
 - Rename REACT_APP_TILER_PARAMS to REACT_APP_SCENE_TILER_PARAMS
 
