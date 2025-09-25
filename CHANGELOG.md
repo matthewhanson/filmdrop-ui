@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## 6.1.0 - 2025-09-25
+
+### Changed
+
+- Improves Presentation of STAC Search Results. ([441](https://github.com/Element84/filmdrop-ui/pull/441))
 - Resolves moderate vulnerabilities in npm packages
   - Upgrades `vite` from 5.x to 7.17
     - and associated peer deps
