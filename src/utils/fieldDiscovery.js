@@ -1,0 +1,279 @@
+import StacFields from '@radiantearth/stac-fields'
+
+/**
+ * Field type detection and metadata discovery
+ */
+
+// Cache for field type discovery to improve performance
+const fieldTypeCache = new Map()
+const fieldSpecCache = new Map()
+const fieldMetadataCache = new Map()
+
+// Cache size limits to prevent memory leaks
+const MAX_CACHE_SIZE = 1000
+
+/**
+ * Clear caches when they get too large
+ */
+function clearCachesIfNeeded() {
+  if (fieldTypeCache.size > MAX_CACHE_SIZE) {
+    fieldTypeCache.clear()
+  }
+  if (fieldSpecCache.size > MAX_CACHE_SIZE) {
+    fieldSpecCache.clear()
+  }
+  if (fieldMetadataCache.size > MAX_CACHE_SIZE) {
+    fieldMetadataCache.clear()
+  }
+}
+
+/**
+ * Discovers field type based on field name and value patterns
+ * @param {string} field - The field name
+ * @param {any} value - The field value to analyze
+ * @returns {string} Field type: 'grid', 'coordinate', 'shape', 'transform', 'processing', 'boolean', 'percentage', or 'standard'
+ */
+function discoverFieldType(field, value) {
+  const fieldLower = field.toLowerCase()
+  const valueStr = String(value)
+
+  // Grid systems (MGRS, WRS, UTM)
+  if (
+    fieldLower.includes('grid') || // Generic grid references
+    fieldLower.includes('mgrs') || // Military Grid Reference System
+    fieldLower.includes('wrs') || // Worldwide Reference System (Landsat)
+    fieldLower.includes('utm') || // Universal Transverse Mercator
+    fieldLower.includes('tile') || // Tile identifiers
+    fieldLower.includes('zone') || // UTM zones, grid zones
+    fieldLower.includes('path') || // WRS path numbers
+    fieldLower.includes('row') || // WRS row numbers
+    valueStr.includes('MGRS') || // MGRS grid codes in values
+    valueStr.includes('WRS') || // WRS identifiers in values
+    valueStr.includes('UTM') || // UTM references in values
+    valueStr.includes('Path:') || // WRS path notation
+    valueStr.includes('Row:') // WRS row notation
+  ) {
+    return 'grid'
+  }
+
+  // Coordinates
+  if (
+    fieldLower.includes('centroid') || // Geometric center points
+    fieldLower.includes('bbox') || // Bounding boxes
+    fieldLower.includes('lat') || // Latitude references
+    fieldLower.includes('lon') || // Longitude references
+    fieldLower.includes('coordinate') || // Generic coordinate fields
+    fieldLower.includes('geometry') || // Geometry-related fields
+    fieldLower.includes('location') // Location fields
+  ) {
+    return 'coordinate'
+  }
+
+  // Array coordinates (2 or 4 elements)
+  if (
+    Array.isArray(value) &&
+    (value.length === 2 || value.length === 4) &&
+    !fieldLower.includes('shape') && // Exclude shape fields
+    !fieldLower.includes('size') && // Exclude size fields
+    !fieldLower.includes('dimension') // Exclude dimension fields
+  ) {
+    return 'coordinate'
+  }
+
+  // Shapes (dimensions, sizes)
+  if (
+    fieldLower.includes('shape') ||
+    fieldLower.includes('size') ||
+    fieldLower.includes('dimension') ||
+    fieldLower.includes('width') ||
+    fieldLower.includes('height') ||
+    fieldLower.includes('pixel') ||
+    fieldLower.includes('resolution')
+  ) {
+    return 'shape'
+  }
+
+  // Transforms (matrices, projections)
+  if (
+    fieldLower.includes('transform') ||
+    fieldLower.includes('matrix') ||
+    fieldLower.includes('affine') ||
+    fieldLower.includes('projection') ||
+    fieldLower.includes('epsg') ||
+    (Array.isArray(value) && value.length === 6) // 6-element transformation arrays
+  ) {
+    return 'transform'
+  }
+
+  // Processing (algorithms, versions)
+  if (
+    fieldLower.includes('processing') ||
+    fieldLower.includes('software') ||
+    fieldLower.includes('algorithm') ||
+    fieldLower.includes('workflow') ||
+    fieldLower.includes('version') ||
+    (typeof value === 'object' && value !== null && value.name) // Named objects
+  ) {
+    return 'processing'
+  }
+
+  // BOOLEAN: Check for True/false values for flags, toggles, presence indicators
+  if (typeof value === 'boolean') {
+    return 'boolean'
+  }
+
+  // Percentages (0-1 range): Cloud cover, quality metrics, coverage ratios
+  if (
+    fieldLower.includes('percentage') || // Explicit percentage fields
+    fieldLower.includes('cover') || // Cloud cover, snow cover, etc.
+    (typeof value === 'number' && value >= 0 && value <= 1) // Normalized values (0-1)
+  ) {
+    return 'percentage'
+  }
+
+  // STANDARD: Default fallback for unrecognized fields
+  // Used for general text, numbers, dates, and unknown formats
+  return 'standard'
+}
+
+/**
+ * Get field type with caching
+ */
+export function getStacFieldType(field, value, item) {
+  const cacheKey = `${field}:${typeof value}:${Array.isArray(value) ? value.length : 'scalar'}`
+  if (fieldTypeCache.has(cacheKey)) {
+    return fieldTypeCache.get(cacheKey)
+  }
+
+  try {
+    const fieldType = discoverFieldType(field, value)
+    clearCachesIfNeeded()
+    fieldTypeCache.set(cacheKey, fieldType)
+
+    return fieldType
+  } catch (error) {
+    console.warn('Field type discovery failed for field:', field, error)
+    const fallbackType = 'standard'
+    clearCachesIfNeeded()
+    fieldTypeCache.set(cacheKey, fallbackType)
+    return fallbackType
+  }
+}
+
+/**
+ * Get field specification with caching
+ */
+export function getFieldSpec(field) {
+  if (fieldSpecCache.has(field)) {
+    return fieldSpecCache.get(field)
+  }
+
+  try {
+    const spec = StacFields.Registry.getSpecification(field)
+    clearCachesIfNeeded()
+    fieldSpecCache.set(field, spec)
+
+    return spec
+  } catch (error) {
+    const fallbackSpec = {}
+    clearCachesIfNeeded()
+    fieldSpecCache.set(field, fallbackSpec)
+    return fallbackSpec
+  }
+}
+
+/**
+ * Get field metadata with caching
+ */
+export function getFieldMetadata(field) {
+  if (fieldMetadataCache.has(field)) {
+    return fieldMetadataCache.get(field)
+  }
+
+  try {
+    const spec = StacFields.Registry.getSpecification(field)
+    const tooltipContent =
+      spec?.description || spec?.explain || spec?.title || null
+    const hasTooltip = !!tooltipContent
+
+    const metadata = {
+      hasTooltip,
+      tooltipContent,
+      tooltipSource: hasTooltip ? 'registry' : null
+    }
+
+    clearCachesIfNeeded()
+    fieldMetadataCache.set(field, metadata)
+
+    return metadata
+  } catch (error) {
+    const fallbackMetadata = {
+      hasTooltip: false,
+      tooltipContent: null,
+      tooltipSource: null
+    }
+
+    clearCachesIfNeeded()
+    fieldMetadataCache.set(field, fallbackMetadata)
+    return fallbackMetadata
+  }
+}
+
+/**
+ * Get tooltip info for a field
+ */
+export function getFieldTooltipInfo(field) {
+  const metadata = getFieldMetadata(field)
+  return metadata.hasTooltip
+    ? {
+        content: metadata.tooltipContent,
+        shouldShow: true,
+        source: metadata.tooltipSource
+      }
+    : null
+}
+
+/**
+ * Check if field is supported
+ */
+export function isFieldSupported(field) {
+  try {
+    const spec = StacFields.Registry.getSpecification(field)
+    return !!spec
+  } catch (error) {
+    return false
+  }
+}
+
+/**
+ * Discover field metadata
+ */
+export function discoverFieldMetadata(field, collection) {
+  try {
+    const spec = StacFields.Registry.getSpecification(field)
+    return {
+      label: spec?.label || getFallbackFieldLabel(field),
+      unit: spec?.unit || null,
+      description: spec?.description || null,
+      type: spec?.type || 'string'
+    }
+  } catch (error) {
+    return {
+      label: getFallbackFieldLabel(field),
+      unit: null,
+      description: null,
+      type: 'string'
+    }
+  }
+}
+
+/**
+ * Generate fallback label for unknown fields
+ */
+export function getFallbackFieldLabel(field) {
+  return field
+    .replace(/^(eo|sar|proj|s2|landsat|sat|view|storage|processing):/, '')
+    .replace(/[-_:]/g, ' ')
+    .replace(/\b\w/g, (l) => l.toUpperCase())
+    .trim()
+}

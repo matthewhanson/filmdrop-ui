@@ -46,7 +46,8 @@ const initialState = {
   autoCenterOnItemChanged: false,
   hasLeftPanelTabChanged: false,
   authTokenExists: false,
-  currentTheme: null
+  currentTheme: null,
+  isEnhancedDetailsExpanded: false
 }
 
 // next, for every key in the initialState
@@ -183,6 +184,9 @@ export const mainSlice = createSlice({
     },
     setCurrentTheme: (state, action) => {
       state.currentTheme = action.payload
+    },
+    setIsEnhancedDetailsExpanded: (state, action) => {
+      state.isEnhancedDetailsExpanded = action.payload
     }
   }
 })
@@ -232,5 +236,6 @@ export const { setautoCenterOnItemChanged } = mainSlice.actions
 export const { sethasLeftPanelTabChanged } = mainSlice.actions
 export const { setauthTokenExists } = mainSlice.actions
 export const { setCurrentTheme } = mainSlice.actions
+export const { setIsEnhancedDetailsExpanded } = mainSlice.actions
 
 export default mainSlice.reducer

@@ -111,62 +111,6 @@
   align-items: center;
 }
 
-.popupFooter {
-  font-size: 18px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  min-height: 50px;
-  border-top: var(--side-panel-horizontal-divider-color) 3px solid;
-}
-
-.popupFooterControls {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.popupFooterButtonsGroup {
-  display: flex;
-  flex-direction: row;
-}
-
-.popupFooterButton {
-  background-color: var(--side-panel-button-background);
-  color: var(--side-panel-button-color);
-  border: 0px;
-  font-weight: bold;
-  height: 30px;
-  width: 30px;
-  border: var(--side-panel-button-border) solid 1px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: color 0.33s ease-in-out;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  user-select: none;
-}
-
-.popupFooterButton:hover {
-  background-color: var(--side-panel-button-background-hover);
-}
-
-.popupFooterButtonRight {
-  margin-left: -1px;
-  border-top-right-radius: 5px;
-  border-bottom-right-radius: 5px;
-}
-
-.popupFooterButtonLeft {
-  margin-left: -1px;
-  border-top-left-radius: 5px;
-  border-bottom-left-radius: 5px;
-}
-
 .popupResultsEmpty {
   display: flex;
   align-items: center;
