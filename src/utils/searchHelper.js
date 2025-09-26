@@ -48,7 +48,7 @@ export function newSearch() {
   const currentMapZoomLevel = getCurrentMapZoomLevel()
 
   const includesGeoHex = _selectedCollection.aggregations?.some(
-    (el) => el.name === 'grid_geohex_frequency'
+    (el) => el.name === 'centroid_geohex_grid_frequency'
   )
   const includesGridCode = _selectedCollection.aggregations?.some(
     (el) => el.name === 'grid_code_frequency'
@@ -188,7 +188,7 @@ function buildSearchAggregateParams(gridType) {
         precision = 5
         break
     }
-    aggregations = `grid_geohex_frequency,total_count&grid_geohex_frequency_precision=${precision}`
+    aggregations = `centroid_geohex_grid_frequency,total_count&grid_geohex_frequency_precision=${precision}`
   } else {
     aggregations = `grid_code_frequency,total_count`
   }
@@ -250,13 +250,13 @@ export function mapHexGridFromJson(json) {
   let largestRatio = 0
   let largestFrequency = 0
   const buckets = json.aggregations?.find(
-    (el) => el.name === 'grid_geohex_frequency'
+    (el) => el.name === 'centroid_geohex_grid_frequency'
   ).buckets
   const numberMatched = json?.aggregations?.find(
     (el) => el.name === 'total_count'
   )?.value
   const overflow = json?.aggregations.find(
-    (el) => el.name === 'grid_geohex_frequency'
+    (el) => el.name === 'centroid_geohex_grid_frequency'
   ).overflow
 
   const convertedItems = buckets.map((feature) => {

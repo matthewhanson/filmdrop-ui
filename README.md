@@ -248,7 +248,7 @@ stac-fastapi-elasticsearch-opensearch implement this extension.
 The geohex aggregated view requires:
 
 1. All Items that are to be aggregated must have the `proj:centroid` property defined,
-2. The aggregation `grid_geohex_frequency` must be advertised by the `/aggregations` endpoint
+2. The aggregation `centroid_geohex_grid_frequency` must be advertised by the `/aggregations` endpoint
    for each collection that has Items with the `proj:centroid` property.
 
 ### Grid Code Aggregated View

@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+- Deprecated grid_geohex_frequency, grid_geohash_frequency, and grid_geotile_frequency aggregations in favor of new
+  centroid_geohash_grid_frequency, centroid_geohex_grid_frequency, and centroid_geotile_grid_frequency aggregations
+  - Aggregations were deprecated in stac-server as of version [3.6.0](https://github.com/stac-utils/stac-server/blob/main/CHANGELOG.md#360---2024-02-07)
+- ([Snyk](https://github.com/Element84/filmdrop-ui/pull/448)) Upgrade react-redux from 9.1.2 to 9.2.0
+- ([Snyk](https://github.com/Element84/filmdrop-ui/pull/447))
+  Upgrade h3-js from 4.2.1 to 4.3.0
+- ([Snyk](https://github.com/Element84/filmdrop-ui/pull/446)) Upgrade @reduxjs/toolkit from 2.8.2 to 2.9.0
+- ([Snyk](https://github.com/Element84/filmdrop-ui/pull/445)) Upgrade dayjs from 1.11.13 to 1.11.18
+
 ## 6.1.0 - 2025-09-25
 
 ### Changed

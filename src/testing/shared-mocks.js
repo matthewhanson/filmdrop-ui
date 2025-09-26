@@ -137,17 +137,17 @@ export const mockCollectionsData = [
         frequency_distribution_data_type: 'string'
       },
       {
-        name: 'grid_geohex_frequency',
+        name: 'centroid_geohex_grid_frequency',
         data_type: 'frequency_distribution',
         frequency_distribution_data_type: 'string'
       },
       {
-        name: 'grid_geohash_frequency',
+        name: 'centroid_geohex_grid_frequency',
         data_type: 'frequency_distribution',
         frequency_distribution_data_type: 'string'
       },
       {
-        name: 'grid_geotile_frequency',
+        name: 'centroid_geotile_grid_frequency',
         data_type: 'frequency_distribution',
         frequency_distribution_data_type: 'string'
       }
@@ -291,7 +291,7 @@ export const mockCollectionsData = [
         frequency_distribution_data_type: 'string'
       },
       {
-        name: 'grid_geohex_frequency',
+        name: 'centroid_geohex_grid_frequency',
         data_type: 'frequency_distribution',
         frequency_distribution_data_type: 'string'
       },
