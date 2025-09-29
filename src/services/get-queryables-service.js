@@ -1,4 +1,5 @@
 import { store } from '../redux/store'
+import { getStacCookies } from '../utils/cookies'
 
 export function GetCollectionQueryablesService(collectionId) {
   const requestHeaders = new Headers()
@@ -8,6 +9,16 @@ export function GetCollectionQueryablesService(collectionId) {
   if (JWT && isSTACTokenAuthEnabled) {
     requestHeaders.append('Authorization', `Bearer ${JWT}`)
   }
+  if (store.getState().mainSlice.appConfig.STAC_HEADER_COOKIES.length > 0) {
+    const cooks = getStacCookies()
+    cooks.forEach((el) => {
+      requestHeaders.append(
+        el.headerName,
+        `${el.headerValPrefix}${el.headerValMain}`
+      )
+    })
+  }
+
   return fetch(
     `${
       store.getState().mainSlice.appConfig.STAC_API_URL

@@ -17,6 +17,7 @@
     "dayjs-plugin-utc": "^0.1.2",
     "dompurify": "^3.2.7",
     "h3-js": "^4.3.0",
+    "js-cookie": "^3.0.5",
     "leaflet": "^1.9.4",
     "leaflet-draw": "^1.0.4",
     "leaflet-geosearch": "^3.9.0",
