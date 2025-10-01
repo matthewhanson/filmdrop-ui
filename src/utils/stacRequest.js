@@ -5,7 +5,8 @@ import { store } from '../redux/store'
 // include in STAC API request headers. if any exist, append them to the
 // request headers
 export function appendStacHeaderCookies(requestHeaders) {
-  const headerArr = store.getState().mainSlice.appConfig.STAC_HEADER_COOKIES ?? []
+  const headerArr =
+    store.getState().mainSlice.appConfig.STAC_HEADER_COOKIES ?? []
 
   if (headerArr.length > 0) {
     const cooks = getStacCookies(headerArr)
