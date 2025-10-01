@@ -7,7 +7,7 @@ import {
 } from '../redux/slices/mainSlice'
 import { buildCollectionsData, loadLocalGridData } from '../utils/dataHelper'
 import { logoutUser } from '../utils/authHelper'
-import { getStacCookies } from '../utils/cookies'
+import { appendStacHeaderCookies } from '../utils/stacRequest'
 
 export async function GetCollectionsService(searchParams) {
   const requestHeaders = new Headers()
@@ -17,15 +17,7 @@ export async function GetCollectionsService(searchParams) {
   if (JWT && isSTACTokenAuthEnabled) {
     requestHeaders.append('Authorization', `Bearer ${JWT}`)
   }
-  if (store.getState().mainSlice.appConfig.STAC_HEADER_COOKIES.length > 0) {
-    const cooks = getStacCookies()
-    cooks.forEach((el) => {
-      requestHeaders.append(
-        el.headerName,
-        `${el.headerValPrefix}${el.headerValMain}`
-      )
-    })
-  }
+  appendStacHeaderCookies(requestHeaders)
 
   await fetch(
     `${store.getState().mainSlice.appConfig.STAC_API_URL}/collections`,

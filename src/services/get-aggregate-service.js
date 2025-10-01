@@ -6,7 +6,7 @@ import {
   gridCodeLayerStyle
 } from '../utils/mapHelper'
 import { mapHexGridFromJson, mapGridCodeFromJson } from '../utils/searchHelper'
-import { getStacCookies } from '../utils/cookies'
+import { appendStacHeaderCookies } from '../utils/stacRequest'
 
 export async function AggregateSearchService(searchParams, gridType) {
   const requestHeaders = new Headers()
@@ -16,15 +16,7 @@ export async function AggregateSearchService(searchParams, gridType) {
   if (JWT && isSTACTokenAuthEnabled) {
     requestHeaders.append('Authorization', `Bearer ${JWT}`)
   }
-  if (store.getState().mainSlice.appConfig.STAC_HEADER_COOKIES.length > 0) {
-    const cooks = getStacCookies()
-    cooks.forEach((el) => {
-      requestHeaders.append(
-        el.headerName,
-        `${el.headerValPrefix}${el.headerValMain}`
-      )
-    })
-  }
+  appendStacHeaderCookies(requestHeaders)
 
   await fetch(
     `${

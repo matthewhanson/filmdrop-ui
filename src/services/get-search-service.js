@@ -8,7 +8,7 @@ import {
   sethasLeftPanelTabChanged
 } from '../redux/slices/mainSlice'
 import { addDataToLayer, footprintLayerStyle } from '../utils/mapHelper'
-import { getStacCookies } from '../utils/cookies'
+import { appendStacHeaderCookies } from '../utils/stacRequest'
 
 export async function SearchService(searchParams, typeOfSearch) {
   const requestHeaders = new Headers()
@@ -18,15 +18,7 @@ export async function SearchService(searchParams, typeOfSearch) {
   if (JWT && isSTACTokenAuthEnabled) {
     requestHeaders.append('Authorization', `Bearer ${JWT}`)
   }
-  if (store.getState().mainSlice.appConfig.STAC_HEADER_COOKIES.length > 0) {
-    const cooks = getStacCookies()
-    cooks.forEach((el) => {
-      requestHeaders.append(
-        el.headerName,
-        `${el.headerValPrefix}${el.headerValMain}`
-      )
-    })
-  }
+  appendStacHeaderCookies(requestHeaders)
 
   await fetch(
     `${
