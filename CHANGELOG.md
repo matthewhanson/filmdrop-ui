@@ -19,6 +19,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added comprehensive `CONFIGURATION.md` documentation with parameter reference,
   examples, and migration guide
 - Added `config-new-format-example.json` demonstrating new `COLLECTIONS_CONFIG` structure
+- Added comprehensive test coverage for `normalizeCollectionsConfig()` and
+  `getCollectionConfig()` functions (16 new tests covering backward compatibility,
+  migration, new format, and parameter mapping)
 - Added `.remarkrc.js` configuration file to customize markdown linting rules for technical
   documentation (allows longer lines, relaxed table formatting, etc.)
 - Migrated from `pre-commit` package to Husky for git hooks management (developers should

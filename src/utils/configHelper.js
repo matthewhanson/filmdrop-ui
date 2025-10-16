@@ -159,6 +159,11 @@ export function normalizeCollectionsConfig(config) {
   // Get all collection IDs from various sources
   const collectionIds = new Set()
 
+  // Add collections from COLLECTIONS array
+  if (config.COLLECTIONS && Array.isArray(config.COLLECTIONS)) {
+    config.COLLECTIONS.forEach((id) => collectionIds.add(id))
+  }
+
   if (config.SCENE_TILER_PARAMS) {
     Object.keys(config.SCENE_TILER_PARAMS).forEach((id) =>
       collectionIds.add(id)
