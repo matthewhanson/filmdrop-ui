@@ -49,8 +49,8 @@
     "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-testing-library": "^6.0.1",
+    "husky": "^9.1.7",
     "jsdom": "^22.0.0",
-    "pre-commit": "^1.2.2",
     "prettier": "^3.0.0",
     "prettier-eslint": "^16.3.0",
     "prettier-eslint-cli": "^8.0.1",
@@ -84,20 +84,8 @@
     "typecheck": "tsc --jsx react",
     "audit-all": "npx better-npm-audit audit",
     "audit-prod": "npx better-npm-audit audit --production",
-    "pre-commit": "./node_modules/pre-commit/hook",
-    "check-markdown": "remark . --frail"
-  },
-  "pre-commit": {
-    "silent": false,
-    "run": [
-      "check-markdown",
-      "format",
-      "lint",
-      "audit-all",
-      "audit-prod",
-      "test-pre-commit",
-      "build"
-    ]
+    "check-markdown": "remark . --frail",
+    "prepare": "husky"
   },
   "eslintConfig": {
     "extends": [
