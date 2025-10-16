@@ -55,7 +55,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Overhauled `README.md` following best practices with improved structure, quick start guide, and developer section
 - Added `CONFIGURATION.md` with details on Config structure and including a migration guide
 - Consolidated duplicate sections in `README.md` for clearer documentation
-- Fixed null safety issue in `PopupResult.jsx` by adding optional chaining for `_selectedCollectionData?.id`
+
+### Fixed
+
+- Fixed bug where Dashboard and Analyze buttons would appear even when `DASHBOARD_BTN_URL`
+  and `ANALYZE_BTN_URL` were set to empty strings or whitespace in configuration
+- Updated `src/components/Layout/PageHeader/PageHeader.jsx` to use `.trim()` when checking
+  button URL values to properly hide buttons when URLs are empty or whitespace-only
+- Added test cases for whitespace-only URL values in `PageHeader.test.jsx`
 
 ### Removed
 
