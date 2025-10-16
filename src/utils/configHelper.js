@@ -120,6 +120,146 @@ async function loadReferenceLayers() {
   store.dispatch(setreferenceLayers(LayerListFromConfig))
 }
 
+/**
+ * Normalizes config to support both old (separate params) and new (COLLECTIONS_CONFIG) formats
+ * @param {Object} config - The application config object
+ * @returns {Object} - Normalized config with COLLECTIONS_CONFIG structure
+ */
+export function normalizeCollectionsConfig(config) {
+  if (!config) return config
+
+  // If COLLECTIONS_CONFIG already exists and is not empty, prioritize it
+  if (
+    config.COLLECTIONS_CONFIG &&
+    Object.keys(config.COLLECTIONS_CONFIG).length > 0
+  ) {
+    // Still check for legacy params and warn if both exist
+    const legacyParams = [
+      'SCENE_TILER_PARAMS',
+      'MOSAIC_TILER_PARAMS',
+      'SEARCH_MIN_ZOOM_LEVELS',
+      'POPUP_DISPLAY_FIELDS',
+      'TILE_LAYER_PARAMS',
+      'ENHANCED_DISPLAY_CONFIG'
+    ]
+    const hasLegacyParams = legacyParams.some((param) => config[param])
+    if (hasLegacyParams) {
+      console.warn(
+        'Both COLLECTIONS_CONFIG and legacy collection parameters detected. ' +
+          'COLLECTIONS_CONFIG takes precedence. Consider removing deprecated parameters: ' +
+          legacyParams.join(', ')
+      )
+    }
+    return config
+  }
+
+  // Build COLLECTIONS_CONFIG from legacy parameters
+  const collectionsConfig = {}
+
+  // Get all collection IDs from various sources
+  const collectionIds = new Set()
+
+  if (config.SCENE_TILER_PARAMS) {
+    Object.keys(config.SCENE_TILER_PARAMS).forEach((id) =>
+      collectionIds.add(id)
+    )
+  }
+  if (config.MOSAIC_TILER_PARAMS) {
+    Object.keys(config.MOSAIC_TILER_PARAMS).forEach((id) =>
+      collectionIds.add(id)
+    )
+  }
+  if (config.SEARCH_MIN_ZOOM_LEVELS) {
+    Object.keys(config.SEARCH_MIN_ZOOM_LEVELS).forEach((id) =>
+      collectionIds.add(id)
+    )
+  }
+  if (config.POPUP_DISPLAY_FIELDS) {
+    Object.keys(config.POPUP_DISPLAY_FIELDS).forEach((id) =>
+      collectionIds.add(id)
+    )
+  }
+  if (config.TILE_LAYER_PARAMS) {
+    Object.keys(config.TILE_LAYER_PARAMS).forEach((id) => collectionIds.add(id))
+  }
+  if (config.ENHANCED_DISPLAY_CONFIG) {
+    Object.keys(config.ENHANCED_DISPLAY_CONFIG).forEach((id) =>
+      collectionIds.add(id)
+    )
+  }
+
+  // Build consolidated config for each collection
+  collectionIds.forEach((collectionId) => {
+    collectionsConfig[collectionId] = {}
+
+    if (config.SCENE_TILER_PARAMS?.[collectionId]) {
+      collectionsConfig[collectionId].sceneTilerParams =
+        config.SCENE_TILER_PARAMS[collectionId]
+    }
+    if (config.MOSAIC_TILER_PARAMS?.[collectionId]) {
+      collectionsConfig[collectionId].mosaicTilerParams =
+        config.MOSAIC_TILER_PARAMS[collectionId]
+    }
+    if (config.SEARCH_MIN_ZOOM_LEVELS?.[collectionId]) {
+      collectionsConfig[collectionId].searchMinZoomLevels =
+        config.SEARCH_MIN_ZOOM_LEVELS[collectionId]
+    }
+    if (config.POPUP_DISPLAY_FIELDS?.[collectionId]) {
+      collectionsConfig[collectionId].popupDisplayFields =
+        config.POPUP_DISPLAY_FIELDS[collectionId]
+    }
+    if (config.TILE_LAYER_PARAMS?.[collectionId]) {
+      collectionsConfig[collectionId].tileLayerParams =
+        config.TILE_LAYER_PARAMS[collectionId]
+    }
+    if (config.ENHANCED_DISPLAY_CONFIG?.[collectionId]) {
+      collectionsConfig[collectionId].enhancedDisplayConfig =
+        config.ENHANCED_DISPLAY_CONFIG[collectionId]
+    }
+  })
+
+  // Add COLLECTIONS_CONFIG to the config
+  if (Object.keys(collectionsConfig).length > 0) {
+    config.COLLECTIONS_CONFIG = collectionsConfig
+  }
+
+  return config
+}
+
+/**
+ * Gets collection-specific config parameter using new or legacy structure
+ * @param {string} collectionId - The collection ID
+ * @param {string} paramName - Parameter name ('sceneTilerParams', 'mosaicTilerParams', etc.)
+ * @param {Object} config - Optional config object for testing (uses store if not provided)
+ * @returns {*} - The parameter value or undefined
+ */
+export function getCollectionConfig(collectionId, paramName, config = null) {
+  const appConfig = config || store.getState().mainSlice.appConfig
+  if (!appConfig) return undefined
+
+  // Try new structure first
+  if (appConfig.COLLECTIONS_CONFIG?.[collectionId]?.[paramName]) {
+    return appConfig.COLLECTIONS_CONFIG[collectionId][paramName]
+  }
+
+  // Fall back to legacy structure
+  const legacyParamMap = {
+    sceneTilerParams: 'SCENE_TILER_PARAMS',
+    mosaicTilerParams: 'MOSAIC_TILER_PARAMS',
+    searchMinZoomLevels: 'SEARCH_MIN_ZOOM_LEVELS',
+    popupDisplayFields: 'POPUP_DISPLAY_FIELDS',
+    tileLayerParams: 'TILE_LAYER_PARAMS',
+    enhancedDisplayConfig: 'ENHANCED_DISPLAY_CONFIG'
+  }
+
+  const legacyParam = legacyParamMap[paramName]
+  if (legacyParam && appConfig[legacyParam]?.[collectionId]) {
+    return appConfig[legacyParam][collectionId]
+  }
+
+  return undefined
+}
+
 export function InitializeAppFromConfig() {
   loadAppTitle()
   loadAppFavicon()

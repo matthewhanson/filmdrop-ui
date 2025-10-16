@@ -9,9 +9,9 @@ import {
   getCurrentMapZoomLevel,
   clearAllLayers,
   bboxFromMapBounds,
-  getTilerParams,
   clearMapSelection
 } from './mapHelper'
+import { getCollectionConfig } from './configHelper'
 import { convertDateForURL, convertDate } from './datetime'
 import { SearchService } from '../services/get-search-service'
 import { AggregateSearchService } from '../services/get-aggregate-service'
@@ -35,15 +35,12 @@ export function newSearch() {
 
   const _selectedCollection = store.getState().mainSlice.selectedCollectionData
 
-  const midZoomLevel =
-    store.getState().mainSlice.appConfig.SEARCH_MIN_ZOOM_LEVELS[
-      _selectedCollection.id
-    ]?.medium || DEFAULT_MED_ZOOM
-
-  const highZoomLevel =
-    store.getState().mainSlice.appConfig.SEARCH_MIN_ZOOM_LEVELS[
-      _selectedCollection.id
-    ]?.high || DEFAULT_HIGH_ZOOM
+  const searchMinZoomLevels = getCollectionConfig(
+    _selectedCollection.id,
+    'searchMinZoomLevels'
+  )
+  const midZoomLevel = searchMinZoomLevels?.medium || DEFAULT_MED_ZOOM
+  const highZoomLevel = searchMinZoomLevels?.high || DEFAULT_HIGH_ZOOM
 
   const currentMapZoomLevel = getCurrentMapZoomLevel()
 
@@ -442,9 +439,8 @@ function newMosaicSearch() {
 }
 
 const constructMosaicAssetVal = (collection) => {
-  const envMosaicTilerParams =
-    store.getState().mainSlice.appConfig.MOSAIC_TILER_PARAMS || ''
-  const asset = getTilerParams(envMosaicTilerParams)[collection]?.assets || ''
+  const mosaicTilerParams = getCollectionConfig(collection, 'mosaicTilerParams')
+  const asset = mosaicTilerParams?.assets || ''
   if (!asset) {
     console.log(`Assets not defined for ${collection}`)
     return null

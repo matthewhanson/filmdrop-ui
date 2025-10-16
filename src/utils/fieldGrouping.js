@@ -2,6 +2,8 @@
  * Semantic grouping and filtering of STAC fields
  */
 
+import { getCollectionConfig } from './configHelper'
+
 /**
  * Groups STAC properties by extension prefix
  * @param {Record<string, any>} properties - STAC item properties
@@ -34,11 +36,18 @@ export function groupFieldsSemantically(properties, filterPredicate = null) {
 /**
  * Creates field predicate for enhanced display configuration
  * @param {string} collectionId - Collection ID
- * @param {object} appConfig - Application configuration
+ * @param {object} appConfig - Optional application configuration for testing (uses store if not provided)
  * @returns {Function} Field filter predicate
  */
-export function createEnhancedDisplayFieldPredicate(collectionId, appConfig) {
-  const enhancedConfig = appConfig?.ENHANCED_DISPLAY_CONFIG?.[collectionId]
+export function createEnhancedDisplayFieldPredicate(
+  collectionId,
+  appConfig = null
+) {
+  const enhancedConfig = getCollectionConfig(
+    collectionId,
+    'enhancedDisplayConfig',
+    appConfig
+  )
 
   if (enhancedConfig?.property_groups) {
     // Extract field names from the grouped format

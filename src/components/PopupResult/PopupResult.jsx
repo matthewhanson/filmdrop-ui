@@ -8,6 +8,7 @@ import {
   setIsEnhancedDetailsExpanded
 } from '../../redux/slices/mainSlice'
 import { debounceTitilerOverlay, zoomToItemExtent } from '../../utils/mapHelper'
+import { getCollectionConfig } from '../../utils/configHelper'
 
 const PopupResult = (props) => {
   const dispatch = useDispatch()
@@ -107,32 +108,31 @@ const PopupResult = (props) => {
                 {props.result.id}
               </span>
             </div>
-            {_appConfig.POPUP_DISPLAY_FIELDS &&
-              _selectedCollectionData.id in _appConfig.POPUP_DISPLAY_FIELDS &&
-              _appConfig.POPUP_DISPLAY_FIELDS[_selectedCollectionData.id].map(
-                (field) => (
-                  <div className="detailRow" key={field + '1'}>
-                    <span
-                      className="popupResultDetailsRowKey"
-                      key={field + '2'}
-                    >
-                      {field.charAt(0).toUpperCase() + field.slice(1) + ':'}
-                    </span>
-                    <span
-                      className="popupResultDetailsRowValue"
-                      key={field + '3'}
-                    >
-                      {field === 'eo:cloud_cover'
-                        ? Math.round(props.result?.properties[field] * 100) /
-                            100 +
-                          ' %'
-                        : processDisplayFieldValues(
-                            props.result?.properties[field]
-                          )}
-                    </span>
-                  </div>
-                )
-              )}
+            {(() => {
+              const popupDisplayFields = getCollectionConfig(
+                _selectedCollectionData?.id,
+                'popupDisplayFields'
+              )
+              return popupDisplayFields?.map((field) => (
+                <div className="detailRow" key={field + '1'}>
+                  <span className="popupResultDetailsRowKey" key={field + '2'}>
+                    {field.charAt(0).toUpperCase() + field.slice(1) + ':'}
+                  </span>
+                  <span
+                    className="popupResultDetailsRowValue"
+                    key={field + '3'}
+                  >
+                    {field === 'eo:cloud_cover'
+                      ? Math.round(props.result?.properties[field] * 100) /
+                          100 +
+                        ' %'
+                      : processDisplayFieldValues(
+                          props.result?.properties[field]
+                        )}
+                  </span>
+                </div>
+              ))
+            })()}
 
             {/* Enhanced Details Button */}
             <div className="detailRow enhancedDetailsButtonRow">

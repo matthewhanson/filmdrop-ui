@@ -101,10 +101,7 @@ const EnhancedDetailsTab = () => {
           return orderedGroups
         }
         // Fallback to semantic grouping if config is malformed
-        const shouldShowField = createEnhancedDisplayFieldPredicate(
-          collection,
-          appConfig
-        )
+        const shouldShowField = createEnhancedDisplayFieldPredicate(collection)
         return groupFieldsSemantically(properties, shouldShowField)
       }
       return groupPropertiesByExtension(properties)
