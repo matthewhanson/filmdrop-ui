@@ -5,13 +5,25 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 FilmDrop UI is a powerful web application for searching, visualizing, and interacting with
-geospatial imagery catalogs through the STAC (SpatioTemporal Asset Catalog) API. It provides
+geospatial imagery catalogs through STAC (SpatioTemporal Asset Catalog) APIs. It provides
 multiple visualization modes including aggregated views, mosaics, and individual scenes with
 advanced filtering and export capabilities.
 
 Check out [FilmDrop-UI in action with Earth-Search](https://console.earth-search.aws.element84.com/).
 
-![Sentinel-2 L2A Scene View](screenshots/s2-l2a-mosaic.jpg)
+![Sentinel-2 L2A Scene View](screenshots/s2-hex-aggregation.png)
+
+## 📋 Table of Contents
+
+- [✨ Key Features](#key-features)
+- [🚀 Quick Start](#quick-start)
+- [📖 Documentation](#documentation)
+- [🎯 Configuration Examples](#configuration-examples)
+- [📸 Screenshots](#screenshots)
+- [🏗️ Architecture](#architecture)
+- [🤝 Contributing](#contributing)
+- [📚 Related Projects](#related-projects)
+- [📄 License](#license)
 
 ## ✨ Key Features
 
@@ -22,7 +34,7 @@ Check out [FilmDrop-UI in action with Earth-Search](https://console.earth-search
   - Grid Aggregation - Grid code (MGRS, WRS2) based aggregation
   - Customizable color formulas and band combinations
 
-- **🔍 Advanced Search**
+- **🔍 Search**
   - Date/time range filtering
   - Cloud cover filtering
   - Draw or upload GeoJSON search bounds
@@ -99,9 +111,22 @@ Create `public/config/config.json` (development) or `build/config/config.json` (
 }
 ```
 
-See [CONFIGURATION.md](CONFIGURATION.md) for complete details.
+### STAC API Requirements
 
-## 🎯 Usage Examples
+Some FilmDrop features require specific STAC API extensions:
+
+- **Aggregation Views** - [Aggregation Extension](https://github.com/stac-api-extensions/aggregation)
+  - Hex view requires items with `proj:centroid` property
+  - Currently supported by [stac-server](https://github.com/stac-utils/stac-server) and stac-fastapi-elasticsearch-opensearch
+
+- **Grid Code Aggregation** - Custom `grid:code` property
+  - Items must include grid identifier (e.g., MGRS, WRS2)
+
+- **Cloud Cover Filtering** - [EO Extension](https://github.com/stac-extensions/eo)
+
+See [CONFIGURATION.md](CONFIGURATION.md) for detailed feature configuration.
+
+## 🎯 Configuration Examples
 
 ### Basic Setup
 
@@ -165,6 +190,24 @@ Add TiTiler for on-the-fly tile generation:
 }
 ```
 
+## 📸 Screenshots
+
+### Landsat Hex Aggregation in light mode
+
+![Landsat hex aggregations in light mode](screenshots/landsat-lightmode.png)
+
+### Sentinel-1 Footprints
+
+![sentinel-1 footprints](screenshots/s1-footprints.png)
+
+### Landsat footprints with rendered scene
+
+![landsat footprints with rendered scene](screenshots/landsat-scene.png)
+
+### Sentinel-2 Grid Aggregation (on MGRS grids)
+
+![sentinel-2 grid aggregation MGRS](screenshots/s2-grid-aggregation.png)
+
 ## 🏗️ Architecture
 
 FilmDrop UI is built with:
@@ -181,44 +224,17 @@ FilmDrop UI is built with:
 - **Extensible** - Easy to add new collections and visualizations
 - **Performance** - Optimized for large result sets
 
-## 📸 Screenshots
-
-### Geohex Aggregation View
-
-![Geohex View](screenshots/s1-hex.jpg)
-
-### Grid Code Aggregation
-
-![Grid View](screenshots/naip-grid.jpg)
-
-### Scene View with Details
-
-![Scene View](screenshots/naip-scene.jpg)
-
-### Mosaic View
-
-![Mosaic View](screenshots/cop-dem-mosaic.jpg)
-
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-### Development Workflow
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### Code Style
+### Guidelines
 
 - Follow existing code style
 - Use meaningful variable and function names
+- Add details of the changes/updates to the CHANGELOG's `Unreleased` section
 - Add tests for new features
 - Update documentation as needed
-
-## 🧪 For Developers
 
 ### Available Scripts
 
@@ -242,25 +258,6 @@ npm run coverage
 # Run tests in watch mode
 npm test -- --watch
 ```
-
-## 🌟 Feature Requirements
-
-### STAC API Extensions
-
-Some FilmDrop features require specific STAC API extensions:
-
-- **Aggregation Views** - [Aggregation Extension](https://github.com/stac-api-extensions/aggregation)
-  - Hex view requires items with `proj:centroid` property
-  - Currently supported by [stac-server](https://github.com/stac-utils/stac-server) and stac-fastapi-elasticsearch-opensearch
-
-- **Grid Code Aggregation** - Custom `grid:code` property
-  - Items must include grid identifier (e.g., MGRS, WRS2)
-
-- **SAR Imagery** - [SAR Extension](https://github.com/stac-extensions/sar)
-
-- **Cloud Cover Filtering** - [EO Extension](https://github.com/stac-extensions/eo)
-
-See [CONFIGURATION.md](CONFIGURATION.md) for detailed feature configuration.
 
 ## 📚 Related Projects
 
