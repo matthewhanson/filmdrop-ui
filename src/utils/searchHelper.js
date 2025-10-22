@@ -51,42 +51,55 @@ export function newSearch() {
     (el) => el.name === 'grid_code_frequency'
   )
 
-  if (store.getState().mainSlice.viewMode !== 'scene') {
-    if (currentMapZoomLevel < 7) {
-      store.dispatch(setZoomLevelNeeded(7))
+  const viewMode = store.getState().mainSlice.viewMode
+
+  // Handle mosaic mode
+  if (viewMode === 'mosaic') {
+    if (currentMapZoomLevel < highZoomLevel) {
+      store.dispatch(setZoomLevelNeeded(highZoomLevel))
       store.dispatch(setShowZoomNotice(true))
       return
     }
     newMosaicSearch()
     return
   }
-  if (currentMapZoomLevel >= highZoomLevel) {
+
+  // Handle user-selected view mode
+  if (viewMode === 'scene') {
+    // User wants scene view - check zoom level
+    if (currentMapZoomLevel < highZoomLevel) {
+      store.dispatch(setZoomLevelNeeded(highZoomLevel))
+      store.dispatch(setShowZoomNotice(true))
+      return
+    }
     const searchScenesParams = buildSearchScenesParams()
     store.dispatch(setSearchType('scene'))
     store.dispatch(setSearchLoading(true))
     SearchService(searchScenesParams, 'scene')
     return
-  }
-  if (includesGeoHex && currentMapZoomLevel < midZoomLevel) {
+  } else if (viewMode === 'hex' && includesGeoHex) {
+    // User wants hex view - no zoom restriction
     const searchAggregateParams = buildSearchAggregateParams('hex')
     store.dispatch(setSearchLoading(true))
     store.dispatch(setSearchType('hex'))
     AggregateSearchService(searchAggregateParams, 'hex')
     return
-  }
-  if (includesGridCode) {
-    if (currentMapZoomLevel < midZoomLevel) {
-      store.dispatch(setZoomLevelNeeded(midZoomLevel))
-      store.dispatch(setShowZoomNotice(true))
-      return
-    }
+  } else if (viewMode === 'grid-code' && includesGridCode) {
+    // User wants grid-code view - no zoom restriction
     const searchAggregateParams = buildSearchAggregateParams('grid-code')
     store.dispatch(setSearchType('grid-code'))
     store.dispatch(setSearchLoading(true))
     AggregateSearchService(searchAggregateParams, 'grid-code')
     return
   }
-  if (currentMapZoomLevel < highZoomLevel) {
+
+  // Fallback: if no valid selection, default to scene view if zoom allows
+  if (currentMapZoomLevel >= highZoomLevel) {
+    const searchScenesParams = buildSearchScenesParams()
+    store.dispatch(setSearchType('scene'))
+    store.dispatch(setSearchLoading(true))
+    SearchService(searchScenesParams, 'scene')
+  } else {
     store.dispatch(setZoomLevelNeeded(highZoomLevel))
     store.dispatch(setShowZoomNotice(true))
   }
