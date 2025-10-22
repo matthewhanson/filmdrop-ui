@@ -161,7 +161,7 @@ improves maintainability.
 | `searchMinZoomLevels`   | Object | `{ "medium": number, "high": number }` - Zoom thresholds for grid/scene views                                               |
 | `popupDisplayFields`    | Array  | STAC property names to display in popup (e.g., `["datetime", "platform"]`)                                                  |
 | `tileLayerParams`       | Object | Leaflet tile layer options (e.g., `minZoom`, `maxZoom`, `opacity`)                                                          |
-| `enhancedDisplayConfig` | Object | Enhanced details modal configuration with `property_groups` and `asset_groups`                                              |
+| `enhancedDisplayConfig` | Object | Enhanced details configuration with `property_groups` and `asset_groups`                                                    |
 
 **Example:**
 
