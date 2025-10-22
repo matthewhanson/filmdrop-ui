@@ -38,7 +38,6 @@ Check out [FilmDrop-UI in action with Earth-Search](https://console.earth-search
   - Date/time range filtering
   - Cloud cover filtering
   - Draw or upload GeoJSON search bounds
-  - Collection-specific queryable fields
   - Interactive map with Leaflet
   - Light/dark theme support
 
