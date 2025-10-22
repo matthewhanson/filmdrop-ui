@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
+- Added unified View Mode selector with four buttons (Hex, Grid, Scene, Mosaic) for
+  user-selectable aggregation and viewing options
+- Added automatic view mode switching based on zoom level (low zoom→hex, mid zoom→grid,
+  high zoom→scene) with manual override capability
 - Added `COLLECTIONS_CONFIG` structure to consolidate collection-specific parameters
   (sceneTilerParams, mosaicTilerParams, searchMinZoomLevels, popupDisplayFields,
   tileLayerParams, enhancedDisplayConfig)
@@ -33,6 +37,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 
+- Unified Mosaic and Scene zoom level requirements to both use collection-specific
+  `searchMinZoomLevels.high` configuration
+- Updated Scene and Mosaic buttons to share same zoom-based enabling/disabling behavior
 - Updated `src/services/get-config-service.js` to normalize configuration on load
 - Updated `src/utils/searchHelper.js` to use `getCollectionConfig()` for accessing
   search min zoom levels and removed unused `getTilerParams` import
