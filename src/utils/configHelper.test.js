@@ -28,8 +28,8 @@ describe('ConfigHelper', () => {
     it('sets document title and appName from default if App_Name not present in config', () => {
       store.dispatch(setappConfig(mockAppConfig))
       loadAppTitle()
-      expect(global.window.document.title).toBe('FilmDrop Console')
-      expect(store.getState().mainSlice.appName).toBe('FilmDrop Console')
+      expect(global.window.document.title).toBe('FilmDrop UI')
+      expect(store.getState().mainSlice.appName).toBe('FilmDrop UI')
     })
   })
   describe('loadAppFavicon', () => {

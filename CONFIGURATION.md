@@ -72,12 +72,12 @@ After building with `npm run build`, place your config at `build/config/config.j
 | Parameter                 | Type    | Default | Description                                             |
 | ------------------------- | ------- | ------- | ------------------------------------------------------- |
 | `CART_ENABLED`            | Boolean | `false` | Enable shopping cart features for scene selection       |
-| `EXPORT_ENABLED`          | Boolean | `false` | Enable GeoJSON export of search results                 |
-| `SEARCH_BY_GEOM_ENABLED`  | Boolean | `false` | Allow users to draw or upload GeoJSON for search bounds |
+| `EXPORT_ENABLED`          | Boolean | `true`  | Enable GeoJSON export of search results                 |
+| `SEARCH_BY_GEOM_ENABLED`  | Boolean | `true`  | Allow users to draw or upload GeoJSON for search bounds |
 | `STAC_LINK_ENABLED`       | Boolean | `false` | Show link to STAC API item in details                   |
-| `SHOW_ITEM_AUTO_ZOOM`     | Boolean | `false` | Show toggle to auto-center map on selected item         |
+| `SHOW_ITEM_AUTO_ZOOM`     | Boolean | `true`  | Show toggle to auto-center map on selected item         |
 | `LAYER_LIST_ENABLED`      | Boolean | `false` | Enable reference layer list widget                      |
-| `THEME_SWITCHING_ENABLED` | Boolean | `false` | Enable light/dark theme switching                       |
+| `THEME_SWITCHING_ENABLED` | Boolean | `true`  | Enable light/dark theme switching                       |
 
 #### Navigation Buttons
 
