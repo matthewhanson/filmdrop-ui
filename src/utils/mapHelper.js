@@ -4,7 +4,6 @@ import { store } from '../redux/store'
 import { colorMap } from './colorMap'
 import {
   setClickResults,
-  setShowZoomNotice,
   setisDrawingEnabled,
   setsearchGeojsonBoundary,
   setimageOverlayLoading,
