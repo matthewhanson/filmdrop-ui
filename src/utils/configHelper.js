@@ -121,7 +121,7 @@ async function parseLayerListConfig(config) {
 async function loadReferenceLayers() {
   if (
     !store.getState().mainSlice.appConfig.LAYER_LIST_SERVICES ||
-    !store.getState().mainSlice.appConfig.LAYER_LIST_ENABLED
+    store.getState().mainSlice.appConfig.LAYER_LIST_SERVICES.length === 0
   ) {
     return
   }

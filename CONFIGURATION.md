@@ -76,7 +76,6 @@ After building with `npm run build`, place your config at `build/config/config.j
 | `SEARCH_BY_GEOM_ENABLED`  | Boolean | `true`  | Allow users to draw or upload GeoJSON for search bounds |
 | `STAC_LINK_ENABLED`       | Boolean | `false` | Show link to STAC API item in details                   |
 | `SHOW_ITEM_AUTO_ZOOM`     | Boolean | `true`  | Show toggle to auto-center map on selected item         |
-| `LAYER_LIST_ENABLED`      | Boolean | `false` | Enable reference layer list widget                      |
 | `THEME_SWITCHING_ENABLED` | Boolean | `true`  | Enable light/dark theme switching                       |
 
 #### Navigation Buttons
@@ -125,11 +124,11 @@ After building with `npm run build`, place your config at `build/config/config.j
 
 #### Layer Configuration
 
-| Parameter             | Type   | Description                                                                                             |
-| --------------------- | ------ | ------------------------------------------------------------------------------------------------------- |
-| `LAYER_LIST_SERVICES` | Array  | WMS service definitions for reference layers. See [Layer List Configuration](#layer-list-configuration) |
-| `COLLECTIONS`         | Array  | Filter collections to show (array of collection IDs)                                                    |
-| `DEFAULT_COLLECTION`  | String | Default selected collection ID                                                                          |
+| Parameter             | Type   | Description                                                                                                               |
+| --------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------- |
+| `LAYER_LIST_SERVICES` | Array  | WMS service definitions for reference layers. Auto-enables layer list widget. See [Layer List](#layer-list-configuration) |
+| `COLLECTIONS`         | Array  | Filter collections to show (array of collection IDs)                                                                      |
+| `DEFAULT_COLLECTION`  | String | Default selected collection ID                                                                                            |
 
 ### Collection Configuration
 
@@ -283,9 +282,10 @@ The following parameters are **deprecated** but still supported for backward com
 
 ### Layer List Configuration
 
+The reference layer list widget is automatically enabled when `LAYER_LIST_SERVICES` is populated.
+
 ```json
 {
-  "LAYER_LIST_ENABLED": true,
   "LAYER_LIST_SERVICES": [
     {
       "name": "USGS Topography",

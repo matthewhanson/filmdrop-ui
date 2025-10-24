@@ -105,6 +105,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Removed
 
+- Removed `LAYER_LIST_ENABLED` configuration parameter - layer list widget is now automatically
+  enabled when `LAYER_LIST_SERVICES` array is populated (follows convention over configuration)
 - Removed `pre-commit` npm package (replaced by Husky) and configuration
 - Removed `MOSAIC_MIN_ZOOM_LEVEL` configuration parameter (mosaic views now use
   per-collection `sceneMinZoom` parameter, same as scene views)
