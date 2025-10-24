@@ -50,7 +50,7 @@ const PageHeader = () => {
       </div>
       <div className="pageHeaderRight">
         <div className="pageHeaderRightButtons">
-          {_appConfig.ANALYZE_BTN_URL && (
+          {_appConfig.ANALYZE_BTN_URL?.trim() && (
             <Stack
               className="buttonLink"
               data-testid="testAnalyzeButton"
@@ -62,7 +62,7 @@ const PageHeader = () => {
               </span>
             </Stack>
           )}
-          {_appConfig.DASHBOARD_BTN_URL && (
+          {_appConfig.DASHBOARD_BTN_URL?.trim() && (
             <Stack
               className="buttonLink"
               data-testid="testDashboardButton"

@@ -22,6 +22,7 @@ import {
   DEFAULT_MOSAIC_MIN_ZOOM,
   DEFAULT_TILE_LAYER_PARAMS
 } from '../components/defaults'
+import { getCollectionConfig } from './configHelper'
 
 export const footprintLayerStyle = {
   color: '#3183f5',
@@ -358,14 +359,11 @@ export const debounceTitilerOverlay = debounce(
 function addImageOverlay(item) {
   const sceneTilerURL =
     store.getState().mainSlice.appConfig.SCENE_TILER_URL || ''
-  if (
-    !item ||
-    !sceneTilerURL ||
-    !Object.prototype.hasOwnProperty.call(
-      store.getState().mainSlice.appConfig.SCENE_TILER_PARAMS,
-      item.collection
-    )
-  ) {
+  const sceneTilerParams = getCollectionConfig(
+    item?.collection,
+    'sceneTilerParams'
+  )
+  if (!item || !sceneTilerURL || !sceneTilerParams) {
     store.dispatch(setimageOverlayLoading(false))
     return
   }
@@ -439,61 +437,56 @@ function setupBounds(bbox) {
 }
 
 const getTileLayerParams = (collection) => {
-  const envTileLayerParams =
-    store.getState().mainSlice.appConfig.TILE_LAYER_PARAMS || ''
-  if (!envTileLayerParams) {
-    console.log(`TILE_LAYER_PARAMS is not defined`)
-    return {}
-  }
-  const tileLayerParams = getTilerParams(envTileLayerParams)
-
-  const collectionTileLayerParams = tileLayerParams[collection] || ''
+  const collectionTileLayerParams = getCollectionConfig(
+    collection,
+    'tileLayerParams'
+  )
   if (!collectionTileLayerParams) {
-    console.log(`TILE_LAYER_PARAMS not defined for ${collection}`)
+    console.log(`tileLayerParams not defined for ${collection}`)
     return {}
   }
   return collectionTileLayerParams
 }
 
 const constructSceneTilerParams = (collection) => {
-  const envSceneTilerParams =
-    store.getState().mainSlice.appConfig.SCENE_TILER_PARAMS || ''
-  // retrieve mosaic tiler parameters from env variable
-  const tilerParams = getTilerParams(envSceneTilerParams)
+  const tilerParams = getCollectionConfig(collection, 'sceneTilerParams')
+  if (!tilerParams) return ''
 
   const params = []
 
-  const [asset, assetsParam] = constructSceneAssetsParam(
-    collection,
-    tilerParams
-  )
-
+  const [asset, assetsParam] = constructSceneAssetsParam(tilerParams)
   params.push(assetsParam)
 
-  const assetBidx = parameters.bidx(tilerParams, collection, asset)
+  const assetBidx = parameters.bidx(tilerParams, asset)
   if (assetBidx) params.push(assetBidx)
 
-  const nodata = parameters.nodata(tilerParams, collection)
+  const nodata = parameters.nodata(tilerParams)
   if (nodata) params.push(nodata)
 
-  const colorFormula = parameters.colorFormula(tilerParams, collection)
+  const colorFormula = parameters.colorFormula(tilerParams)
   if (colorFormula) params.push(colorFormula)
 
-  const expression = parameters.expression(tilerParams, collection)
+  const expression = parameters.expression(tilerParams)
   if (expression) params.push(expression)
 
-  const rescale = parameters.rescale(tilerParams, collection)
+  const rescale = parameters.rescale(tilerParams)
   if (rescale) params.push(rescale)
 
-  const colormapName = parameters.colormapName(tilerParams, collection)
+  const colormapName = parameters.colormapName(tilerParams)
   if (colormapName) params.push(colormapName)
 
-  const colormap = parameters.colormap(tilerParams, collection)
+  const colormap = parameters.colormap(tilerParams)
   if (colormap) params.push(colormap)
 
   return params.join('&')
 }
 
+/**
+ * @deprecated This function is no longer used internally. Use getCollectionConfig() instead.
+ * Deep clones a configuration object via JSON serialization.
+ * @param {Object} configVariable - Configuration object to clone
+ * @returns {Object} Deep cloned configuration object
+ */
 export const getTilerParams = (configVariable) => {
   try {
     return JSON.parse(JSON.stringify(configVariable))
@@ -503,10 +496,9 @@ export const getTilerParams = (configVariable) => {
   return {}
 }
 
-const constructSceneAssetsParam = (collection, tilerParams) => {
-  const assets = tilerParams[collection]?.assets || ''
+const constructSceneAssetsParam = (tilerParams) => {
+  const assets = tilerParams?.assets || ''
   if (!assets) {
-    console.log(`Assets not defined for ${collection}`)
     return [null, '']
   }
   // titiler accepts multiple `assets` parameters for compositing
@@ -516,32 +508,32 @@ const constructSceneAssetsParam = (collection, tilerParams) => {
 }
 
 const parameters = {
-  nodata: (tilerParams, collection) => {
-    const value = tilerParams[collection]?.nodata
+  nodata: (tilerParams) => {
+    const value = tilerParams?.nodata
     return value == null ? null : `nodata=${value}`
   },
-  colorFormula: (tilerParams, collection) => {
-    const value = tilerParams[collection]?.color_formula
+  colorFormula: (tilerParams) => {
+    const value = tilerParams?.color_formula
     return value && `color_formula=${value}`
   },
-  expression: (tilerParams, collection) => {
-    const value = tilerParams[collection]?.expression
+  expression: (tilerParams) => {
+    const value = tilerParams?.expression
     return value && `expression=${value}`
   },
-  rescale: (tilerParams, collection) => {
-    const value = tilerParams[collection]?.rescale
+  rescale: (tilerParams) => {
+    const value = tilerParams?.rescale
     return value && `rescale=${value}`
   },
-  colormapName: (tilerParams, collection) => {
-    const value = tilerParams[collection]?.colormap_name
+  colormapName: (tilerParams) => {
+    const value = tilerParams?.colormap_name
     return value && `colormap_name=${value}`
   },
-  colormap: (tilerParams, collection) => {
-    const value = tilerParams[collection]?.colormap
+  colormap: (tilerParams) => {
+    const value = tilerParams?.colormap
     return value && `colormap=${encodeURIComponent(JSON.stringify(value))}`
   },
-  bidx: (tilerParams, collection, asset) => {
-    const value = tilerParams[collection]?.bidx
+  bidx: (tilerParams, asset) => {
+    const value = tilerParams?.bidx
     // for scene tiler
     if (asset) {
       const assetBidx = asset && value ? `${asset}|${value}` : null
@@ -573,32 +565,30 @@ export function setMosaicZoomMessage() {
 }
 
 export const constructMosaicTilerParams = (collection) => {
-  const mosaicTilerParams =
-    store.getState().mainSlice.appConfig.MOSAIC_TILER_PARAMS || ''
-  // retrieve mosaic tiler parameters from env variable
-  const tilerParams = getTilerParams(mosaicTilerParams)
+  const tilerParams = getCollectionConfig(collection, 'mosaicTilerParams')
+  if (!tilerParams) return ''
 
   const params = []
 
-  const bidx = parameters.bidx(tilerParams, collection)
+  const bidx = parameters.bidx(tilerParams)
   if (bidx) params.push(bidx)
 
-  const nodata = parameters.nodata(tilerParams, collection)
+  const nodata = parameters.nodata(tilerParams)
   if (nodata) params.push(nodata)
 
-  const colorFormula = parameters.colorFormula(tilerParams, collection)
+  const colorFormula = parameters.colorFormula(tilerParams)
   if (colorFormula) params.push(colorFormula)
 
-  const expression = parameters.expression(tilerParams, collection)
+  const expression = parameters.expression(tilerParams)
   if (expression) params.push(expression)
 
-  const rescale = parameters.rescale(tilerParams, collection)
+  const rescale = parameters.rescale(tilerParams)
   if (rescale) params.push(rescale)
 
-  const colormapName = parameters.colormapName(tilerParams, collection)
+  const colormapName = parameters.colormapName(tilerParams)
   if (colormapName) params.push(colormapName)
 
-  const colormap = parameters.colormap(tilerParams, collection)
+  const colormap = parameters.colormap(tilerParams)
   if (colormap) params.push(colormap)
 
   return params.join('&')

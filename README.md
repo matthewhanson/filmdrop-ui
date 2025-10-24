@@ -1,337 +1,272 @@
 # FilmDrop UI
 
-- [FilmDrop UI](#filmdrop-ui)
-  - [Summary](#summary)
-  - [Screenshots](#screenshots)
-  - [Running](#running)
-    - [Configuration File](#configuration-file)
-    - [`config.json`](#configjson)
-    - [Links](#links)
-  - [Scripts](#scripts)
-    - [`npm start`](#npm-start)
-    - [`npm test`](#npm-test)
-    - [`npm run build`](#npm-run-build)
-    - [`npm run coverage`](#npm-run-coverage)
-    - [`npm run serve`](#npm-run-serve)
-  - [Feature Support](#feature-support)
-    - [Geohex Aggregated View](#geohex-aggregated-view)
-    - [Grid Code Aggregated View](#grid-code-aggregated-view)
-    - [Cloud Cover](#cloud-cover)
-    - [SAR](#sar)
-    - [Thumbnails](#thumbnails)
-    - [Scene Tiling Configuration](#scene-tiling-configuration)
-    - [Mosaic Tiling Configuration](#mosaic-tiling-configuration)
+> A modern, browser-based interface for exploring and visualizing STAC API catalogs
 
-## Summary
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
-FilmDrop UI is a browser-based interface for displaying results from a STAC API. Additional information can be found in the [CHANGELOG](CHANGELOG.md).
+FilmDrop UI is a powerful web application for searching, visualizing, and interacting with
+geospatial imagery catalogs through STAC (SpatioTemporal Asset Catalog) APIs. It provides
+multiple visualization modes including aggregated views, mosaics, and individual scenes with
+advanced filtering and export capabilities.
 
-## Screenshots
+Check out [FilmDrop-UI in action with Earth-Search](https://console.earth-search.aws.element84.com/).
 
-Sentinel-1 L1C H3 Geohex View
+![Sentinel-2 L2A Scene View](screenshots/s2-hex-aggregation.png)
 
-![Sentinel-1 L1C H3 Geohex View](/screenshots/s1-hex.jpg)
+## 📋 Table of Contents
 
-Copernicus DEM H3 Geohex Aggregation View
+- [✨ Key Features](#key-features)
+- [🚀 Quick Start](#quick-start)
+- [📖 Documentation](#documentation)
+- [🎯 Configuration Examples](#configuration-examples)
+- [📸 Screenshots](#screenshots)
+- [🏗️ Architecture](#architecture)
+- [🤝 Contributing](#contributing)
+- [📚 Related Projects](#related-projects)
+- [📄 License](#license)
 
-![Copernicus DEM H3 Geohex Aggregation View](/screenshots/cop-dem-hex.jpg)
+## ✨ Key Features
 
-NAIP Grid View
+- **🎨 Visualization**
+  - Scene View - Individual imagery footprints and tile rendering with TiTiler
+  - Mosaic View - Seamless imagery mosaics using TiTiler
+  - Hex Aggregation - H3 geohex-based data density visualization
+  - Grid Aggregation - Grid code (MGRS, WRS2) based aggregation
+  - Customizable color formulas and band combinations
 
-![NAIP Grid View](/screenshots/naip-grid.jpg)
+- **🔍 Search**
+  - Date/time range filtering
+  - Cloud cover filtering
+  - Draw or upload GeoJSON search bounds
+  - Interactive map with Leaflet
+  - Light/dark theme support
 
-Sentinel-2 L2A Grid View
+## 🚀 Quick Start
 
-![Sentinel-2 L2A Grid View](/screenshots/s2-l2a-grid.jpg)
+### Prerequisites
 
-Sentinel-1 L1C Scene View
+- Node.js 18+ and npm
+- A STAC API endpoint
+- (Optional) TiTiler instance for imagery visualization
 
-![Sentinel-1 L1C Scene View](/screenshots/s1-scene.jpg)
+```bash
+# Clone the repository
+git clone https://github.com/Element84/filmdrop-ui.git
+cd filmdrop-ui
 
-NAIP Scene View
+# Install dependencies
+npm install
 
-![NAIP Scene View](/screenshots/naip-scene.jpg)
+# Create configuration file
+cp config_helper/config-new-format-example.json public/config/config.json
 
-Copernicus DEM Mosaic View
+# Edit configuration (at minimum, set STAC_API_URL)
+nano public/config/config.json
 
-![Copernicus DEM Mosaic View](/screenshots/cop-dem-mosaic.jpg)
+# Start development server
+npm start
 
-Sentinel-2 L2A Mosaic View
-
-![Sentinel-2 L2A Mosaic View](/screenshots/s2-l2a-mosaic.jpg)
-
-## Running
-
-### Configuration File
-
-For local development, you should create a `./public/config/config.json` file with appropriate variables outlined in the table below.
-The file `config_helper/config.example.json` is included in this repository as representative file structure.
-
-> NOTE: This project uses a "build-once, deploy-anywhere" approach with config variables.
-> The config is read on application load by a fetch to the `/config/config.json` path.
-> There is a cachebreaker included in the request to prevent stale config files from being used.
-
-### `config.json`
-
-| Variable                | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | Required |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| **REQUIRED VARIABLES**  |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |          |
-| BASEMAP                 | Object configuration for basemap providers used by the leaflet map. When `THEME_SWITCHING_ENABLED` is `true`, supports theme-specific providers via `light` and `dark` properties. Each provider must be a raster tile provider as vector tiles are not supported. Both `url` and `attribution` are required for each provider configuration. See the [BASEMAP Configuration Examples](#basemap-configuration-examples).                                                                                                                                          | Required |
-| SEARCH_MIN_ZOOM_LEVELS  | Per-collection configuration for minimum zoom levels needed for grid code aggregated results (medium zoom level) and single scene search results (high zoom level). Example: [config.example.json](config_helper/config.example.json). If no grid code aggregation, set value for `medium` to be the same value as `high` and hex aggregations will be used until the zoom level is reached when individual scenes become available.                                                                                                                              | Required |
-| STAC_API_URL            | URL for STAC API                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Required |
-| **OPTIONAL VARIABLES**  |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |          |
-| ACTION_BUTTON           | Button text and redirect URL used to link to external website as a prominent call to action. If not set, the button will not be visible. Should be an object with `text` and `url` keys. Example: [config.example.json](config_helper/config.example.json).                                                                                                                                                                                                                                                                                                       | Optional |
-| ANALYZE_BTN_URL         | URL for the Analyze button at the bottom left of the UI. If not set, the button will not be visible.                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Optional |
-| API_MAX_ITEMS           | Maximum number of items requested from API. If not set, the default max items will be 200.                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | Optional |
-| APP_FAVICON             | If set, custom application favicon is used instead of default FilmDrop favicon. Favicon file of format `.ico` OR `.png` must be used and file must exist next to config in `/config` of the built deployment directory. Place in `public` directory during local development, but can also be added or adjusted post depolyment. File name in `config.json` must match extactly with file in config, see `config.example.json` for example. If not set or error in config/file, default FilmDrop favicon will be used.                                            | Optional |
-| APP_NAME                | String value used for html title and anywhere else that the text value for app name is used. If not set, default value of `FilmDrop Console` will be used.                                                                                                                                                                                                                                                                                                                                                                                                        | Optional |
-| APP_TOKEN_AUTH_ENABLED  | If set to `true` login page renders initially and app only fully loads if a non expired token exists. STAC API calls made from the app will also send JWT as Bearer Token. **Note:** This approach provides a form of limited client-side authentication for the frontend, which is not fully secure. The STAC API endpoint must also require the JWT to ensure application data security.                                                                                                                                                                        | Optional |
-| AUTH_URL                | Endpoint used to pass a username and password that returns as JWT that is used for STAC API calls. `APP_TOKEN_AUTH_ENABLED` config value must also be set to `true`.                                                                                                                                                                                                                                                                                                                                                                                              | Optional |
-| BRAND_LOGO              | Object configuration for displaying a brand logo with clickable hyperlink in the top right of the UI. Set to `null` or omit entirely to disable. When `THEME_SWITCHING_ENABLED` is `true`, supports theme-specific logos via `image_light` and `image_dark` properties. See [BRAND_LOGO Configuration Examples](#brand_logo-configuration-examples) section below.                                                                                                                                                                                                | Optional |
-| CART_ENABLED            | If set to `true` cart features will be enabled. These include: rendering cart button in search controls bar, adding cart management buttons to popup results, render buttons in messages to quickly add some or all scenes to cart after search completes.                                                                                                                                                                                                                                                                                                        | Optional |
-| COLLECTIONS             | Array of strings listing collections to show in dropdown. This is used to filter the collections endpoint from the list fetched from the `STAC_API_URL` defined in the config. Collection property of `id` must be used. If set, only the matched collections will show in the app. If not set, all collections in the STAC API will show in dropdown.                                                                                                                                                                                                            | Optional |
-| CONFIG_COLORMAP         | Color map used in low level hex grid search results. Complete list of colormaps are available here: [bpostlethwaite/colormap](https://github.com/bpostlethwaite/colormap). If not set, the default colormap will be "viridis".                                                                                                                                                                                                                                                                                                                                    | Optional |
-| DASHBOARD_BTN_URL       | URL for the Dashboard button at the top right of the UI. If not set, the button will not be visible.                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Optional |
-| DEFAULT_COLLECTION      | Default collection option for collection dropdown                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Optional |
-| ENHANCED_DISPLAY_CONFIG | Per-collection configuration of enhanced metadata fields and assets to display in the Enhanced Details modal. Uses a grouped structure with `property_groups` and `asset_groups` for organized display. Each group contains fields with optional custom labels. Supports logical grouping by category (Core Fields, Spatial Reference, Data Quality, etc.) and asset organization (COGs, Metadata, Thumbnails). If not configured for a collection, automatic grouping by extension is used. Example in [config.example.json](config_helper/config.example.json). | Optional |
-| EXPORT_ENABLED          | If included and set to `true` a simple export button will render and allow for the simple export of search results as a geojson file.                                                                                                                                                                                                                                                                                                                                                                                                                             | Optional |
-| FETCH_CREDENTIALS       | Defines if API calls made from the app should include the basic authentication used to access the app. Can be set to `same-origin` (default), `include`, or `omit`.                                                                                                                                                                                                                                                                                                                                                                                               | Optional |
-| LAYER_LIST_ENABLED      | If set to `true`, reference layer list widget is displayed in map controls. NOTE: both `LAYER_LIST_ENABLED` and `LAYER_LIST_SERVICES` must exist in config for reference layer list widget to actually be displayed in the UI. If not set or `false`, reference layer list widget is not rendered.                                                                                                                                                                                                                                                                | Optional |
-| LAYER_LIST_SERVICES     | Defines the services used as reference layers for the map. **Limitations:** Currently only WMS services are supported and only `EPSG:4326` or `EPSG:3857` are supported values for defining crs options. If not set or not formatted correctly, reference layer list widget will either be empty or will not render. Formatting should match example in `config.example.json`.                                                                                                                                                                                    | Optional |
-| LOGO_ALT                | Alt image description for your custom logo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | Optional |
-| LOGO_URL                | URL for your custom logo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | Optional |
-| MAP_CENTER              | If set, starting map center point is initialized with this location. If not set, default map location of `[30, 0]` will be used.                                                                                                                                                                                                                                                                                                                                                                                                                                  | Optional |
-| MAP_ZOOM                | If set, starting map zoom level is set to this integer value. If not set, default value of `3` will be used.                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Optional |
-| MAP_ZOOM_MAX            | If set, the map zoom level is limited to this integer value. If not set, the default value of `18` will be used.                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Optional |
-| MOSAIC_MAX_ITEMS        | Maximum number of items in mosaic. If not set, the default max items will be 100.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Optional |
-| MOSAIC_MIN_ZOOM_LEVEL   | Minimum zoom level for mosaic view search results. If not set, the default zoom level will be 7.                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Optional |
-| MOSAIC_TILER_PARAMS     | Per-collection configuration of TiTiler mosaic `assets`, `color_formula`, `bidx`, `rescale`, `expression`, `colormap_name`, and `colormap` parameters. Example in [config.example.json](config_helper/config.example.json)                                                                                                                                                                                                                                                                                                                                        | Optional |
-| MOSAIC_TILER_URL        | URL for mosaic tiling. If not set, the View Mode selector will not be visible. The app requires the use of the [NASA IMPACT TiTiler fork](https://github.com/NASA-IMPACT/titiler) as it contains the mosaicjson endpoints needed.                                                                                                                                                                                                                                                                                                                                 | Optional |
-| POPUP_DISPLAY_FIELDS    | Per-collection configuration of popup metadata fields properies to render. Example in [config.example.json](config_helper/config.example.json). Only `Title` field (which maps to the `id` property for STAC items) is rendered if collection used in application but not included in configuration.                                                                                                                                                                                                                                                              | Optional |
-| PUBLIC_URL              | URL for the FilmDrop UI. Useful when using a CDN to host application.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | Optional |
-| SCENE_TILER_PARAMS      | Per-collection configuration of TiTiler `assets`, `color_formula`, `bidx`, `rescale`, `expression`, `colormap_name`, and `colormap` parameters. Example in [config.example.json](config_helper/config.example.json)                                                                                                                                                                                                                                                                                                                                               | Optional |
-| SCENE_TILER_URL         | URL for map tiling                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | Optional |
-| SEARCH_BY_GEOM_ENABLED  | If set to `true` search options will render and allow users to draw or upload a geojson file to use as search bounds.                                                                                                                                                                                                                                                                                                                                                                                                                                             | Optional |
-| SHOW_ITEM_AUTO_ZOOM     | If set to `true`, switch will render in `Filters` list to let the user toggle if the map automatically centers on item footprint when selected item is changed. Default when initialized is auto-zoom not enabled, user must opt-in by turning on (choice will persist for app session).                                                                                                                                                                                                                                                                          | Optional |
-| STAC_LINK_ENABLED       | If set to `true`, STAC Item link will render in Item Details.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | Optional |
-| SUPPORTS_AGGREGATIONS   | If included and set to `false` aggregation features are disabled and API calls are not made to load the optional aggregations from the STAC API.                                                                                                                                                                                                                                                                                                                                                                                                                  | Optional |
-| THEME_SWITCHING_ENABLED | If set to `true`, enables user theme switching between light and dark modes via a theme switcher button in the header. The application automatically detects the current system mode (light or dark) on startup and falls back to light theme if detection fails. If false (default), single theme mode is used. See [CSS Theme Configuration](#css-theme-configuration) section below for required CSS structure.                                                                                                                                                | Optional |
-| TILE_LAYER_PARAMS       | Per-collection configuration of `Leaflet.tileLayer`. See [Leaflet docs](https://leafletjs.com/reference.html#tilelayer-option) or example in [config.example.json](config_helper/config.example.json)                                                                                                                                                                                                                                                                                                                                                             | Optional |
-
-#### CSS Theme Configuration
-
-FilmDrop-UI supports two theming modes that require different CSS structures in
-`src/themes/theme.css`. Mismatched configuration and CSS will result in error messages.
-
-- Theme Switching Mode (`THEME_SWITCHING_ENABLED: true`): Enables users to switch
-  between light and dark themes by clicking a button. Requires the following explicit
-  theme selectors in `src/themes/theme.css`.
-  - `:root[data-theme='filmdrop-dark']` - Contains the dark theme variables.
-  - `:root[data-theme='filmdrop-light']` - Contains the light theme variables.
-
-- Single Theme Mode (`THEME_SWITCHING_ENABLED: false` or not set): Theme switching is
-  disabled. Requires a single explicit theme selector in `src/themes/theme.css`.
-  - `:root[data-theme='filmdrop']` - Contains variables for the single theme.
-
-#### BASEMAP Configuration Examples
-
-Single Basemap:
-
-```json
-{
-  "BASEMAP": {
-    "url": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-    "attribution": "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a>"
-  }
-}
+# Application available at http://localhost:5173
 ```
 
-Theme-Aware Basemap (requires `THEME_SWITCHING_ENABLED: true`):
+**For production deployment:**
+
+```bash
+# Create production build
+npm run build
+
+# Build output in ./build directory
+# Deploy contents to web server
+```
+
+## 📖 Documentation
+
+- **[Configuration Guide](CONFIGURATION.md)** - Complete configuration reference with migration guide
+- **[Changelog](CHANGELOG.md)** - Version history and changes
+
+### Configuration Quick Reference
+
+Create `public/config/config.json` (development) or `build/config/config.json` (production):
 
 ```json
 {
+  "STAC_API_URL": "https://your-stac-api.com",
   "BASEMAP": {
-    "light": {
-      "url": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-      "attribution": "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a>"
-    },
-    "dark": {
-      "url": "https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png",
-      "attribution": "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> &copy; <a href=\"https://cartodb.com/attributions\">CartoDB</a>"
+    "url": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    "attribution": "&copy; OpenStreetMap"
+  },
+  "COLLECTIONS_CONFIG": {
+    "your-collection-id": {
+      "sceneTilerParams": {
+        "assets": ["red", "green", "blue"]
+      },
+      "searchMinZoomLevels": {
+        "medium": 4,
+        "high": 7
+      },
+      "popupDisplayFields": ["datetime", "platform"]
     }
   }
 }
 ```
 
-#### BRAND_LOGO Configuration Examples
+### STAC API Requirements
 
-Disabled Brand Logo:
+Some FilmDrop features require specific STAC API extensions:
+
+- **Aggregation Views** - [Aggregation Extension](https://github.com/stac-api-extensions/aggregation)
+  - Hex view requires items with `proj:centroid` property
+  - Currently supported by [stac-server](https://github.com/stac-utils/stac-server) and stac-fastapi-elasticsearch-opensearch
+
+- **Grid Code Aggregation** - Custom `grid:code` property
+  - Items must include grid identifier (e.g., MGRS, WRS2)
+
+- **Cloud Cover Filtering** - [EO Extension](https://github.com/stac-extensions/eo)
+
+See [CONFIGURATION.md](CONFIGURATION.md) for detailed feature configuration.
+
+## 🎯 Configuration Examples
+
+### Basic Setup
+
+Minimal configuration for viewing a single collection:
 
 ```json
 {
-  "BRAND_LOGO": null
-}
-```
-
-Single Brand Logo:
-
-```json
-{
-  "BRAND_LOGO": {
-    "url": "https://your-company.com",
-    "title": "Visit Your Company",
-    "alt": "Your Company Logo",
-    "image": "./your-logo.png"
+  "STAC_API_URL": "https://earth-search.aws.element84.com/v1",
+  "BASEMAP": {
+    "url": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    "attribution": "&copy; OpenStreetMap"
+  },
+  "COLLECTIONS_CONFIG": {
+    "sentinel-2-l2a": {
+      "searchMinZoomLevels": { "medium": 4, "high": 7 }
+    }
   }
 }
 ```
 
-Theme-Aware Brand Logo (requires `THEME_SWITCHING_ENABLED: true`):
+### With Imagery Visualization
+
+Add TiTiler for on-the-fly tile generation:
 
 ```json
 {
-  "BRAND_LOGO": {
-    "url": "https://your-company.com",
-    "title": "Visit Your Company",
-    "alt": "Your Company Logo",
-    "image": null,
-    "image_light": "./your-logo-light.png",
-    "image_dark": "./your-logo-dark.png"
+  "STAC_API_URL": "https://earth-search.aws.element84.com/v1",
+  "SCENE_TILER_URL": "https://titiler.xyz",
+  "BASEMAP": {
+    "url": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    "attribution": "&copy; OpenStreetMap"
+  },
+  "COLLECTIONS_CONFIG": {
+    "sentinel-2-l2a": {
+      "sceneTilerParams": {
+        "assets": ["red", "green", "blue"],
+        "color_formula": "Gamma+RGB+3.2+Saturation+0.8"
+      },
+      "searchMinZoomLevels": { "medium": 4, "high": 7 }
+    }
   }
 }
 ```
 
-### Links
+### Multiple Collections
 
-Static files are built with `npm run build` then moved to overwrite files in existing S3 buckets.
-
-## Scripts
-
-This project contains several NPM scripts for common tasks.
-
-### `npm start`
-
-Runs the app locally at <http://localhost:5173>
-
-This uses the configuration settings in `./public/config/config.json`.
-
-### `npm test`
-
-Launches the test runner.
-
-### `npm run build`
-
-This builds using the configuration settings found in `./public/config/config.json`.
-
-The result will appear in the `build` folder.
-
-### `npm run coverage`
-
-Runs tests and outputs a coverage report into console.
-
-### `npm run serve`
-
-Starts a local web server that serves the built solution from `build` folder.
-
-## Feature Support
-
-Many of the advanced features of FilmDrop-UI rely on behaviors of
-[stac-server](https://github.com/stac-utils/stac-server), part of the
-FilmDrop family of services.
-
-### Geohex Aggregated View
-
-Support for STAC API [Aggregation Extension](https://github.com/stac-api-extensions/aggregation)
-is necessary for the geohex aggregated view. As of July 2025, only stac-server and
-stac-fastapi-elasticsearch-opensearch implement this extension.
-
-The geohex aggregated view requires:
-
-1. All Items that are to be aggregated must have the `proj:centroid` property defined,
-2. The aggregation `grid_geohex_frequency` must be advertised by the `/aggregations` endpoint
-   for each collection that has Items with the `proj:centroid` property.
-
-### Grid Code Aggregated View
-
-Support for STAC API [Aggregation Extension](https://github.com/stac-api-extensions/aggregation)
-is necessary for the grid code aggregated view. As of July 2025, only stac-server and
-stac-fastapi-elasticsearch-opensearch implement this extension.
-
-The grid code view requires:
-
-1. All Items that are to be aggregated must have the `grid:code` property defined,
-2. The aggregation `grid_code_frequency` must be advertised by the `/aggregations` endpoint
-   for each collection that has Items with the `grid:code` property.
-3. The `grid:code` prefixes CDEM, DOQQ, MGRS, and WRS2 are supported by default. Any other grid
-   code prefixes require customization of the filmdrop-ui application.
-
-### Cloud Cover
-
-The Cloud Cover filter widget is enabled when a Collection's `/queryables` endpoint advertises
-it has a queryable named `eo:cloud_cover`. This should be configured for all Collections with the
-`eo:cloud_cover` property defined.
-
-### SAR
-
-One limitation of the scene and mosaic views is that the assets they display must be consistent
-across all items, e.g., if "red", "green", and "blue" are configured as the assets to composite,
-then assets with these names must exist across all items in the collection. In the case of a
-collection of SAR data, this is frequently not the case. For example, Sentinel-1 scenes have
-some combination of assets "vv", "vh", "hv", and "hh". To work around this, the UI searches only
-for items with the polarization `VV` present in the `sar:polarizations` property and then the
-scene configuration only uses the `vv` asset in rendering.
-
-To support this behavior, the queryable `sar:polarizations` must be advertised by a collection's
-`/queryables` endpoint.
-
-### Thumbnails
-
-The thumbnail for a scene is determined by the existence of link with the relation `thumbnail`
-for an item. stac-server will always present this relation, but making a request to it may result
-in a 404 if no appropriate thumbnail can be determined for an item. stac-server determines the
-appropriate thing to do by first looking for an asset with a role of `thumbnail`. If this asset
-exists and the href starts with `http`, a 302 redirect is made to that URL. If this asset exists
-and has an href starting with `s3://`, the URI is signed using stac-server's AWS credentials and
-the pre-signed URL is redirected. For non-public S3 buckets, stac-server must be granted
-permissions on that bucket or the pre-signed URL will get an Access Denied error.
-
-### Scene Tiling Configuration
-
-Scene tiling requires describing the form of the data and how titiler should create a single
-image from an item.
-
-The configurations include:
-
-- `assets`: one or three assets. If three assets are specified, they will be composited as RGB.
-- `color_formula`: the color formula to adjust a composite with
-- `bidx`: if a single asset is defined, these indicies are used as the band indicies within that
-  image to composite.
-- `colormap_name`: the colormap to use for mapping values (typically used for single band)
-- `colormap`: a colormap of values to hex colors to use for mapping values (typically used for single band)
-- `rescale`: the rescale range to apply prior to color mapping (typically used for single band)
-- `nodata`: the nodata value to use, if not in image metadata
-
-An example of a `colormap` configuration is:
-
-```text
- "colormap": {
-        "0": "#000000",
-        "1": "#419bdf",
-        "2": "#397d49",
-        "3": "#000000",
-        "4": "#7a87c6",
-        "5": "#e49635",
-        "6": "#000000",
-        "7": "#c4281b",
-        "8": "#a59b8f",
-        "9": "#a8ebff",
-        "10": "#616161",
-        "11": "#e3e2c3"
-      }
+```json
+{
+  "COLLECTIONS_CONFIG": {
+    "sentinel-2-l2a": {
+      "sceneTilerParams": { "assets": ["red", "green", "blue"] },
+      "searchMinZoomLevels": { "medium": 4, "high": 7 },
+      "popupDisplayFields": ["datetime", "platform", "eo:cloud_cover"]
+    },
+    "landsat-c2-l2": {
+      "sceneTilerParams": { "assets": ["red", "green", "blue"] },
+      "searchMinZoomLevels": { "medium": 4, "high": 7 },
+      "popupDisplayFields": ["datetime", "platform", "instruments"]
+    }
+  }
+}
 ```
 
-### Mosaic Tiling Configuration
+## 📸 Screenshots
 
-Configuration of mosaic tiling is the same as for scene tiling, with the additional constraint
-that multi-asset compositing cannot be done, so only a single asset may be specified for the
-`assets` list.
+### Landsat Hex Aggregation in light mode
+
+![Landsat hex aggregations in light mode](screenshots/landsat-lightmode.png)
+
+### Sentinel-1 Footprints
+
+![sentinel-1 footprints](screenshots/s1-footprints.png)
+
+### Landsat footprints with rendered scene
+
+![landsat footprints with rendered scene](screenshots/landsat-scene.png)
+
+### Sentinel-2 Grid Aggregation (on MGRS grids)
+
+![sentinel-2 grid aggregation MGRS](screenshots/s2-grid-aggregation.png)
+
+## 🏗️ Architecture
+
+FilmDrop UI is built with:
+
+- **React** - UI framework
+- **Redux** - State management
+- **Leaflet** - Interactive mapping
+- **Vite** - Build tool and dev server
+
+### Key Design Principles
+
+- **Build-once, deploy-anywhere** - Runtime configuration
+- **Responsive design** - Works on desktop and mobile
+- **Extensible** - Easy to add new collections and visualizations
+- **Performance** - Optimized for large result sets
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+### Guidelines
+
+- Follow existing code style
+- Use meaningful variable and function names
+- Add details of the changes/updates to the CHANGELOG's `Unreleased` section
+- Add tests for new features
+- Update documentation as needed
+
+### Available Scripts
+
+```bash
+npm start        # Start development server (localhost:5173)
+npm test         # Run test suite
+npm run build    # Create production build
+npm run coverage # Generate test coverage report
+npm run serve    # Serve production build locally
+```
+
+### Running Tests
+
+```bash
+# Run tests
+npm test
+
+# Run tests with coverage
+npm run coverage
+
+# Run tests in watch mode
+npm test -- --watch
+```
+
+## 📚 Related Projects
+
+- [STAC Specification](https://stacspec.org/) - Core STAC specification
+- [stac-server](https://github.com/stac-utils/stac-server) - Serverless STAC API implementation
+- [TiTiler](https://github.com/developmentseed/titiler) - Dynamic tile server
+- [NASA IMPACT TiTiler](https://github.com/NASA-IMPACT/titiler) - Extended TiTiler with mosaicjson support
+
+## 📄 License
+
+Copyright 2020-2025 Element 84
+
+Licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for details.

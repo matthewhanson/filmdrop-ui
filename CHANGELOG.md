@@ -7,6 +7,77 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+### Added
+
+- Added `COLLECTIONS_CONFIG` structure to consolidate collection-specific parameters
+  (sceneTilerParams, mosaicTilerParams, searchMinZoomLevels, popupDisplayFields,
+  tileLayerParams, enhancedDisplayConfig)
+- Added automatic configuration migration from legacy format to new format on load
+- Added `normalizeCollectionsConfig()` helper function in `src/utils/configHelper.js`
+  for backward compatibility
+- Added `getCollectionConfig()` helper function for unified access to collection settings
+- Added comprehensive `CONFIGURATION.md` documentation with parameter reference,
+  examples, and migration guide
+- Added `config-new-format-example.json` demonstrating new `COLLECTIONS_CONFIG` structure
+- Added comprehensive test coverage for `normalizeCollectionsConfig()` and
+  `getCollectionConfig()` functions (16 new tests covering backward compatibility,
+  migration, new format, and parameter mapping)
+- Added `.remarkrc.js` configuration file to customize markdown linting rules for technical
+  documentation (allows longer lines, relaxed table formatting, etc.)
+- Migrated from `pre-commit` package to Husky for git hooks management (developers should
+  run `npm install` to set up hooks automatically)
+- Added `.husky/` directory for git hooks
+- Git hooks now properly source nvm to ensure consistent Node.js version across all
+  environments (fixes Node version mismatch issues in VS Code/GitLens) due to moving
+  from pre-commit to husky
+
+### Changed
+
+- Updated `src/services/get-config-service.js` to normalize configuration on load
+- Updated `src/utils/searchHelper.js` to use `getCollectionConfig()` for accessing
+  search min zoom levels and removed unused `getTilerParams` import
+- Updated `src/utils/mapHelper.js` to use `getCollectionConfig()` for tile layer and
+  tiler parameters
+- Simplified `constructSceneTilerParams()` and `constructMosaicTilerParams()` to work
+  directly with collection config without unnecessary wrapping/unwrapping
+- Refactored `parameters` helper functions in `src/utils/mapHelper.js` to accept tiler
+  params directly instead of requiring collection lookup
+- Updated `constructSceneAssetsParam()` to work with params directly without collection
+  parameter
+- Updated `src/components/PopupResult/PopupResult.jsx` to use `getCollectionConfig()`
+  without passing redundant `_appConfig` parameter
+- Updated `src/components/EnhancedDetailsTab/EnhancedDetailsTab.jsx` to call
+  `createEnhancedDisplayFieldPredicate()` without passing redundant `appConfig` parameter
+- Updated `src/utils/fieldGrouping.js` to make `appConfig` parameter optional in
+  `createEnhancedDisplayFieldPredicate()`
+- Updated `src/utils/configHelper.js` JSDoc to clarify third parameter is for testing purposes
+- Updated `public/config/config.json` to use new `COLLECTIONS_CONFIG` structure
+- Overhauled `README.md` following best practices with improved structure, quick start guide, and developer section
+- Added `CONFIGURATION.md` with details on Config structure and including a migration guide
+- Consolidated duplicate sections in `README.md` for clearer documentation
+
+### Fixed
+
+- Fixed bug where Dashboard and Analyze buttons would appear even when `DASHBOARD_BTN_URL`
+  and `ANALYZE_BTN_URL` were set to empty strings or whitespace in configuration
+- Updated `src/components/Layout/PageHeader/PageHeader.jsx` to use `.trim()` when checking
+  button URL values to properly hide buttons when URLs are empty or whitespace-only
+- Added test cases for whitespace-only URL values in `PageHeader.test.jsx`
+
+### Removed
+
+- Removed `pre-commit` npm package (replaced by Husky) and configuration
+
+### Deprecated
+
+- Deprecated `SCENE_TILER_PARAMS` (use `COLLECTIONS_CONFIG[id].sceneTilerParams` instead, backward compatible)
+- Deprecated `MOSAIC_TILER_PARAMS` (use `COLLECTIONS_CONFIG[id].mosaicTilerParams` instead, backward compatible)
+- Deprecated `SEARCH_MIN_ZOOM_LEVELS` (use `COLLECTIONS_CONFIG[id].searchMinZoomLevels` instead, backward compatible)
+- Deprecated `POPUP_DISPLAY_FIELDS` (use `COLLECTIONS_CONFIG[id].popupDisplayFields` instead, backward compatible)
+- Deprecated `TILE_LAYER_PARAMS` (use `COLLECTIONS_CONFIG[id].tileLayerParams` instead, backward compatible)
+- Deprecated `ENHANCED_DISPLAY_CONFIG` (use `COLLECTIONS_CONFIG[id].enhancedDisplayConfig` instead, backward compatible)
+- Deprecated `getTilerParams()` in `src/utils/mapHelper.js` (no longer used internally, use `getCollectionConfig()` instead)
+
 ## 6.1.0 - 2025-09-25
 
 ### Changed

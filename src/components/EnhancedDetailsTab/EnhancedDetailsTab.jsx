@@ -7,6 +7,7 @@ import {
 } from '../../utils/fieldGrouping.js'
 import { groupPropertiesByExtension } from '../../utils/defaultFieldGrouping.js'
 import { getCollectionFieldPriorities } from '../../utils/fieldPriorities.js'
+import { getCollectionConfig } from '../../utils/configHelper.js'
 import FieldGroup from './FieldGroup.jsx'
 import ItemHeader from './ItemHeader.jsx'
 import AssetDisplay from './AssetDisplay.jsx'
@@ -68,7 +69,11 @@ const EnhancedDetailsTab = () => {
   }
 
   const { properties, id, collection, assets } = currentPopupResult
-  const hasEnhancedConfig = appConfig?.ENHANCED_DISPLAY_CONFIG?.[collection]
+  const enhancedDisplayConfig = getCollectionConfig(
+    collection,
+    'enhancedDisplayConfig'
+  )
+  const hasEnhancedConfig = !!enhancedDisplayConfig
 
   // Error handling for field processing
   const handleFieldProcessingError = useCallback((error, context) => {
@@ -83,11 +88,10 @@ const EnhancedDetailsTab = () => {
   const groupedFields = useMemo(() => {
     try {
       if (hasEnhancedConfig) {
-        // For enhanced config, use the exact order from ENHANCED_DISPLAY_CONFIG
-        const enhancedConfig = appConfig?.ENHANCED_DISPLAY_CONFIG?.[collection]
-        if (enhancedConfig?.property_groups) {
+        // For enhanced config, use the exact order from enhancedDisplayConfig
+        if (enhancedDisplayConfig?.property_groups) {
           const orderedGroups = {}
-          enhancedConfig.property_groups.forEach((group) => {
+          enhancedDisplayConfig.property_groups.forEach((group) => {
             const groupFields = {}
             group.fields.forEach((field) => {
               if (properties[field.name] !== undefined) {
@@ -101,10 +105,7 @@ const EnhancedDetailsTab = () => {
           return orderedGroups
         }
         // Fallback to semantic grouping if config is malformed
-        const shouldShowField = createEnhancedDisplayFieldPredicate(
-          collection,
-          appConfig
-        )
+        const shouldShowField = createEnhancedDisplayFieldPredicate(collection)
         return groupFieldsSemantically(properties, shouldShowField)
       }
       return groupPropertiesByExtension(properties)
@@ -115,7 +116,7 @@ const EnhancedDetailsTab = () => {
   }, [
     properties,
     collection,
-    appConfig,
+    enhancedDisplayConfig,
     hasEnhancedConfig,
     handleFieldProcessingError
   ])

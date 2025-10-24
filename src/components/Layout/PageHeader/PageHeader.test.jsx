@@ -88,6 +88,26 @@ describe('PageHeader', () => {
         screen.queryByTestId('testDashboardButton')
       ).not.toBeInTheDocument()
     })
+    it('should not render analyze Button if ANALYZE_BTN_URL is whitespace only', () => {
+      const mockAppConfigSearchEnabled = {
+        ...mockAppConfig,
+        ANALYZE_BTN_URL: '   '
+      }
+      store.dispatch(setappConfig(mockAppConfigSearchEnabled))
+      setup()
+      expect(screen.queryByTestId('testAnalyzeButton')).not.toBeInTheDocument()
+    })
+    it('should not render dashboard Button if DASHBOARD_BTN_URL is whitespace only', () => {
+      const mockAppConfigSearchEnabled = {
+        ...mockAppConfig,
+        DASHBOARD_BTN_URL: '   '
+      }
+      store.dispatch(setappConfig(mockAppConfigSearchEnabled))
+      setup()
+      expect(
+        screen.queryByTestId('testDashboardButton')
+      ).not.toBeInTheDocument()
+    })
   })
   describe('button clicks', () => {
     describe('analyze button', () => {
