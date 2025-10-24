@@ -7,6 +7,11 @@ export const DEFAULT_APP_NAME = 'FilmDrop Console'
 export const DEFAULT_MAX_SCENES_RENDERED = 1000
 export const DEFAULT_MAP_CENTER = [30, 0]
 export const DEFAULT_MAP_ZOOM = 3
+export const DEFAULT_BASEMAP = {
+  url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+  attribution:
+    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}
 // sets default date range (current minus 24hrs * 60min * 60sec * 1000ms per day * 14 days)
 const twoWeeksAgo = new Date(Date.now() - 24 * 60 * 60 * 1000 * 14)
 export const DEFAULT_DATE_RANGE = [twoWeeksAgo, new Date()]

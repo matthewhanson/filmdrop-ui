@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
+- Added sensible defaults and auto-population for configuration to reduce required parameters:
+  - `BASEMAP` now defaults to OpenStreetMap if not provided in config
+  - Users can completely omit `BASEMAP` section and application will work with default basemap
 - Added unified View Mode selector with four buttons (Hex, Grid, Scene, Mosaic) for
   user-selectable aggregation and viewing options
 - Added automatic view mode switching based on zoom level with manual override capability:

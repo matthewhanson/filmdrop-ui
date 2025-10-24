@@ -1,3 +1,5 @@
+import { DEFAULT_BASEMAP } from '../components/defaults'
+
 const THEME_STORAGE_KEY = 'APP_THEME_PREFERENCE'
 
 export function getSystemTheme() {
@@ -31,7 +33,7 @@ export function saveThemeToStorage(theme) {
 
 export function getBasemapConfig(appConfig, currentTheme) {
   if (!appConfig.BASEMAP) {
-    return null
+    return DEFAULT_BASEMAP
   }
 
   // Check if this is single basemap mode (has url property directly)
@@ -43,10 +45,10 @@ export function getBasemapConfig(appConfig, currentTheme) {
   }
 
   if (appConfig.THEME_SWITCHING_ENABLED === true && currentTheme) {
-    return appConfig.BASEMAP[currentTheme]
+    return appConfig.BASEMAP[currentTheme] || DEFAULT_BASEMAP
   }
 
-  return null
+  return DEFAULT_BASEMAP
 }
 
 export function getBrandLogoConfig(appConfig, currentTheme) {

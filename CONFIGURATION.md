@@ -46,10 +46,9 @@ After building with `npm run build`, place your config at `build/config/config.j
 
 ### Required Parameters
 
-| Parameter      | Type   | Description                                                                                                                                                           |
-| -------------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `BASEMAP`      | Object | Basemap provider configuration for the Leaflet map. Must be a raster tile provider (vector tiles not supported). See [Basemap Configuration](#basemap-configuration). |
-| `STAC_API_URL` | String | URL for the STAC API endpoint                                                                                                                                         |
+| Parameter      | Type   | Description                   |
+| -------------- | ------ | ----------------------------- |
+| `STAC_API_URL` | String | URL for the STAC API endpoint |
 
 > **Note:** `SEARCH_MIN_ZOOM_LEVELS` was previously required but is now **deprecated**.
 > Use `sceneMinZoom` within `COLLECTIONS_CONFIG` instead.
@@ -108,12 +107,13 @@ After building with `npm run build`, place your config at `build/config/config.j
 
 #### Map Configuration
 
-| Parameter         | Type   | Default     | Description                                                                                              |
-| ----------------- | ------ | ----------- | -------------------------------------------------------------------------------------------------------- |
-| `MAP_CENTER`      | Array  | `[30, 0]`   | Initial map center `[lat, lon]`                                                                          |
-| `MAP_ZOOM`        | Number | `3`         | Initial map zoom level                                                                                   |
-| `MAP_ZOOM_MAX`    | Number | `18`        | Maximum map zoom level                                                                                   |
-| `CONFIG_COLORMAP` | String | `"viridis"` | Colormap for hex grid results. See [bpostlethwaite/colormap](https://github.com/bpostlethwaite/colormap) |
+| Parameter         | Type   | Default       | Description                                                                                                                     |
+| ----------------- | ------ | ------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `BASEMAP`         | Object | OpenStreetMap | Basemap provider configuration. See [Basemap Configuration](#basemap-configuration). Defaults to OpenStreetMap if not provided. |
+| `MAP_CENTER`      | Array  | `[30, 0]`     | Initial map center `[lat, lon]`                                                                                                 |
+| `MAP_ZOOM`        | Number | `3`           | Initial map zoom level                                                                                                          |
+| `MAP_ZOOM_MAX`    | Number | `18`          | Maximum map zoom level                                                                                                          |
+| `CONFIG_COLORMAP` | String | `"viridis"`   | Colormap for hex grid results. See [bpostlethwaite/colormap](https://github.com/bpostlethwaite/colormap)                        |
 
 #### Tiling Configuration
 
@@ -205,6 +205,15 @@ The following parameters are **deprecated** but still supported for backward com
 ## Configuration Examples
 
 ### Basemap Configuration
+
+**Default:** If not provided, defaults to OpenStreetMap:
+
+```json
+{
+  "url": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+  "attribution": "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a>"
+}
+```
 
 **Single Basemap:**
 
