@@ -55,6 +55,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Overhauled `README.md` following best practices with improved structure, quick start guide, and developer section
 - Added `CONFIGURATION.md` with details on Config structure and including a migration guide
 - Consolidated duplicate sections in `README.md` for clearer documentation
+- Added backwards compatibility for stac-server aggregation names
+  - Now supports both new (stac-server >= 3.6.0) and old (deprecated) aggregation names
+  - Automatically detects and uses appropriate aggregation name based on STAC API capabilities
+  - New names: `centroid_geohex_grid_frequency`, `centroid_geohash_grid_frequency`, `centroid_geotile_grid_frequency`
+  - Old names: `grid_geohex_frequency`, `grid_geohash_frequency`, `grid_geotile_frequency`
+  - Ensures compatibility with Earth Search STAC API and other APIs using deprecated names
 
 ### Fixed
 

@@ -117,6 +117,7 @@ Some FilmDrop features require specific STAC API extensions:
 - **Aggregation Views** - [Aggregation Extension](https://github.com/stac-api-extensions/aggregation)
   - Hex view requires items with `proj:centroid` property
   - Currently supported by [stac-server](https://github.com/stac-utils/stac-server) and stac-fastapi-elasticsearch-opensearch
+  - The aggregation `centroid_geohex_grid_frequency` or `grid_geohex_frequency` (Deprecated) must be advertised by the `/aggregations` endpoint
 
 - **Grid Code Aggregation** - Custom `grid:code` property
   - Items must include grid identifier (e.g., MGRS, WRS2)
