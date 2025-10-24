@@ -70,6 +70,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 
+- Fixed bug in `constructMosaicAssetVal()` that mutated Redux state by calling `.pop()` on
+  the assets array, causing crashes in development mode and silent failures on subsequent
+  mosaic searches in production (bug introduced in May 2023)
 - Fixed bug where Dashboard and Analyze buttons would appear even when `DASHBOARD_BTN_URL`
   and `ANALYZE_BTN_URL` were set to empty strings or whitespace in configuration
 - Updated `src/components/Layout/PageHeader/PageHeader.jsx` to use `.trim()` when checking

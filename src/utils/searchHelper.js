@@ -450,11 +450,14 @@ function newMosaicSearch() {
 
 const constructMosaicAssetVal = (collection) => {
   const mosaicTilerParams = getCollectionConfig(collection, 'mosaicTilerParams')
-  const asset = mosaicTilerParams?.assets || ''
-  if (!asset) {
+  const assets = mosaicTilerParams?.assets
+  if (!assets) {
     console.log(`Assets not defined for ${collection}`)
     return null
-  } else {
-    return asset.pop()
   }
+  // Handle both string and array formats without mutation
+  if (Array.isArray(assets)) {
+    return assets[assets.length - 1]
+  }
+  return assets
 }
