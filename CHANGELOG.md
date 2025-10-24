@@ -79,6 +79,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Removed
 
 - Removed `pre-commit` npm package (replaced by Husky) and configuration
+- Removed `MOSAIC_MIN_ZOOM_LEVEL` configuration parameter (mosaic views now use
+  per-collection `sceneMinZoom` parameter, same as scene views)
 
 ### Deprecated
 

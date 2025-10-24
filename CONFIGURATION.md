@@ -116,12 +116,11 @@ After building with `npm run build`, place your config at `build/config/config.j
 
 #### Tiling Configuration
 
-| Parameter               | Type   | Description                                                                                           |
-| ----------------------- | ------ | ----------------------------------------------------------------------------------------------------- |
-| `SCENE_TILER_URL`       | String | TiTiler endpoint for scene tiling                                                                     |
-| `MOSAIC_TILER_URL`      | String | TiTiler mosaic endpoint (requires [NASA IMPACT TiTiler fork](https://github.com/NASA-IMPACT/titiler)) |
-| `MOSAIC_MAX_ITEMS`      | Number | Maximum items in mosaic (default: `100`)                                                              |
-| `MOSAIC_MIN_ZOOM_LEVEL` | Number | Minimum zoom for mosaic view (default: `7`)                                                           |
+| Parameter          | Type   | Description                                                                                           |
+| ------------------ | ------ | ----------------------------------------------------------------------------------------------------- |
+| `SCENE_TILER_URL`  | String | TiTiler endpoint for scene tiling                                                                     |
+| `MOSAIC_TILER_URL` | String | TiTiler mosaic endpoint (requires [NASA IMPACT TiTiler fork](https://github.com/NASA-IMPACT/titiler)) |
+| `MOSAIC_MAX_ITEMS` | Number | Maximum items in mosaic (default: `100`)                                                              |
 
 #### Layer Configuration
 

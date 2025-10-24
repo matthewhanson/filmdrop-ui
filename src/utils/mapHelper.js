@@ -18,10 +18,7 @@ import { searchGridCodeScenes } from './searchHelper'
 import debounce from './debounce'
 import { GetMosaicBoundsService } from '../services/get-mosaic-bounds'
 import GeoJSONValidation from './geojsonValidation'
-import {
-  DEFAULT_MOSAIC_MIN_ZOOM,
-  DEFAULT_TILE_LAYER_PARAMS
-} from '../components/defaults'
+import { DEFAULT_TILE_LAYER_PARAMS } from '../components/defaults'
 import { getCollectionConfig } from './configHelper'
 
 export const footprintLayerStyle = {
@@ -543,23 +540,6 @@ const parameters = {
         ?.split(',')
         .map((x) => `bidx=${x}`)
         .join('&')
-    }
-  }
-}
-
-export function setMosaicZoomMessage() {
-  const map = store.getState().mainSlice.map
-  if (map && Object.keys(map).length > 0) {
-    const MOSAIC_MIN_ZOOM =
-      store.getState().mainSlice.appConfig.MOSAIC_MIN_ZOOM_LEVEL ||
-      DEFAULT_MOSAIC_MIN_ZOOM
-    if (
-      map.getZoom() >= MOSAIC_MIN_ZOOM ||
-      store.getState().mainSlice.viewMode === 'scene'
-    ) {
-      store.dispatch(setShowZoomNotice(false))
-    } else {
-      store.dispatch(setShowZoomNotice(true))
     }
   }
 }

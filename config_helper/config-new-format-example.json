@@ -13,7 +13,6 @@
   "SCENE_TILER_URL": "https://titiler.example.com",
   "MOSAIC_TILER_URL": "https://titiler-mosaic.example.com",
   "MOSAIC_MAX_ITEMS": 100,
-  "MOSAIC_MIN_ZOOM_LEVEL": 7,
   "CONFIG_COLORMAP": "viridis",
   "BASEMAP": {
     "url": "https://tile-provider.example.com/{z}/{x}/{y}.png",
