@@ -75,12 +75,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Updated `src/components/Layout/PageHeader/PageHeader.jsx` to use `.trim()` when checking
   button URL values to properly hide buttons when URLs are empty or whitespace-only
 - Added test cases for whitespace-only URL values in `PageHeader.test.jsx`
+- Fixed `TypeError: Invalid URL` warnings in test output by adding global fetch mock in
+  `src/setupTests.js`
+- Suppressed expected console.error messages in tests to reduce noise in test output
 
 ### Removed
 
 - Removed `pre-commit` npm package (replaced by Husky) and configuration
 - Removed `MOSAIC_MIN_ZOOM_LEVEL` configuration parameter (mosaic views now use
   per-collection `sceneMinZoom` parameter, same as scene views)
+- Removed unused `setShowZoomNotice` import from `src/utils/mapHelper.js` (functionality
+  moved to `searchHelper.js`)
+- Removed deprecated `setMosaicZoomMessage()` function from `src/utils/mapHelper.js`
+  (zoom notice handling now centralized in `searchHelper.js`)
 
 ### Deprecated
 
