@@ -9,8 +9,7 @@ import ButtonGroup from '@mui/material/ButtonGroup'
 import { getCurrentMapZoomLevel } from '../../utils/mapHelper'
 import { getCollectionConfig } from '../../utils/configHelper'
 
-const DEFAULT_MED_ZOOM = 4
-const DEFAULT_HIGH_ZOOM = 7
+const DEFAULT_SCENE_MIN_ZOOM = 7
 
 const ViewSelector = () => {
   const _viewMode = useSelector((state) => state.mainSlice.viewMode)
@@ -33,12 +32,11 @@ const ViewSelector = () => {
     (el) => el.name === 'grid_code_frequency'
   )
 
-  // Get zoom level requirements
-  const searchMinZoomLevels = _selectedCollectionData
-    ? getCollectionConfig(_selectedCollectionData.id, 'searchMinZoomLevels')
-    : null
-  const midZoomLevel = searchMinZoomLevels?.medium || DEFAULT_MED_ZOOM
-  const highZoomLevel = searchMinZoomLevels?.high || DEFAULT_HIGH_ZOOM
+  // Get minimum zoom level for scene/mosaic views
+  const sceneMinZoom = _selectedCollectionData
+    ? getCollectionConfig(_selectedCollectionData.id, 'sceneMinZoom') ||
+      DEFAULT_SCENE_MIN_ZOOM
+    : DEFAULT_SCENE_MIN_ZOOM
 
   // Reset to default view when collection changes
   useEffect(() => {
@@ -74,53 +72,34 @@ const ViewSelector = () => {
   }, [_map])
 
   // Auto-switch view based on zoom level (only when not manually selected)
+  // Switches between hex (if available) and scene based on zoom
   useEffect(() => {
     if (isManualSelection) return // Don't auto-switch if user manually selected a view
     if (selectedView === 'mosaic') return // Don't auto-switch in mosaic mode
 
-    const canUseScene = currentZoom >= highZoomLevel
-    const isAtMidZoom =
-      currentZoom >= midZoomLevel && currentZoom < highZoomLevel
-    const isBelowMidZoom = currentZoom < midZoomLevel
+    const canUseScene = currentZoom >= sceneMinZoom
 
-    // Auto-switch based on zoom and available aggregations
+    // Auto-switch based on zoom
     if (canUseScene) {
       // High zoom: switch to scene if not already there
       if (selectedView !== 'scene') {
         setSelectedView('scene')
       }
-    } else if (isAtMidZoom) {
-      // Mid zoom: prefer grid-code if available, otherwise hex
-      if (supportsGrid && selectedView !== 'grid-code') {
-        setSelectedView('grid-code')
-      } else if (supportsHex && !supportsGrid && selectedView !== 'hex') {
-        setSelectedView('hex')
-      }
-    } else if (isBelowMidZoom) {
-      // Low zoom: prefer hex if available, otherwise grid-code
+    } else {
+      // Low zoom: prefer hex if available, otherwise scene (will show zoom notice)
       if (supportsHex && selectedView !== 'hex') {
         setSelectedView('hex')
-      } else if (supportsGrid && !supportsHex && selectedView !== 'grid-code') {
-        setSelectedView('grid-code')
       }
     }
-  }, [
-    currentZoom,
-    highZoomLevel,
-    midZoomLevel,
-    supportsHex,
-    supportsGrid,
-    selectedView,
-    isManualSelection
-  ])
+  }, [currentZoom, sceneMinZoom, supportsHex, selectedView, isManualSelection])
 
   // Update Redux state when view changes
   useEffect(() => {
     dispatch(setViewMode(selectedView))
   }, [selectedView, dispatch])
 
-  // Only scene view requires high zoom level
-  const canUseScene = currentZoom >= highZoomLevel
+  // Scene and Mosaic views require minimum zoom level
+  const canUseScene = currentZoom >= sceneMinZoom
 
   const handleViewChange = (view) => {
     setSelectedView(view)
@@ -181,7 +160,7 @@ const ViewSelector = () => {
             <Tooltip
               title={
                 !canUseScene
-                  ? `Zoom to level ${highZoomLevel} or higher for scene view`
+                  ? `Zoom to level ${sceneMinZoom} or higher for scene view`
                   : ''
               }
               arrow
@@ -201,7 +180,7 @@ const ViewSelector = () => {
             <Tooltip
               title={
                 !canUseScene
-                  ? `Zoom to level ${highZoomLevel} or higher for mosaic view`
+                  ? `Zoom to level ${sceneMinZoom} or higher for mosaic view`
                   : ''
               }
               arrow

@@ -1,7 +1,6 @@
 import { store } from '../redux/store'
 import {
-  DEFAULT_MED_ZOOM,
-  DEFAULT_HIGH_ZOOM,
+  DEFAULT_SCENE_MIN_ZOOM,
   DEFAULT_API_MAX_ITEMS,
   DEFAULT_MOSAIC_MAX_ITEMS
 } from '../components/defaults'
@@ -35,12 +34,10 @@ export function newSearch() {
 
   const _selectedCollection = store.getState().mainSlice.selectedCollectionData
 
-  const searchMinZoomLevels = getCollectionConfig(
-    _selectedCollection.id,
-    'searchMinZoomLevels'
-  )
-  const midZoomLevel = searchMinZoomLevels?.medium || DEFAULT_MED_ZOOM
-  const highZoomLevel = searchMinZoomLevels?.high || DEFAULT_HIGH_ZOOM
+  // Get minimum zoom level for scene/mosaic views
+  const sceneMinZoom =
+    getCollectionConfig(_selectedCollection.id, 'sceneMinZoom') ||
+    DEFAULT_SCENE_MIN_ZOOM
 
   const currentMapZoomLevel = getCurrentMapZoomLevel()
 
@@ -55,8 +52,8 @@ export function newSearch() {
 
   // Handle mosaic mode
   if (viewMode === 'mosaic') {
-    if (currentMapZoomLevel < highZoomLevel) {
-      store.dispatch(setZoomLevelNeeded(highZoomLevel))
+    if (currentMapZoomLevel < sceneMinZoom) {
+      store.dispatch(setZoomLevelNeeded(sceneMinZoom))
       store.dispatch(setShowZoomNotice(true))
       return
     }
@@ -67,8 +64,8 @@ export function newSearch() {
   // Handle user-selected view mode
   if (viewMode === 'scene') {
     // User wants scene view - check zoom level
-    if (currentMapZoomLevel < highZoomLevel) {
-      store.dispatch(setZoomLevelNeeded(highZoomLevel))
+    if (currentMapZoomLevel < sceneMinZoom) {
+      store.dispatch(setZoomLevelNeeded(sceneMinZoom))
       store.dispatch(setShowZoomNotice(true))
       return
     }
@@ -94,13 +91,13 @@ export function newSearch() {
   }
 
   // Fallback: if no valid selection, default to scene view if zoom allows
-  if (currentMapZoomLevel >= highZoomLevel) {
+  if (currentMapZoomLevel >= sceneMinZoom) {
     const searchScenesParams = buildSearchScenesParams()
     store.dispatch(setSearchType('scene'))
     store.dispatch(setSearchLoading(true))
     SearchService(searchScenesParams, 'scene')
   } else {
-    store.dispatch(setZoomLevelNeeded(highZoomLevel))
+    store.dispatch(setZoomLevelNeeded(sceneMinZoom))
     store.dispatch(setShowZoomNotice(true))
   }
 }
