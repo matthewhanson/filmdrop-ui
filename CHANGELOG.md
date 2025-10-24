@@ -11,10 +11,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Added unified View Mode selector with four buttons (Hex, Grid, Scene, Mosaic) for
   user-selectable aggregation and viewing options
-- Added automatic view mode switching based on zoom level (low zoom→hex, mid zoom→grid,
-  high zoom→scene) with manual override capability
+- Added automatic view mode switching based on zoom level with manual override capability:
+  automatically switches between Hex (if available) and Scene views based on zoom
+- Added `sceneMinZoom` configuration parameter to specify minimum zoom level for
+  Scene and Mosaic views (replaces `searchMinZoomLevels.high`)
 - Added `COLLECTIONS_CONFIG` structure to consolidate collection-specific parameters
-  (sceneTilerParams, mosaicTilerParams, searchMinZoomLevels, popupDisplayFields,
+  (sceneTilerParams, mosaicTilerParams, sceneMinZoom, popupDisplayFields,
   tileLayerParams, enhancedDisplayConfig)
 - Added automatic configuration migration from legacy format to new format on load
 - Added `normalizeCollectionsConfig()` helper function in `src/utils/configHelper.js`
@@ -37,12 +39,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 
-- Unified Mosaic and Scene zoom level requirements to both use collection-specific
-  `searchMinZoomLevels.high` configuration
+- Simplified zoom-based view switching: removed medium zoom level and grid-code auto-switching
+- Consolidated Redux state from separate `viewMode` and `aggregationViewMode` to single
+  `viewMode` state with values: 'hex', 'grid-code', 'scene', 'mosaic'
+- Changed initial `viewMode` state from 'hex' to 'scene' (universally supported)
+- Unified Mosaic and Scene zoom level requirements to both use `sceneMinZoom`
 - Updated Scene and Mosaic buttons to share same zoom-based enabling/disabling behavior
 - Updated `src/services/get-config-service.js` to normalize configuration on load
 - Updated `src/utils/searchHelper.js` to use `getCollectionConfig()` for accessing
-  search min zoom levels and removed unused `getTilerParams` import
+  scene min zoom level and removed unused `getTilerParams` import
 - Updated `src/utils/mapHelper.js` to use `getCollectionConfig()` for tile layer and
   tiler parameters
 - Simplified `constructSceneTilerParams()` and `constructMosaicTilerParams()` to work
@@ -79,7 +84,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Deprecated `SCENE_TILER_PARAMS` (use `COLLECTIONS_CONFIG[id].sceneTilerParams` instead, backward compatible)
 - Deprecated `MOSAIC_TILER_PARAMS` (use `COLLECTIONS_CONFIG[id].mosaicTilerParams` instead, backward compatible)
-- Deprecated `SEARCH_MIN_ZOOM_LEVELS` (use `COLLECTIONS_CONFIG[id].searchMinZoomLevels` instead, backward compatible)
+- Deprecated `SEARCH_MIN_ZOOM_LEVELS` (use `COLLECTIONS_CONFIG[id].sceneMinZoom` instead, backward compatible - automatically converts `{ medium, high }` format to use "high" value)
+- Deprecated `searchMinZoomLevels` parameter (use `sceneMinZoom` instead)
 - Deprecated `POPUP_DISPLAY_FIELDS` (use `COLLECTIONS_CONFIG[id].popupDisplayFields` instead, backward compatible)
 - Deprecated `TILE_LAYER_PARAMS` (use `COLLECTIONS_CONFIG[id].tileLayerParams` instead, backward compatible)
 - Deprecated `ENHANCED_DISPLAY_CONFIG` (use `COLLECTIONS_CONFIG[id].enhancedDisplayConfig` instead, backward compatible)

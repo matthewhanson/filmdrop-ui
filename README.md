@@ -100,10 +100,7 @@ Create `public/config/config.json` (development) or `build/config/config.json` (
       "sceneTilerParams": {
         "assets": ["red", "green", "blue"]
       },
-      "searchMinZoomLevels": {
-        "medium": 4,
-        "high": 7
-      },
+      "sceneMinZoom": 7,
       "popupDisplayFields": ["datetime", "platform"]
     }
   }
@@ -140,7 +137,7 @@ Minimal configuration for viewing a single collection:
   },
   "COLLECTIONS_CONFIG": {
     "sentinel-2-l2a": {
-      "searchMinZoomLevels": { "medium": 4, "high": 7 }
+      "sceneMinZoom": 7
     }
   }
 }
@@ -164,7 +161,7 @@ Add TiTiler for on-the-fly tile generation:
         "assets": ["red", "green", "blue"],
         "color_formula": "Gamma+RGB+3.2+Saturation+0.8"
       },
-      "searchMinZoomLevels": { "medium": 4, "high": 7 }
+      "sceneMinZoom": 7
     }
   }
 }
@@ -177,12 +174,12 @@ Add TiTiler for on-the-fly tile generation:
   "COLLECTIONS_CONFIG": {
     "sentinel-2-l2a": {
       "sceneTilerParams": { "assets": ["red", "green", "blue"] },
-      "searchMinZoomLevels": { "medium": 4, "high": 7 },
+      "sceneMinZoom": 7,
       "popupDisplayFields": ["datetime", "platform", "eo:cloud_cover"]
     },
     "landsat-c2-l2": {
       "sceneTilerParams": { "assets": ["red", "green", "blue"] },
-      "searchMinZoomLevels": { "medium": 4, "high": 7 },
+      "sceneMinZoom": 7,
       "popupDisplayFields": ["datetime", "platform", "instruments"]
     }
   }
