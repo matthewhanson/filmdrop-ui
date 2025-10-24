@@ -32,10 +32,7 @@ export function saveThemeToStorage(theme) {
 }
 
 export function getBasemapConfig(appConfig, currentTheme) {
-  if (!appConfig.BASEMAP) {
-    return DEFAULT_BASEMAP
-  }
-
+  // BASEMAP is always defined due to applyConfigDefaults()
   // Check if this is single basemap mode (has url property directly)
   if (appConfig.BASEMAP.url) {
     return {
@@ -44,6 +41,7 @@ export function getBasemapConfig(appConfig, currentTheme) {
     }
   }
 
+  // Theme-based basemap (THEME_SWITCHING_ENABLED must be true)
   if (appConfig.THEME_SWITCHING_ENABLED === true && currentTheme) {
     return appConfig.BASEMAP[currentTheme] || DEFAULT_BASEMAP
   }

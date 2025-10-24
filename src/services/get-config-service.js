@@ -1,7 +1,10 @@
 import { store } from '../redux/store'
 import { setappConfig } from '../redux/slices/mainSlice'
 import { showApplicationAlert } from '../utils/alertHelper'
-import { normalizeCollectionsConfig } from '../utils/configHelper'
+import {
+  normalizeCollectionsConfig,
+  applyConfigDefaults
+} from '../utils/configHelper'
 
 export async function LoadConfigIntoStateService() {
   const cacheBuster = Date.now()
@@ -21,7 +24,9 @@ export async function LoadConfigIntoStateService() {
     .then((json) => {
       // Normalize the config to support both old and new formats
       const normalizedConfig = normalizeCollectionsConfig(json)
-      store.dispatch(setappConfig(normalizedConfig))
+      // Apply defaults for optional parameters
+      const configWithDefaults = applyConfigDefaults(normalizedConfig)
+      store.dispatch(setappConfig(configWithDefaults))
     })
     .catch((error) => {
       const message = 'Error Fetching Config File'

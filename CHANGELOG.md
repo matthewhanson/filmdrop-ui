@@ -10,11 +10,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 
 - Added sensible defaults and auto-population for configuration to reduce required parameters:
+  - Added `applyConfigDefaults()` function in `src/utils/configHelper.js` to centralize default value handling
   - `BASEMAP` now defaults to OpenStreetMap if not provided in config
   - `THEME_SWITCHING_ENABLED` now defaults to `true` (was `false`)
   - `EXPORT_ENABLED` now defaults to `true` (was `false`)
   - `SHOW_ITEM_AUTO_ZOOM` now defaults to `true` (was `false`)
   - `SEARCH_BY_GEOM_ENABLED` now defaults to `true` (was `false`)
+  - `API_MAX_ITEMS` defaults to `200`
+  - `MOSAIC_MAX_ITEMS` defaults to `100`
+  - `MAP_CENTER` defaults to `[30, 0]`
+  - `MAP_ZOOM` defaults to `3`
+  - `MAP_ZOOM_MAX` defaults to `18`
+  - `CONFIG_COLORMAP` defaults to `"viridis"`
   - Users can completely omit these configuration parameters for better out-of-box experience
 - Added unified View Mode selector with four buttons (Hex, Grid, Scene, Mosaic) for
   user-selectable aggregation and viewing options

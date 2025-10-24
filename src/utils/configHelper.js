@@ -1,4 +1,17 @@
-import { DEFAULT_APP_NAME } from '../components/defaults'
+import {
+  DEFAULT_APP_NAME,
+  DEFAULT_BASEMAP,
+  DEFAULT_THEME_SWITCHING_ENABLED,
+  DEFAULT_EXPORT_ENABLED,
+  DEFAULT_SHOW_ITEM_AUTO_ZOOM,
+  DEFAULT_SEARCH_BY_GEOM_ENABLED,
+  DEFAULT_API_MAX_ITEMS,
+  DEFAULT_MOSAIC_MAX_ITEMS,
+  DEFAULT_MAP_CENTER,
+  DEFAULT_MAP_ZOOM,
+  DEFAULT_MAP_ZOOM_MAX,
+  DEFAULT_COLORMAP
+} from '../components/defaults'
 import { store } from '../redux/store'
 import { DoesFaviconExistService } from '../services/get-config-service'
 import { setappName, setreferenceLayers } from '../redux/slices/mainSlice'
@@ -270,6 +283,35 @@ export function getCollectionConfig(collectionId, paramName, config = null) {
   }
 
   return undefined
+}
+
+/**
+ * Applies default values to config for optional parameters
+ * @param {Object} config - The configuration object
+ * @returns {Object} - Config with defaults applied
+ */
+export function applyConfigDefaults(config) {
+  return {
+    ...config,
+    // Basemap configuration
+    BASEMAP: config.BASEMAP ?? DEFAULT_BASEMAP,
+    // UI feature flags
+    THEME_SWITCHING_ENABLED:
+      config.THEME_SWITCHING_ENABLED ?? DEFAULT_THEME_SWITCHING_ENABLED,
+    EXPORT_ENABLED: config.EXPORT_ENABLED ?? DEFAULT_EXPORT_ENABLED,
+    SHOW_ITEM_AUTO_ZOOM:
+      config.SHOW_ITEM_AUTO_ZOOM ?? DEFAULT_SHOW_ITEM_AUTO_ZOOM,
+    SEARCH_BY_GEOM_ENABLED:
+      config.SEARCH_BY_GEOM_ENABLED ?? DEFAULT_SEARCH_BY_GEOM_ENABLED,
+    // API and search limits
+    API_MAX_ITEMS: config.API_MAX_ITEMS ?? DEFAULT_API_MAX_ITEMS,
+    MOSAIC_MAX_ITEMS: config.MOSAIC_MAX_ITEMS ?? DEFAULT_MOSAIC_MAX_ITEMS,
+    // Map configuration
+    MAP_CENTER: config.MAP_CENTER ?? DEFAULT_MAP_CENTER,
+    MAP_ZOOM: config.MAP_ZOOM ?? DEFAULT_MAP_ZOOM,
+    MAP_ZOOM_MAX: config.MAP_ZOOM_MAX ?? DEFAULT_MAP_ZOOM_MAX,
+    CONFIG_COLORMAP: config.CONFIG_COLORMAP ?? DEFAULT_COLORMAP
+  }
 }
 
 export function InitializeAppFromConfig() {
