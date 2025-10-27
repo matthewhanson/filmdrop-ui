@@ -124,11 +124,102 @@ After building with `npm run build`, place your config at `build/config/config.j
 
 #### Layer Configuration
 
-| Parameter             | Type   | Description                                                                                                               |
-| --------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------- |
-| `LAYER_LIST_SERVICES` | Array  | WMS service definitions for reference layers. Auto-enables layer list widget. See [Layer List](#layer-list-configuration) |
-| `COLLECTIONS`         | Array  | Filter collections to show (array of collection IDs)                                                                      |
-| `DEFAULT_COLLECTION`  | String | Default selected collection ID                                                                                            |
+| Parameter             | Type   | Description                                                                       |
+| --------------------- | ------ | --------------------------------------------------------------------------------- |
+| `LAYER_LIST_SERVICES` | Array  | WMS service definitions for reference layers. Auto-enables layer list widget.     |
+|                       |        | See [Layer List](#layer-list-configuration)                                       |
+| `COLLECTIONS`         | Object | Auto-configure collections from STAC API with include/exclude filters and default |
+|                       |        | selection. See [Collections Auto-Configuration](#collections-auto-configuration). |
+|                       |        | If omitted, all collections will be used.                                         |
+
+### Collections Auto-Configuration
+
+The `COLLECTIONS` parameter allows you to automatically fetch and filter the list of collections from
+your STAC API, rather than hardcoding collection IDs. It also lets you specify which collection should
+be selected by default.
+
+#### Configuration Format
+
+```json
+{
+  "STAC_API_URL": "https://your-stac-api.com",
+  "COLLECTIONS": {
+    "default": "sentinel-2-l2a",
+    "include": ["collection-1", "collection-2"],
+    "exclude": ["deprecated-collection"]
+  }
+}
+```
+
+#### Properties
+
+- `default` (String, optional): Collection ID to select by default. If not provided, the first collection will be selected.
+- `include` (Array, optional): Whitelist of collection IDs to use. Only these collections will be available.
+- `exclude` (Array, optional): Blacklist of collection IDs to exclude from the available collections.
+
+#### Behavior
+
+- If `COLLECTIONS` is **not provided**: All collections from the STAC API will be available
+- If `COLLECTIONS.include` is provided: **Only** these collections will be used (whitelist)
+- If `COLLECTIONS.exclude` is provided: These collections will be removed from the list (blacklist)
+- Both `include` and `exclude` can be used together (include is applied first, then exclude)
+
+#### Examples
+
+**Use only specific collections:**
+
+```json
+{
+  "COLLECTIONS": {
+    "include": ["sentinel-2-l2a", "landsat-8-c2-l2"]
+  }
+}
+```
+
+**Use all collections except specific ones:**
+
+```json
+{
+  "COLLECTIONS": {
+    "exclude": ["test-collection", "deprecated-collection"]
+  }
+}
+```
+
+**Use all collections (default behavior):**
+
+```json
+{
+  "COLLECTIONS": {}
+}
+```
+
+or simply omit the `COLLECTIONS` parameter entirely.
+
+#### Integration with COLLECTIONS_CONFIG
+
+The `COLLECTIONS_CONFIG` parameter can still be used to configure collection-specific settings. If a
+collection is configured in `COLLECTIONS_CONFIG` but is not in the filtered list (not included or is
+excluded), that configuration will be ignored with a debug message in the console.
+
+```json
+{
+  "COLLECTIONS": {
+    "include": ["sentinel-2-l2a", "landsat-8-c2-l2"]
+  },
+  "COLLECTIONS_CONFIG": {
+    "sentinel-2-l2a": {
+      "sceneMinZoom": 8,
+      "sceneTilerParams": { "assets": "visual" }
+    },
+    "deprecated-collection": {
+      "sceneMinZoom": 6
+    }
+  }
+}
+```
+
+In this example, the configuration for `deprecated-collection` will be ignored since it's not in the include list.
 
 ### Collection Configuration
 

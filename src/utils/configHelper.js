@@ -172,9 +172,20 @@ export function normalizeCollectionsConfig(config) {
   // Get all collection IDs from various sources
   const collectionIds = new Set()
 
-  // Add collections from COLLECTIONS array
-  if (config.COLLECTIONS && Array.isArray(config.COLLECTIONS)) {
-    config.COLLECTIONS.forEach((id) => collectionIds.add(id))
+  // Add collections from COLLECTIONS parameter
+  // Handle both legacy array format and new object format
+  if (config.COLLECTIONS) {
+    if (Array.isArray(config.COLLECTIONS)) {
+      // Legacy format: COLLECTIONS is an array of IDs
+      config.COLLECTIONS.forEach((id) => collectionIds.add(id))
+    } else if (
+      typeof config.COLLECTIONS === 'object' &&
+      config.COLLECTIONS.include &&
+      Array.isArray(config.COLLECTIONS.include)
+    ) {
+      // New format: COLLECTIONS.include is an array of IDs
+      config.COLLECTIONS.include.forEach((id) => collectionIds.add(id))
+    }
   }
 
   if (config.SCENE_TILER_PARAMS) {
@@ -243,6 +254,31 @@ export function normalizeCollectionsConfig(config) {
     config.COLLECTIONS_CONFIG = collectionsConfig
   }
 
+  // Convert legacy COLLECTIONS array format to new object format
+  // This ensures all downstream code works with the normalized object format
+  if (config.COLLECTIONS && Array.isArray(config.COLLECTIONS)) {
+    console.log(
+      'Normalizing legacy COLLECTIONS array to object format with include filter'
+    )
+    config.COLLECTIONS = {
+      include: config.COLLECTIONS
+    }
+  }
+
+  // Also migrate DEFAULT_COLLECTION to COLLECTIONS.default
+  if (
+    config.DEFAULT_COLLECTION &&
+    typeof config.DEFAULT_COLLECTION === 'string'
+  ) {
+    if (!config.COLLECTIONS || typeof config.COLLECTIONS !== 'object') {
+      config.COLLECTIONS = {}
+    }
+    if (!config.COLLECTIONS.default) {
+      console.log('Migrating DEFAULT_COLLECTION to COLLECTIONS.default')
+      config.COLLECTIONS.default = config.DEFAULT_COLLECTION
+    }
+  }
+
   return config
 }
 
@@ -283,6 +319,118 @@ export function getCollectionConfig(collectionId, paramName, config = null) {
   }
 
   return undefined
+}
+
+/**
+ * Auto-configures collections from the STAC API
+ * @param {string} apiUrl - The STAC API URL
+ * @param {Object} config - The configuration object
+ * @returns {Promise<Object>} - Config with auto-configured collections
+ */
+export async function autoConfigureCollections(apiUrl, config) {
+  if (!apiUrl) {
+    console.warn(
+      'STAC_API_URL not provided, skipping collections auto-configuration'
+    )
+    return config
+  }
+
+  try {
+    // Import dynamically to avoid circular dependencies
+    const { getCollections } = await import('../services/stac-api')
+
+    // Fetch collections from STAC API
+    const response = await getCollections(apiUrl)
+
+    if (!response.collections || !Array.isArray(response.collections)) {
+      console.warn('No collections found in STAC API response')
+      return config
+    }
+
+    let collections = response.collections
+
+    // At this point, COLLECTIONS should already be normalized to object format
+    // by normalizeCollectionsConfig(), so we can just use it directly
+    const collectionsFilter = config.COLLECTIONS || {}
+
+    // Apply include filter (whitelist) - if provided, only use these collections
+    if (
+      collectionsFilter.include &&
+      Array.isArray(collectionsFilter.include) &&
+      collectionsFilter.include.length > 0
+    ) {
+      collections = collections.filter((collection) =>
+        collectionsFilter.include.includes(collection.id)
+      )
+      console.log(
+        `Filtered collections to include only: ${collectionsFilter.include.join(', ')}`
+      )
+    }
+
+    // Apply exclude filter (blacklist) - remove these collections
+    if (
+      collectionsFilter.exclude &&
+      Array.isArray(collectionsFilter.exclude) &&
+      collectionsFilter.exclude.length > 0
+    ) {
+      collections = collections.filter(
+        (collection) => !collectionsFilter.exclude.includes(collection.id)
+      )
+      console.log(
+        `Excluded collections: ${collectionsFilter.exclude.join(', ')}`
+      )
+    }
+
+    if (collections.length === 0) {
+      console.warn('No collections available after filtering')
+      return config
+    }
+
+    // Build array of collection IDs
+    const collectionIds = collections.map((c) => c.id).filter(Boolean)
+
+    // Filter COLLECTIONS_CONFIG to only include collections that are being used
+    let filteredCollectionsConfig = {}
+    if (
+      config.COLLECTIONS_CONFIG &&
+      typeof config.COLLECTIONS_CONFIG === 'object'
+    ) {
+      const activeSet = new Set(collectionIds)
+      for (const [collectionId, collectionConfig] of Object.entries(
+        config.COLLECTIONS_CONFIG
+      )) {
+        if (activeSet.has(collectionId)) {
+          filteredCollectionsConfig[collectionId] = collectionConfig
+        } else {
+          console.debug(
+            `Ignoring COLLECTIONS_CONFIG for '${collectionId}' - collection not in active list`
+          )
+        }
+      }
+    }
+
+    console.log(
+      `Auto-configured ${collectionIds.length} collections from STAC API:`,
+      collectionIds
+    )
+
+    return {
+      ...config,
+      // After auto-config, COLLECTIONS becomes an object with both metadata and IDs
+      // This supports both the default selection and collection filtering
+      COLLECTIONS: {
+        ...collectionsFilter, // Preserve default, include, exclude metadata
+        _ids: collectionIds // Array of collection IDs (for backward compat with get-collections-service)
+      },
+      COLLECTIONS_CONFIG: filteredCollectionsConfig,
+      // Store the full collection objects for potential future use
+      _STAC_COLLECTIONS: collections
+    }
+  } catch (error) {
+    console.error('Error auto-configuring collections from STAC API:', error)
+    // Return original config if auto-configuration fails
+    return config
+  }
 }
 
 /**

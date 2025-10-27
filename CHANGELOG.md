@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
+- Added STAC API client library (`src/services/stac-api/`) for programmatic interaction with STAC APIs:
+  - Core client functions: `getRootCatalog()`, `getCollections()`, `getCollection()`
+  - Conformance checking: `supportsConformance()`, `getConformance()`, `checkConformance()`
+  - Comprehensive conformance class constants for STAC API Core, Extensions, and Community extensions
+  - Fully tested (34 tests) and ready for extraction as standalone npm package
+  - Complete documentation in `src/services/stac-api/README.md`
+- Added collections auto-configuration from STAC API:
+  - Collections are now automatically fetched from the STAC API instead of being hardcoded
+  - New `COLLECTIONS` config parameter with `default`, `include` and `exclude` options:
+    - `default`: Specify which collection should be selected by default (e.g., `"sentinel-2-l2a"`)
+    - `include`: Whitelist specific collections (e.g., `["sentinel-2-l2a", "landsat-8-c2-l2"]`)
+    - `exclude`: Blacklist specific collections (e.g., `["deprecated-collection"]`)
+    - If omitted, all collections from the API are available
+  - `COLLECTIONS_CONFIG` automatically filtered to only include active collections
+  - Added `autoConfigureCollections()` function in `src/utils/configHelper.js`
+  - Full collection objects stored in `_STAC_COLLECTIONS` for future use
 - Added sensible defaults and auto-population for configuration to reduce required parameters:
   - Added `applyConfigDefaults()` function in `src/utils/configHelper.js` to centralize default value handling
   - `BASEMAP` now defaults to OpenStreetMap if not provided in config
@@ -105,6 +121,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Removed
 
+- Removed `DEFAULT_COLLECTION` configuration parameter - moved into `COLLECTIONS.default` for
+  better organization. For backward compatibility, code still supports the old `DEFAULT_COLLECTION`
+  parameter, but new configurations should use `COLLECTIONS.default` instead.
 - Removed `LAYER_LIST_ENABLED` configuration parameter - layer list widget is now automatically
   enabled when `LAYER_LIST_SERVICES` array is populated (follows convention over configuration)
 - Removed `pre-commit` npm package (replaced by Husky) and configuration

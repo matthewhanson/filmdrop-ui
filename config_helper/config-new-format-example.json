@@ -5,7 +5,10 @@
   "PUBLIC_URL": "http://example.com/",
   "LOGO_URL": "./logo.png",
   "LOGO_ALT": "Alt description for my custom logo",
-  "DEFAULT_COLLECTION": "sentinel-2-l2a",
+  "COLLECTIONS": {
+    "default": "sentinel-2-l2a",
+    "include": ["sentinel-2-l2a", "landsat-c2-l2", "naip"]
+  },
   "STAC_API_URL": "https://api-endpoint.example.com",
   "STAC_LINK_ENABLED": true,
   "SHOW_ITEM_AUTO_ZOOM": true,
@@ -21,7 +24,6 @@
   "THEME_SWITCHING_ENABLED": true,
   "SEARCH_BY_GEOM_ENABLED": false,
   "CART_ENABLED": false,
-  "COLLECTIONS": ["sentinel-2-l2a", "landsat-c2-l2", "naip"],
 
   "_comment_COLLECTIONS_CONFIG": "NEW: COLLECTIONS_CONFIG consolidates all collection-specific parameters",
   "COLLECTIONS_CONFIG": {

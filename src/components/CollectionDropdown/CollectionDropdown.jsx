@@ -37,18 +37,20 @@ const Dropdown = () => {
         setCollectionId(_selectedCollection)
         return
       }
-      if (!_appConfig.DEFAULT_COLLECTION) {
+      // Config is already normalized, so we only need to check COLLECTIONS.default
+      const defaultCollection = _appConfig.COLLECTIONS?.default
+      if (!defaultCollection) {
         setCollectionId(_collectionsData[0].id)
         return
       }
       const defaultCollectionFound = !!_collectionsData.find(
-        (o) => o.id === _appConfig.DEFAULT_COLLECTION
+        (o) => o.id === defaultCollection
       )
       if (!defaultCollectionFound) {
-        console.log('Configuration Error: DEFAULT_COLLECTION not found in API')
+        console.log('Configuration Error: default collection not found in API')
         setCollectionId(_collectionsData[0].id)
       } else {
-        setCollectionId(_appConfig.DEFAULT_COLLECTION)
+        setCollectionId(defaultCollection)
       }
     }
   }, [_collectionsData])

@@ -131,7 +131,7 @@
       "remark-lint-no-consecutive-blank-lines",
       [
         "remark-lint-maximum-line-length",
-        150
+        200
       ],
       [
         "remark-lint-fenced-code-flag",
