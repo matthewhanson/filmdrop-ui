@@ -44,8 +44,11 @@ export function newSearch() {
 
   const currentMapZoomLevel = getCurrentMapZoomLevel()
 
+  // Check for both new (stac-server >= 3.6.0) and old (deprecated) aggregation names
   const includesGeoHex = _selectedCollection.aggregations?.some(
-    (el) => el.name === 'grid_geohex_frequency'
+    (el) =>
+      el.name === 'centroid_geohex_grid_frequency' ||
+      el.name === 'grid_geohex_frequency'
   )
   const includesGridCode = _selectedCollection.aggregations?.some(
     (el) => el.name === 'grid_code_frequency'
@@ -185,7 +188,15 @@ function buildSearchAggregateParams(gridType) {
         precision = 5
         break
     }
-    aggregations = `grid_geohex_frequency,total_count&grid_geohex_frequency_precision=${precision}`
+
+    // Determine which aggregation name to use (prefer new, fallback to old for backwards compatibility)
+    const hasNewAggregation = _selectedCollection.aggregations?.some(
+      (el) => el.name === 'centroid_geohex_grid_frequency'
+    )
+    const aggregationName = hasNewAggregation
+      ? 'centroid_geohex_grid_frequency'
+      : 'grid_geohex_frequency'
+    aggregations = `${aggregationName},total_count&${aggregationName}_precision=${precision}`
   } else {
     aggregations = `grid_code_frequency,total_count`
   }
@@ -246,15 +257,19 @@ function buildUrlParamFromBBOX() {
 export function mapHexGridFromJson(json) {
   let largestRatio = 0
   let largestFrequency = 0
-  const buckets = json.aggregations?.find(
-    (el) => el.name === 'grid_geohex_frequency'
-  ).buckets
+
+  // Check for both new (stac-server >= 3.6.0) and old (deprecated) aggregation names
+  const hexAggregation = json.aggregations?.find(
+    (el) =>
+      el.name === 'centroid_geohex_grid_frequency' ||
+      el.name === 'grid_geohex_frequency'
+  )
+
+  const buckets = hexAggregation?.buckets
   const numberMatched = json?.aggregations?.find(
     (el) => el.name === 'total_count'
   )?.value
-  const overflow = json?.aggregations.find(
-    (el) => el.name === 'grid_geohex_frequency'
-  ).overflow
+  const overflow = hexAggregation?.overflow
 
   const convertedItems = buckets.map((feature) => {
     const hexBoundary = h3.cellToBoundary(feature.key, true)
