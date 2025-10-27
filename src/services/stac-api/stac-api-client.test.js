@@ -49,12 +49,65 @@ describe('STAC API Client', () => {
       global.fetch.mockResolvedValueOnce({
         ok: false,
         status: 404,
-        statusText: 'Not Found'
+        statusText: 'Not Found',
+        headers: {
+          get: () => null
+        }
       })
 
-      await expect(getRootCatalog(mockApiUrl)).rejects.toThrow(
-        'Failed to fetch root catalog: 404 Not Found'
-      )
+      const error = await getRootCatalog(mockApiUrl).catch((e) => e)
+      expect(error).toBeInstanceOf(Error)
+      expect(error.message).toBe('Server responded with an error')
+      expect(error.status).toBe(404)
+      expect(error.statusText).toBe('Not Found')
+    })
+
+    it('should support custom headers', async () => {
+      const mockCatalog = {
+        type: 'Catalog',
+        id: 'test-catalog'
+      }
+
+      global.fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockCatalog
+      })
+
+      await getRootCatalog(mockApiUrl, {
+        headers: { Authorization: 'Bearer test-token' }
+      })
+
+      expect(global.fetch).toHaveBeenCalledWith(mockApiUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer test-token'
+        }
+      })
+    })
+
+    it('should support custom credentials', async () => {
+      const mockCatalog = {
+        type: 'Catalog',
+        id: 'test-catalog'
+      }
+
+      global.fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockCatalog
+      })
+
+      await getRootCatalog(mockApiUrl, {
+        credentials: 'include'
+      })
+
+      expect(global.fetch).toHaveBeenCalledWith(mockApiUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include'
+      })
     })
   })
 
@@ -109,12 +162,17 @@ describe('STAC API Client', () => {
       global.fetch.mockResolvedValueOnce({
         ok: false,
         status: 500,
-        statusText: 'Internal Server Error'
+        statusText: 'Internal Server Error',
+        headers: {
+          get: () => null
+        }
       })
 
-      await expect(getCollections(mockApiUrl)).rejects.toThrow(
-        'Failed to fetch collections: 500 Internal Server Error'
-      )
+      const error = await getCollections(mockApiUrl).catch((e) => e)
+      expect(error).toBeInstanceOf(Error)
+      expect(error.message).toBe('Server responded with an error')
+      expect(error.status).toBe(500)
+      expect(error.statusText).toBe('Internal Server Error')
     })
   })
 
@@ -161,12 +219,19 @@ describe('STAC API Client', () => {
       global.fetch.mockResolvedValueOnce({
         ok: false,
         status: 404,
-        statusText: 'Not Found'
+        statusText: 'Not Found',
+        headers: {
+          get: () => null
+        }
       })
 
-      await expect(getCollection(mockApiUrl, 'non-existent')).rejects.toThrow(
-        'Failed to fetch collection non-existent: 404 Not Found'
+      const error = await getCollection(mockApiUrl, 'non-existent').catch(
+        (e) => e
       )
+      expect(error).toBeInstanceOf(Error)
+      expect(error.message).toBe('Server responded with an error')
+      expect(error.status).toBe(404)
+      expect(error.statusText).toBe('Not Found')
     })
   })
 
@@ -273,14 +338,20 @@ describe('STAC API Client', () => {
       global.fetch.mockResolvedValueOnce({
         ok: false,
         status: 500,
-        statusText: 'Internal Server Error'
+        statusText: 'Internal Server Error',
+        headers: {
+          get: () => null
+        }
       })
 
-      await expect(
-        supportsConformance(mockApiUrl, 'https://api.stacspec.org/v1.0.0/core')
-      ).rejects.toThrow(
-        'Failed to fetch root catalog: 500 Internal Server Error'
-      )
+      const error = await supportsConformance(
+        mockApiUrl,
+        'https://api.stacspec.org/v1.0.0/core'
+      ).catch((e) => e)
+      expect(error).toBeInstanceOf(Error)
+      expect(error.message).toBe('Server responded with an error')
+      expect(error.status).toBe(500)
+      expect(error.statusText).toBe('Internal Server Error')
     })
 
     it('should work with conformance constants', async () => {

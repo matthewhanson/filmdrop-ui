@@ -10,25 +10,49 @@ import { STAC_API_CORE, STAC_API_EXTENSIONS } from './stac-api-conformance'
 /**
  * Fetches the root catalog from a STAC API
  * @param {string} apiUrl - The base URL of the STAC API
+ * @param {Object} options - Optional fetch options
+ * @param {Object} options.headers - Custom headers to include (merged with defaults)
+ * @param {string} options.credentials - Credentials mode ('same-origin', 'include', etc.)
  * @returns {Promise<Object>} The root catalog object
  * @throws {Error} If the fetch fails or returns non-OK response
  */
-export async function getRootCatalog(apiUrl) {
+export async function getRootCatalog(apiUrl, options = {}) {
   if (!apiUrl) {
     throw new Error('STAC API URL is required')
   }
 
-  const response = await fetch(apiUrl, {
+  const { headers = {}, credentials, ...otherOptions } = options
+
+  const fetchOptions = {
     method: 'GET',
     headers: {
-      'Content-Type': 'application/json'
-    }
-  })
+      'Content-Type': 'application/json',
+      ...headers
+    },
+    ...otherOptions
+  }
+
+  if (credentials) {
+    fetchOptions.credentials = credentials
+  }
+
+  const response = await fetch(apiUrl, fetchOptions)
 
   if (!response.ok) {
-    throw new Error(
-      `Failed to fetch root catalog: ${response.status} ${response.statusText}`
-    )
+    const contentType = response.headers.get('content-type')
+    const error = new Error('Server responded with an error')
+    error.status = response.status
+    error.statusText = response.statusText
+
+    if (contentType && contentType.includes('application/json')) {
+      try {
+        error.response = await response.json()
+      } catch (e) {
+        // If JSON parsing fails, continue without response body
+      }
+    }
+
+    throw error
   }
 
   return response.json()
@@ -37,27 +61,51 @@ export async function getRootCatalog(apiUrl) {
 /**
  * Fetches all collections from a STAC API
  * @param {string} apiUrl - The base URL of the STAC API
+ * @param {Object} options - Optional fetch options
+ * @param {Object} options.headers - Custom headers to include (merged with defaults)
+ * @param {string} options.credentials - Credentials mode ('same-origin', 'include', etc.)
  * @returns {Promise<Object>} The collections response object with collections array
  * @throws {Error} If the fetch fails or returns non-OK response
  */
-export async function getCollections(apiUrl) {
+export async function getCollections(apiUrl, options = {}) {
   if (!apiUrl) {
     throw new Error('STAC API URL is required')
   }
 
   const collectionsUrl = `${apiUrl.replace(/\/$/, '')}/collections`
 
-  const response = await fetch(collectionsUrl, {
+  const { headers = {}, credentials, ...otherOptions } = options
+
+  const fetchOptions = {
     method: 'GET',
     headers: {
-      'Content-Type': 'application/json'
-    }
-  })
+      'Content-Type': 'application/json',
+      ...headers
+    },
+    ...otherOptions
+  }
+
+  if (credentials) {
+    fetchOptions.credentials = credentials
+  }
+
+  const response = await fetch(collectionsUrl, fetchOptions)
 
   if (!response.ok) {
-    throw new Error(
-      `Failed to fetch collections: ${response.status} ${response.statusText}`
-    )
+    const contentType = response.headers.get('content-type')
+    const error = new Error('Server responded with an error')
+    error.status = response.status
+    error.statusText = response.statusText
+
+    if (contentType && contentType.includes('application/json')) {
+      try {
+        error.response = await response.json()
+      } catch (e) {
+        // If JSON parsing fails, continue without response body
+      }
+    }
+
+    throw error
   }
 
   return response.json()
@@ -67,10 +115,13 @@ export async function getCollections(apiUrl) {
  * Fetches a single collection by ID from a STAC API
  * @param {string} apiUrl - The base URL of the STAC API
  * @param {string} collectionId - The ID of the collection to fetch
+ * @param {Object} options - Optional fetch options
+ * @param {Object} options.headers - Custom headers to include (merged with defaults)
+ * @param {string} options.credentials - Credentials mode ('same-origin', 'include', etc.)
  * @returns {Promise<Object>} The collection object
  * @throws {Error} If the fetch fails or returns non-OK response
  */
-export async function getCollection(apiUrl, collectionId) {
+export async function getCollection(apiUrl, collectionId, options = {}) {
   if (!apiUrl) {
     throw new Error('STAC API URL is required')
   }
@@ -80,17 +131,38 @@ export async function getCollection(apiUrl, collectionId) {
 
   const collectionUrl = `${apiUrl.replace(/\/$/, '')}/collections/${collectionId}`
 
-  const response = await fetch(collectionUrl, {
+  const { headers = {}, credentials, ...otherOptions } = options
+
+  const fetchOptions = {
     method: 'GET',
     headers: {
-      'Content-Type': 'application/json'
-    }
-  })
+      'Content-Type': 'application/json',
+      ...headers
+    },
+    ...otherOptions
+  }
+
+  if (credentials) {
+    fetchOptions.credentials = credentials
+  }
+
+  const response = await fetch(collectionUrl, fetchOptions)
 
   if (!response.ok) {
-    throw new Error(
-      `Failed to fetch collection ${collectionId}: ${response.status} ${response.statusText}`
-    )
+    const contentType = response.headers.get('content-type')
+    const error = new Error('Server responded with an error')
+    error.status = response.status
+    error.statusText = response.statusText
+
+    if (contentType && contentType.includes('application/json')) {
+      try {
+        error.response = await response.json()
+      } catch (e) {
+        // If JSON parsing fails, continue without response body
+      }
+    }
+
+    throw error
   }
 
   return response.json()
