@@ -3547,7 +3547,6 @@ export const mockAppConfig = {
     }
   },
   MOSAIC_MAX_ITEMS: 100,
-  MOSAIC_MIN_ZOOM_LEVEL: 7,
   CONFIG_COLORMAP: 'viridis',
   SEARCH_MIN_ZOOM_LEVELS: {
     'sentinel-2-l2a': {
