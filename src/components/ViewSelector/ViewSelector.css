@@ -11,7 +11,7 @@
 }
 
 /* Remove left border from all buttons except first to create connected look */
-.viewSelector .MuiButtonGroup-root > span:not(:first-child) button {
+.viewSelector .MuiButtonGroup-root > span:not(:first-child) {
   margin-left: -1px;
 }
 
