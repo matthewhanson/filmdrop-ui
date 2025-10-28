@@ -318,6 +318,7 @@ describe('ConfigHelper', () => {
       expect(
         result.COLLECTIONS_CONFIG.sentinel2.sceneTilerParams.assets
       ).toEqual(['visual'])
+      expect(result.COLLECTIONS_CONFIG.sentinel2.tileLayerParams).toEqual({})
       expect(console.log).toHaveBeenCalledWith(
         "Auto-configured assets for collection 'sentinel2': visual (source: asset 'visual')"
       )

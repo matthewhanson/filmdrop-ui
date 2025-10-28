@@ -567,6 +567,11 @@ export function autoConfigureAssets(config) {
       }
       collectionsConfig[collectionId].sceneTilerParams.assets = selectedAssets
 
+      // Initialize tileLayerParams if not present to avoid warnings
+      if (!collectionsConfig[collectionId].tileLayerParams) {
+        collectionsConfig[collectionId].tileLayerParams = {}
+      }
+
       console.log(
         `Auto-configured assets for collection '${collectionId}': ${selectedAssets.join(', ')} (source: ${configSource})`
       )
