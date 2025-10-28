@@ -7,7 +7,7 @@ import {
   loadAppFavicon,
   normalizeCollectionsConfig,
   getCollectionConfig,
-  autoConfigureAssets
+  autoConfigureRendering
 } from './configHelper'
 import { DoesFaviconExistService } from '../services/get-config-service'
 
@@ -267,7 +267,7 @@ describe('ConfigHelper', () => {
     })
   })
 
-  describe('autoConfigureAssets', () => {
+  describe('autoConfigureRendering', () => {
     beforeEach(() => {
       vi.clearAllMocks()
       // Spy on console methods
@@ -281,426 +281,282 @@ describe('ConfigHelper', () => {
       vi.restoreAllMocks()
     })
 
+    it('should return config unchanged if no SCENE_TILER_URL', () => {
+      const config = {
+        COLLECTIONS_CONFIG: {
+          col1: {}
+        },
+        _STAC_COLLECTIONS: [
+          {
+            id: 'col1',
+            renders: {
+              visual: {
+                assets: ['red', 'green', 'blue']
+              }
+            }
+          }
+        ]
+      }
+
+      const result = autoConfigureRendering(config)
+      expect(result).toEqual(config)
+      expect(console.debug).toHaveBeenCalledWith(
+        'SCENE_TILER_URL not configured, skipping rendering auto-configuration'
+      )
+    })
+
     it('should return config unchanged if no _STAC_COLLECTIONS', () => {
       const config = {
+        SCENE_TILER_URL: 'https://example.com/titiler',
         COLLECTIONS_CONFIG: {
           col1: {}
         }
       }
 
-      const result = autoConfigureAssets(config)
+      const result = autoConfigureRendering(config)
       expect(result).toEqual(config)
     })
 
-    it('should auto-configure visual asset when present', () => {
+    it('should skip collections without renders object', () => {
       const config = {
-        COLLECTIONS_CONFIG: {
-          sentinel2: {}
-        },
-        _STAC_COLLECTIONS: [
-          {
-            id: 'sentinel2',
-            item_assets: {
-              visual: {
-                type: 'image/tiff',
-                roles: ['visual']
-              },
-              red: {
-                type: 'image/tiff',
-                roles: ['data']
-              }
-            }
-          }
-        ]
-      }
-
-      const result = autoConfigureAssets(config)
-      expect(
-        result.COLLECTIONS_CONFIG.sentinel2.sceneTilerParams.assets
-      ).toEqual(['visual'])
-      expect(result.COLLECTIONS_CONFIG.sentinel2.tileLayerParams).toEqual({})
-      expect(console.log).toHaveBeenCalledWith(
-        "Auto-configured assets for collection 'sentinel2': visual (source: asset 'visual')"
-      )
-    })
-
-    it('should warn if multiple visual assets found', () => {
-      const config = {
-        COLLECTIONS_CONFIG: {
-          col1: {}
-        },
-        _STAC_COLLECTIONS: [
-          {
-            id: 'col1',
-            item_assets: {
-              visual: {
-                type: 'image/tiff',
-                roles: ['visual']
-              },
-              red: {
-                type: 'image/tiff',
-                roles: ['data']
-              }
-            }
-          }
-        ]
-      }
-
-      const result = autoConfigureAssets(config)
-      expect(result.COLLECTIONS_CONFIG.col1.sceneTilerParams.assets).toEqual([
-        'visual'
-      ])
-      // Note: This test validates that visual asset is used when present
-      // The implementation only looks for assets with key "visual", not by role
-      // So there can only be one asset with the exact key "visual"
-    })
-
-    it('should auto-configure RGB assets when all three present', () => {
-      const config = {
-        COLLECTIONS_CONFIG: {
-          landsat: {}
-        },
-        _STAC_COLLECTIONS: [
-          {
-            id: 'landsat',
-            item_assets: {
-              red: {
-                type: 'image/tiff',
-                roles: ['data']
-              },
-              green: {
-                type: 'image/tiff',
-                roles: ['data']
-              },
-              blue: {
-                type: 'image/tiff',
-                roles: ['data']
-              }
-            }
-          }
-        ]
-      }
-
-      const result = autoConfigureAssets(config)
-      expect(result.COLLECTIONS_CONFIG.landsat.sceneTilerParams.assets).toEqual(
-        ['red', 'green', 'blue']
-      )
-      expect(console.log).toHaveBeenCalledWith(
-        "Auto-configured assets for collection 'landsat': red, green, blue (source: RGB assets (red, green, blue))"
-      )
-    })
-
-    it('should not use RGB if visual asset takes precedence', () => {
-      const config = {
-        COLLECTIONS_CONFIG: {
-          col1: {}
-        },
-        _STAC_COLLECTIONS: [
-          {
-            id: 'col1',
-            item_assets: {
-              visual: {
-                type: 'image/tiff',
-                roles: ['visual']
-              },
-              red: {
-                type: 'image/tiff',
-                roles: ['data']
-              },
-              green: {
-                type: 'image/tiff',
-                roles: ['data']
-              },
-              blue: {
-                type: 'image/tiff',
-                roles: ['data']
-              }
-            }
-          }
-        ]
-      }
-
-      const result = autoConfigureAssets(config)
-      expect(result.COLLECTIONS_CONFIG.col1.sceneTilerParams.assets).toEqual([
-        'visual'
-      ])
-    })
-
-    it('should auto-configure single data asset with 1 band', () => {
-      const config = {
-        COLLECTIONS_CONFIG: {
-          sar: {}
-        },
-        _STAC_COLLECTIONS: [
-          {
-            id: 'sar',
-            item_assets: {
-              vv: {
-                type: 'image/tiff',
-                roles: ['data'],
-                'raster:bands': [{ name: 'vv' }]
-              }
-            }
-          }
-        ]
-      }
-
-      const result = autoConfigureAssets(config)
-      expect(result.COLLECTIONS_CONFIG.sar.sceneTilerParams.assets).toEqual([
-        'vv'
-      ])
-      expect(console.log).toHaveBeenCalledWith(
-        "Auto-configured assets for collection 'sar': vv (source: single 'data' asset 'vv')"
-      )
-    })
-
-    it('should auto-configure single data asset with 3 bands', () => {
-      const config = {
-        COLLECTIONS_CONFIG: {
-          rgb: {}
-        },
-        _STAC_COLLECTIONS: [
-          {
-            id: 'rgb',
-            item_assets: {
-              data: {
-                type: 'image/tiff',
-                roles: ['data'],
-                'raster:bands': [{ name: 'r' }, { name: 'g' }, { name: 'b' }]
-              }
-            }
-          }
-        ]
-      }
-
-      const result = autoConfigureAssets(config)
-      expect(result.COLLECTIONS_CONFIG.rgb.sceneTilerParams.assets).toEqual([
-        'data'
-      ])
-      expect(console.log).toHaveBeenCalledWith(
-        "Auto-configured assets for collection 'rgb': data (source: single 'data' asset 'data')"
-      )
-    })
-
-    it('should error on single data asset with 2 bands', () => {
-      const config = {
-        COLLECTIONS_CONFIG: {
-          col1: {}
-        },
-        _STAC_COLLECTIONS: [
-          {
-            id: 'col1',
-            item_assets: {
-              data: {
-                type: 'image/tiff',
-                roles: ['data'],
-                'raster:bands': [{ name: 'b1' }, { name: 'b2' }]
-              }
-            }
-          }
-        ]
-      }
-
-      const result = autoConfigureAssets(config)
-      expect(
-        result.COLLECTIONS_CONFIG.col1.sceneTilerParams?.assets
-      ).toBeUndefined()
-      expect(console.error).toHaveBeenCalledWith(
-        "Collection 'col1': Asset 'data' has 2 bands, which is not supported for auto-configuration. Please manually configure sceneTilerParams."
-      )
-    })
-
-    it('should warn and use first 3 bands for single data asset with >3 bands', () => {
-      const config = {
-        COLLECTIONS_CONFIG: {
-          multispectral: {}
-        },
-        _STAC_COLLECTIONS: [
-          {
-            id: 'multispectral',
-            item_assets: {
-              data: {
-                type: 'image/tiff',
-                roles: ['data'],
-                'raster:bands': [
-                  { name: 'b1' },
-                  { name: 'b2' },
-                  { name: 'b3' },
-                  { name: 'b4' },
-                  { name: 'b5' }
-                ]
-              }
-            }
-          }
-        ]
-      }
-
-      const result = autoConfigureAssets(config)
-      expect(
-        result.COLLECTIONS_CONFIG.multispectral.sceneTilerParams.assets
-      ).toEqual(['data'])
-      expect(
-        result.COLLECTIONS_CONFIG.multispectral.sceneTilerParams.asset_bidx
-      ).toEqual(['data|1,2,3'])
-      expect(console.warn).toHaveBeenCalledWith(
-        "Collection 'multispectral': Asset 'data' has 5 bands - using first 3 bands"
-      )
-      expect(console.log).toHaveBeenCalledWith(
-        "Auto-configured assets for collection 'multispectral': data (source: single 'data' asset 'data' (using first 3 of 5 bands))"
-      )
-    })
-
-    it('should skip collections with user-configured assets', () => {
-      const config = {
-        COLLECTIONS_CONFIG: {
-          col1: {
-            sceneTilerParams: {
-              assets: ['custom-asset']
-            }
-          }
-        },
-        _STAC_COLLECTIONS: [
-          {
-            id: 'col1',
-            item_assets: {
-              visual: {
-                type: 'image/tiff',
-                roles: ['visual']
-              }
-            }
-          }
-        ]
-      }
-
-      const result = autoConfigureAssets(config)
-      expect(result.COLLECTIONS_CONFIG.col1.sceneTilerParams.assets).toEqual([
-        'custom-asset'
-      ])
-      expect(console.debug).toHaveBeenCalledWith(
-        "Skipping asset auto-configuration for 'col1' - already configured"
-      )
-    })
-
-    it('should skip collections without item_assets', () => {
-      const config = {
+        SCENE_TILER_URL: 'https://example.com/titiler',
         COLLECTIONS_CONFIG: {
           col1: {}
         },
         _STAC_COLLECTIONS: [
           {
             id: 'col1'
-            // No item_assets
+            // No renders
           }
         ]
       }
 
-      const result = autoConfigureAssets(config)
-      expect(
-        result.COLLECTIONS_CONFIG.col1.sceneTilerParams?.assets
-      ).toBeUndefined()
+      const result = autoConfigureRendering(config)
+      expect(result.COLLECTIONS_CONFIG.col1.sceneTilerParams).toBeUndefined()
+      expect(console.debug).toHaveBeenCalledWith(
+        "No 'renders' found for collection 'col1', skipping rendering auto-configuration"
+      )
     })
 
-    it('should handle multiple collections with different asset types', () => {
+    it('should auto-configure from basic render definition with assets', () => {
       const config = {
+        SCENE_TILER_URL: 'https://example.com/titiler',
         COLLECTIONS_CONFIG: {
-          col1: {},
-          col2: {},
-          col3: {}
+          sentinel2: {}
         },
         _STAC_COLLECTIONS: [
           {
-            id: 'col1',
-            item_assets: {
-              visual: { roles: ['visual'] }
-            }
-          },
-          {
-            id: 'col2',
-            item_assets: {
-              red: { roles: ['data'] },
-              green: { roles: ['data'] },
-              blue: { roles: ['data'] }
-            }
-          },
-          {
-            id: 'col3',
-            item_assets: {
-              data: {
-                roles: ['data'],
-                'raster:bands': [{ name: 'b1' }]
+            id: 'sentinel2',
+            renders: {
+              'true-color': {
+                title: 'True Color',
+                assets: ['red', 'green', 'blue']
               }
             }
           }
         ]
       }
 
-      const result = autoConfigureAssets(config)
+      const result = autoConfigureRendering(config)
+      expect(
+        result.COLLECTIONS_CONFIG.sentinel2.sceneTilerParams.assets
+      ).toEqual(['red', 'green', 'blue'])
+      expect(result.COLLECTIONS_CONFIG.sentinel2.tileLayerParams).toEqual({})
+      expect(console.log).toHaveBeenCalledWith(
+        "Auto-configuring rendering for collection 'sentinel2' using render definition 'true-color'"
+      )
+    })
+
+    it('should map render extension fields to TiTiler parameters', () => {
+      const config = {
+        SCENE_TILER_URL: 'https://example.com/titiler',
+        COLLECTIONS_CONFIG: {
+          landsat: {}
+        },
+        _STAC_COLLECTIONS: [
+          {
+            id: 'landsat',
+            renders: {
+              swir: {
+                title: 'Shortwave Infrared',
+                assets: ['swir22', 'nir', 'red'],
+                rescale: [
+                  [0, 5000],
+                  [0, 7000],
+                  [0, 9000]
+                ],
+                resampling: 'nearest',
+                color_formula: 'Gamma+RGB+3.2'
+              }
+            }
+          }
+        ]
+      }
+
+      const result = autoConfigureRendering(config)
+      const params = result.COLLECTIONS_CONFIG.landsat.sceneTilerParams
+
+      expect(params.assets).toEqual(['swir22', 'nir', 'red'])
+      expect(params.rescale).toEqual(['0,5000,0,7000,0,9000'])
+      expect(params.resampling).toEqual('nearest')
+      expect(params.color_formula).toEqual('Gamma+RGB+3.2')
+    })
+
+    it('should handle colormap_name and expression', () => {
+      const config = {
+        SCENE_TILER_URL: 'https://example.com/titiler',
+        COLLECTIONS_CONFIG: {
+          ndvi: {}
+        },
+        _STAC_COLLECTIONS: [
+          {
+            id: 'ndvi',
+            renders: {
+              ndvi: {
+                title: 'NDVI',
+                assets: ['nir', 'red'],
+                expression: '(nir-red)/(nir+red)',
+                rescale: [[-1, 1]],
+                colormap_name: 'ylgn',
+                resampling: 'average'
+              }
+            }
+          }
+        ]
+      }
+
+      const result = autoConfigureRendering(config)
+      const params = result.COLLECTIONS_CONFIG.ndvi.sceneTilerParams
+
+      expect(params.assets).toEqual(['nir', 'red'])
+      expect(params.expression).toEqual('(nir-red)/(nir+red)')
+      expect(params.rescale).toEqual(['-1,1'])
+      expect(params.colormap_name).toEqual('ylgn')
+      expect(params.resampling).toEqual('average')
+    })
+
+    it('should handle custom colormap object', () => {
+      const config = {
+        SCENE_TILER_URL: 'https://example.com/titiler',
+        COLLECTIONS_CONFIG: {
+          dem: {}
+        },
+        _STAC_COLLECTIONS: [
+          {
+            id: 'dem',
+            renders: {
+              elevation: {
+                assets: ['data'],
+                colormap: {
+                  0: '#000000',
+                  1000: '#419bdf',
+                  2000: '#397d49'
+                },
+                nodata: -9999
+              }
+            }
+          }
+        ]
+      }
+
+      const result = autoConfigureRendering(config)
+      const params = result.COLLECTIONS_CONFIG.dem.sceneTilerParams
+
+      expect(params.assets).toEqual(['data'])
+      expect(params.colormap).toEqual({
+        0: '#000000',
+        1000: '#419bdf',
+        2000: '#397d49'
+      })
+      expect(params.nodata).toEqual(-9999)
+    })
+
+    it('should skip collections with user-configured sceneTilerParams', () => {
+      const config = {
+        SCENE_TILER_URL: 'https://example.com/titiler',
+        COLLECTIONS_CONFIG: {
+          col1: {
+            sceneTilerParams: {
+              assets: ['custom-asset'],
+              color_formula: 'custom'
+            }
+          }
+        },
+        _STAC_COLLECTIONS: [
+          {
+            id: 'col1',
+            renders: {
+              default: {
+                assets: ['auto-asset']
+              }
+            }
+          }
+        ]
+      }
+
+      const result = autoConfigureRendering(config)
       expect(result.COLLECTIONS_CONFIG.col1.sceneTilerParams.assets).toEqual([
-        'visual'
+        'custom-asset'
       ])
-      expect(result.COLLECTIONS_CONFIG.col2.sceneTilerParams.assets).toEqual([
+      expect(
+        result.COLLECTIONS_CONFIG.col1.sceneTilerParams.color_formula
+      ).toEqual('custom')
+      expect(console.debug).toHaveBeenCalledWith(
+        "Skipping rendering auto-configuration for 'col1' - already configured"
+      )
+    })
+
+    it('should use first render definition when multiple exist', () => {
+      const config = {
+        SCENE_TILER_URL: 'https://example.com/titiler',
+        COLLECTIONS_CONFIG: {
+          col1: {}
+        },
+        _STAC_COLLECTIONS: [
+          {
+            id: 'col1',
+            renders: {
+              'true-color': {
+                assets: ['red', 'green', 'blue']
+              },
+              'false-color': {
+                assets: ['nir', 'red', 'green']
+              }
+            }
+          }
+        ]
+      }
+
+      const result = autoConfigureRendering(config)
+      // Should use the first one (true-color)
+      expect(result.COLLECTIONS_CONFIG.col1.sceneTilerParams.assets).toEqual([
         'red',
         'green',
         'blue'
       ])
-      expect(result.COLLECTIONS_CONFIG.col3.sceneTilerParams.assets).toEqual([
-        'data'
-      ])
     })
 
-    it('should not auto-configure if no suitable assets found', () => {
+    it('should handle empty renders object', () => {
       const config = {
+        SCENE_TILER_URL: 'https://example.com/titiler',
         COLLECTIONS_CONFIG: {
           col1: {}
         },
         _STAC_COLLECTIONS: [
           {
             id: 'col1',
-            item_assets: {
-              metadata: {
-                type: 'application/json',
-                roles: ['metadata']
-              }
-            }
+            renders: {}
           }
         ]
       }
 
-      const result = autoConfigureAssets(config)
-      expect(
-        result.COLLECTIONS_CONFIG.col1.sceneTilerParams?.assets
-      ).toBeUndefined()
-    })
-
-    it('should skip if multiple data assets found', () => {
-      const config = {
-        COLLECTIONS_CONFIG: {
-          col1: {}
-        },
-        _STAC_COLLECTIONS: [
-          {
-            id: 'col1',
-            item_assets: {
-              vv: {
-                roles: ['data'],
-                'raster:bands': [{ name: 'vv' }]
-              },
-              vh: {
-                roles: ['data'],
-                'raster:bands': [{ name: 'vh' }]
-              }
-            }
-          }
-        ]
-      }
-
-      const result = autoConfigureAssets(config)
-      expect(
-        result.COLLECTIONS_CONFIG.col1.sceneTilerParams?.assets
-      ).toBeUndefined()
+      const result = autoConfigureRendering(config)
+      expect(result.COLLECTIONS_CONFIG.col1.sceneTilerParams).toBeUndefined()
+      expect(console.debug).toHaveBeenCalledWith(
+        "Collection 'col1' has empty 'renders' object"
+      )
     })
   })
-
   describe('getCollectionConfig', () => {
     beforeEach(() => {
       // Reset store before each test

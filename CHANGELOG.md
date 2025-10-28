@@ -26,18 +26,26 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - `COLLECTIONS_CONFIG` automatically filtered to only include active collections
   - Added `autoConfigureCollections()` function in `src/utils/configHelper.js`
   - Full collection objects stored in `_STAC_COLLECTIONS` for future use
-- Added asset auto-configuration based on STAC collection `item_assets` metadata:
-  - Automatically configures `sceneTilerParams.assets` for each collection based on STAC metadata
-  - Eliminates need to manually specify which assets to render for most collections
-  - Priority-based selection logic:
-    1. Uses "visual" asset if present (with warning if multiple visual assets exist)
-    2. Uses red/green/blue assets if all three are available
-    3. Uses single "data" role asset with band count validation (errors on 2 bands, warns on >3 bands)
-  - Respects user overrides - skips auto-configuration for collections with manually configured assets
-  - Multi-band asset support - automatically uses first 3 bands via `asset_bidx` for assets with >3 bands
-  - Added `autoConfigureAssets()` function in `src/utils/configHelper.js`
-  - Comprehensive test coverage (15 new tests)
+- Added rendering auto-configuration based on STAC Render Extension:
+  - Automatically configures visualization parameters for collections using the [STAC Render Extension](https://github.com/stac-extensions/render)
+  - Eliminates need to manually specify TiTiler visualization parameters for collections
+  - Only activates when both `STAC_API_URL` and `SCENE_TILER_URL` are configured
+  - Reads `renders` object from STAC Collections and maps to `sceneTilerParams`:
+    - `assets` → Array of asset keys to render
+    - `rescale` → Value ranges for stretching (flattened to comma-separated format)
+    - `colormap_name` → Predefined colormap
+    - `colormap` → Custom colormap object
+    - `color_formula` → Color adjustment formula
+    - `nodata` → No-data value to mask
+    - `expression` → Band math expression
+    - `resampling` → Resampling method
+  - Uses first render definition when multiple are available
+  - Respects user overrides - skips auto-configuration for collections manually configured
+
+  - Added `autoConfigureRendering()` function in `src/utils/configHelper.js`
+  - Comprehensive test coverage (10 new tests)
   - Full documentation in `CONFIGURATION.md`
+
 - Added sensible defaults and auto-population for configuration to reduce required parameters:
   - Added `applyConfigDefaults()` function in `src/utils/configHelper.js` to centralize default value handling
   - `BASEMAP` now defaults to OpenStreetMap if not provided in config

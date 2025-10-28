@@ -221,94 +221,153 @@ excluded), that configuration will be ignored with a debug message in the consol
 
 In this example, the configuration for `deprecated-collection` will be ignored since it's not in the include list.
 
-### Asset Auto-Configuration
+### Rendering Auto-Configuration
 
-FilmDrop UI can automatically configure the `sceneTilerParams.assets` parameter for each collection
-based on the collection's `item_assets` metadata from the STAC API. This eliminates the need to manually
-specify which assets to render for each collection.
+When both `STAC_API_URL` and `SCENE_TILER_URL` are configured, FilmDrop UI can automatically configure
+rendering parameters for collections that use the [STAC Render Extension](https://github.com/stac-extensions/render).
+This eliminates the need to manually specify visualization parameters for each collection.
 
-#### Auto-Configuration Rules
+#### How It Works
 
-The asset selection follows a priority order:
+FilmDrop UI reads the `renders` object from each STAC Collection and automatically maps it to TiTiler
+parameters. The render extension allows data providers to define how their data should be visualized.
 
-1. **Visual Asset** (Highest Priority)
-   - If a collection has an asset with `roles: ["visual"]`, it will be used
-   - If multiple visual assets exist, the first one is used with a warning
+**Requirements:**
 
-2. **RGB Assets** (Medium Priority)
-   - If assets named `red`, `green`, and `blue` all exist, they will be used together
-   - This creates a true-color RGB composite
+- `STAC_API_URL` must be configured
+- `SCENE_TILER_URL` must be configured
+- STAC Collections must include the `renders` extension
 
-3. **Single Data Asset** (Lowest Priority)
-   - If there is exactly one asset with `roles: ["data"]`, it will be used
-   - Band count validation:
-     - **1 band**: Used as-is (grayscale)
-     - **2 bands**: ERROR - Not supported (skipped)
-     - **3 bands**: Used as RGB composite
-     - **>3 bands**: WARNING - First 3 bands used via `asset_bidx` parameter
+#### Supported Render Extension Fields
+
+The following fields from the render extension are automatically mapped to `sceneTilerParams`:
+
+| Render Field    | TiTiler Parameter | Description                                                           |
+| --------------- | ----------------- | --------------------------------------------------------------------- |
+| `assets`        | `assets`          | Array of asset keys to render (required)                              |
+| `rescale`       | `rescale`         | Value ranges for stretching (e.g., `[[0,10000],[0,10000],[0,10000]]`) |
+| `colormap_name` | `colormap_name`   | Predefined colormap (e.g., `"viridis"`, `"ylgn"`)                     |
+| `colormap`      | `colormap`        | Custom colormap object                                                |
+| `color_formula` | `color_formula`   | Color adjustment formula (e.g., `"Gamma RGB 3.5"`)                    |
+| `nodata`        | `nodata`          | No-data value to mask                                                 |
+| `expression`    | `expression`      | Band math expression (e.g., `"(nir-red)/(nir+red)"`)                  |
+| `resampling`    | `resampling`      | Resampling method (e.g., `"nearest"`, `"bilinear"`)                   |
+
+#### Example STAC Collection with Render Extension
+
+```json
+{
+  "id": "sentinel-2-l2a",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/render/v2.0.0/schema.json"
+  ],
+  "renders": {
+    "true-color": {
+      "title": "True Color",
+      "assets": ["red", "green", "blue"],
+      "rescale": [
+        [0, 10000],
+        [0, 10000],
+        [0, 10000]
+      ],
+      "color_formula": "Gamma RGB 3.5"
+    },
+    "ndvi": {
+      "title": "NDVI",
+      "assets": ["nir", "red"],
+      "expression": "(nir-red)/(nir+red)",
+      "rescale": [[-1, 1]],
+      "colormap_name": "rdylgn"
+    }
+  }
+}
+```
+
+FilmDrop UI will automatically use the **first render definition** (`true-color` in this example)
+to configure the visualization.
 
 #### Overriding Auto-Configuration
 
-Auto-configuration is **skipped** for collections where you have manually configured `assets` in
-`COLLECTIONS_CONFIG`. This allows you to override the automatic selection when needed.
+Auto-configuration is **skipped** for collections where you have manually configured
+`sceneTilerParams` in `COLLECTIONS_CONFIG`. This allows you to override the automatic
+configuration when needed.
 
 ```json
 {
   "COLLECTIONS_CONFIG": {
     "sentinel-2-l2a": {
       "sceneTilerParams": {
-        "assets": ["B08", "B04", "B03"]
+        "assets": ["B08", "B04", "B03"],
+        "rescale": ["0,3000", "0,3000", "0,3000"]
       }
     }
   }
 }
 ```
 
-#### Example Scenarios
+#### Example Auto-Configured Scenarios
 
-**Scenario 1: Collection with visual asset**
+**Scenario 1: True color visualization**
 
 ```json
-// STAC Collection item_assets:
+// STAC Collection renders:
 {
-  "visual": { "roles": ["visual"] },
-  "red": { "roles": ["data"] },
-  "green": { "roles": ["data"] }
+  "true-color": {
+    "assets": ["red", "green", "blue"],
+    "rescale": [
+      [0, 10000],
+      [0, 10000],
+      [0, 10000]
+    ]
+  }
 }
-// Result: assets = ["visual"]
+// Result:
+// sceneTilerParams.assets = ["red", "green", "blue"]
+// sceneTilerParams.rescale = ["0,10000,0,10000,0,10000"]
 ```
 
-**Scenario 2: Collection with RGB assets**
+**Scenario 2: NDVI with colormap**
 
 ```json
-// STAC Collection item_assets:
+// STAC Collection renders:
 {
-  "red": { "roles": ["data"] },
-  "green": { "roles": ["data"] },
-  "blue": { "roles": ["data"] }
+  "ndvi": {
+    "assets": ["nir", "red"],
+    "expression": "(nir-red)/(nir+red)",
+    "rescale": [[-1, 1]],
+    "colormap_name": "rdylgn",
+    "resampling": "nearest"
+  }
 }
-// Result: assets = ["red", "green", "blue"]
+// Result:
+// sceneTilerParams.assets = ["nir", "red"]
+// sceneTilerParams.expression = "(nir-red)/(nir+red)"
+// sceneTilerParams.rescale = ["-1,1"]
+// sceneTilerParams.colormap_name = "rdylgn"
+// sceneTilerParams.resampling = "nearest"
 ```
 
-**Scenario 3: Single-band data asset**
+**Scenario 3: Custom colormap for elevation**
 
 ```json
-// STAC Collection item_assets:
+// STAC Collection renders:
 {
-  "vv": { "roles": ["data"], "raster:bands": [{ "name": "vv" }] }
+  "elevation": {
+    "assets": ["data"],
+    "colormap": {
+      "0": "#d7191c",
+      "1000": "#fdae61",
+      "2000": "#ffffbf",
+      "3000": "#a6d96a",
+      "4000": "#1a9641"
+    },
+    "nodata": -9999
+  }
 }
-// Result: assets = ["vv"]
-```
-
-**Scenario 4: Multi-band data asset (>3 bands)**
-
-```json
-// STAC Collection item_assets:
-{
-  "data": { "roles": ["data"], "raster:bands": [{}, {}, {}, {}, {}] }
-}
-// Result: assets = ["data"], asset_bidx = "data|1,2,3"
-// Warning logged about using first 3 of 5 bands
+// Result:
+// sceneTilerParams.assets = ["data"]
+// sceneTilerParams.colormap = { "0": "#d7191c", ... }
+// sceneTilerParams.nodata = -9999
 ```
 
 ### Collection Configuration

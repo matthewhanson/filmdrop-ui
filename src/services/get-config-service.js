@@ -5,7 +5,7 @@ import {
   normalizeCollectionsConfig,
   applyConfigDefaults,
   autoConfigureCollections,
-  autoConfigureAssets
+  autoConfigureRendering
 } from '../utils/configHelper'
 
 export async function LoadConfigIntoStateService() {
@@ -35,8 +35,8 @@ export async function LoadConfigIntoStateService() {
         )
       }
 
-      // Auto-configure assets based on collection item_assets metadata
-      normalizedConfig = autoConfigureAssets(normalizedConfig)
+      // Auto-configure rendering based on collection render extension
+      normalizedConfig = autoConfigureRendering(normalizedConfig)
 
       // Apply defaults for optional parameters
       const configWithDefaults = applyConfigDefaults(normalizedConfig)

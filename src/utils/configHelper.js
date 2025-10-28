@@ -434,12 +434,20 @@ export async function autoConfigureCollections(apiUrl, config) {
 }
 
 /**
- * Auto-configures TiTiler assets for collections based on STAC item_assets metadata
+ * Auto-configures TiTiler rendering for collections based on STAC render extension
  * @param {Object} config - The configuration object with _STAC_COLLECTIONS
  * @returns {Object} - Config with auto-configured sceneTilerParams
  */
-export function autoConfigureAssets(config) {
-  // If no collections were fetched, skip asset auto-configuration
+export function autoConfigureRendering(config) {
+  // If no SCENE_TILER_URL is configured, skip rendering auto-configuration
+  if (!config.SCENE_TILER_URL) {
+    console.debug(
+      'SCENE_TILER_URL not configured, skipping rendering auto-configuration'
+    )
+    return config
+  }
+
+  // If no collections were fetched, skip rendering auto-configuration
   if (!config._STAC_COLLECTIONS || !Array.isArray(config._STAC_COLLECTIONS)) {
     return config
   }
@@ -452,130 +460,99 @@ export function autoConfigureAssets(config) {
 
     // Skip if user has already configured sceneTilerParams for this collection
     if (
-      collectionsConfig[collectionId]?.sceneTilerParams?.assets &&
-      Array.isArray(collectionsConfig[collectionId].sceneTilerParams.assets) &&
-      collectionsConfig[collectionId].sceneTilerParams.assets.length > 0
+      collectionsConfig[collectionId]?.sceneTilerParams &&
+      Object.keys(collectionsConfig[collectionId].sceneTilerParams).length > 0
     ) {
       console.debug(
-        `Skipping asset auto-configuration for '${collectionId}' - already configured`
+        `Skipping rendering auto-configuration for '${collectionId}' - already configured`
       )
       continue
     }
 
-    // Get item_assets from collection
-    const itemAssets = collection.item_assets
-    if (!itemAssets || typeof itemAssets !== 'object') {
+    // Check for render extension
+    const renders = collection.renders
+    if (!renders || typeof renders !== 'object') {
       console.debug(
-        `No item_assets found for collection '${collectionId}', skipping asset auto-configuration`
+        `No 'renders' found for collection '${collectionId}', skipping rendering auto-configuration`
       )
       continue
     }
 
-    const assetKeys = Object.keys(itemAssets)
-    if (assetKeys.length === 0) {
+    const renderKeys = Object.keys(renders)
+    if (renderKeys.length === 0) {
+      console.debug(`Collection '${collectionId}' has empty 'renders' object`)
       continue
     }
 
-    let selectedAssets = null
-    let configSource = null
+    // Use the first render definition (or could make this configurable)
+    const defaultRenderKey = renderKeys[0]
+    const renderDef = renders[defaultRenderKey]
 
-    // Rule 1: If there is an asset with key "visual", use that
-    const visualAssets = assetKeys.filter((key) => key === 'visual')
-    if (visualAssets.length > 0) {
-      if (visualAssets.length > 1) {
-        console.warn(
-          `Collection '${collectionId}' has multiple 'visual' assets - using the first one`
-        )
-      }
-      selectedAssets = [visualAssets[0]]
-      configSource = "asset 'visual'"
+    console.log(
+      `Auto-configuring rendering for collection '${collectionId}' using render definition '${defaultRenderKey}'`
+    )
+
+    // Initialize collection config if needed
+    if (!collectionsConfig[collectionId]) {
+      collectionsConfig[collectionId] = {}
+    }
+    if (!collectionsConfig[collectionId].sceneTilerParams) {
+      collectionsConfig[collectionId].sceneTilerParams = {}
     }
 
-    // Rule 2: If there are assets with keys red, green, and blue, use those
-    if (!selectedAssets) {
-      const hasRed = assetKeys.includes('red')
-      const hasGreen = assetKeys.includes('green')
-      const hasBlue = assetKeys.includes('blue')
+    // Map render extension fields to TiTiler parameters
+    const sceneTilerParams = collectionsConfig[collectionId].sceneTilerParams
 
-      if (hasRed && hasGreen && hasBlue) {
-        selectedAssets = ['red', 'green', 'blue']
-        configSource = 'RGB assets (red, green, blue)'
-      }
+    // Required: assets
+    if (renderDef.assets && Array.isArray(renderDef.assets)) {
+      sceneTilerParams.assets = renderDef.assets
     }
 
-    // Rule 3: If there is only one asset with role "data", use that
-    if (!selectedAssets) {
-      const dataAssets = assetKeys.filter((key) => {
-        const asset = itemAssets[key]
-        return (
-          asset.roles &&
-          Array.isArray(asset.roles) &&
-          asset.roles.includes('data')
-        )
-      })
-
-      if (dataAssets.length === 1) {
-        const assetKey = dataAssets[0]
-        const asset = itemAssets[assetKey]
-
-        // Check band count if available in raster:bands
-        const rasterBands = asset['raster:bands']
-        const bandCount = Array.isArray(rasterBands) ? rasterBands.length : null
-
-        if (bandCount === 2) {
-          console.error(
-            `Collection '${collectionId}': Asset '${assetKey}' has 2 bands, which is not supported for auto-configuration. Please manually configure sceneTilerParams.`
-          )
-          continue
-        }
-
-        if (bandCount && bandCount > 3) {
-          console.warn(
-            `Collection '${collectionId}': Asset '${assetKey}' has ${bandCount} bands - using first 3 bands`
-          )
-          // Use asset with bidx to select first 3 bands
-          selectedAssets = [assetKey]
-          // We'll need to set asset_bidx in the config
-          if (!collectionsConfig[collectionId]) {
-            collectionsConfig[collectionId] = {}
-          }
-          if (!collectionsConfig[collectionId].sceneTilerParams) {
-            collectionsConfig[collectionId].sceneTilerParams = {}
-          }
-          collectionsConfig[collectionId].sceneTilerParams.asset_bidx = [
-            `${assetKey}|1,2,3`
-          ]
-          configSource = `single 'data' asset '${assetKey}' (using first 3 of ${bandCount} bands)`
-        } else {
-          selectedAssets = [assetKey]
-          configSource = `single 'data' asset '${assetKey}'`
-        }
-      } else if (dataAssets.length > 1) {
-        console.debug(
-          `Collection '${collectionId}' has multiple assets with role 'data': ${dataAssets.join(', ')}. Auto-configuration skipped - please manually configure sceneTilerParams.`
-        )
-      }
+    // Optional: rescale
+    if (renderDef.rescale && Array.isArray(renderDef.rescale)) {
+      // Convert [[0,10000],[0,10000],[0,10000]] to "0,10000,0,10000,0,10000"
+      const rescaleFlat = renderDef.rescale.flat().join(',')
+      sceneTilerParams.rescale = [rescaleFlat]
     }
 
-    // Apply the auto-configured assets
-    if (selectedAssets) {
-      if (!collectionsConfig[collectionId]) {
-        collectionsConfig[collectionId] = {}
-      }
-      if (!collectionsConfig[collectionId].sceneTilerParams) {
-        collectionsConfig[collectionId].sceneTilerParams = {}
-      }
-      collectionsConfig[collectionId].sceneTilerParams.assets = selectedAssets
-
-      // Initialize tileLayerParams if not present to avoid warnings
-      if (!collectionsConfig[collectionId].tileLayerParams) {
-        collectionsConfig[collectionId].tileLayerParams = {}
-      }
-
-      console.log(
-        `Auto-configured assets for collection '${collectionId}': ${selectedAssets.join(', ')} (source: ${configSource})`
-      )
+    // Optional: colormap_name
+    if (renderDef.colormap_name) {
+      sceneTilerParams.colormap_name = renderDef.colormap_name
     }
+
+    // Optional: colormap
+    if (renderDef.colormap) {
+      sceneTilerParams.colormap = renderDef.colormap
+    }
+
+    // Optional: color_formula
+    if (renderDef.color_formula) {
+      sceneTilerParams.color_formula = renderDef.color_formula
+    }
+
+    // Optional: nodata
+    if (renderDef.nodata !== undefined) {
+      sceneTilerParams.nodata = renderDef.nodata
+    }
+
+    // Optional: expression
+    if (renderDef.expression) {
+      sceneTilerParams.expression = renderDef.expression
+    }
+
+    // Optional: resampling (map to TiTiler's resampling_method)
+    if (renderDef.resampling) {
+      sceneTilerParams.resampling = renderDef.resampling
+    }
+
+    // Initialize tileLayerParams if not present to avoid warnings
+    if (!collectionsConfig[collectionId].tileLayerParams) {
+      collectionsConfig[collectionId].tileLayerParams = {}
+    }
+
+    console.log(
+      `Auto-configured rendering for collection '${collectionId}' with ${Object.keys(sceneTilerParams).length} parameters from '${defaultRenderKey}'`
+    )
   }
 
   return {
