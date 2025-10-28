@@ -4,7 +4,8 @@ import { showApplicationAlert } from '../utils/alertHelper'
 import {
   normalizeCollectionsConfig,
   applyConfigDefaults,
-  autoConfigureCollections
+  autoConfigureCollections,
+  autoConfigureAssets
 } from '../utils/configHelper'
 
 export async function LoadConfigIntoStateService() {
@@ -33,6 +34,9 @@ export async function LoadConfigIntoStateService() {
           normalizedConfig
         )
       }
+
+      // Auto-configure assets based on collection item_assets metadata
+      normalizedConfig = autoConfigureAssets(normalizedConfig)
 
       // Apply defaults for optional parameters
       const configWithDefaults = applyConfigDefaults(normalizedConfig)

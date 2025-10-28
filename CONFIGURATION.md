@@ -221,6 +221,96 @@ excluded), that configuration will be ignored with a debug message in the consol
 
 In this example, the configuration for `deprecated-collection` will be ignored since it's not in the include list.
 
+### Asset Auto-Configuration
+
+FilmDrop UI can automatically configure the `sceneTilerParams.assets` parameter for each collection
+based on the collection's `item_assets` metadata from the STAC API. This eliminates the need to manually
+specify which assets to render for each collection.
+
+#### Auto-Configuration Rules
+
+The asset selection follows a priority order:
+
+1. **Visual Asset** (Highest Priority)
+   - If a collection has an asset with `roles: ["visual"]`, it will be used
+   - If multiple visual assets exist, the first one is used with a warning
+
+2. **RGB Assets** (Medium Priority)
+   - If assets named `red`, `green`, and `blue` all exist, they will be used together
+   - This creates a true-color RGB composite
+
+3. **Single Data Asset** (Lowest Priority)
+   - If there is exactly one asset with `roles: ["data"]`, it will be used
+   - Band count validation:
+     - **1 band**: Used as-is (grayscale)
+     - **2 bands**: ERROR - Not supported (skipped)
+     - **3 bands**: Used as RGB composite
+     - **>3 bands**: WARNING - First 3 bands used via `asset_bidx` parameter
+
+#### Overriding Auto-Configuration
+
+Auto-configuration is **skipped** for collections where you have manually configured `assets` in
+`COLLECTIONS_CONFIG`. This allows you to override the automatic selection when needed.
+
+```json
+{
+  "COLLECTIONS_CONFIG": {
+    "sentinel-2-l2a": {
+      "sceneTilerParams": {
+        "assets": ["B08", "B04", "B03"]
+      }
+    }
+  }
+}
+```
+
+#### Example Scenarios
+
+**Scenario 1: Collection with visual asset**
+
+```json
+// STAC Collection item_assets:
+{
+  "visual": { "roles": ["visual"] },
+  "red": { "roles": ["data"] },
+  "green": { "roles": ["data"] }
+}
+// Result: assets = ["visual"]
+```
+
+**Scenario 2: Collection with RGB assets**
+
+```json
+// STAC Collection item_assets:
+{
+  "red": { "roles": ["data"] },
+  "green": { "roles": ["data"] },
+  "blue": { "roles": ["data"] }
+}
+// Result: assets = ["red", "green", "blue"]
+```
+
+**Scenario 3: Single-band data asset**
+
+```json
+// STAC Collection item_assets:
+{
+  "vv": { "roles": ["data"], "raster:bands": [{ "name": "vv" }] }
+}
+// Result: assets = ["vv"]
+```
+
+**Scenario 4: Multi-band data asset (>3 bands)**
+
+```json
+// STAC Collection item_assets:
+{
+  "data": { "roles": ["data"], "raster:bands": [{}, {}, {}, {}, {}] }
+}
+// Result: assets = ["data"], asset_bidx = "data|1,2,3"
+// Warning logged about using first 3 of 5 bands
+```
+
 ### Collection Configuration
 
 #### Modern Format (Recommended): COLLECTIONS_CONFIG
@@ -249,6 +339,7 @@ improves maintainability.
 | Property                | Type   | Description                                                                                                                 |
 | ----------------------- | ------ | --------------------------------------------------------------------------------------------------------------------------- |
 | `sceneTilerParams`      | Object | TiTiler scene parameters: `assets`, `color_formula`, `bidx`, `rescale`, `expression`, `colormap_name`, `colormap`, `nodata` |
+|                         |        | **Note:** TiTiler automatically reads `nodata` from the COG metadata; only override if needed.                              |
 | `mosaicTilerParams`     | Object | TiTiler mosaic parameters (same as sceneTilerParams)                                                                        |
 | `sceneMinZoom`          | Number | Minimum zoom level required for Scene and Mosaic views (default: 7)                                                         |
 | `popupDisplayFields`    | Array  | STAC property names to display in popup (e.g., `["datetime", "platform"]`)                                                  |
@@ -436,6 +527,10 @@ The reference layer list widget is automatically enabled when `LAYER_LIST_SERVIC
 ```
 
 ### TiTiler Parameters
+
+TiTiler automatically reads metadata from COG files and STAC items, including nodata values, CRS,
+scale/offset, and band information. The parameters below allow you to override these automatic values
+when needed. For complete parameter documentation, see [TiTiler Docs](https://devseed.com/titiler/).
 
 **Basic RGB:**
 

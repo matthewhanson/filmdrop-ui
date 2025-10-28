@@ -434,6 +434,152 @@ export async function autoConfigureCollections(apiUrl, config) {
 }
 
 /**
+ * Auto-configures TiTiler assets for collections based on STAC item_assets metadata
+ * @param {Object} config - The configuration object with _STAC_COLLECTIONS
+ * @returns {Object} - Config with auto-configured sceneTilerParams
+ */
+export function autoConfigureAssets(config) {
+  // If no collections were fetched, skip asset auto-configuration
+  if (!config._STAC_COLLECTIONS || !Array.isArray(config._STAC_COLLECTIONS)) {
+    return config
+  }
+
+  const collectionsConfig = { ...config.COLLECTIONS_CONFIG } || {}
+
+  // Process each collection
+  for (const collection of config._STAC_COLLECTIONS) {
+    const collectionId = collection.id
+
+    // Skip if user has already configured sceneTilerParams for this collection
+    if (
+      collectionsConfig[collectionId]?.sceneTilerParams?.assets &&
+      Array.isArray(collectionsConfig[collectionId].sceneTilerParams.assets) &&
+      collectionsConfig[collectionId].sceneTilerParams.assets.length > 0
+    ) {
+      console.debug(
+        `Skipping asset auto-configuration for '${collectionId}' - already configured`
+      )
+      continue
+    }
+
+    // Get item_assets from collection
+    const itemAssets = collection.item_assets
+    if (!itemAssets || typeof itemAssets !== 'object') {
+      console.debug(
+        `No item_assets found for collection '${collectionId}', skipping asset auto-configuration`
+      )
+      continue
+    }
+
+    const assetKeys = Object.keys(itemAssets)
+    if (assetKeys.length === 0) {
+      continue
+    }
+
+    let selectedAssets = null
+    let configSource = null
+
+    // Rule 1: If there is an asset with key "visual", use that
+    const visualAssets = assetKeys.filter((key) => key === 'visual')
+    if (visualAssets.length > 0) {
+      if (visualAssets.length > 1) {
+        console.warn(
+          `Collection '${collectionId}' has multiple 'visual' assets - using the first one`
+        )
+      }
+      selectedAssets = [visualAssets[0]]
+      configSource = "asset 'visual'"
+    }
+
+    // Rule 2: If there are assets with keys red, green, and blue, use those
+    if (!selectedAssets) {
+      const hasRed = assetKeys.includes('red')
+      const hasGreen = assetKeys.includes('green')
+      const hasBlue = assetKeys.includes('blue')
+
+      if (hasRed && hasGreen && hasBlue) {
+        selectedAssets = ['red', 'green', 'blue']
+        configSource = 'RGB assets (red, green, blue)'
+      }
+    }
+
+    // Rule 3: If there is only one asset with role "data", use that
+    if (!selectedAssets) {
+      const dataAssets = assetKeys.filter((key) => {
+        const asset = itemAssets[key]
+        return (
+          asset.roles &&
+          Array.isArray(asset.roles) &&
+          asset.roles.includes('data')
+        )
+      })
+
+      if (dataAssets.length === 1) {
+        const assetKey = dataAssets[0]
+        const asset = itemAssets[assetKey]
+
+        // Check band count if available in raster:bands
+        const rasterBands = asset['raster:bands']
+        const bandCount = Array.isArray(rasterBands) ? rasterBands.length : null
+
+        if (bandCount === 2) {
+          console.error(
+            `Collection '${collectionId}': Asset '${assetKey}' has 2 bands, which is not supported for auto-configuration. Please manually configure sceneTilerParams.`
+          )
+          continue
+        }
+
+        if (bandCount && bandCount > 3) {
+          console.warn(
+            `Collection '${collectionId}': Asset '${assetKey}' has ${bandCount} bands - using first 3 bands`
+          )
+          // Use asset with bidx to select first 3 bands
+          selectedAssets = [assetKey]
+          // We'll need to set asset_bidx in the config
+          if (!collectionsConfig[collectionId]) {
+            collectionsConfig[collectionId] = {}
+          }
+          if (!collectionsConfig[collectionId].sceneTilerParams) {
+            collectionsConfig[collectionId].sceneTilerParams = {}
+          }
+          collectionsConfig[collectionId].sceneTilerParams.asset_bidx = [
+            `${assetKey}|1,2,3`
+          ]
+          configSource = `single 'data' asset '${assetKey}' (using first 3 of ${bandCount} bands)`
+        } else {
+          selectedAssets = [assetKey]
+          configSource = `single 'data' asset '${assetKey}'`
+        }
+      } else if (dataAssets.length > 1) {
+        console.debug(
+          `Collection '${collectionId}' has multiple assets with role 'data': ${dataAssets.join(', ')}. Auto-configuration skipped - please manually configure sceneTilerParams.`
+        )
+      }
+    }
+
+    // Apply the auto-configured assets
+    if (selectedAssets) {
+      if (!collectionsConfig[collectionId]) {
+        collectionsConfig[collectionId] = {}
+      }
+      if (!collectionsConfig[collectionId].sceneTilerParams) {
+        collectionsConfig[collectionId].sceneTilerParams = {}
+      }
+      collectionsConfig[collectionId].sceneTilerParams.assets = selectedAssets
+
+      console.log(
+        `Auto-configured assets for collection '${collectionId}': ${selectedAssets.join(', ')} (source: ${configSource})`
+      )
+    }
+  }
+
+  return {
+    ...config,
+    COLLECTIONS_CONFIG: collectionsConfig
+  }
+}
+
+/**
  * Applies default values to config for optional parameters
  * @param {Object} config - The configuration object
  * @returns {Object} - Config with defaults applied

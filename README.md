@@ -41,6 +41,12 @@ Check out [FilmDrop-UI in action with Earth-Search](https://console.earth-search
   - Interactive map with Leaflet
   - Light/dark theme support
 
+- **⚙️ Auto-Configuration**
+  - Automatic collection discovery from STAC API with include/exclude filters
+  - Asset selection based on STAC collection metadata
+  - Minimal configuration required - works out-of-the-box with most STAC catalogs
+  - Sensible defaults for common parameters
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -146,7 +152,8 @@ Minimal configuration for viewing a single collection:
 
 ### With Imagery Visualization
 
-Add TiTiler for on-the-fly tile generation:
+Add TiTiler for on-the-fly tile generation. Note that `assets` will be auto-configured
+based on the collection's STAC metadata if not specified:
 
 ```json
 {
