@@ -158,11 +158,7 @@ const ViewSelector = () => {
             </Tooltip>
 
             <Tooltip
-              title={
-                !canUseScene
-                  ? `Zoom to level ${sceneMinZoom} or higher for scene view`
-                  : ''
-              }
+              title={!canUseScene ? `Zoom in for scene view` : ''}
               arrow
               disableInteractive
             >
