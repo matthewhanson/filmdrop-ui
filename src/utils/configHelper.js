@@ -390,7 +390,7 @@ export async function autoConfigureCollections(apiUrl, config) {
     const collectionIds = collections.map((c) => c.id).filter(Boolean)
 
     // Filter COLLECTIONS_CONFIG to only include collections that are being used
-    let filteredCollectionsConfig = {}
+    const filteredCollectionsConfig = {}
     if (
       config.COLLECTIONS_CONFIG &&
       typeof config.COLLECTIONS_CONFIG === 'object'

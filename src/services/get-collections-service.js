@@ -18,7 +18,7 @@ export async function GetCollectionsService(searchParams) {
   // Build custom headers for authentication
   const customHeaders = {}
   if (JWT && isSTACTokenAuthEnabled) {
-    customHeaders['Authorization'] = `Bearer ${JWT}`
+    customHeaders.Authorization = `Bearer ${JWT}`
   }
   appendStacHeaderCookies(requestHeaders)
 

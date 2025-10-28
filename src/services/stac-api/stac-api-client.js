@@ -5,8 +5,6 @@
  * Currently supports fetching the root catalog and collections.
  */
 
-import { STAC_API_CORE, STAC_API_EXTENSIONS } from './stac-api-conformance'
-
 /**
  * Fetches the root catalog from a STAC API
  * @param {string} apiUrl - The base URL of the STAC API
