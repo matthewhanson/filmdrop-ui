@@ -283,8 +283,12 @@ The following fields from the render extension are automatically mapped to `scen
 }
 ```
 
-FilmDrop UI will automatically use the **first render definition** (`true-color` in this example)
-to configure the visualization.
+FilmDrop UI will automatically:
+
+- Store **all render definitions** in the `renders` field of `COLLECTIONS_CONFIG`
+- Use the **first render definition** (`true-color` in this example) to populate `sceneTilerParams` for backwards compatibility
+
+This means you have access to all available render options while maintaining compatibility with existing code that uses `sceneTilerParams`.
 
 #### Overriding Auto-Configuration
 
@@ -382,6 +386,7 @@ improves maintainability.
 {
   "COLLECTIONS_CONFIG": {
     "collection-id": {
+      "renders": {},
       "sceneTilerParams": {},
       "mosaicTilerParams": {},
       "sceneMinZoom": 7,
@@ -395,15 +400,17 @@ improves maintainability.
 
 **Properties:**
 
-| Property                | Type   | Description                                                                                                                 |
-| ----------------------- | ------ | --------------------------------------------------------------------------------------------------------------------------- |
-| `sceneTilerParams`      | Object | TiTiler scene parameters: `assets`, `color_formula`, `bidx`, `rescale`, `expression`, `colormap_name`, `colormap`, `nodata` |
-|                         |        | **Note:** TiTiler automatically reads `nodata` from the COG metadata; only override if needed.                              |
-| `mosaicTilerParams`     | Object | TiTiler mosaic parameters (same as sceneTilerParams)                                                                        |
-| `sceneMinZoom`          | Number | Minimum zoom level required for Scene and Mosaic views (default: 7)                                                         |
-| `popupDisplayFields`    | Array  | STAC property names to display in popup (e.g., `["datetime", "platform"]`)                                                  |
-| `tileLayerParams`       | Object | Leaflet tile layer options (e.g., `minZoom`, `maxZoom`, `opacity`)                                                          |
-| `enhancedDisplayConfig` | Object | Enhanced details configuration with `property_groups` and `asset_groups`                                                    |
+| Property                | Type   | Description                                                                                                                    |
+| ----------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| `renders`               | Object | All render definitions from the STAC Render Extension (auto-populated). Each key is a render name with its TiTiler parameters. |
+|                         |        | **Note:** This field is automatically populated from STAC Collections. The first render is used for `sceneTilerParams`.        |
+| `sceneTilerParams`      | Object | TiTiler scene parameters: `assets`, `color_formula`, `bidx`, `rescale`, `expression`, `colormap_name`, `colormap`, `nodata`    |
+|                         |        | **Note:** TiTiler automatically reads `nodata` from the COG metadata; only override if needed.                                 |
+| `mosaicTilerParams`     | Object | TiTiler mosaic parameters (same as sceneTilerParams)                                                                           |
+| `sceneMinZoom`          | Number | Minimum zoom level required for Scene and Mosaic views (default: 7)                                                            |
+| `popupDisplayFields`    | Array  | STAC property names to display in popup (e.g., `["datetime", "platform"]`)                                                     |
+| `tileLayerParams`       | Object | Leaflet tile layer options (e.g., `minZoom`, `maxZoom`, `opacity`)                                                             |
+| `enhancedDisplayConfig` | Object | Enhanced details configuration with `property_groups` and `asset_groups`                                                       |
 
 **Example:**
 
@@ -411,9 +418,30 @@ improves maintainability.
 {
   "COLLECTIONS_CONFIG": {
     "sentinel-2-l2a": {
+      "renders": {
+        "true-color": {
+          "title": "True Color",
+          "assets": ["red", "green", "blue"],
+          "rescale": ["0,10000,0,10000,0,10000"],
+          "color_formula": "Gamma RGB 3.5"
+        },
+        "false-color": {
+          "title": "False Color (NIR, Red, Green)",
+          "assets": ["nir", "red", "green"],
+          "rescale": ["0,10000,0,10000,0,10000"]
+        },
+        "ndvi": {
+          "title": "NDVI",
+          "expression": "(nir-red)/(nir+red)",
+          "colormap_name": "rdylgn",
+          "rescale": ["-1,1"]
+        }
+      },
       "sceneTilerParams": {
+        "title": "True Color",
         "assets": ["red", "green", "blue"],
-        "color_formula": "Gamma+RGB+3.2+Saturation+0.8+Sigmoidal+RGB+12+0.35"
+        "rescale": ["0,10000,0,10000,0,10000"],
+        "color_formula": "Gamma RGB 3.5"
       },
       "mosaicTilerParams": {
         "assets": ["visual"]
@@ -428,6 +456,9 @@ improves maintainability.
   }
 }
 ```
+
+**Note:** The `renders` field is automatically populated when auto-configuration is enabled. All render definitions from the
+STAC Collection are stored here, while `sceneTilerParams` contains the first (default) render for backwards compatibility.
 
 #### Legacy Format (Deprecated)
 

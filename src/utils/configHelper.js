@@ -484,75 +484,89 @@ export function autoConfigureRendering(config) {
       continue
     }
 
-    // Use the first render definition (or could make this configurable)
-    const defaultRenderKey = renderKeys[0]
-    const renderDef = renders[defaultRenderKey]
-
-    console.log(
-      `Auto-configuring rendering for collection '${collectionId}' using render definition '${defaultRenderKey}'`
-    )
-
     // Initialize collection config if needed
     if (!collectionsConfig[collectionId]) {
       collectionsConfig[collectionId] = {}
     }
+
+    // Store all renders in the new "renders" field
+    collectionsConfig[collectionId].renders = {}
+
+    // Process all render definitions and store them
+    for (const renderKey of renderKeys) {
+      const renderDef = renders[renderKey]
+      const processedRender = {}
+
+      // Required: assets
+      if (renderDef.assets && Array.isArray(renderDef.assets)) {
+        processedRender.assets = renderDef.assets
+      }
+
+      // Optional: rescale
+      if (renderDef.rescale && Array.isArray(renderDef.rescale)) {
+        // Convert [[0,10000],[0,10000],[0,10000]] to "0,10000,0,10000,0,10000"
+        const rescaleFlat = renderDef.rescale.flat().join(',')
+        processedRender.rescale = [rescaleFlat]
+      }
+
+      // Optional: colormap_name
+      if (renderDef.colormap_name) {
+        processedRender.colormap_name = renderDef.colormap_name
+      }
+
+      // Optional: colormap
+      if (renderDef.colormap) {
+        processedRender.colormap = renderDef.colormap
+      }
+
+      // Optional: color_formula
+      if (renderDef.color_formula) {
+        processedRender.color_formula = renderDef.color_formula
+      }
+
+      // Optional: nodata
+      if (renderDef.nodata !== undefined) {
+        processedRender.nodata = renderDef.nodata
+      }
+
+      // Optional: expression
+      if (renderDef.expression) {
+        processedRender.expression = renderDef.expression
+      }
+
+      // Optional: resampling (map to TiTiler's resampling_method)
+      if (renderDef.resampling) {
+        processedRender.resampling = renderDef.resampling
+      }
+
+      // Optional: title (for UI display)
+      if (renderDef.title) {
+        processedRender.title = renderDef.title
+      }
+
+      collectionsConfig[collectionId].renders[renderKey] = processedRender
+    }
+
+    // For backwards compatibility, use the first render definition in sceneTilerParams
+    const defaultRenderKey = renderKeys[0]
+    const defaultRender =
+      collectionsConfig[collectionId].renders[defaultRenderKey]
+
+    console.log(
+      `Auto-configuring rendering for collection '${collectionId}' using render definition '${defaultRenderKey}' (stored ${renderKeys.length} render(s) in 'renders' field)`
+    )
+
     if (!collectionsConfig[collectionId].sceneTilerParams) {
       collectionsConfig[collectionId].sceneTilerParams = {}
     }
 
-    // Map render extension fields to TiTiler parameters
-    const sceneTilerParams = collectionsConfig[collectionId].sceneTilerParams
-
-    // Required: assets
-    if (renderDef.assets && Array.isArray(renderDef.assets)) {
-      sceneTilerParams.assets = renderDef.assets
-    }
-
-    // Optional: rescale
-    if (renderDef.rescale && Array.isArray(renderDef.rescale)) {
-      // Convert [[0,10000],[0,10000],[0,10000]] to "0,10000,0,10000,0,10000"
-      const rescaleFlat = renderDef.rescale.flat().join(',')
-      sceneTilerParams.rescale = [rescaleFlat]
-    }
-
-    // Optional: colormap_name
-    if (renderDef.colormap_name) {
-      sceneTilerParams.colormap_name = renderDef.colormap_name
-    }
-
-    // Optional: colormap
-    if (renderDef.colormap) {
-      sceneTilerParams.colormap = renderDef.colormap
-    }
-
-    // Optional: color_formula
-    if (renderDef.color_formula) {
-      sceneTilerParams.color_formula = renderDef.color_formula
-    }
-
-    // Optional: nodata
-    if (renderDef.nodata !== undefined) {
-      sceneTilerParams.nodata = renderDef.nodata
-    }
-
-    // Optional: expression
-    if (renderDef.expression) {
-      sceneTilerParams.expression = renderDef.expression
-    }
-
-    // Optional: resampling (map to TiTiler's resampling_method)
-    if (renderDef.resampling) {
-      sceneTilerParams.resampling = renderDef.resampling
-    }
+    // Copy the default render to sceneTilerParams for backwards compatibility
+    collectionsConfig[collectionId].sceneTilerParams = { ...defaultRender }
 
     // Initialize tileLayerParams if not present to avoid warnings
     if (!collectionsConfig[collectionId].tileLayerParams) {
       collectionsConfig[collectionId].tileLayerParams = {}
     }
-
-    console.log(
-      `Auto-configured rendering for collection '${collectionId}' with ${Object.keys(sceneTilerParams).length} parameters from '${defaultRenderKey}'`
-    )
   }
 
   return {

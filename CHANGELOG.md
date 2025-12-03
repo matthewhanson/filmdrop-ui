@@ -30,16 +30,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Automatically configures visualization parameters for collections using the [STAC Render Extension](https://github.com/stac-extensions/render)
   - Eliminates need to manually specify TiTiler visualization parameters for collections
   - Only activates when both `STAC_API_URL` and `SCENE_TILER_URL` are configured
-  - Reads `renders` object from STAC Collections and maps to `sceneTilerParams`:
-    - `assets` → Array of asset keys to render
-    - `rescale` → Value ranges for stretching (flattened to comma-separated format)
-    - `colormap_name` → Predefined colormap
-    - `colormap` → Custom colormap object
-    - `color_formula` → Color adjustment formula
-    - `nodata` → No-data value to mask
-    - `expression` → Band math expression
-    - `resampling` → Resampling method
-  - Uses first render definition when multiple are available
+  - Reads `renders` object from STAC Collections and stores all render definitions in `COLLECTIONS_CONFIG`:
+    - All render definitions stored in new `renders` field (e.g., `"true-color"`, `"false-color"`, `"ndvi"`)
+    - First render definition copied to `sceneTilerParams` for backwards compatibility
+    - Each render includes: `title`, `assets`, `rescale`, `colormap_name`, `colormap`, `color_formula`, `nodata`, `expression`, `resampling`
+    - Rescale values flattened to comma-separated format for TiTiler
+  - Preserves all available render options while maintaining backwards compatibility
   - Respects user overrides - skips auto-configuration for collections manually configured
 
   - Added `autoConfigureRendering()` function in `src/utils/configHelper.js`

@@ -363,7 +363,7 @@ describe('ConfigHelper', () => {
       ).toEqual(['red', 'green', 'blue'])
       expect(result.COLLECTIONS_CONFIG.sentinel2.tileLayerParams).toEqual({})
       expect(console.log).toHaveBeenCalledWith(
-        "Auto-configuring rendering for collection 'sentinel2' using render definition 'true-color'"
+        "Auto-configuring rendering for collection 'sentinel2' using render definition 'true-color' (stored 1 render(s) in 'renders' field)"
       )
     })
 
