@@ -65,16 +65,20 @@ const itemRoute = createRoute({
       const { collectionId, itemId } = params
 
       // Wait for appConfig to be loaded (with timeout)
+      // Check for STAC_API_URL as indicator that config is fully loaded
       let appConfig = store.getState().mainSlice.appConfig
       const maxWaitTime = 5000 // 5 seconds
       const startTime = Date.now()
 
-      while (!appConfig && Date.now() - startTime < maxWaitTime) {
+      while (
+        (!appConfig || !appConfig.STAC_API_URL) &&
+        Date.now() - startTime < maxWaitTime
+      ) {
         await new Promise((resolve) => setTimeout(resolve, 100))
         appConfig = store.getState().mainSlice.appConfig
       }
 
-      if (!appConfig) {
+      if (!appConfig || !appConfig.STAC_API_URL) {
         showApplicationAlert('error', 'Configuration failed to load')
         return
       }
