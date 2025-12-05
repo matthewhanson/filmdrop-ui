@@ -29,7 +29,9 @@ import {
   setClickResults,
   setCurrentPopupResult,
   setselectedPopupResultIndex,
-  settabSelected
+  settabSelected,
+  setSelectedCollectionData,
+  setSelectedCollection
 } from './redux/slices/mainSlice'
 import { LoadConfigIntoStateService } from './services/get-config-service'
 
@@ -137,6 +139,19 @@ const itemRoute = createRoute({
         }
         console.error(`Failed to load item: ${collectionId}/${itemId}`, result)
         return
+      }
+
+      // Set selected collection data for map visualization
+      const collectionsData = store.getState().mainSlice.collectionsData
+      const selectedCollection = collectionsData?.find(
+        (c) => c.id === result.collection
+      )
+      if (selectedCollection) {
+        console.log('Router: Setting selected collection:', selectedCollection.id)
+        store.dispatch(setSelectedCollection(selectedCollection.id))
+        store.dispatch(setSelectedCollectionData(selectedCollection))
+      } else {
+        console.warn('Router: Collection data not found for:', result.collection)
       }
 
       // Populate Redux states to trigger component rendering
