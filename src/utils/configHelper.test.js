@@ -104,7 +104,7 @@ describe('ConfigHelper', () => {
         COLLECTIONS: ['collection1', 'collection2'],
         COLLECTIONS_CONFIG: {
           collection1: {
-            sceneTilerParams: { param1: 'value1' },
+            visualizations: { default: { param1: 'value1' } },
             mosaicTilerParams: { param2: 'value2' }
           },
           collection2: {
@@ -130,13 +130,17 @@ describe('ConfigHelper', () => {
 
       const result = normalizeCollectionsConfig(legacyConfig)
 
-      expect(result.COLLECTIONS_CONFIG.collection1.sceneTilerParams).toEqual({
+      expect(
+        result.COLLECTIONS_CONFIG.collection1.visualizations.default
+      ).toEqual({
         param1: 'value1'
       })
-      expect(result.COLLECTIONS_CONFIG.collection2.sceneTilerParams).toEqual({
+      expect(
+        result.COLLECTIONS_CONFIG.collection2.visualizations.default
+      ).toEqual({
         param2: 'value2'
       })
-      expect(result.SCENE_TILER_PARAMS).toBeDefined() // Backward compatibility
+      expect(result.SCENE_TILER_PARAMS).toBeDefined() // Still present for reference
     })
 
     it('should migrate legacy MOSAIC_TILER_PARAMS to COLLECTIONS_CONFIG', () => {
@@ -237,7 +241,9 @@ describe('ConfigHelper', () => {
 
       const result = normalizeCollectionsConfig(legacyConfig)
 
-      expect(result.COLLECTIONS_CONFIG.collection1.sceneTilerParams).toEqual({
+      expect(
+        result.COLLECTIONS_CONFIG.collection1.visualizations.default
+      ).toEqual({
         scene: 'param1'
       })
       expect(result.COLLECTIONS_CONFIG.collection1.mosaicTilerParams).toEqual({
@@ -332,7 +338,7 @@ describe('ConfigHelper', () => {
       }
 
       const result = autoConfigureRendering(config)
-      expect(result.COLLECTIONS_CONFIG.col1.sceneTilerParams).toBeUndefined()
+      expect(result.COLLECTIONS_CONFIG.col1.visualizations).toBeUndefined()
       expect(console.debug).toHaveBeenCalledWith(
         "No 'renders' found for collection 'col1', skipping rendering auto-configuration"
       )
@@ -358,12 +364,14 @@ describe('ConfigHelper', () => {
       }
 
       const result = autoConfigureRendering(config)
+      // Should populate visualizations field
+      expect(result.COLLECTIONS_CONFIG.sentinel2.visualizations).toBeDefined()
       expect(
-        result.COLLECTIONS_CONFIG.sentinel2.sceneTilerParams.assets
+        result.COLLECTIONS_CONFIG.sentinel2.visualizations['true-color'].assets
       ).toEqual(['red', 'green', 'blue'])
       expect(result.COLLECTIONS_CONFIG.sentinel2.tileLayerParams).toEqual({})
       expect(console.log).toHaveBeenCalledWith(
-        "Auto-configuring rendering for collection 'sentinel2' using render definition 'true-color' (stored 1 render(s) in 'renders' field)"
+        "Auto-configured visualizations for collection 'sentinel2': stored 1 visualization(s) (default: 'true-color')"
       )
     })
 
@@ -394,7 +402,7 @@ describe('ConfigHelper', () => {
       }
 
       const result = autoConfigureRendering(config)
-      const params = result.COLLECTIONS_CONFIG.landsat.sceneTilerParams
+      const params = result.COLLECTIONS_CONFIG.landsat.visualizations['swir']
 
       expect(params.assets).toEqual(['swir22', 'nir', 'red'])
       expect(params.rescale).toEqual(['0,5000,0,7000,0,9000'])
@@ -426,7 +434,7 @@ describe('ConfigHelper', () => {
       }
 
       const result = autoConfigureRendering(config)
-      const params = result.COLLECTIONS_CONFIG.ndvi.sceneTilerParams
+      const params = result.COLLECTIONS_CONFIG.ndvi.visualizations.ndvi
 
       expect(params.assets).toEqual(['nir', 'red'])
       expect(params.expression).toEqual('(nir-red)/(nir+red)')
@@ -460,7 +468,7 @@ describe('ConfigHelper', () => {
       }
 
       const result = autoConfigureRendering(config)
-      const params = result.COLLECTIONS_CONFIG.dem.sceneTilerParams
+      const params = result.COLLECTIONS_CONFIG.dem.visualizations.elevation
 
       expect(params.assets).toEqual(['data'])
       expect(params.colormap).toEqual({
@@ -471,14 +479,16 @@ describe('ConfigHelper', () => {
       expect(params.nodata).toEqual(-9999)
     })
 
-    it('should skip collections with user-configured sceneTilerParams', () => {
+    it('should skip collections with user-configured visualizations', () => {
       const config = {
         SCENE_TILER_URL: 'https://example.com/titiler',
         COLLECTIONS_CONFIG: {
           col1: {
-            sceneTilerParams: {
-              assets: ['custom-asset'],
-              color_formula: 'custom'
+            visualizations: {
+              'custom-vis': {
+                assets: ['custom-asset'],
+                color_formula: 'custom'
+              }
             }
           }
         },
@@ -495,14 +505,15 @@ describe('ConfigHelper', () => {
       }
 
       const result = autoConfigureRendering(config)
-      expect(result.COLLECTIONS_CONFIG.col1.sceneTilerParams.assets).toEqual([
-        'custom-asset'
-      ])
       expect(
-        result.COLLECTIONS_CONFIG.col1.sceneTilerParams.color_formula
+        result.COLLECTIONS_CONFIG.col1.visualizations['custom-vis'].assets
+      ).toEqual(['custom-asset'])
+      expect(
+        result.COLLECTIONS_CONFIG.col1.visualizations['custom-vis']
+          .color_formula
       ).toEqual('custom')
       expect(console.debug).toHaveBeenCalledWith(
-        "Skipping rendering auto-configuration for 'col1' - already configured"
+        "Skipping rendering auto-configuration for 'col1' - visualizations already configured"
       )
     })
 
@@ -529,11 +540,12 @@ describe('ConfigHelper', () => {
 
       const result = autoConfigureRendering(config)
       // Should use the first one (true-color)
-      expect(result.COLLECTIONS_CONFIG.col1.sceneTilerParams.assets).toEqual([
-        'red',
-        'green',
-        'blue'
-      ])
+      expect(
+        result.COLLECTIONS_CONFIG.col1.visualizations['true-color'].assets
+      ).toEqual(['red', 'green', 'blue'])
+      expect(
+        result.COLLECTIONS_CONFIG.col1.visualizations['false-color'].assets
+      ).toEqual(['nir', 'red', 'green'])
     })
 
     it('should handle empty renders object', () => {
@@ -551,7 +563,7 @@ describe('ConfigHelper', () => {
       }
 
       const result = autoConfigureRendering(config)
-      expect(result.COLLECTIONS_CONFIG.col1.sceneTilerParams).toBeUndefined()
+      expect(result.COLLECTIONS_CONFIG.col1.visualizations).toBeUndefined()
       expect(console.debug).toHaveBeenCalledWith(
         "Collection 'col1' has empty 'renders' object"
       )
@@ -565,7 +577,7 @@ describe('ConfigHelper', () => {
           COLLECTIONS: ['collection1', 'collection2'],
           COLLECTIONS_CONFIG: {
             collection1: {
-              sceneTilerParams: { scene: 'value1' },
+              visualizations: { default: { scene: 'value1' } },
               popupDisplayFields: ['field1', 'field2']
             },
             collection2: {
@@ -577,12 +589,12 @@ describe('ConfigHelper', () => {
     })
 
     it('should retrieve value from COLLECTIONS_CONFIG (new format)', () => {
-      const result = getCollectionConfig('collection1', 'sceneTilerParams')
-      expect(result).toEqual({ scene: 'value1' })
+      const result = getCollectionConfig('collection1', 'visualizations')
+      expect(result).toEqual({ default: { scene: 'value1' } })
     })
 
     it('should return undefined if collection does not exist', () => {
-      const result = getCollectionConfig('nonexistent', 'sceneTilerParams')
+      const result = getCollectionConfig('nonexistent', 'visualizations')
       expect(result).toBeUndefined()
     })
 
@@ -591,50 +603,56 @@ describe('ConfigHelper', () => {
       expect(result).toBeUndefined()
     })
 
-    it('should fall back to legacy parameter if not in COLLECTIONS_CONFIG', () => {
+    it('should work with visualizations parameter', () => {
       store.dispatch(
         setappConfig({
           COLLECTIONS: ['collection1'],
-          SCENE_TILER_PARAMS: {
-            collection1: { legacy: 'value' }
-          },
           COLLECTIONS_CONFIG: {
-            collection1: {} // No sceneTilerParams in new config
+            collection1: {
+              visualizations: {
+                'true-color': { assets: ['red', 'green', 'blue'] }
+              }
+            }
           }
         })
       )
 
-      const result = getCollectionConfig('collection1', 'sceneTilerParams')
-      expect(result).toEqual({ legacy: 'value' })
+      const result = getCollectionConfig('collection1', 'visualizations')
+      expect(result).toEqual({
+        'true-color': { assets: ['red', 'green', 'blue'] }
+      })
     })
 
     it('should use custom config when provided as third parameter', () => {
       const customConfig = {
         COLLECTIONS_CONFIG: {
           testCollection: {
-            sceneTilerParams: { custom: 'test' }
+            visualizations: { default: { custom: 'test' } }
           }
         }
       }
 
       const result = getCollectionConfig(
         'testCollection',
-        'sceneTilerParams',
+        'visualizations',
         customConfig
       )
-      expect(result).toEqual({ custom: 'test' })
+      expect(result).toEqual({ default: { custom: 'test' } })
     })
 
-    it('should handle all parameter type mappings', () => {
+    it('should handle all parameter types from COLLECTIONS_CONFIG', () => {
       store.dispatch(
         setappConfig({
           COLLECTIONS: ['col1'],
-          MOSAIC_TILER_PARAMS: { col1: { m: '1' } },
-          SEARCH_MIN_ZOOM_LEVELS: { col1: { medium: 5, high: 7 } },
-          POPUP_DISPLAY_FIELDS: { col1: ['f1'] },
-          TILE_LAYER_PARAMS: { col1: { t: '1' } },
-          ENHANCED_DISPLAY_CONFIG: { col1: { e: '1' } },
-          COLLECTIONS_CONFIG: { col1: {} }
+          COLLECTIONS_CONFIG: {
+            col1: {
+              mosaicTilerParams: { m: '1' },
+              sceneMinZoom: 7,
+              popupDisplayFields: ['f1'],
+              tileLayerParams: { t: '1' },
+              enhancedDisplayConfig: { e: '1' }
+            }
+          }
         })
       )
 
@@ -651,23 +669,20 @@ describe('ConfigHelper', () => {
       })
     })
 
-    it('should prioritize COLLECTIONS_CONFIG over legacy parameters', () => {
+    it('should retrieve visualizations from COLLECTIONS_CONFIG', () => {
       store.dispatch(
         setappConfig({
           COLLECTIONS: ['collection1'],
-          SCENE_TILER_PARAMS: {
-            collection1: { legacy: 'old' }
-          },
           COLLECTIONS_CONFIG: {
             collection1: {
-              sceneTilerParams: { new: 'value' }
+              visualizations: { default: { new: 'value' } }
             }
           }
         })
       )
 
-      const result = getCollectionConfig('collection1', 'sceneTilerParams')
-      expect(result).toEqual({ new: 'value' })
+      const result = getCollectionConfig('collection1', 'visualizations')
+      expect(result).toEqual({ default: { new: 'value' } })
     })
   })
 })

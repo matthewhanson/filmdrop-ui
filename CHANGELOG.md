@@ -31,17 +31,23 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Eliminates need to manually specify TiTiler visualization parameters for collections
   - Only activates when both `STAC_API_URL` and `SCENE_TILER_URL` are configured
   - Reads `renders` object from STAC Collections and stores all render definitions in `COLLECTIONS_CONFIG`:
-    - All render definitions stored in new `renders` field (e.g., `"true-color"`, `"false-color"`, `"ndvi"`)
-    - First render definition copied to `sceneTilerParams` for backwards compatibility
-    - Each render includes: `title`, `assets`, `rescale`, `colormap_name`, `colormap`, `color_formula`, `nodata`, `expression`, `resampling`
+    - All render definitions stored in `visualizations` field (e.g., `"true-color"`, `"false-color"`, `"ndvi"`)
+    - First visualization is used as the default for rendering
+    - Each visualization includes: `title`, `assets`, `rescale`, `colormap_name`, `colormap`, `color_formula`, `nodata`, `expression`, `resampling`
     - Rescale values flattened to comma-separated format for TiTiler
-  - Preserves all available render options while maintaining backwards compatibility
+  - Preserves all available visualization options for future UI enhancements (e.g., visualization selector)
   - Respects user overrides - skips auto-configuration for collections manually configured
-
   - Added `autoConfigureRendering()` function in `src/utils/configHelper.js`
   - Comprehensive test coverage (10 new tests)
   - Full documentation in `CONFIGURATION.md`
 
+### Changed
+
+- Replaced `sceneTilerParams` with `visualizations` field:
+  - Old configs with `SCENE_TILER_PARAMS` are automatically upgraded to `visualizations` dictionary
+  - Old `SCENE_TILER_PARAMS` converted to `visualizations: { "default": {...} }`
+  - Use the new `visualizations` field for defining multiple rendering options
+  - This change enables future UI enhancements like visualization selectors
 - Added sensible defaults and auto-population for configuration to reduce required parameters:
   - Added `applyConfigDefaults()` function in `src/utils/configHelper.js` to centralize default value handling
   - `BASEMAP` now defaults to OpenStreetMap if not provided in config

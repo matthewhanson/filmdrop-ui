@@ -386,7 +386,7 @@ improves maintainability.
 {
   "COLLECTIONS_CONFIG": {
     "collection-id": {
-      "renders": {},
+      "visualizations": {},
       "sceneTilerParams": {},
       "mosaicTilerParams": {},
       "sceneMinZoom": 7,
@@ -400,17 +400,15 @@ improves maintainability.
 
 **Properties:**
 
-| Property                | Type   | Description                                                                                                                    |
-| ----------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------ |
-| `renders`               | Object | All render definitions from the STAC Render Extension (auto-populated). Each key is a render name with its TiTiler parameters. |
-|                         |        | **Note:** This field is automatically populated from STAC Collections. The first render is used for `sceneTilerParams`.        |
-| `sceneTilerParams`      | Object | TiTiler scene parameters: `assets`, `color_formula`, `bidx`, `rescale`, `expression`, `colormap_name`, `colormap`, `nodata`    |
-|                         |        | **Note:** TiTiler automatically reads `nodata` from the COG metadata; only override if needed.                                 |
-| `mosaicTilerParams`     | Object | TiTiler mosaic parameters (same as sceneTilerParams)                                                                           |
-| `sceneMinZoom`          | Number | Minimum zoom level required for Scene and Mosaic views (default: 7)                                                            |
-| `popupDisplayFields`    | Array  | STAC property names to display in popup (e.g., `["datetime", "platform"]`)                                                     |
-| `tileLayerParams`       | Object | Leaflet tile layer options (e.g., `minZoom`, `maxZoom`, `opacity`)                                                             |
-| `enhancedDisplayConfig` | Object | Enhanced details configuration with `property_groups` and `asset_groups`                                                       |
+| Property                | Type   | Description                                                                                                                   |
+| ----------------------- | ------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| `visualizations`        | Object | Dictionary of visualization definitions, keyed by name. Auto-populated from STAC Render Extension when available.             |
+|                         |        | **Note:** This is the recommended way to define visualizations. The first visualization is used as the default for rendering. |
+| `mosaicTilerParams`     | Object | TiTiler mosaic parameters (same structure as sceneTilerParams)                                                                |
+| `sceneMinZoom`          | Number | Minimum zoom level required for Scene and Mosaic views (default: 7)                                                           |
+| `popupDisplayFields`    | Array  | STAC property names to display in popup (e.g., `["datetime", "platform"]`)                                                    |
+| `tileLayerParams`       | Object | Leaflet tile layer options (e.g., `minZoom`, `maxZoom`, `opacity`)                                                            |
+| `enhancedDisplayConfig` | Object | Enhanced details configuration with `property_groups` and `asset_groups`                                                      |
 
 **Example:**
 
@@ -418,7 +416,7 @@ improves maintainability.
 {
   "COLLECTIONS_CONFIG": {
     "sentinel-2-l2a": {
-      "renders": {
+      "visualizations": {
         "true-color": {
           "title": "True Color",
           "assets": ["red", "green", "blue"],
@@ -432,16 +430,11 @@ improves maintainability.
         },
         "ndvi": {
           "title": "NDVI",
+          "assets": ["nir", "red"],
           "expression": "(nir-red)/(nir+red)",
           "colormap_name": "rdylgn",
           "rescale": ["-1,1"]
         }
-      },
-      "sceneTilerParams": {
-        "title": "True Color",
-        "assets": ["red", "green", "blue"],
-        "rescale": ["0,10000,0,10000,0,10000"],
-        "color_formula": "Gamma RGB 3.5"
       },
       "mosaicTilerParams": {
         "assets": ["visual"]
@@ -457,14 +450,14 @@ improves maintainability.
 }
 ```
 
-**Note:** The `renders` field is automatically populated when auto-configuration is enabled. All render definitions from the
-STAC Collection are stored here, while `sceneTilerParams` contains the first (default) render for backwards compatibility.
+**Note:** The `visualizations` field is automatically populated when auto-configuration is enabled. All render definitions from
+the STAC Collection are stored here. The first visualization is used as the default for rendering.
 
 #### Legacy Format (Deprecated)
 
 The following parameters are **deprecated** but still supported for backward compatibility:
 
-- `SCENE_TILER_PARAMS`
+- `SCENE_TILER_PARAMS` - Converted to `visualizations` dictionary with key `"default"`
 - `MOSAIC_TILER_PARAMS`
 - `SEARCH_MIN_ZOOM_LEVELS` - Legacy format `{ "medium": number, "high": number }` converted to `sceneMinZoom` (uses the "high" value)
 - `POPUP_DISPLAY_FIELDS`

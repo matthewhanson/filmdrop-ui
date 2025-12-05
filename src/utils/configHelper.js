@@ -222,8 +222,10 @@ export function normalizeCollectionsConfig(config) {
     collectionsConfig[collectionId] = {}
 
     if (config.SCENE_TILER_PARAMS?.[collectionId]) {
-      collectionsConfig[collectionId].sceneTilerParams =
-        config.SCENE_TILER_PARAMS[collectionId]
+      // Upgrade old sceneTilerParams to visualizations dictionary
+      collectionsConfig[collectionId].visualizations = {
+        default: config.SCENE_TILER_PARAMS[collectionId]
+      }
     }
     if (config.MOSAIC_TILER_PARAMS?.[collectionId]) {
       collectionsConfig[collectionId].mosaicTilerParams =
@@ -283,9 +285,9 @@ export function normalizeCollectionsConfig(config) {
 }
 
 /**
- * Gets collection-specific config parameter using new or legacy structure
+ * Gets collection-specific config parameter from COLLECTIONS_CONFIG
  * @param {string} collectionId - The collection ID
- * @param {string} paramName - Parameter name ('sceneTilerParams', 'mosaicTilerParams', etc.)
+ * @param {string} paramName - Parameter name ('visualizations', 'mosaicTilerParams', etc.)
  * @param {Object} config - Optional config object for testing (uses store if not provided)
  * @returns {*} - The parameter value or undefined
  */
@@ -293,32 +295,7 @@ export function getCollectionConfig(collectionId, paramName, config = null) {
   const appConfig = config || store.getState().mainSlice.appConfig
   if (!appConfig) return undefined
 
-  // Try new structure first
-  if (appConfig.COLLECTIONS_CONFIG?.[collectionId]?.[paramName]) {
-    return appConfig.COLLECTIONS_CONFIG[collectionId][paramName]
-  }
-
-  // Fall back to legacy structure
-  const legacyParamMap = {
-    sceneTilerParams: 'SCENE_TILER_PARAMS',
-    mosaicTilerParams: 'MOSAIC_TILER_PARAMS',
-    sceneMinZoom: 'SEARCH_MIN_ZOOM_LEVELS',
-    popupDisplayFields: 'POPUP_DISPLAY_FIELDS',
-    tileLayerParams: 'TILE_LAYER_PARAMS',
-    enhancedDisplayConfig: 'ENHANCED_DISPLAY_CONFIG'
-  }
-
-  const legacyParam = legacyParamMap[paramName]
-  if (legacyParam && appConfig[legacyParam]?.[collectionId]) {
-    const legacyValue = appConfig[legacyParam][collectionId]
-    // Special handling for sceneMinZoom: extract 'high' value from legacy object
-    if (paramName === 'sceneMinZoom' && typeof legacyValue === 'object') {
-      return legacyValue.high || legacyValue
-    }
-    return legacyValue
-  }
-
-  return undefined
+  return appConfig.COLLECTIONS_CONFIG?.[collectionId]?.[paramName]
 }
 
 /**
@@ -436,7 +413,7 @@ export async function autoConfigureCollections(apiUrl, config) {
 /**
  * Auto-configures TiTiler rendering for collections based on STAC render extension
  * @param {Object} config - The configuration object with _STAC_COLLECTIONS
- * @returns {Object} - Config with auto-configured sceneTilerParams
+ * @returns {Object} - Config with auto-configured visualizations
  */
 export function autoConfigureRendering(config) {
   // If no SCENE_TILER_URL is configured, skip rendering auto-configuration
@@ -458,13 +435,13 @@ export function autoConfigureRendering(config) {
   for (const collection of config._STAC_COLLECTIONS) {
     const collectionId = collection.id
 
-    // Skip if user has already configured sceneTilerParams for this collection
+    // Skip if user has already configured visualizations for this collection
     if (
-      collectionsConfig[collectionId]?.sceneTilerParams &&
-      Object.keys(collectionsConfig[collectionId].sceneTilerParams).length > 0
+      collectionsConfig[collectionId]?.visualizations &&
+      Object.keys(collectionsConfig[collectionId].visualizations).length > 0
     ) {
       console.debug(
-        `Skipping rendering auto-configuration for '${collectionId}' - already configured`
+        `Skipping rendering auto-configuration for '${collectionId}' - visualizations already configured`
       )
       continue
     }
@@ -489,8 +466,8 @@ export function autoConfigureRendering(config) {
       collectionsConfig[collectionId] = {}
     }
 
-    // Store all renders in the new "renders" field
-    collectionsConfig[collectionId].renders = {}
+    // Store all renders in the new "visualizations" field
+    collectionsConfig[collectionId].visualizations = {}
 
     // Process all render definitions and store them
     for (const renderKey of renderKeys) {
@@ -544,24 +521,18 @@ export function autoConfigureRendering(config) {
         processedRender.title = renderDef.title
       }
 
-      collectionsConfig[collectionId].renders[renderKey] = processedRender
+      collectionsConfig[collectionId].visualizations[renderKey] =
+        processedRender
     }
 
-    // For backwards compatibility, use the first render definition in sceneTilerParams
+    // The first visualization is used as the default
     const defaultRenderKey = renderKeys[0]
     const defaultRender =
-      collectionsConfig[collectionId].renders[defaultRenderKey]
+      collectionsConfig[collectionId].visualizations[defaultRenderKey]
 
     console.log(
-      `Auto-configuring rendering for collection '${collectionId}' using render definition '${defaultRenderKey}' (stored ${renderKeys.length} render(s) in 'renders' field)`
+      `Auto-configured visualizations for collection '${collectionId}': stored ${renderKeys.length} visualization(s) (default: '${defaultRenderKey}')`
     )
-
-    if (!collectionsConfig[collectionId].sceneTilerParams) {
-      collectionsConfig[collectionId].sceneTilerParams = {}
-    }
-
-    // Copy the default render to sceneTilerParams for backwards compatibility
-    collectionsConfig[collectionId].sceneTilerParams = { ...defaultRender }
 
     // Initialize tileLayerParams if not present to avoid warnings
     if (!collectionsConfig[collectionId].tileLayerParams) {

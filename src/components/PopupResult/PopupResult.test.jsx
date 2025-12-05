@@ -38,7 +38,13 @@ describe('PopupResult', () => {
     it('should render other properties only if POPUP_DISPLAY_FIELDS set in config and collection exists in app', () => {
       const mockAppConfigSearchEnabled = {
         ...mockAppConfig,
-        POPUP_DISPLAY_FIELDS: { 'cop-dem-glo-30': ['datetime'] }
+        COLLECTIONS_CONFIG: {
+          ...mockAppConfig.COLLECTIONS_CONFIG,
+          'cop-dem-glo-30': {
+            ...mockAppConfig.COLLECTIONS_CONFIG?.['cop-dem-glo-30'],
+            popupDisplayFields: ['datetime']
+          }
+        }
       }
       store.dispatch(setappConfig(mockAppConfigSearchEnabled))
       store.dispatch(setSelectedCollectionData(mockCollectionsData[0]))
@@ -49,7 +55,13 @@ describe('PopupResult', () => {
     it('should not render other properties if POPUP_DISPLAY_FIELDS set in config but collection does not exists in app', () => {
       const mockAppConfigSearchEnabled = {
         ...mockAppConfig,
-        POPUP_DISPLAY_FIELDS: { 'sentinel-2-l2a': ['datetime'] }
+        COLLECTIONS_CONFIG: {
+          ...mockAppConfig.COLLECTIONS_CONFIG,
+          'sentinel-2-l2a': {
+            ...mockAppConfig.COLLECTIONS_CONFIG?.['sentinel-2-l2a'],
+            popupDisplayFields: ['datetime']
+          }
+        }
       }
       store.dispatch(setappConfig(mockAppConfigSearchEnabled))
       store.dispatch(setSelectedCollectionData(mockCollectionsData[0]))
