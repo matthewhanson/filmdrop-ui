@@ -34,7 +34,6 @@ import {
   setSelectedCollection
 } from './redux/slices/mainSlice'
 import { LoadConfigIntoStateService } from './services/get-config-service'
-import { GetCollectionsService } from './services/get-collections-service'
 
 // Root route renders App component
 const rootRoute = createRootRoute({
@@ -107,19 +106,13 @@ const itemRoute = createRoute({
         return
       }
 
-      // Ensure collections data is loaded
+      // Wait for collections data to be loaded (triggered by App.jsx)
+      console.log('Router: Waiting for collections data to load')
       let collectionsData = store.getState().mainSlice.collectionsData
-
-      if (!collectionsData || collectionsData.length === 0) {
-        console.log(
-          'Router: Collections not loaded, triggering GetCollectionsService'
-        )
-        await GetCollectionsService()
-      }
-
-      // Wait for collections data to be loaded
       startTime = Date.now()
-      while (Date.now() - startTime < maxWaitTime) {
+      const collectionsMaxWaitTime = 10000 // 10 seconds for collections
+
+      while (Date.now() - startTime < collectionsMaxWaitTime) {
         collectionsData = store.getState().mainSlice.collectionsData
 
         if (collectionsData && collectionsData.length > 0) {
@@ -127,7 +120,7 @@ const itemRoute = createRoute({
           break
         }
 
-        await new Promise((resolve) => setTimeout(resolve, 50))
+        await new Promise((resolve) => setTimeout(resolve, 100))
       }
 
       if (!collectionsData || collectionsData.length === 0) {
