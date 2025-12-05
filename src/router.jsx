@@ -64,6 +64,21 @@ const itemRoute = createRoute({
       // TanStack Router automatically decodes path parameters
       const { collectionId, itemId } = params
 
+      // Wait for appConfig to be loaded (with timeout)
+      let appConfig = store.getState().mainSlice.appConfig
+      const maxWaitTime = 5000 // 5 seconds
+      const startTime = Date.now()
+
+      while (!appConfig && Date.now() - startTime < maxWaitTime) {
+        await new Promise((resolve) => setTimeout(resolve, 100))
+        appConfig = store.getState().mainSlice.appConfig
+      }
+
+      if (!appConfig) {
+        showApplicationAlert('error', 'Configuration failed to load')
+        return
+      }
+
       // Validate collection exists in configuration
       const collectionConfig = getCollectionConfig(collectionId, 'sceneMinZoom')
       if (!collectionConfig) {
