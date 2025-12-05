@@ -31,6 +31,7 @@ import {
   setselectedPopupResultIndex,
   settabSelected
 } from './redux/slices/mainSlice'
+import { LoadConfigIntoStateService } from './services/get-config-service'
 
 // Root route renders App component
 const rootRoute = createRootRoute({
@@ -64,9 +65,15 @@ const itemRoute = createRoute({
       // TanStack Router automatically decodes path parameters
       const { collectionId, itemId } = params
 
-      // Wait for appConfig to be loaded and normalized (with timeout)
-      // Check for both STAC_API_URL and COLLECTIONS_CONFIG/legacy params
+      // Ensure config is loaded - trigger load if not already loading
       let appConfig = store.getState().mainSlice.appConfig
+      
+      if (!appConfig || !appConfig.STAC_API_URL) {
+        console.log('Router: Config not loaded, triggering LoadConfigIntoStateService')
+        await LoadConfigIntoStateService()
+      }
+      
+      // Wait for appConfig to be loaded and normalized (with timeout)
       const maxWaitTime = 5000 // 5 seconds
       const startTime = Date.now()
 
@@ -82,10 +89,11 @@ const itemRoute = createRoute({
         )
         
         if (hasBasicConfig && hasCollectionsConfig) {
+          console.log('Router: Config loaded successfully')
           break
         }
         
-        await new Promise((resolve) => setTimeout(resolve, 100))
+        await new Promise((resolve) => setTimeout(resolve, 50))
       }
 
       if (!appConfig || !appConfig.STAC_API_URL) {
