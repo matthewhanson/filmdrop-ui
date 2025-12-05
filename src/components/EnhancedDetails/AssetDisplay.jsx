@@ -1,12 +1,12 @@
 import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
-import { getFileType } from '../../utils/defaultAssetGrouping.js'
+import { getFileType, isThumbnail } from '../../utils/defaultAssetGrouping.js'
 import BaseAssetDisplay from './BaseAssetDisplay.jsx'
 
 /**
  * Displays STAC asset links, excluding thumbnails
  */
-const AssetDisplay = ({ assets, className = 'asset-list' }) => {
+const AssetDisplay = React.memo(({ assets, className = 'asset-list' }) => {
   // Filter out thumbnails and group by file type
   const groupedAssets = useMemo(() => {
     if (!assets || Object.keys(assets).length === 0) {
@@ -14,16 +14,9 @@ const AssetDisplay = ({ assets, className = 'asset-list' }) => {
     }
 
     // Filter out thumbnails
-    const filteredAssets = Object.entries(assets).filter(([key, asset]) => {
-      if (
-        key.toLowerCase().includes('thumbnail') ||
-        key.toLowerCase().includes('preview') ||
-        (asset.title && asset.title.toLowerCase().includes('thumbnail'))
-      ) {
-        return false
-      }
-      return true
-    })
+    const filteredAssets = Object.entries(assets).filter(
+      ([key, asset]) => !isThumbnail(key, asset)
+    )
 
     if (filteredAssets.length === 0) {
       return []
@@ -52,11 +45,13 @@ const AssetDisplay = ({ assets, className = 'asset-list' }) => {
       className={className}
     />
   )
-}
+})
 
 AssetDisplay.propTypes = {
   assets: PropTypes.object,
   className: PropTypes.string
 }
+
+AssetDisplay.displayName = 'AssetDisplay'
 
 export default AssetDisplay

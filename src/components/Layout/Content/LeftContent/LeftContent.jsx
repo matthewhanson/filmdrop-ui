@@ -1,22 +1,19 @@
-import { React, useEffect, useCallback } from 'react'
+import { React, useEffect, useCallback, useRef } from 'react'
 import './LeftContent.css'
 import Search from '../../../Search/Search'
 import PopupResults from '../../../PopupResults/PopupResults'
-import EnhancedDetailsTab from '../../../EnhancedDetailsTab/EnhancedDetailsTab'
 import { useSelector, useDispatch } from 'react-redux'
 import { debounceNewSearch } from '../../../../utils/searchHelper'
 import {
   settabSelected,
-  sethasLeftPanelTabChanged,
-  setIsEnhancedDetailsExpanded
+  sethasLeftPanelTabChanged
 } from '../../../../redux/slices/mainSlice'
-import {
-  KeyboardDoubleArrowRight,
-  KeyboardDoubleArrowLeft
-} from '@mui/icons-material'
+import { useResizablePanel } from '../../../../hooks/useResizablePanel'
+import DragHandleIcon from '@mui/icons-material/DragHandle'
 
 const LeftContent = () => {
   const dispatch = useDispatch()
+  const panelRef = useRef(null)
 
   const _clickResults = useSelector((state) => state.mainSlice.clickResults)
   const _searchLoading = useSelector((state) => state.mainSlice.searchLoading)
@@ -24,9 +21,11 @@ const LeftContent = () => {
     (state) => state.mainSlice.isDrawingEnabled
   )
   const _tabSelected = useSelector((state) => state.mainSlice.tabSelected)
-  const _isEnhancedDetailsExpanded = useSelector(
-    (state) => state.mainSlice.isEnhancedDetailsExpanded
+  const _isLeftPanelVisible = useSelector(
+    (state) => state.mainSlice.isLeftPanelVisible
   )
+
+  const { handleMouseDown, currentWidth } = useResizablePanel(panelRef)
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyPress)
@@ -43,31 +42,18 @@ const LeftContent = () => {
 
   const setFiltersTab = useCallback(() => {
     dispatch(settabSelected('filters'))
-    // Collapse Enhanced Details when switching to other tabs
-    if (_isEnhancedDetailsExpanded) {
-      dispatch(setIsEnhancedDetailsExpanded(false))
-    }
-  }, [dispatch, _isEnhancedDetailsExpanded])
+  }, [dispatch])
 
   const setDetailsTab = useCallback(() => {
     dispatch(settabSelected('details'))
     dispatch(sethasLeftPanelTabChanged(true))
-    // Collapse Enhanced Details when switching to other tabs
-    if (_isEnhancedDetailsExpanded) {
-      dispatch(setIsEnhancedDetailsExpanded(false))
-    }
-  }, [dispatch, _isEnhancedDetailsExpanded])
-
-  const setEnhancedDetailsTab = useCallback(() => {
-    dispatch(settabSelected('enhanced'))
-    dispatch(sethasLeftPanelTabChanged(true))
-    // Toggle expansion state
-    dispatch(setIsEnhancedDetailsExpanded(!_isEnhancedDetailsExpanded))
-  }, [dispatch, _isEnhancedDetailsExpanded])
+  }, [dispatch])
 
   return (
     <div
-      className={`LeftContent ${_isEnhancedDetailsExpanded ? 'expanded' : ''}`}
+      ref={panelRef}
+      className={`LeftContent ${!_isLeftPanelVisible ? 'hidden' : ''}`}
+      style={{ width: _isLeftPanelVisible ? `${currentWidth}px` : '0px' }}
     >
       <div className="LeftContentHolder">
         {_isDrawingEnabled || _searchLoading ? (
@@ -97,29 +83,10 @@ const LeftContent = () => {
           >
             Item Details
           </button>
-          <button
-            className={
-              _tabSelected === 'enhanced'
-                ? `LeftContentTab LeftContentTabSelected ${_isEnhancedDetailsExpanded ? 'enhanced-expanded' : 'enhanced-collapsed'}`
-                : `LeftContentTab ${_isEnhancedDetailsExpanded ? 'enhanced-expanded' : 'enhanced-collapsed'}`
-            }
-            onClick={setEnhancedDetailsTab}
-          >
-            {_isEnhancedDetailsExpanded ? (
-              <>
-                Enhanced Details
-                <KeyboardDoubleArrowLeft />
-              </>
-            ) : (
-              <KeyboardDoubleArrowRight />
-            )}
-          </button>
         </div>
         <div className="LeftContentSelectedTab">
           {_tabSelected === 'filters' ? (
             <Search></Search>
-          ) : _tabSelected === 'enhanced' ? (
-            <EnhancedDetailsTab></EnhancedDetailsTab>
           ) : (
             <div className="ItemDetails">
               <PopupResults results={_clickResults}></PopupResults>
@@ -127,6 +94,16 @@ const LeftContent = () => {
           )}
         </div>
       </div>
+      {_isLeftPanelVisible && (
+        <button
+          className="resize-handle"
+          onMouseDown={handleMouseDown}
+          aria-label="Resize panel"
+          type="button"
+        >
+          <DragHandleIcon className="resize-handle-icon" />
+        </button>
+      )}
     </div>
   )
 }

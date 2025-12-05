@@ -20,6 +20,7 @@
   --black-alpha-70: rgba(0, 0, 0, 0.7);
   --black-alpha-80: rgba(0, 0, 0, 0.8);
   --gray-alpha-80: rgba(34, 34, 34, 0.8);
+  --white-alpha-15: rgba(255, 255, 255, 0.15);
 
   /* App */
   --app-background-disabled: var(--black-alpha-70);
@@ -129,7 +130,10 @@
   --action-button-color-disabled: var(--gray-4);
   --action-button-background-disabled: var(--gray-2);
 
-  /* Enhanced Details Tab */
+  /* Resize Handle */
+  --resize-handle-hover-background: var(--white-alpha-15);
+
+  /* Enhanced Details */
   --enhanced-details-field-label-color: var(--gray-1);
   --enhanced-details-field-value-color: var(--white);
   --enhanced-details-primary-background: var(--blue-gray-4);
@@ -165,6 +169,7 @@
 
   --blue-gray-alpha-60: rgba(108, 117, 125, 0.6);
   --white-alpha-95: rgba(255, 255, 255, 0.95);
+  --white-alpha-08: rgba(0, 0, 0, 0.08);
 
   /* App */
   --app-background-disabled: var(--blue-gray-alpha-60);
@@ -277,7 +282,10 @@
   --action-button-color-disabled: var(--blue-gray-5);
   --action-button-background-disabled: var(--blue-gray-4);
 
-  /* Enhanced Details Tab */
+  /* Resize Handle */
+  --resize-handle-hover-background: var(--white-alpha-08);
+
+  /* Enhanced Details */
   --enhanced-details-field-label-color: var(--blue-gray-7);
   --enhanced-details-field-value-color: var(--blue-gray-8);
   --enhanced-details-primary-background: var(--white);

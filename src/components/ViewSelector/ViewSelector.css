@@ -59,3 +59,9 @@
   background-color: var(--side-panel-button-background-hover);
   box-shadow: none;
 }
+
+.viewSelector .MuiButton-root.Mui-disabled {
+  background-color: var(--side-panel-button-background);
+  color: var(--page-content-color);
+  opacity: 0.5;
+}

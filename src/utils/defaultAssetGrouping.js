@@ -71,7 +71,7 @@ export function getFileType(typeOrUrl) {
  * @param {Object} asset - Asset object
  * @returns {boolean} True if asset is a thumbnail
  */
-function isThumbnail(key, asset) {
+export function isThumbnail(key, asset) {
   const lowerKey = key.toLowerCase()
   const lowerTitle = (asset.title || '').toLowerCase()
 

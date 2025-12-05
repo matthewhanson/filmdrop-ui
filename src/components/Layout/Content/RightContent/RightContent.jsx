@@ -68,17 +68,20 @@ const RightContent = () => {
   const _appName = useSelector((state) => state.mainSlice.appName)
   const _showLayerList = useSelector((state) => state.mainSlice.showLayerList)
   const _currentTheme = useSelector((state) => state.mainSlice.currentTheme)
-  const _isEnhancedDetailsExpanded = useSelector(
-    (state) => state.mainSlice.isEnhancedDetailsExpanded
-  )
   const _selectedCollectionData = useSelector(
     (state) => state.mainSlice.selectedCollectionData
   )
+  const _leftPanelWidth = useSelector((state) => state.mainSlice.leftPanelWidth)
+  const _isLeftPanelVisible = useSelector(
+    (state) => state.mainSlice.isLeftPanelVisible
+  )
+  const _map = useSelector((state) => state.mainSlice.map)
 
   const dispatch = useDispatch()
 
   const abortControllerRef = useRef(null)
   const attributionTimeout = useRef(null)
+  const rightContentRef = useRef(null)
 
   const resultType = _searchType === 'hex' ? 'hex cells' : 'grid cells'
 
@@ -199,9 +202,30 @@ const RightContent = () => {
     dispatch(setshowLayerList(!_showLayerList))
   }
 
+  // Observe RightContent size changes and update map
+  useEffect(() => {
+    if (!rightContentRef.current) return
+
+    const resizeObserver = new ResizeObserver(() => {
+      if (_map && Object.keys(_map).length > 0) {
+        setTimeout(() => _map.invalidateSize(), 100)
+      }
+    })
+
+    resizeObserver.observe(rightContentRef.current)
+    return () => resizeObserver.disconnect()
+  }, [_map])
+
+  const effectiveLeftWidth = _isLeftPanelVisible ? _leftPanelWidth : 0
+
   return (
     <div
-      className={`RightContent ${_isEnhancedDetailsExpanded ? 'expanded' : ''}`}
+      ref={rightContentRef}
+      className="RightContent"
+      style={{
+        width: `calc(100% - ${effectiveLeftWidth}px)`,
+        left: `${effectiveLeftWidth}px`
+      }}
     >
       <LeafMap></LeafMap>
       {_showZoomNotice && (

@@ -1,6 +1,6 @@
 /**
  * ENHANCED FIELD RENDERER
- * React component for rendering STAC fields using React components instead of HTML strings
+ * Render STAC fields using React components
  * Eliminates dangerouslySetInnerHTML usage
  */
 
@@ -9,6 +9,7 @@ import PropTypes from 'prop-types'
 import { getStacFieldType } from '../../utils/fieldDiscovery.js'
 import { extractFieldComponents } from '../../utils/fieldFormatting.js'
 import { FieldDisplay } from './FieldDisplayComponents.jsx'
+import { formatStacDatetime } from '../../utils/datetime.js'
 
 /**
  * Enhanced Field Renderer Component
@@ -26,6 +27,14 @@ const EnhancedFieldRenderer = ({ field, value, item }) => {
 
   // If no components were extracted, fall back to simple text rendering
   if (!components || components.length === 0) {
+    // Smart datetime detection: check if value matches ISO 8601 datetime format
+    // Matches patterns like: 2022-11-03T13:21:10.730Z, 2022-11-03T13:21:10Z, etc.
+    if (
+      typeof value === 'string' &&
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(value)
+    ) {
+      return formatStacDatetime(value)
+    }
     return String(value || '')
   }
 

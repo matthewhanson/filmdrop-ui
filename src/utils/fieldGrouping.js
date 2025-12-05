@@ -66,3 +66,12 @@ export function createEnhancedDisplayFieldPredicate(
   // If no config exists for this collection, show all fields (fallback to auto-discovery)
   return () => true
 }
+
+/**
+ * Normalize group name for use in HTML attributes
+ * @param {string} groupName - The group name
+ * @returns {string} Normalized name (lowercase with hyphens)
+ */
+export function normalizeGroupName(groupName) {
+  return (groupName || '').toLowerCase().replace(/\s+/g, '-')
+}

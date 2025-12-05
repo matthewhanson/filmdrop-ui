@@ -27,8 +27,69 @@ const AssetItem = React.memo(({ asset, copiedUrl, onCopyToClipboard }) => {
   const detailsString = detailsParts.join(' | ')
 
   return (
-    <div role="listitem">
-      <div className="asset-title-row">
+    <div role="listitem" className="asset-card">
+      <div className="asset-content">
+        <div className="asset-title-row">
+          <Tooltip
+            title={copiedUrl === asset.key ? 'Copied!' : 'Click to copy link'}
+            placement="top-start"
+            arrow
+            slotProps={{
+              tooltip: {
+                className: 'tooltip-enhancedDetails'
+              }
+            }}
+          >
+            <span
+              className="field-label-inline copy-target"
+              role="button"
+              tabIndex={0}
+              onClick={() => onCopyToClipboard(asset.href, asset.key)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  onCopyToClipboard(asset.href, asset.key)
+                }
+              }}
+            >
+              {sanitizeFieldValue(assetLabel)}
+            </span>
+          </Tooltip>
+          {asset.description && (
+            <Tooltip
+              title={sanitizeFieldValue(asset.description)}
+              placement="top-start"
+              arrow
+              slotProps={{
+                tooltip: {
+                  className: 'tooltip-enhancedDetails'
+                }
+              }}
+            >
+              <span
+                aria-label={`Information about ${assetLabel}`}
+                style={{ display: 'inline-flex' }}
+              >
+                <InfoIcon className="icon-info" />
+              </span>
+            </Tooltip>
+          )}
+        </div>
+        {(asset.description || detailsString) && (
+          <div className="asset-details-row">
+            {asset.description && (
+              <div className="asset-description">
+                {sanitizeFieldValue(asset.description)}
+              </div>
+            )}
+            {detailsString && (
+              <div className="asset-details">
+                {sanitizeFieldValue(detailsString)}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+      <div className="asset-actions">
         <Tooltip
           title={copiedUrl === asset.key ? 'Copied!' : 'Click to copy link'}
           placement="top-end"
@@ -45,46 +106,10 @@ const AssetItem = React.memo(({ asset, copiedUrl, onCopyToClipboard }) => {
             type="button"
             aria-label="Copy Link to Clipboard"
           >
-            <span className="field-label-inline">
-              {sanitizeFieldValue(assetLabel)}
-            </span>
             <ContentCopyIcon className="icon-copy" />
           </button>
         </Tooltip>
-        {asset.description && (
-          <Tooltip
-            title={sanitizeFieldValue(asset.description)}
-            placement="top-start"
-            arrow
-            slotProps={{
-              tooltip: {
-                className: 'tooltip-enhancedDetails'
-              }
-            }}
-          >
-            <span
-              aria-label={`Information about ${assetLabel}`}
-              style={{ display: 'inline-flex' }}
-            >
-              <InfoIcon className="icon-info" />
-            </span>
-          </Tooltip>
-        )}
       </div>
-      {(asset.description || detailsString) && (
-        <div className="asset-details-row">
-          {asset.description && (
-            <div className="asset-description">
-              {sanitizeFieldValue(asset.description)}
-            </div>
-          )}
-          {detailsString && (
-            <div className="asset-details">
-              {sanitizeFieldValue(detailsString)}
-            </div>
-          )}
-        </div>
-      )}
     </div>
   )
 })

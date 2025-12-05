@@ -103,7 +103,12 @@ export const CoordinateFieldDisplay = ({ components }) => {
         ? c.lon.toFixed(6)
         : sanitizeFieldValue(c.lon, false)
 
-    return `Lat: ${lat}°, Lon: ${lon}°`
+    return (
+      <>
+        Lat: {lat}°<br />
+        Lon: {lon}°
+      </>
+    )
   }
 
   if (c.type === 'bbox') {
@@ -210,7 +215,6 @@ export const FieldDisplay = ({ fieldType, components, field }) => {
   }
 }
 
-// PropTypes validation
 GridFieldDisplay.propTypes = {
   components: PropTypes.arrayOf(
     PropTypes.shape({
