@@ -1,3 +1,19 @@
+/**
+ * TanStack Router configuration for FilmDrop UI
+ *
+ * This file implements client-side routing as a minimal overlay on the existing
+ * Redux-driven architecture. The router manages URL patterns and the History API
+ * while continuing to populate Redux states that trigger existing component rendering.
+ *
+ * Key architectural pattern:
+ * - Route loaders fetch data and dispatch Redux actions
+ * - Existing components read from Redux via useSelector hooks
+ * - No component refactoring required - they remain Redux-native
+ *
+ * Routes:
+ * - / (index): Home path, no specific component
+ * - /item/:collectionId/:itemId: Direct link to STAC items
+ */
 import {
   createRouter,
   createRootRoute,

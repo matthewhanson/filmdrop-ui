@@ -1,6 +1,19 @@
 import { store } from '../redux/store'
 import { logoutUser } from '../utils/authHelper'
 
+/**
+ * Fetches a single STAC item from the API
+ * @param {string} collectionId - The collection ID containing the item
+ * @param {string} itemId - The unique identifier for the item
+ * @returns {Promise<Object>} The STAC item GeoJSON feature or error object {error: true, status: number}
+ * @example
+ * const item = await GetItemService('sentinel-2-l2a', 'S2A_17SNB_20230617_0_L2A')
+ * if (item.error) {
+ *   // Handle error based on status code
+ * } else {
+ *   // Process valid STAC item
+ * }
+ */
 export async function GetItemService(collectionId, itemId) {
   const requestHeaders = new Headers()
   const JWT = localStorage.getItem('APP_AUTH_TOKEN')
