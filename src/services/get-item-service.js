@@ -1,4 +1,5 @@
 import { store } from '../redux/store'
+import { logoutUser } from '../utils/authHelper'
 
 export async function GetItemService(collectionId, itemId) {
   const requestHeaders = new Headers()
@@ -22,6 +23,11 @@ export async function GetItemService(collectionId, itemId) {
 
     if (response.ok) {
       return await response.json()
+    }
+
+    // Handle 403 by logging out user (token expired or invalid)
+    if (response.status === 403) {
+      logoutUser()
     }
 
     // Return error info for caller to handle

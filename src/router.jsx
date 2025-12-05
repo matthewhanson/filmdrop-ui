@@ -1,7 +1,8 @@
 import {
   createRouter,
   createRootRoute,
-  createRoute
+  createRoute,
+  redirect
 } from '@tanstack/react-router'
 import App from './App'
 import { GetItemService } from './services/get-item-service'
@@ -31,6 +32,17 @@ const indexRoute = createRoute({
 const itemRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/item/$collectionId/$itemId',
+  beforeLoad: ({ location }) => {
+    const appConfig = store.getState().mainSlice.appConfig
+    const JWT = localStorage.getItem('APP_AUTH_TOKEN')
+    const authRequired = appConfig?.APP_TOKEN_AUTH_ENABLED ?? false
+
+    if (authRequired && !JWT) {
+      // Store target URL for post-auth redirect
+      sessionStorage.setItem('POST_AUTH_REDIRECT_URL', location.href)
+      throw redirect({ to: '/' })
+    }
+  },
   loader: async ({ params }) => {
     try {
       // TanStack Router automatically decodes path parameters
