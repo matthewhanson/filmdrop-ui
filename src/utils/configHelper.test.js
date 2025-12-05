@@ -402,7 +402,7 @@ describe('ConfigHelper', () => {
       }
 
       const result = autoConfigureRendering(config)
-      const params = result.COLLECTIONS_CONFIG.landsat.visualizations['swir']
+      const params = result.COLLECTIONS_CONFIG.landsat.visualizations.swir
 
       expect(params.assets).toEqual(['swir22', 'nir', 'red'])
       expect(params.rescale).toEqual(['0,5000,0,7000,0,9000'])

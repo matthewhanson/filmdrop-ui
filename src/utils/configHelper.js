@@ -527,8 +527,6 @@ export function autoConfigureRendering(config) {
 
     // The first visualization is used as the default
     const defaultRenderKey = renderKeys[0]
-    const defaultRender =
-      collectionsConfig[collectionId].visualizations[defaultRenderKey]
 
     console.log(
       `Auto-configured visualizations for collection '${collectionId}': stored ${renderKeys.length} visualization(s) (default: '${defaultRenderKey}')`
