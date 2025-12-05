@@ -34,6 +34,7 @@ import {
   setSelectedCollection
 } from './redux/slices/mainSlice'
 import { LoadConfigIntoStateService } from './services/get-config-service'
+import { GetCollectionsService } from './services/get-collections-service'
 
 // Root route renders App component
 const rootRoute = createRootRoute({
@@ -106,11 +107,24 @@ const itemRoute = createRoute({
         return
       }
 
-      // Wait for collections data to be loaded (triggered by App.jsx)
-      console.log('Router: Waiting for collections data to load')
+      // Ensure collections data is loaded
+      // On direct URL navigation, router loader runs before App.jsx mounts
+      // We trigger collection load here if needed, App.jsx will skip if already loading
       let collectionsData = store.getState().mainSlice.collectionsData
+
+      if (!collectionsData || collectionsData.length === 0) {
+        console.log('Router: Collections not loaded, triggering load')
+        // Trigger load and wait for completion
+        GetCollectionsService().catch((err) => {
+          console.error('Router: Error loading collections', err)
+        })
+      } else {
+        console.log('Router: Collections already loaded')
+      }
+
+      // Wait for collections to be populated in Redux state
       startTime = Date.now()
-      const collectionsMaxWaitTime = 10000 // 10 seconds for collections
+      const collectionsMaxWaitTime = 15000 // 15 seconds
 
       while (Date.now() - startTime < collectionsMaxWaitTime) {
         collectionsData = store.getState().mainSlice.collectionsData

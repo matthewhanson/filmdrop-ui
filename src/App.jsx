@@ -52,6 +52,10 @@ function App() {
     }
   }, [])
 
+  const _collectionsData = useSelector(
+    (state) => state.mainSlice.collectionsData
+  )
+
   useEffect(() => {
     if (_appConfig) {
       if (_appConfig.APP_TOKEN_AUTH_ENABLED && !_authTokenExists) {
@@ -60,9 +64,12 @@ function App() {
       }
       setShowLogin(false)
       InitializeAppFromConfig()
-      GetCollectionsService()
+      // Only load collections if not already loaded (router may have loaded them)
+      if (!_collectionsData || _collectionsData.length === 0) {
+        GetCollectionsService()
+      }
     }
-  }, [_appConfig, _authTokenExists])
+  }, [_appConfig, _authTokenExists, _collectionsData])
 
   useEffect(() => {
     if (_appConfig) {
