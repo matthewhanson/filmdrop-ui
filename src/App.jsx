@@ -15,7 +15,11 @@ import Login from './components/Login/Login'
 import { setauthTokenExists, setCurrentTheme } from './redux/slices/mainSlice'
 import { initializeTheme, applyTheme } from './utils/themeHelper'
 import L from 'leaflet'
-import { clickedFootprintLayerStyle, clearLayer } from './utils/mapHelper'
+import {
+  clickedFootprintLayerStyle,
+  clearLayer,
+  zoomToItemExtent
+} from './utils/mapHelper'
 
 function App() {
   const dispatch = useDispatch()
@@ -87,8 +91,13 @@ function App() {
           clickedFootprintsFound.addTo(layer)
         }
       })
+
+      // Auto-zoom to item extent if enabled in config
+      if (_appConfig?.SHOW_ITEM_AUTO_ZOOM) {
+        zoomToItemExtent(_currentPopupResult)
+      }
     }
-  }, [_currentPopupResult, _map])
+  }, [_currentPopupResult, _map, _appConfig])
 
   return (
     <React.StrictMode>
