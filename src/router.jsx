@@ -32,32 +32,54 @@ const itemRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/item/$collectionId/$itemId',
   loader: async ({ params }) => {
-    const { collectionId, itemId } = params
+    try {
+      // TanStack Router automatically decodes path parameters
+      const { collectionId, itemId } = params
 
-    // Validate collection exists in configuration
-    const collectionConfig = getCollectionConfig(collectionId, 'sceneMinZoom')
-    if (!collectionConfig) {
-      showApplicationAlert('info', 'Collection not configured')
-      return
-    }
-
-    // Fetch item from STAC API
-    const result = await GetItemService(collectionId, itemId)
-
-    if (result.error) {
-      if (result.status === 404) {
-        showApplicationAlert('error', 'Item not found')
-      } else {
-        showApplicationAlert('error', 'Unable to load item. Please try again.')
+      // Validate collection exists in configuration
+      const collectionConfig = getCollectionConfig(collectionId, 'sceneMinZoom')
+      if (!collectionConfig) {
+        showApplicationAlert(
+          'info',
+          `Collection "${collectionId}" is not configured in this deployment`
+        )
+        return
       }
-      return
-    }
 
-    // Populate Redux states to trigger component rendering
-    store.dispatch(setClickResults([result]))
-    store.dispatch(setselectedPopupResultIndex(0))
-    store.dispatch(setCurrentPopupResult(result))
-    store.dispatch(settabSelected('details'))
+      // Fetch item from STAC API
+      const result = await GetItemService(collectionId, itemId)
+
+      if (result.error) {
+        if (result.status === 404) {
+          showApplicationAlert(
+            'error',
+            `Item "${itemId}" not found in collection "${collectionId}"`
+          )
+        } else if (result.status === 403) {
+          showApplicationAlert('warning', 'Authentication required')
+        } else {
+          showApplicationAlert(
+            'error',
+            'Unable to load item. Please check your network connection and try again.'
+          )
+        }
+        console.error(`Failed to load item: ${collectionId}/${itemId}`, result)
+        return
+      }
+
+      // Populate Redux states to trigger component rendering
+      store.dispatch(setClickResults([result]))
+      store.dispatch(setselectedPopupResultIndex(0))
+      store.dispatch(setCurrentPopupResult(result))
+      store.dispatch(settabSelected('details'))
+    } catch (error) {
+      // Catch any unexpected errors
+      console.error('Unexpected error in item route loader:', error)
+      showApplicationAlert(
+        'error',
+        'An unexpected error occurred while loading the item'
+      )
+    }
   },
   component: () => null // App.jsx handles rendering via Redux state
 })
