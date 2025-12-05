@@ -34,6 +34,7 @@ import {
   setSelectedCollection
 } from './redux/slices/mainSlice'
 import { LoadConfigIntoStateService } from './services/get-config-service'
+import { GetCollectionsService } from './services/get-collections-service'
 
 // Root route renders App component
 const rootRoute = createRootRoute({
@@ -77,7 +78,7 @@ const itemRoute = createRoute({
       
       // Wait for appConfig to be loaded and normalized (with timeout)
       const maxWaitTime = 5000 // 5 seconds
-      const startTime = Date.now()
+      let startTime = Date.now()
 
       while (Date.now() - startTime < maxWaitTime) {
         appConfig = store.getState().mainSlice.appConfig
@@ -101,6 +102,33 @@ const itemRoute = createRoute({
       if (!appConfig || !appConfig.STAC_API_URL) {
         console.error('Router: Configuration failed to load within timeout')
         showApplicationAlert('error', 'Configuration failed to load')
+        return
+      }
+
+      // Ensure collections data is loaded
+      let collectionsData = store.getState().mainSlice.collectionsData
+      
+      if (!collectionsData || collectionsData.length === 0) {
+        console.log('Router: Collections not loaded, triggering GetCollectionsService')
+        await GetCollectionsService()
+      }
+
+      // Wait for collections data to be loaded
+      startTime = Date.now()
+      while (Date.now() - startTime < maxWaitTime) {
+        collectionsData = store.getState().mainSlice.collectionsData
+        
+        if (collectionsData && collectionsData.length > 0) {
+          console.log('Router: Collections loaded successfully')
+          break
+        }
+        
+        await new Promise((resolve) => setTimeout(resolve, 50))
+      }
+
+      if (!collectionsData || collectionsData.length === 0) {
+        console.error('Router: Collections failed to load within timeout')
+        showApplicationAlert('error', 'Collections data failed to load')
         return
       }
 
