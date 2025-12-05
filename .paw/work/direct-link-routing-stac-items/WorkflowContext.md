@@ -10,3 +10,6 @@ Issue URL: https://github.com/Element84/filmdrop-ui/issues/477
 Remote: origin
 Artifact Paths: auto-derived
 Additional Inputs: none
+
+## Status
+Specification draft complete. Research prompt generated. Ready for spec research phase.
