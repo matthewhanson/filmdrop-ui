@@ -64,28 +64,43 @@ const itemRoute = createRoute({
       // TanStack Router automatically decodes path parameters
       const { collectionId, itemId } = params
 
-      // Wait for appConfig to be loaded (with timeout)
-      // Check for STAC_API_URL as indicator that config is fully loaded
+      // Wait for appConfig to be loaded and normalized (with timeout)
+      // Check for both STAC_API_URL and COLLECTIONS_CONFIG/legacy params
       let appConfig = store.getState().mainSlice.appConfig
       const maxWaitTime = 5000 // 5 seconds
       const startTime = Date.now()
 
-      while (
-        (!appConfig || !appConfig.STAC_API_URL) &&
-        Date.now() - startTime < maxWaitTime
-      ) {
-        await new Promise((resolve) => setTimeout(resolve, 100))
+      while (Date.now() - startTime < maxWaitTime) {
         appConfig = store.getState().mainSlice.appConfig
+        
+        // Config is ready if it has STAC_API_URL and either COLLECTIONS_CONFIG or legacy params
+        const hasBasicConfig = appConfig && appConfig.STAC_API_URL
+        const hasCollectionsConfig = appConfig && (
+          appConfig.COLLECTIONS_CONFIG || 
+          appConfig.SEARCH_MIN_ZOOM_LEVELS ||
+          appConfig.SCENE_TILER_PARAMS
+        )
+        
+        if (hasBasicConfig && hasCollectionsConfig) {
+          break
+        }
+        
+        await new Promise((resolve) => setTimeout(resolve, 100))
       }
 
       if (!appConfig || !appConfig.STAC_API_URL) {
+        console.error('Router: Configuration failed to load within timeout')
         showApplicationAlert('error', 'Configuration failed to load')
         return
       }
 
       // Validate collection exists in configuration
+      console.log('Router: Validating collection', collectionId, 'for item', itemId)
       const collectionConfig = getCollectionConfig(collectionId, 'sceneMinZoom')
+      console.log('Router: Collection config result:', collectionConfig)
+      
       if (!collectionConfig) {
+        console.warn('Router: Collection not found in config', collectionId)
         showApplicationAlert(
           'info',
           `Collection "${collectionId}" is not configured in this deployment`
@@ -94,7 +109,9 @@ const itemRoute = createRoute({
       }
 
       // Fetch item from STAC API
+      console.log('Router: Fetching item from STAC API')
       const result = await GetItemService(collectionId, itemId)
+      console.log('Router: Item fetch result:', result.error ? 'ERROR' : 'SUCCESS')
 
       if (result.error) {
         if (result.status === 404) {
@@ -115,10 +132,12 @@ const itemRoute = createRoute({
       }
 
       // Populate Redux states to trigger component rendering
+      console.log('Router: Populating Redux state with item')
       store.dispatch(setClickResults([result]))
       store.dispatch(setselectedPopupResultIndex(0))
       store.dispatch(setCurrentPopupResult(result))
       store.dispatch(settabSelected('details'))
+      console.log('Router: Item loaded successfully')
     } catch (error) {
       // Catch any unexpected errors
       console.error('Unexpected error in item route loader:', error)
