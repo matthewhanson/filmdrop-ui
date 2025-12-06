@@ -31,10 +31,13 @@ import {
   setselectedPopupResultIndex,
   settabSelected,
   setSelectedCollectionData,
-  setSelectedCollection
+  setSelectedCollection,
+  setSearchResults,
+  setmappedScenes
 } from './redux/slices/mainSlice'
 import { LoadConfigIntoStateService } from './services/get-config-service'
 import { GetCollectionsService } from './services/get-collections-service'
+import { addDataToLayer, footprintLayerStyle } from './utils/mapHelper'
 
 // Root route renders App component
 const rootRoute = createRootRoute({
@@ -72,9 +75,7 @@ const itemRoute = createRoute({
       let appConfig = store.getState().mainSlice.appConfig
 
       if (!appConfig || !appConfig.STAC_API_URL) {
-        console.log(
-          'Router: Config not loaded, triggering LoadConfigIntoStateService'
-        )
+        // Router: Config not loaded, triggering LoadConfigIntoStateService
         await LoadConfigIntoStateService()
       }
 
@@ -94,7 +95,7 @@ const itemRoute = createRoute({
             appConfig.SCENE_TILER_PARAMS)
 
         if (hasBasicConfig && hasCollectionsConfig) {
-          console.log('Router: Config loaded successfully')
+          // Router: Config loaded successfully
           break
         }
 
@@ -113,13 +114,10 @@ const itemRoute = createRoute({
       let collectionsData = store.getState().mainSlice.collectionsData
 
       if (!collectionsData || collectionsData.length === 0) {
-        console.log('Router: Collections not loaded, triggering load')
         // Trigger load and wait for completion
         GetCollectionsService().catch((err) => {
           console.error('Router: Error loading collections', err)
         })
-      } else {
-        console.log('Router: Collections already loaded')
       }
 
       // Wait for collections to be populated in Redux state
@@ -130,7 +128,7 @@ const itemRoute = createRoute({
         collectionsData = store.getState().mainSlice.collectionsData
 
         if (collectionsData && collectionsData.length > 0) {
-          console.log('Router: Collections loaded successfully')
+          // Router: Collections loaded successfully
           break
         }
 
@@ -144,14 +142,7 @@ const itemRoute = createRoute({
       }
 
       // Validate collection exists in configuration
-      console.log(
-        'Router: Validating collection',
-        collectionId,
-        'for item',
-        itemId
-      )
       const collectionConfig = getCollectionConfig(collectionId, 'sceneMinZoom')
-      console.log('Router: Collection config result:', collectionConfig)
 
       if (!collectionConfig) {
         console.warn('Router: Collection not found in config', collectionId)
@@ -163,12 +154,7 @@ const itemRoute = createRoute({
       }
 
       // Fetch item from STAC API
-      console.log('Router: Fetching item from STAC API')
       const result = await GetItemService(collectionId, itemId)
-      console.log(
-        'Router: Item fetch result:',
-        result.error ? 'ERROR' : 'SUCCESS'
-      )
 
       if (result.error) {
         if (result.status === 404) {
@@ -193,10 +179,6 @@ const itemRoute = createRoute({
         (c) => c.id === result.collection
       )
       if (selectedCollection) {
-        console.log(
-          'Router: Setting selected collection:',
-          selectedCollection.id
-        )
         store.dispatch(setSelectedCollection(selectedCollection.id))
         store.dispatch(setSelectedCollectionData(selectedCollection))
       } else {
@@ -207,8 +189,27 @@ const itemRoute = createRoute({
       }
 
       // Populate Redux states to trigger component rendering
-      console.log('Router: Populating Redux state with item')
-      store.dispatch(setClickResults([result]))
+      const searchResultsObject = {
+        type: 'FeatureCollection',
+        features: [result],
+        searchType: 'Direct'
+      }
+
+      // Only set the item result in search results if item was loaded directly via link
+      const searchResults = store.getState().mainSlice.searchResults
+      if (
+        !searchResults?.features ||
+        searchResults?.searchType === 'direct-item'
+      ) {
+        store.dispatch(setSearchResults(searchResultsObject))
+        store.dispatch(setmappedScenes(searchResultsObject.features))
+        const options = {
+          style: footprintLayerStyle
+        }
+        addDataToLayer(searchResultsObject, 'searchResultsLayer', options, true)
+      }
+
+      store.dispatch(setClickResults(searchResultsObject.features))
       store.dispatch(setselectedPopupResultIndex(0))
       store.dispatch(setCurrentPopupResult(result))
       store.dispatch(settabSelected('details'))

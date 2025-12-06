@@ -93,8 +93,6 @@ export function mapClickHandler(e) {
     const _searchType = store.getState().mainSlice.searchType
     const _searchResults = store.getState().mainSlice.searchResults
 
-    clearMapSelection()
-
     if (
       e.originalEvent.detail === 2 ||
       store.getState().mainSlice.viewMode === 'mosaic' ||
