@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
+- Added direct URL routing to STAC items using TanStack Router, enabling users to share
+  links like `/item/sentinel-2-l2a/S2A_17SNB_20230617_0_L2A` that display items
+  immediately with full map visualization, browser navigation support, and authentication
 - Added STAC API client library (`src/services/stac-api/`) for programmatic interaction with STAC APIs:
   - Core client functions: `getRootCatalog()`, `getCollections()`, `getCollection()`
   - Conformance checking: `supportsConformance()`, `getConformance()`, `checkConformance()`
