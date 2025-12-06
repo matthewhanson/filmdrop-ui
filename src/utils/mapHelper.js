@@ -92,8 +92,7 @@ export function mapClickHandler(e) {
   if (map && Object.keys(map).length > 0) {
     const _searchType = store.getState().mainSlice.searchType
     const _searchResults = store.getState().mainSlice.searchResults
-
-    clearMapSelection()
+    const _currentPopupResult = store.getState().mainSlice.currentPopupResult
 
     if (
       e.originalEvent.detail === 2 ||
@@ -111,7 +110,33 @@ export function mapClickHandler(e) {
         const feature = _searchResults.features[f]
         const featureBounds = L.geoJSON(feature).getBounds()
         if (featureBounds && featureBounds.intersects(clickBounds)) {
-          // highlight layer
+          intersectingFeatures = [...intersectingFeatures, feature]
+        }
+      }
+
+      // Check if we clicked on the currently selected item
+      const clickedSameItem =
+        intersectingFeatures.length > 0 &&
+        _currentPopupResult &&
+        intersectingFeatures.some(
+          (f) =>
+            f.id === _currentPopupResult.id &&
+            f.collection === _currentPopupResult.collection
+        )
+
+      // Only clear selection if clicking on empty space or a different item
+      if (!clickedSameItem) {
+        clearMapSelection()
+      }
+
+      // Handle intersecting features
+      if (intersectingFeatures.length === 0) {
+        // Clicked on empty space - selection already cleared above
+        store.dispatch(setClickResults([]))
+      } else {
+        // Clicked on one or more items
+        // Highlight the clicked features
+        for (const feature of intersectingFeatures) {
           const clickedFootprintsFound = L.geoJSON(feature, {
             style: clickedFootprintLayerStyle
           })
@@ -120,40 +145,41 @@ export function mapClickHandler(e) {
               clickedFootprintsFound.addTo(layer)
             }
           })
-          intersectingFeatures = [...intersectingFeatures, feature]
-          if (intersectingFeatures.length === 0) {
-            store.dispatch(setClickResults([]))
-          }
-          if (_searchType === 'scene') {
-            // if at least one feature found, push to store
-            if (intersectingFeatures.length > 0) {
-              // push to store
-              store.dispatch(setClickResults(intersectingFeatures))
-              store.dispatch(settabSelected('details'))
-              store.dispatch(setIsEnhancedDetailsExpanded(false))
-              store.dispatch(sethasLeftPanelTabChanged(true))
+        }
 
-              // Navigate to first item URL
-              const firstItem = intersectingFeatures[0]
-              if (firstItem.collection && firstItem.id) {
-                router.navigate({
-                  to: '/item/$collectionId/$itemId',
-                  params: {
-                    collectionId: firstItem.collection,
-                    itemId: firstItem.id
-                  }
-                })
+        if (_searchType === 'scene') {
+          // push to store
+          store.dispatch(setClickResults(intersectingFeatures))
+          store.dispatch(settabSelected('details'))
+          store.dispatch(setIsEnhancedDetailsExpanded(false))
+          store.dispatch(sethasLeftPanelTabChanged(true))
+
+          // Navigate to first item URL (unless it's the same item)
+          const firstItem = intersectingFeatures[0]
+          if (
+            firstItem.collection &&
+            firstItem.id &&
+            (!_currentPopupResult ||
+              firstItem.id !== _currentPopupResult.id ||
+              firstItem.collection !== _currentPopupResult.collection)
+          ) {
+            router.navigate({
+              to: '/item/$collectionId/$itemId',
+              params: {
+                collectionId: firstItem.collection,
+                itemId: firstItem.id
               }
-            }
-          } else if (_searchType === 'grid-code') {
-            for (const i in intersectingFeatures) {
-              const feature = intersectingFeatures[i]
-              // fetch all scenes from API with matching grid code
-              gridCodesToSearch.push(feature.properties['grid:code'])
-            }
+            })
+          }
+        } else if (_searchType === 'grid-code') {
+          for (const i in intersectingFeatures) {
+            const feature = intersectingFeatures[i]
+            // fetch all scenes from API with matching grid code
+            gridCodesToSearch.push(feature.properties['grid:code'])
           }
         }
       }
+
       if (_searchType === 'grid-code') {
         searchGridCodeScenes(gridCodesToSearch)
       }
