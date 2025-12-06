@@ -31,8 +31,7 @@ import {
   setselectedPopupResultIndex,
   settabSelected,
   setSelectedCollectionData,
-  setSelectedCollection,
-  setSearchResults
+  setSelectedCollection
 } from './redux/slices/mainSlice'
 import { LoadConfigIntoStateService } from './services/get-config-service'
 import { GetCollectionsService } from './services/get-collections-service'
@@ -209,13 +208,6 @@ const itemRoute = createRoute({
 
       // Populate Redux states to trigger component rendering
       console.log('Router: Populating Redux state with item')
-
-      // Set item as both search results and click results
-      const searchResultsObject = {
-        type: 'FeatureCollection',
-        features: [result]
-      }
-      store.dispatch(setSearchResults(searchResultsObject))
       store.dispatch(setClickResults([result]))
       store.dispatch(setselectedPopupResultIndex(0))
       store.dispatch(setCurrentPopupResult(result))
