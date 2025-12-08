@@ -90,12 +90,12 @@ After building with `npm run build`, place your config at `build/config/config.j
 
 #### API Configuration
 
-| Parameter               | Type    | Default         | Description                                                           |
-| ----------------------- | ------- | --------------- | --------------------------------------------------------------------- |
-| `API_MAX_ITEMS`         | Number  | `200`           | Maximum items requested from STAC API                                 |
-| `FETCH_CREDENTIALS`     | String  | `"same-origin"` | Fetch credentials mode: `"same-origin"`, `"include"`, or `"omit"`     |
-| `STAC_HEADER_COOKIES`   | String  | undefined | Include cookie value(s) in STAC API request headers. `cookie_name` and `header_name` are required properties, `header_val_prefix` optional. |
-| `SUPPORTS_AGGREGATIONS` | Boolean | `true`          | Enable aggregation features (requires STAC API Aggregation Extension) |
+| Parameter               | Type    | Default         | Description                                                                                                                                 |
+| ----------------------- | ------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `API_MAX_ITEMS`         | Number  | `200`           | Maximum items requested from STAC API                                                                                                       |
+| `FETCH_CREDENTIALS`     | String  | `"same-origin"` | Fetch credentials mode: `"same-origin"`, `"include"`, or `"omit"`                                                                           |
+| `STAC_HEADER_COOKIES`   | String  | undefined       | Include cookie value(s) in STAC API request headers. `cookie_name` and `header_name` are required properties, `header_val_prefix` optional. |
+| `SUPPORTS_AGGREGATIONS` | Boolean | `true`          | Enable aggregation features (requires STAC API Aggregation Extension)                                                                       |
 
 #### Authentication
 
