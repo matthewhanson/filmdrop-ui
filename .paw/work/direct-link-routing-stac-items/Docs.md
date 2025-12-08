@@ -401,6 +401,44 @@ Documentation author creating tutorial:
 
 ## Testing Guide
 
+### Automated Tests
+
+The routing feature includes **23 fast-running unit tests** (~11ms execution time) that provide strong developer guardrails:
+
+**`src/utils/routerHelper.test.js`** (10 tests):
+- URL construction with basic collection/item IDs
+- Special character encoding (colons, slashes, mixed characters)
+- Edge cases (spaces, dots, underscores, percent signs, empty IDs, long IDs)
+- Validates `buildItemUrl()` utility works correctly for all STAC item ID patterns
+
+**`src/services/get-item-service.test.js`** (13 tests):
+- STAC API endpoint URL construction
+- Authentication header inclusion when `APP_TOKEN_AUTH_ENABLED` is true
+- Credentials configuration (`FETCH_CREDENTIALS`) applied correctly
+- Success responses return item GeoJSON
+- Error responses (404, 403, 500) return error objects with status codes
+- 403 responses trigger `logoutUser()` for re-authentication
+- Network failures handled gracefully with null status
+- JSON parse failures return error objects
+
+**Run tests**:
+```bash
+# Run all tests
+npm test
+
+# Run only routing-related tests
+npm test -- routerHelper.test.js get-item-service.test.js
+
+# Run tests in watch mode during development
+npm test -- --watch
+```
+
+**Test Coverage Rationale**:
+These tests focus on the most critical paths that could break in production:
+- URL encoding prevents routing failures with real-world STAC item IDs
+- Service contract tests catch regressions in authentication and error handling
+- Minimal test time ensures fast CI/CD feedback loops
+
 ### How to Test This Feature
 
 **Test Direct URL Access**:
