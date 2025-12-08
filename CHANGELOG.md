@@ -40,6 +40,39 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Added `autoConfigureRendering()` function in `src/utils/configHelper.js`
   - Comprehensive test coverage (10 new tests)
   - Full documentation in `CONFIGURATION.md`
+- Added enhanced details component library (`src/components/EnhancedDetails/`) for React-based STAC item field and asset rendering:
+  - Core field rendering components: `FieldRenderer`, `FieldValue`, `FieldsGroup`, `FieldGroup`, `Field` for type-safe field display
+  - Specialized field type components: `GridCoordinateField`, `CoordinateField`, `ShapeField`, `BooleanField`, `PercentageField`, `TransformField`, `ProcessingField` for domain-specific rendering
+  - Item header component: `EnhancedDetailsHeader` for displaying STAC item ID and collection information
+  - Asset display components: `AssetsContainer`, `AssetCard`, `AssetGroup`, `DefaultAssetDisplay` with file type grouping and thumbnail exclusion
+  - Styling: `EnhancedDetails.css` with comprehensive styles for all enhanced details components
+  - Replaces unsafe HTML string rendering with component-based approach for improved security and maintainability
+- Added field type detection and discovery system (`src/utils/fieldDiscovery.js` enhanced):
+  - Automatic field type detection with caching for performance optimization
+  - Support for grid systems: MGRS (Military Grid Reference System), WRS (Worldwide Reference System), UTM (Universal Transverse Mercator), and generic grid codes
+  - Pattern matching for field names and values to identify coordinates, shapes, transforms, processing metadata, booleans, and percentages
+  - Grid type classification with intelligent component selection
+- Added field value extraction and formatting (`src/utils/fieldFormatting.js` enhanced):
+  - Component extraction for structured rendering of complex field types
+  - Grid system parsing with coordinate and component detection
+  - Bbox and coordinate extraction from arrays and objects
+  - Image dimension extraction from nested field structures
+  - HTML generation with sanitization for safe rendering of formatted values
+- Added security infrastructure (`src/utils/sanitizer.js`) for XSS prevention:
+  - DOMPurify integration with configurable strictness levels
+  - Safe field value rendering supporting strings, arrays, objects, booleans, and numbers
+  - Array and object-specific sanitization functions
+  - Strict mode (no HTML allowed) and regular mode (safe HTML tags only)
+- Added clipboard management hook (`src/hooks/useAssetClipboard.js`):
+  - React hook for managing copy-to-clipboard functionality for asset URLs
+  - Tracks which asset was most recently copied
+  - Handles clipboard write operations with error handling
+- Added comprehensive test coverage (14 new/enhanced test files):
+  - Security tests for sanitization and XSS prevention
+  - Field discovery tests for grid systems and field type detection
+  - Field formatting tests for component extraction and value parsing
+  - Field grouping tests for display configuration
+  - Asset grouping tests for file type classification and thumbnail detection
 
 ### Changed
 
@@ -90,6 +123,36 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   environments (fixes Node version mismatch issues in VS Code/GitLens) due to moving
   from pre-commit to husky
 - Added config `STAC_HEADER_COOKIES` to optionally inject STAC request header values from cookies. ([455](https://github.com/Element84/filmdrop-ui/pull/455))
+- STAC item field and asset rendering refactored to use React components instead of string-based HTML:
+  - `src/components/PopupResults/PopupResults.jsx` integrated with new enhanced details components
+  - New 3-step field processing pipeline: validation → type detection → component extraction → React rendering
+  - Error handling for field processing failures with graceful degradation
+  - Field rendering delegated to `FieldRenderer` component for type-safe display
+  - Asset rendering delegated to `AssetsContainer` component with file type grouping
+  - Item metadata displayed via `EnhancedDetailsHeader` component
+- Asset display now automatically groups by file type and excludes thumbnails from main asset view:
+  - `src/utils/defaultAssetGrouping.js` enhanced with file type detection and asset classification
+  - Thumbnails excluded from asset container (displayed separately if needed)
+  - Asset groups created by MIME type for organized presentation
+- Grid system recognition extended to support multiple coordinate system formats:
+  - MGRS (Military Grid Reference System) with component parsing
+  - WRS (Worldwide Reference System) for Landsat imagery
+  - UTM (Universal Transverse Mercator) with zone and band detection
+  - Generic grid codes with intelligent pattern matching
+  - Each grid type renders with specialized `GridCoordinateField` component
+- New `enhancedDisplayConfig` parameter within `COLLECTIONS_CONFIG[id]` for field and asset grouping:
+  - Allows configuration of which fields appear in popup and their display order
+  - Supports field grouping with collapsible sections
+  - Asset grouping configuration with custom group labels
+  - Optional configuration—if omitted, all fields and assets are displayed
+  - See `CONFIGURATION.md` for detailed parameter structure and examples
+- `src/utils/configHelper.js` enhanced with `createEnhancedDisplayFieldPredicate()` function:
+  - Factory function for creating field filtering predicates based on `enhancedDisplayConfig`
+  - Enables declarative field inclusion/exclusion logic
+  - Integrates with field grouping system
+- `src/utils/fieldGrouping.js` updated to make `appConfig` parameter optional in `createEnhancedDisplayFieldPredicate()`:
+  - When `appConfig` omitted, all fields included in grouping logic
+  - Reduces required parameters for utility function usage
 
 ### Changed
 
@@ -141,6 +204,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fixed `TypeError: Invalid URL` warnings in test output by adding global fetch mock in
   `src/setupTests.js`
 - Suppressed expected console.error messages in tests to reduce noise in test output
+- Fixed XSS (Cross-Site Scripting) vulnerabilities by replacing string-based HTML rendering with React components:
+  - STAC item field values no longer generated as HTML strings; instead rendered through type-safe `FieldRenderer` component
+  - All user-controlled content in field display sanitized before rendering
+  - DOMPurify integration provides additional HTML sanitization layer
+  - Eliminates unsafe `dangerouslySetInnerHTML` pattern previously used in field rendering
+- Fixed smart text truncation for long field values without spaces:
+  - Long values without spaces (e.g., URLs, coordinate strings) now truncated intelligently
+  - Full value displayed in tooltip on hover for accessibility
+  - Text overflow detection prevents UI layout issues
+- Fixed asset processing corrected for proper file type grouping and consistent thumbnail exclusion:
+  - Assets now reliably grouped by MIME type and file extension
+  - Thumbnails consistently excluded from main asset display across all collection types
+  - Asset metadata (roles, GSD, description) properly extracted and displayed
 
 ### Removed
 
