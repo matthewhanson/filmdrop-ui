@@ -217,6 +217,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Assets now reliably grouped by MIME type and file extension
   - Thumbnails consistently excluded from main asset display across all collection types
   - Asset metadata (roles, GSD, description) properly extracted and displayed
+- Fixed duplicate `rescale` parameter being added twice in TiTiler scene requests in `src/utils/mapHelper.js`
+  - Removed duplicate parameter push that caused malformed query strings
+- Fixed missing validation in `autoConfigureCollections()` function in `src/utils/configHelper.js`
+  - Added check for empty `collectionIds` array after filtering to prevent invalid configuration state
+  - Now returns early with warning when all collections have falsy IDs
+- Fixed incomplete error handling in visualization system in `src/utils/mapHelper.js`
+  - Added comprehensive validation to `constructSceneTilerParams()` with actionable warning messages
+  - Validates visualizations exist, are proper object type, and contain at least one definition
+  - Added specific error messaging in `addImageOverlay()` when visualizations are missing
+  - All failures now provide clear diagnostic information for developers
 
 ### Removed
 

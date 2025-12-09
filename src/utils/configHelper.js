@@ -366,6 +366,13 @@ export async function autoConfigureCollections(apiUrl, config) {
     // Build array of collection IDs
     const collectionIds = collections.map((c) => c.id).filter(Boolean)
 
+    if (collectionIds.length === 0) {
+      console.warn(
+        'No valid collection IDs found after filtering - all collections have falsy IDs'
+      )
+      return config
+    }
+
     // Filter COLLECTIONS_CONFIG to only include collections that are being used
     const filteredCollectionsConfig = {}
     if (
