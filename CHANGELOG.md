@@ -227,6 +227,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Validates visualizations exist, are proper object type, and contain at least one definition
   - Added specific error messaging in `addImageOverlay()` when visualizations are missing
   - All failures now provide clear diagnostic information for developers
+- Fixed duplicate promise-based code in `src/services/get-collections-service.js`
+  - Removed dead code that was trying to use `.includes()` on COLLECTIONS object
+  - Consolidated to single async/await implementation that properly handles new COLLECTIONS object structure
+  - Prevents TypeError when collections are auto-configured from STAC API
 
 ### Removed
 
