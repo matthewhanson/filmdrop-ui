@@ -830,7 +830,7 @@
       ]
     }
   },
-  "APP_NAME": "Filmdrop Console",
+  "APP_NAME": "Filmdrop UI",
   "APP_FAVICON": "exampleFavicon.ico",
   "MAP_ZOOM": 3,
   "MAP_CENTER": [30, 0],

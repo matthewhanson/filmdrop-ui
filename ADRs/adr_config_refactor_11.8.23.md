@@ -133,7 +133,7 @@ deciders: Brad Andrick, Matt Hanson, Phil Varner
       "sar:polarizations"
     ]
   },
-  "APP_NAME": "Filmdrop Console",
+  "APP_NAME": "Filmdrop UI",
   "APP_FAVICON": "exampleFavicon.ico",
   "MAP_ZOOM": 3,
   "MAP_CENTER": [30, 0],
@@ -179,7 +179,7 @@ deciders: Brad Andrick, Matt Hanson, Phil Varner
 {
   "CONSOLE_SETTINGS": {
     // settings for top level console/parent container app
-    "APP_NAME": "Filmdrop Console",
+    "APP_NAME": "Filmdrop UI",
     "APP_FAVICON": "exampleFavicon.ico",
     "LOGO_URL": "./logo.png",
     "LOGO_ALT": "Alt description for my custom logo",
@@ -192,7 +192,7 @@ deciders: Brad Andrick, Matt Hanson, Phil Varner
   "APP_SETTINGS": {
     // settings for each individual nested 'app'
     "CORE_APPS": {
-      // settings for core apps included with base FD console
+      // settings for core apps included with base FD UI
       "SEARCH": {
         // all settings for search app here
         // this would be all existing console FD-UI search/map settings from old config
