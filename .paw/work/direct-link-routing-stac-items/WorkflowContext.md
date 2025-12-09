@@ -7,9 +7,10 @@ Workflow Mode: full
 Review Strategy: local
 Handoff Mode: manual
 Issue URL: https://github.com/Element84/filmdrop-ui/issues/477
+PR URL: https://github.com/Element84/filmdrop-ui/pull/485
 Remote: origin
 Artifact Paths: auto-derived
 Additional Inputs: none
 
 ## Status
-Specification draft complete. Research prompt generated. Ready for spec research phase.
+Final PR opened. Ready for review and merge.
