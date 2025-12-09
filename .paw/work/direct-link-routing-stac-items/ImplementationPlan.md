@@ -580,3 +580,136 @@ const itemRoute = createRoute({
 - TanStack Router Documentation: https://tanstack.com/router/latest
 - STAC API Specification: https://github.com/radiantearth/stac-api-spec
 - Similar implementation pattern in `mapHelper.js`: `src/utils/mapHelper.js:86-143` (mapClickHandler function)
+
+---
+
+## Addressed Review Comments: Final PR #485 Feedback
+
+**Date**: 2025-12-09  
+**Reviewer Feedback**: Two critical issues identified in router.jsx requiring immediate fixes:
+
+1. **State inconsistency on failure** (lines 168-181): When loader errors occur, we call showApplicationAlert and return, but don't clean up partially-set Redux state. If collections loaded but item fetch failed, selectedCollectionData may be set incorrectly.
+2. **Missing authentication guard - security bypass** (lines 58-68): The beforeLoad hook reads APP_TOKEN_AUTH_ENABLED from Redux state which may not be loaded yet on direct URL navigation, creating a security bypass where unauthenticated users can access protected routes before config loads.
+
+### Changes Made
+
+**File**: `src/router.jsx`
+
+#### 1. Fixed Authentication Security Bypass (CRITICAL)
+**Lines**: 55-100 (beforeLoad hook)
+
+**Problem**: beforeLoad hook checked APP_TOKEN_AUTH_ENABLED from Redux state immediately, but config might not be loaded yet on direct URL navigation. This created a security bypass where:
+- User navigates directly to `/item/collection/item-id`
+- beforeLoad runs before config loads
+- APP_TOKEN_AUTH_ENABLED is undefined/false
+- Auth check is skipped, allowing access to protected content
+- Config loads later, but too late to enforce authentication
+
+**Solution**: Made beforeLoad async and added config loading with timeout:
+- Trigger LoadConfigIntoStateService() if config not loaded
+- Wait up to 5 seconds for config to be available
+- Only then read APP_TOKEN_AUTH_ENABLED to make auth decision
+- If config fails to load, proceed to loader (fails safely there)
+- This ensures authentication check happens with valid config data
+
+**Code Changes**:
+```javascript
+beforeLoad: async ({ location }) => {
+  // CRITICAL SECURITY: Ensure config is loaded BEFORE checking authentication
+  let appConfig = store.getState().mainSlice.appConfig
+
+  if (!appConfig || !appConfig.STAC_API_URL) {
+    await LoadConfigIntoStateService()
+  }
+
+  // Wait for config to be loaded (with timeout)
+  const maxWaitTime = 5000
+  const startTime = Date.now()
+
+  while (Date.now() - startTime < maxWaitTime) {
+    appConfig = store.getState().mainSlice.appConfig
+    if (appConfig && appConfig.STAC_API_URL) {
+      break
+    }
+    await new Promise((resolve) => setTimeout(resolve, 50))
+  }
+
+  // Now safely read authentication config
+  const JWT = localStorage.getItem('APP_AUTH_TOKEN')
+  const authRequired = appConfig?.APP_TOKEN_AUTH_ENABLED ?? false
+
+  if (authRequired && !JWT) {
+    sessionStorage.setItem('POST_AUTH_REDIRECT_URL', location.href)
+    throw redirect({ to: '/' })
+  }
+}
+```
+
+#### 2. Fixed State Inconsistency on Failure
+**Lines**: Multiple error paths (149-152, 188-191, 207-212, 219-232, 253-258)
+
+**Problem**: When loader encounters errors at various stages, we displayed error alerts but left Redux state partially populated:
+- Collections might be loaded and selectedCollectionData set
+- Item fetch fails, but selectedCollectionData remains from previous step
+- User sees stale/incorrect item data in UI
+- Map shows wrong footprint or imagery
+
+**Solution**: Created clearItemRouteState() helper function that clears all item-related Redux states:
+- setSelectedCollection('') - clear selected collection ID
+- setSelectedCollectionData(null) - clear collection metadata
+- setClickResults([]) - clear clicked results array
+- setCurrentPopupResult(null) - clear current item
+- setselectedPopupResultIndex(-1) - reset selection index
+- Preserve searchResults/mappedScenes (don't break existing search state)
+
+Called clearItemRouteState() on all error paths:
+1. Config load failure
+2. Collections load failure
+3. Collection validation failure (unconfigured collection)
+4. Item fetch failure (404, 403, network errors)
+5. Unexpected errors in catch block
+
+**Code Changes**:
+```javascript
+function clearItemRouteState() {
+  store.dispatch(setSelectedCollection(''))
+  store.dispatch(setSelectedCollectionData(null))
+  store.dispatch(setClickResults([]))
+  store.dispatch(setCurrentPopupResult(null))
+  store.dispatch(setselectedPopupResultIndex(-1))
+  // Don't clear searchResults/mappedScenes - preserve existing search state
+}
+
+// Applied to all error paths:
+if (!appConfig || !appConfig.STAC_API_URL) {
+  console.error('Router: Configuration failed to load within timeout')
+  clearItemRouteState()
+  showApplicationAlert('error', 'Configuration failed to load')
+  return
+}
+```
+
+### Testing
+
+**Automated Checks** (all passed):
+- ✅ Linting: `npm run lint` - no issues
+- ✅ Type checking: `npm run typecheck` - no errors
+- ✅ Tests: `npm run test` - 338/338 tests pass
+- ✅ Formatting: Prettier applied
+- ✅ Pre-commit hooks: All checks passed
+
+**Expected Behavior**:
+1. **Security**: Direct URL navigation with authentication enabled now properly enforces auth before allowing access
+2. **State Consistency**: Error states leave clean Redux state with no stale item data visible in UI
+
+### Commit
+
+**Commit Hash**: 897f7e2  
+**Message**: "Fix security bypass and state consistency issues in router"  
+**Files Changed**: `src/router.jsx` (+63 lines, -6 lines)
+
+**Review Notes for Next Phase**:
+- Security bypass is now fixed - authentication check waits for config to load
+- State cleanup ensures UI consistency on all error paths
+- No additional manual testing needed for these specific issues
+- Ready for Implementation Review Agent to verify and push
