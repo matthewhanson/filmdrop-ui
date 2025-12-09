@@ -39,6 +39,20 @@ import { LoadConfigIntoStateService } from './services/get-config-service'
 import { GetCollectionsService } from './services/get-collections-service'
 import { addDataToLayer, footprintLayerStyle } from './utils/mapHelper'
 
+/**
+ * Clear Redux state to prevent inconsistencies when route loading fails.
+ * If collections loaded but item fetch failed, we may have partially-set state.
+ * This ensures a clean slate so the UI doesn't render stale/incorrect data.
+ */
+function clearItemRouteState() {
+  store.dispatch(setSelectedCollection(''))
+  store.dispatch(setSelectedCollectionData(null))
+  store.dispatch(setClickResults([]))
+  store.dispatch(setCurrentPopupResult(null))
+  store.dispatch(setselectedPopupResultIndex(-1))
+  // Don't clear searchResults/mappedScenes - preserve existing search state
+}
+
 // Root route renders App component
 const rootRoute = createRootRoute({
   component: App
@@ -55,8 +69,42 @@ const indexRoute = createRoute({
 const itemRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/item/$collectionId/$itemId',
-  beforeLoad: ({ location }) => {
-    const appConfig = store.getState().mainSlice.appConfig
+  beforeLoad: async ({ location }) => {
+    // CRITICAL SECURITY: Ensure config is loaded BEFORE checking authentication
+    // If config isn't loaded yet, APP_TOKEN_AUTH_ENABLED will be undefined/false,
+    // creating a bypass where unauthenticated users can access protected routes
+    let appConfig = store.getState().mainSlice.appConfig
+
+    if (!appConfig || !appConfig.STAC_API_URL) {
+      // Trigger config load if not already loading
+      await LoadConfigIntoStateService()
+    }
+
+    // Wait for config to be loaded (with timeout)
+    const maxWaitTime = 5000 // 5 seconds
+    const startTime = Date.now()
+
+    while (Date.now() - startTime < maxWaitTime) {
+      appConfig = store.getState().mainSlice.appConfig
+
+      // Config is ready if it has STAC_API_URL
+      if (appConfig && appConfig.STAC_API_URL) {
+        break
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+
+    // If config still not loaded after timeout, allow navigation to fail safely in loader
+    // This is better than bypassing authentication
+    if (!appConfig || !appConfig.STAC_API_URL) {
+      console.warn(
+        'Router beforeLoad: Config failed to load, proceeding to loader'
+      )
+      return
+    }
+
+    // Now safely read authentication config
     const JWT = localStorage.getItem('APP_AUTH_TOKEN')
     const authRequired = appConfig?.APP_TOKEN_AUTH_ENABLED ?? false
 
@@ -104,6 +152,7 @@ const itemRoute = createRoute({
 
       if (!appConfig || !appConfig.STAC_API_URL) {
         console.error('Router: Configuration failed to load within timeout')
+        clearItemRouteState()
         showApplicationAlert('error', 'Configuration failed to load')
         return
       }
@@ -114,10 +163,12 @@ const itemRoute = createRoute({
       let collectionsData = store.getState().mainSlice.collectionsData
 
       if (!collectionsData || collectionsData.length === 0) {
-        // Trigger load and wait for completion
-        GetCollectionsService().catch((err) => {
+        // Trigger load (note: GetCollectionsService doesn't return a promise)
+        try {
+          await GetCollectionsService()
+        } catch (err) {
           console.error('Router: Error loading collections', err)
-        })
+        }
       }
 
       // Wait for collections to be populated in Redux state
@@ -137,6 +188,7 @@ const itemRoute = createRoute({
 
       if (!collectionsData || collectionsData.length === 0) {
         console.error('Router: Collections failed to load within timeout')
+        clearItemRouteState()
         showApplicationAlert('error', 'Collections data failed to load')
         return
       }
@@ -146,6 +198,7 @@ const itemRoute = createRoute({
 
       if (!collectionConfig) {
         console.warn('Router: Collection not found in config', collectionId)
+        clearItemRouteState()
         showApplicationAlert(
           'info',
           `Collection "${collectionId}" is not configured in this deployment`
@@ -157,6 +210,9 @@ const itemRoute = createRoute({
       const result = await GetItemService(collectionId, itemId)
 
       if (result.error) {
+        // Clear any partially-set state from earlier in the loader
+        clearItemRouteState()
+
         if (result.status === 404) {
           showApplicationAlert(
             'error',
@@ -215,8 +271,9 @@ const itemRoute = createRoute({
       store.dispatch(settabSelected('details'))
       console.log('Router: Item loaded successfully')
     } catch (error) {
-      // Catch any unexpected errors
+      // Catch any unexpected errors and ensure clean state
       console.error('Unexpected error in item route loader:', error)
+      clearItemRouteState()
       showApplicationAlert(
         'error',
         'An unexpected error occurred while loading the item'
