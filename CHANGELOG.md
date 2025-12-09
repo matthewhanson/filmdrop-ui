@@ -9,6 +9,59 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
+- Added STAC API client library (`src/services/stac-api/`) for programmatic interaction with STAC APIs:
+  - Core client functions: `getRootCatalog()`, `getCollections()`, `getCollection()`
+  - Conformance checking: `supportsConformance()`, `getConformance()`, `checkConformance()`
+  - Comprehensive conformance class constants for STAC API Core, Extensions, and Community extensions
+  - Support for custom headers and credentials for authenticated APIs
+  - Fully tested (38 tests) and ready for extraction as standalone npm package
+  - Complete documentation in `src/services/stac-api/README.md`
+- Added collections auto-configuration from STAC API:
+  - Collections are now automatically fetched from the STAC API instead of being hardcoded
+  - New `COLLECTIONS` config parameter with `default`, `include` and `exclude` options:
+    - `default`: Specify which collection should be selected by default (e.g., `"sentinel-2-l2a"`)
+    - `include`: Whitelist specific collections (e.g., `["sentinel-2-l2a", "landsat-8-c2-l2"]`)
+    - `exclude`: Blacklist specific collections (e.g., `["deprecated-collection"]`)
+    - If omitted, all collections from the API are available
+  - `COLLECTIONS_CONFIG` automatically filtered to only include active collections
+  - Added `autoConfigureCollections()` function in `src/utils/configHelper.js`
+  - Full collection objects stored in `_STAC_COLLECTIONS` for future use
+- Added rendering auto-configuration based on STAC Render Extension:
+  - Automatically configures visualization parameters for collections using the [STAC Render Extension](https://github.com/stac-extensions/render)
+  - Eliminates need to manually specify TiTiler visualization parameters for collections
+  - Only activates when both `STAC_API_URL` and `SCENE_TILER_URL` are configured
+  - Reads `renders` object from STAC Collections and stores all render definitions in `COLLECTIONS_CONFIG`:
+    - All render definitions stored in `visualizations` field (e.g., `"true-color"`, `"false-color"`, `"ndvi"`)
+    - First visualization is used as the default for rendering
+    - Each visualization includes: `title`, `assets`, `rescale`, `colormap_name`, `colormap`, `color_formula`, `nodata`, `expression`, `resampling`
+    - Rescale values flattened to comma-separated format for TiTiler
+  - Preserves all available visualization options for future UI enhancements (e.g., visualization selector)
+  - Respects user overrides - skips auto-configuration for collections manually configured
+  - Added `autoConfigureRendering()` function in `src/utils/configHelper.js`
+  - Comprehensive test coverage (10 new tests)
+  - Full documentation in `CONFIGURATION.md`
+
+### Changed
+
+- Replaced `sceneTilerParams` with `visualizations` field:
+  - Old configs with `SCENE_TILER_PARAMS` are automatically upgraded to `visualizations` dictionary
+  - Old `SCENE_TILER_PARAMS` converted to `visualizations: { "default": {...} }`
+  - Use the new `visualizations` field for defining multiple rendering options
+  - This change enables future UI enhancements like visualization selectors
+- Added sensible defaults and auto-population for configuration to reduce required parameters:
+  - Added `applyConfigDefaults()` function in `src/utils/configHelper.js` to centralize default value handling
+  - `BASEMAP` now defaults to OpenStreetMap if not provided in config
+  - `THEME_SWITCHING_ENABLED` now defaults to `true` (was `false`)
+  - `EXPORT_ENABLED` now defaults to `true` (was `false`)
+  - `SHOW_ITEM_AUTO_ZOOM` now defaults to `true` (was `false`)
+  - `SEARCH_BY_GEOM_ENABLED` now defaults to `true` (was `false`)
+  - `API_MAX_ITEMS` defaults to `200`
+  - `MOSAIC_MAX_ITEMS` defaults to `100`
+  - `MAP_CENTER` defaults to `[30, 0]`
+  - `MAP_ZOOM` defaults to `3`
+  - `MAP_ZOOM_MAX` defaults to `18`
+  - `CONFIG_COLORMAP` defaults to `"viridis"`
+  - Users can completely omit these configuration parameters for better out-of-box experience
 - Added unified View Mode selector with four buttons (Hex, Grid, Scene, Mosaic) for
   user-selectable aggregation and viewing options
 - Added automatic view mode switching based on zoom level with manual override capability:
@@ -91,6 +144,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Removed
 
+- Removed `DEFAULT_COLLECTION` configuration parameter - moved into `COLLECTIONS.default` for
+  better organization. For backward compatibility, code still supports the old `DEFAULT_COLLECTION`
+  parameter, but new configurations should use `COLLECTIONS.default` instead.
+- Removed `LAYER_LIST_ENABLED` configuration parameter - layer list widget is now automatically
+  enabled when `LAYER_LIST_SERVICES` array is populated (follows convention over configuration)
 - Removed `pre-commit` npm package (replaced by Husky) and configuration
 - Removed `MOSAIC_MIN_ZOOM_LEVEL` configuration parameter (mosaic views now use
   per-collection `sceneMinZoom` parameter, same as scene views)

@@ -59,18 +59,20 @@ describe('fieldGrouping', () => {
   describe('createEnhancedDisplayFieldPredicate', () => {
     it('should create predicate that allows configured fields from ENHANCED_DISPLAY_CONFIG', () => {
       const appConfig = {
-        ENHANCED_DISPLAY_CONFIG: {
+        COLLECTIONS_CONFIG: {
           'sentinel-2-l2a': {
-            property_groups: [
-              {
-                name: 'Core Fields',
-                fields: [{ name: 'datetime' }, { name: 'platform' }]
-              },
-              {
-                name: 'Data Quality',
-                fields: [{ name: 'eo:cloud_cover' }]
-              }
-            ]
+            enhancedDisplayConfig: {
+              property_groups: [
+                {
+                  name: 'Core Fields',
+                  fields: [{ name: 'datetime' }, { name: 'platform' }]
+                },
+                {
+                  name: 'Data Quality',
+                  fields: [{ name: 'eo:cloud_cover' }]
+                }
+              ]
+            }
           }
         }
       }
@@ -87,10 +89,12 @@ describe('fieldGrouping', () => {
 
     it('should return allow-all predicate when property_groups is missing', () => {
       const appConfig = {
-        ENHANCED_DISPLAY_CONFIG: {
+        COLLECTIONS_CONFIG: {
           'sentinel-2-l2a': {
-            // Missing property_groups
-            asset_groups: []
+            enhancedDisplayConfig: {
+              // Missing property_groups
+              asset_groups: []
+            }
           }
         }
       }

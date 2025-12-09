@@ -212,14 +212,15 @@ const RightContent = () => {
           </button>
         </div>
       )}
-      {_appConfig.LAYER_LIST_ENABLED && _appConfig.LAYER_LIST_SERVICES && (
-        <div className="layerListButton" title="Layer List">
-          <LayersIcon
-            className="layerListButtonIcon"
-            onClick={() => onLayerListButtonClick()}
-          ></LayersIcon>
-        </div>
-      )}
+      {_appConfig.LAYER_LIST_SERVICES &&
+        _appConfig.LAYER_LIST_SERVICES.length > 0 && (
+          <div className="layerListButton" title="Layer List">
+            <LayersIcon
+              className="layerListButtonIcon"
+              onClick={() => onLayerListButtonClick()}
+            ></LayersIcon>
+          </div>
+        )}
       {_showLayerList && <LayerList></LayerList>}
       <div className="actionButtons">
         {_appConfig.ACTION_BUTTON && (

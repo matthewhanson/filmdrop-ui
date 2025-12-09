@@ -2,7 +2,9 @@
   "PUBLIC_URL": "http://example.com/",
   "LOGO_URL": "./logo.png",
   "LOGO_ALT": "Alt description for my custom logo",
-  "DEFAULT_COLLECTION": "collection-name",
+  "COLLECTIONS": {
+    "default": "collection-name"
+  },
   "STAC_API_URL": "https://api-endpoint.example.com",
   "STAC_LINK_ENABLED": true,
   "SHOW_ITEM_AUTO_ZOOM": true,
@@ -833,7 +835,6 @@
   "MAP_ZOOM": 3,
   "MAP_CENTER": [30, 0],
   "MAP_ZOOM_MAX": 24,
-  "LAYER_LIST_ENABLED": true,
   "LAYER_LIST_SERVICES": [
     {
       "name": "Service 1",
@@ -866,7 +867,6 @@
       ]
     }
   ],
-  "COLLECTIONS": ["naip", "cop-dem-glo-30", "sentinel-2-l2a"],
   "APP_TOKEN_AUTH_ENABLED": true,
   "AUTH_URL": "https://sample-auth-service/login",
   "SUPPORTS_AGGREGATIONS": false,

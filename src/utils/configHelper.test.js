@@ -6,7 +6,8 @@ import {
   loadAppTitle,
   loadAppFavicon,
   normalizeCollectionsConfig,
-  getCollectionConfig
+  getCollectionConfig,
+  autoConfigureRendering
 } from './configHelper'
 import { DoesFaviconExistService } from '../services/get-config-service'
 
@@ -28,8 +29,8 @@ describe('ConfigHelper', () => {
     it('sets document title and appName from default if App_Name not present in config', () => {
       store.dispatch(setappConfig(mockAppConfig))
       loadAppTitle()
-      expect(global.window.document.title).toBe('FilmDrop Console')
-      expect(store.getState().mainSlice.appName).toBe('FilmDrop Console')
+      expect(global.window.document.title).toBe('FilmDrop UI')
+      expect(store.getState().mainSlice.appName).toBe('FilmDrop UI')
     })
   })
   describe('loadAppFavicon', () => {
@@ -103,7 +104,7 @@ describe('ConfigHelper', () => {
         COLLECTIONS: ['collection1', 'collection2'],
         COLLECTIONS_CONFIG: {
           collection1: {
-            sceneTilerParams: { param1: 'value1' },
+            visualizations: { default: { param1: 'value1' } },
             mosaicTilerParams: { param2: 'value2' }
           },
           collection2: {
@@ -129,13 +130,17 @@ describe('ConfigHelper', () => {
 
       const result = normalizeCollectionsConfig(legacyConfig)
 
-      expect(result.COLLECTIONS_CONFIG.collection1.sceneTilerParams).toEqual({
+      expect(
+        result.COLLECTIONS_CONFIG.collection1.visualizations.default
+      ).toEqual({
         param1: 'value1'
       })
-      expect(result.COLLECTIONS_CONFIG.collection2.sceneTilerParams).toEqual({
+      expect(
+        result.COLLECTIONS_CONFIG.collection2.visualizations.default
+      ).toEqual({
         param2: 'value2'
       })
-      expect(result.SCENE_TILER_PARAMS).toBeDefined() // Backward compatibility
+      expect(result.SCENE_TILER_PARAMS).toBeDefined() // Still present for reference
     })
 
     it('should migrate legacy MOSAIC_TILER_PARAMS to COLLECTIONS_CONFIG', () => {
@@ -236,7 +241,9 @@ describe('ConfigHelper', () => {
 
       const result = normalizeCollectionsConfig(legacyConfig)
 
-      expect(result.COLLECTIONS_CONFIG.collection1.sceneTilerParams).toEqual({
+      expect(
+        result.COLLECTIONS_CONFIG.collection1.visualizations.default
+      ).toEqual({
         scene: 'param1'
       })
       expect(result.COLLECTIONS_CONFIG.collection1.mosaicTilerParams).toEqual({
@@ -266,6 +273,302 @@ describe('ConfigHelper', () => {
     })
   })
 
+  describe('autoConfigureRendering', () => {
+    beforeEach(() => {
+      vi.clearAllMocks()
+      // Spy on console methods
+      vi.spyOn(console, 'log').mockImplementation(() => {})
+      vi.spyOn(console, 'warn').mockImplementation(() => {})
+      vi.spyOn(console, 'error').mockImplementation(() => {})
+      vi.spyOn(console, 'debug').mockImplementation(() => {})
+    })
+
+    afterEach(() => {
+      vi.restoreAllMocks()
+    })
+
+    it('should return config unchanged if no SCENE_TILER_URL', () => {
+      const config = {
+        COLLECTIONS_CONFIG: {
+          col1: {}
+        },
+        _STAC_COLLECTIONS: [
+          {
+            id: 'col1',
+            renders: {
+              visual: {
+                assets: ['red', 'green', 'blue']
+              }
+            }
+          }
+        ]
+      }
+
+      const result = autoConfigureRendering(config)
+      expect(result).toEqual(config)
+      expect(console.debug).toHaveBeenCalledWith(
+        'SCENE_TILER_URL not configured, skipping rendering auto-configuration'
+      )
+    })
+
+    it('should return config unchanged if no _STAC_COLLECTIONS', () => {
+      const config = {
+        SCENE_TILER_URL: 'https://example.com/titiler',
+        COLLECTIONS_CONFIG: {
+          col1: {}
+        }
+      }
+
+      const result = autoConfigureRendering(config)
+      expect(result).toEqual(config)
+    })
+
+    it('should skip collections without renders object', () => {
+      const config = {
+        SCENE_TILER_URL: 'https://example.com/titiler',
+        COLLECTIONS_CONFIG: {
+          col1: {}
+        },
+        _STAC_COLLECTIONS: [
+          {
+            id: 'col1'
+            // No renders
+          }
+        ]
+      }
+
+      const result = autoConfigureRendering(config)
+      expect(result.COLLECTIONS_CONFIG.col1.visualizations).toBeUndefined()
+      expect(console.debug).toHaveBeenCalledWith(
+        "No 'renders' found for collection 'col1', skipping rendering auto-configuration"
+      )
+    })
+
+    it('should auto-configure from basic render definition with assets', () => {
+      const config = {
+        SCENE_TILER_URL: 'https://example.com/titiler',
+        COLLECTIONS_CONFIG: {
+          sentinel2: {}
+        },
+        _STAC_COLLECTIONS: [
+          {
+            id: 'sentinel2',
+            renders: {
+              'true-color': {
+                title: 'True Color',
+                assets: ['red', 'green', 'blue']
+              }
+            }
+          }
+        ]
+      }
+
+      const result = autoConfigureRendering(config)
+      // Should populate visualizations field
+      expect(result.COLLECTIONS_CONFIG.sentinel2.visualizations).toBeDefined()
+      expect(
+        result.COLLECTIONS_CONFIG.sentinel2.visualizations['true-color'].assets
+      ).toEqual(['red', 'green', 'blue'])
+      expect(result.COLLECTIONS_CONFIG.sentinel2.tileLayerParams).toEqual({})
+      expect(console.log).toHaveBeenCalledWith(
+        "Auto-configured visualizations for collection 'sentinel2': stored 1 visualization(s) (default: 'true-color')"
+      )
+    })
+
+    it('should map render extension fields to TiTiler parameters', () => {
+      const config = {
+        SCENE_TILER_URL: 'https://example.com/titiler',
+        COLLECTIONS_CONFIG: {
+          landsat: {}
+        },
+        _STAC_COLLECTIONS: [
+          {
+            id: 'landsat',
+            renders: {
+              swir: {
+                title: 'Shortwave Infrared',
+                assets: ['swir22', 'nir', 'red'],
+                rescale: [
+                  [0, 5000],
+                  [0, 7000],
+                  [0, 9000]
+                ],
+                resampling: 'nearest',
+                color_formula: 'Gamma+RGB+3.2'
+              }
+            }
+          }
+        ]
+      }
+
+      const result = autoConfigureRendering(config)
+      const params = result.COLLECTIONS_CONFIG.landsat.visualizations.swir
+
+      expect(params.assets).toEqual(['swir22', 'nir', 'red'])
+      expect(params.rescale).toEqual(['0,5000,0,7000,0,9000'])
+      expect(params.resampling).toEqual('nearest')
+      expect(params.color_formula).toEqual('Gamma+RGB+3.2')
+    })
+
+    it('should handle colormap_name and expression', () => {
+      const config = {
+        SCENE_TILER_URL: 'https://example.com/titiler',
+        COLLECTIONS_CONFIG: {
+          ndvi: {}
+        },
+        _STAC_COLLECTIONS: [
+          {
+            id: 'ndvi',
+            renders: {
+              ndvi: {
+                title: 'NDVI',
+                assets: ['nir', 'red'],
+                expression: '(nir-red)/(nir+red)',
+                rescale: [[-1, 1]],
+                colormap_name: 'ylgn',
+                resampling: 'average'
+              }
+            }
+          }
+        ]
+      }
+
+      const result = autoConfigureRendering(config)
+      const params = result.COLLECTIONS_CONFIG.ndvi.visualizations.ndvi
+
+      expect(params.assets).toEqual(['nir', 'red'])
+      expect(params.expression).toEqual('(nir-red)/(nir+red)')
+      expect(params.rescale).toEqual(['-1,1'])
+      expect(params.colormap_name).toEqual('ylgn')
+      expect(params.resampling).toEqual('average')
+    })
+
+    it('should handle custom colormap object', () => {
+      const config = {
+        SCENE_TILER_URL: 'https://example.com/titiler',
+        COLLECTIONS_CONFIG: {
+          dem: {}
+        },
+        _STAC_COLLECTIONS: [
+          {
+            id: 'dem',
+            renders: {
+              elevation: {
+                assets: ['data'],
+                colormap: {
+                  0: '#000000',
+                  1000: '#419bdf',
+                  2000: '#397d49'
+                },
+                nodata: -9999
+              }
+            }
+          }
+        ]
+      }
+
+      const result = autoConfigureRendering(config)
+      const params = result.COLLECTIONS_CONFIG.dem.visualizations.elevation
+
+      expect(params.assets).toEqual(['data'])
+      expect(params.colormap).toEqual({
+        0: '#000000',
+        1000: '#419bdf',
+        2000: '#397d49'
+      })
+      expect(params.nodata).toEqual(-9999)
+    })
+
+    it('should skip collections with user-configured visualizations', () => {
+      const config = {
+        SCENE_TILER_URL: 'https://example.com/titiler',
+        COLLECTIONS_CONFIG: {
+          col1: {
+            visualizations: {
+              'custom-vis': {
+                assets: ['custom-asset'],
+                color_formula: 'custom'
+              }
+            }
+          }
+        },
+        _STAC_COLLECTIONS: [
+          {
+            id: 'col1',
+            renders: {
+              default: {
+                assets: ['auto-asset']
+              }
+            }
+          }
+        ]
+      }
+
+      const result = autoConfigureRendering(config)
+      expect(
+        result.COLLECTIONS_CONFIG.col1.visualizations['custom-vis'].assets
+      ).toEqual(['custom-asset'])
+      expect(
+        result.COLLECTIONS_CONFIG.col1.visualizations['custom-vis']
+          .color_formula
+      ).toEqual('custom')
+      expect(console.debug).toHaveBeenCalledWith(
+        "Skipping rendering auto-configuration for 'col1' - visualizations already configured"
+      )
+    })
+
+    it('should use first render definition when multiple exist', () => {
+      const config = {
+        SCENE_TILER_URL: 'https://example.com/titiler',
+        COLLECTIONS_CONFIG: {
+          col1: {}
+        },
+        _STAC_COLLECTIONS: [
+          {
+            id: 'col1',
+            renders: {
+              'true-color': {
+                assets: ['red', 'green', 'blue']
+              },
+              'false-color': {
+                assets: ['nir', 'red', 'green']
+              }
+            }
+          }
+        ]
+      }
+
+      const result = autoConfigureRendering(config)
+      // Should use the first one (true-color)
+      expect(
+        result.COLLECTIONS_CONFIG.col1.visualizations['true-color'].assets
+      ).toEqual(['red', 'green', 'blue'])
+      expect(
+        result.COLLECTIONS_CONFIG.col1.visualizations['false-color'].assets
+      ).toEqual(['nir', 'red', 'green'])
+    })
+
+    it('should handle empty renders object', () => {
+      const config = {
+        SCENE_TILER_URL: 'https://example.com/titiler',
+        COLLECTIONS_CONFIG: {
+          col1: {}
+        },
+        _STAC_COLLECTIONS: [
+          {
+            id: 'col1',
+            renders: {}
+          }
+        ]
+      }
+
+      const result = autoConfigureRendering(config)
+      expect(result.COLLECTIONS_CONFIG.col1.visualizations).toBeUndefined()
+      expect(console.debug).toHaveBeenCalledWith(
+        "Collection 'col1' has empty 'renders' object"
+      )
+    })
+  })
   describe('getCollectionConfig', () => {
     beforeEach(() => {
       // Reset store before each test
@@ -274,7 +577,7 @@ describe('ConfigHelper', () => {
           COLLECTIONS: ['collection1', 'collection2'],
           COLLECTIONS_CONFIG: {
             collection1: {
-              sceneTilerParams: { scene: 'value1' },
+              visualizations: { default: { scene: 'value1' } },
               popupDisplayFields: ['field1', 'field2']
             },
             collection2: {
@@ -286,12 +589,12 @@ describe('ConfigHelper', () => {
     })
 
     it('should retrieve value from COLLECTIONS_CONFIG (new format)', () => {
-      const result = getCollectionConfig('collection1', 'sceneTilerParams')
-      expect(result).toEqual({ scene: 'value1' })
+      const result = getCollectionConfig('collection1', 'visualizations')
+      expect(result).toEqual({ default: { scene: 'value1' } })
     })
 
     it('should return undefined if collection does not exist', () => {
-      const result = getCollectionConfig('nonexistent', 'sceneTilerParams')
+      const result = getCollectionConfig('nonexistent', 'visualizations')
       expect(result).toBeUndefined()
     })
 
@@ -300,50 +603,56 @@ describe('ConfigHelper', () => {
       expect(result).toBeUndefined()
     })
 
-    it('should fall back to legacy parameter if not in COLLECTIONS_CONFIG', () => {
+    it('should work with visualizations parameter', () => {
       store.dispatch(
         setappConfig({
           COLLECTIONS: ['collection1'],
-          SCENE_TILER_PARAMS: {
-            collection1: { legacy: 'value' }
-          },
           COLLECTIONS_CONFIG: {
-            collection1: {} // No sceneTilerParams in new config
+            collection1: {
+              visualizations: {
+                'true-color': { assets: ['red', 'green', 'blue'] }
+              }
+            }
           }
         })
       )
 
-      const result = getCollectionConfig('collection1', 'sceneTilerParams')
-      expect(result).toEqual({ legacy: 'value' })
+      const result = getCollectionConfig('collection1', 'visualizations')
+      expect(result).toEqual({
+        'true-color': { assets: ['red', 'green', 'blue'] }
+      })
     })
 
     it('should use custom config when provided as third parameter', () => {
       const customConfig = {
         COLLECTIONS_CONFIG: {
           testCollection: {
-            sceneTilerParams: { custom: 'test' }
+            visualizations: { default: { custom: 'test' } }
           }
         }
       }
 
       const result = getCollectionConfig(
         'testCollection',
-        'sceneTilerParams',
+        'visualizations',
         customConfig
       )
-      expect(result).toEqual({ custom: 'test' })
+      expect(result).toEqual({ default: { custom: 'test' } })
     })
 
-    it('should handle all parameter type mappings', () => {
+    it('should handle all parameter types from COLLECTIONS_CONFIG', () => {
       store.dispatch(
         setappConfig({
           COLLECTIONS: ['col1'],
-          MOSAIC_TILER_PARAMS: { col1: { m: '1' } },
-          SEARCH_MIN_ZOOM_LEVELS: { col1: { medium: 5, high: 7 } },
-          POPUP_DISPLAY_FIELDS: { col1: ['f1'] },
-          TILE_LAYER_PARAMS: { col1: { t: '1' } },
-          ENHANCED_DISPLAY_CONFIG: { col1: { e: '1' } },
-          COLLECTIONS_CONFIG: { col1: {} }
+          COLLECTIONS_CONFIG: {
+            col1: {
+              mosaicTilerParams: { m: '1' },
+              sceneMinZoom: 7,
+              popupDisplayFields: ['f1'],
+              tileLayerParams: { t: '1' },
+              enhancedDisplayConfig: { e: '1' }
+            }
+          }
         })
       )
 
@@ -360,23 +669,20 @@ describe('ConfigHelper', () => {
       })
     })
 
-    it('should prioritize COLLECTIONS_CONFIG over legacy parameters', () => {
+    it('should retrieve visualizations from COLLECTIONS_CONFIG', () => {
       store.dispatch(
         setappConfig({
           COLLECTIONS: ['collection1'],
-          SCENE_TILER_PARAMS: {
-            collection1: { legacy: 'old' }
-          },
           COLLECTIONS_CONFIG: {
             collection1: {
-              sceneTilerParams: { new: 'value' }
+              visualizations: { default: { new: 'value' } }
             }
           }
         })
       )
 
-      const result = getCollectionConfig('collection1', 'sceneTilerParams')
-      expect(result).toEqual({ new: 'value' })
+      const result = getCollectionConfig('collection1', 'visualizations')
+      expect(result).toEqual({ default: { new: 'value' } })
     })
   })
 })

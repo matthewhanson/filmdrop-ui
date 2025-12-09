@@ -46,10 +46,9 @@ After building with `npm run build`, place your config at `build/config/config.j
 
 ### Required Parameters
 
-| Parameter      | Type   | Description                                                                                                                                                           |
-| -------------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `BASEMAP`      | Object | Basemap provider configuration for the Leaflet map. Must be a raster tile provider (vector tiles not supported). See [Basemap Configuration](#basemap-configuration). |
-| `STAC_API_URL` | String | URL for the STAC API endpoint                                                                                                                                         |
+| Parameter      | Type   | Description                   |
+| -------------- | ------ | ----------------------------- |
+| `STAC_API_URL` | String | URL for the STAC API endpoint |
 
 > **Note:** `SEARCH_MIN_ZOOM_LEVELS` was previously required but is now **deprecated**.
 > Use `sceneMinZoom` within `COLLECTIONS_CONFIG` instead.
@@ -73,12 +72,11 @@ After building with `npm run build`, place your config at `build/config/config.j
 | Parameter                 | Type    | Default | Description                                             |
 | ------------------------- | ------- | ------- | ------------------------------------------------------- |
 | `CART_ENABLED`            | Boolean | `false` | Enable shopping cart features for scene selection       |
-| `EXPORT_ENABLED`          | Boolean | `false` | Enable GeoJSON export of search results                 |
-| `SEARCH_BY_GEOM_ENABLED`  | Boolean | `false` | Allow users to draw or upload GeoJSON for search bounds |
+| `EXPORT_ENABLED`          | Boolean | `true`  | Enable GeoJSON export of search results                 |
+| `SEARCH_BY_GEOM_ENABLED`  | Boolean | `true`  | Allow users to draw or upload GeoJSON for search bounds |
 | `STAC_LINK_ENABLED`       | Boolean | `false` | Show link to STAC API item in details                   |
-| `SHOW_ITEM_AUTO_ZOOM`     | Boolean | `false` | Show toggle to auto-center map on selected item         |
-| `LAYER_LIST_ENABLED`      | Boolean | `false` | Enable reference layer list widget                      |
-| `THEME_SWITCHING_ENABLED` | Boolean | `false` | Enable light/dark theme switching                       |
+| `SHOW_ITEM_AUTO_ZOOM`     | Boolean | `true`  | Show toggle to auto-center map on selected item         |
+| `THEME_SWITCHING_ENABLED` | Boolean | `true`  | Enable light/dark theme switching                       |
 
 #### Navigation Buttons
 
@@ -108,12 +106,13 @@ After building with `npm run build`, place your config at `build/config/config.j
 
 #### Map Configuration
 
-| Parameter         | Type   | Default     | Description                                                                                              |
-| ----------------- | ------ | ----------- | -------------------------------------------------------------------------------------------------------- |
-| `MAP_CENTER`      | Array  | `[30, 0]`   | Initial map center `[lat, lon]`                                                                          |
-| `MAP_ZOOM`        | Number | `3`         | Initial map zoom level                                                                                   |
-| `MAP_ZOOM_MAX`    | Number | `18`        | Maximum map zoom level                                                                                   |
-| `CONFIG_COLORMAP` | String | `"viridis"` | Colormap for hex grid results. See [bpostlethwaite/colormap](https://github.com/bpostlethwaite/colormap) |
+| Parameter         | Type   | Default       | Description                                                                                                                     |
+| ----------------- | ------ | ------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `BASEMAP`         | Object | OpenStreetMap | Basemap provider configuration. See [Basemap Configuration](#basemap-configuration). Defaults to OpenStreetMap if not provided. |
+| `MAP_CENTER`      | Array  | `[30, 0]`     | Initial map center `[lat, lon]`                                                                                                 |
+| `MAP_ZOOM`        | Number | `3`           | Initial map zoom level                                                                                                          |
+| `MAP_ZOOM_MAX`    | Number | `18`          | Maximum map zoom level                                                                                                          |
+| `CONFIG_COLORMAP` | String | `"viridis"`   | Colormap for hex grid results. See [bpostlethwaite/colormap](https://github.com/bpostlethwaite/colormap)                        |
 
 #### Tiling Configuration
 
@@ -125,11 +124,255 @@ After building with `npm run build`, place your config at `build/config/config.j
 
 #### Layer Configuration
 
-| Parameter             | Type   | Description                                                                                             |
-| --------------------- | ------ | ------------------------------------------------------------------------------------------------------- |
-| `LAYER_LIST_SERVICES` | Array  | WMS service definitions for reference layers. See [Layer List Configuration](#layer-list-configuration) |
-| `COLLECTIONS`         | Array  | Filter collections to show (array of collection IDs)                                                    |
-| `DEFAULT_COLLECTION`  | String | Default selected collection ID                                                                          |
+| Parameter             | Type   | Description                                                                       |
+| --------------------- | ------ | --------------------------------------------------------------------------------- |
+| `LAYER_LIST_SERVICES` | Array  | WMS service definitions for reference layers. Auto-enables layer list widget.     |
+|                       |        | See [Layer List](#layer-list-configuration)                                       |
+| `COLLECTIONS`         | Object | Auto-configure collections from STAC API with include/exclude filters and default |
+|                       |        | selection. See [Collections Auto-Configuration](#collections-auto-configuration). |
+|                       |        | If omitted, all collections will be used.                                         |
+
+### Collections Auto-Configuration
+
+The `COLLECTIONS` parameter allows you to automatically fetch and filter the list of collections from
+your STAC API, rather than hardcoding collection IDs. It also lets you specify which collection should
+be selected by default.
+
+#### Configuration Format
+
+```json
+{
+  "STAC_API_URL": "https://your-stac-api.com",
+  "COLLECTIONS": {
+    "default": "sentinel-2-l2a",
+    "include": ["collection-1", "collection-2"],
+    "exclude": ["deprecated-collection"]
+  }
+}
+```
+
+#### Properties
+
+- `default` (String, optional): Collection ID to select by default. If not provided, the first collection will be selected.
+- `include` (Array, optional): Whitelist of collection IDs to use. Only these collections will be available.
+- `exclude` (Array, optional): Blacklist of collection IDs to exclude from the available collections.
+
+#### Behavior
+
+- If `COLLECTIONS` is **not provided**: All collections from the STAC API will be available
+- If `COLLECTIONS.include` is provided: **Only** these collections will be used (whitelist)
+- If `COLLECTIONS.exclude` is provided: These collections will be removed from the list (blacklist)
+- Both `include` and `exclude` can be used together (include is applied first, then exclude)
+
+#### Examples
+
+**Use only specific collections:**
+
+```json
+{
+  "COLLECTIONS": {
+    "include": ["sentinel-2-l2a", "landsat-8-c2-l2"]
+  }
+}
+```
+
+**Use all collections except specific ones:**
+
+```json
+{
+  "COLLECTIONS": {
+    "exclude": ["test-collection", "deprecated-collection"]
+  }
+}
+```
+
+**Use all collections (default behavior):**
+
+```json
+{
+  "COLLECTIONS": {}
+}
+```
+
+or simply omit the `COLLECTIONS` parameter entirely.
+
+#### Integration with COLLECTIONS_CONFIG
+
+The `COLLECTIONS_CONFIG` parameter can still be used to configure collection-specific settings. If a
+collection is configured in `COLLECTIONS_CONFIG` but is not in the filtered list (not included or is
+excluded), that configuration will be ignored with a debug message in the console.
+
+```json
+{
+  "COLLECTIONS": {
+    "include": ["sentinel-2-l2a", "landsat-8-c2-l2"]
+  },
+  "COLLECTIONS_CONFIG": {
+    "sentinel-2-l2a": {
+      "sceneMinZoom": 8,
+      "sceneTilerParams": { "assets": "visual" }
+    },
+    "deprecated-collection": {
+      "sceneMinZoom": 6
+    }
+  }
+}
+```
+
+In this example, the configuration for `deprecated-collection` will be ignored since it's not in the include list.
+
+### Rendering Auto-Configuration
+
+When both `STAC_API_URL` and `SCENE_TILER_URL` are configured, FilmDrop UI can automatically configure
+rendering parameters for collections that use the [STAC Render Extension](https://github.com/stac-extensions/render).
+This eliminates the need to manually specify visualization parameters for each collection.
+
+#### How It Works
+
+FilmDrop UI reads the `renders` object from each STAC Collection and automatically maps it to TiTiler
+parameters. The render extension allows data providers to define how their data should be visualized.
+
+**Requirements:**
+
+- `STAC_API_URL` must be configured
+- `SCENE_TILER_URL` must be configured
+- STAC Collections must include the `renders` extension
+
+#### Supported Render Extension Fields
+
+The following fields from the render extension are automatically mapped to `sceneTilerParams`:
+
+| Render Field    | TiTiler Parameter | Description                                                           |
+| --------------- | ----------------- | --------------------------------------------------------------------- |
+| `assets`        | `assets`          | Array of asset keys to render (required)                              |
+| `rescale`       | `rescale`         | Value ranges for stretching (e.g., `[[0,10000],[0,10000],[0,10000]]`) |
+| `colormap_name` | `colormap_name`   | Predefined colormap (e.g., `"viridis"`, `"ylgn"`)                     |
+| `colormap`      | `colormap`        | Custom colormap object                                                |
+| `color_formula` | `color_formula`   | Color adjustment formula (e.g., `"Gamma RGB 3.5"`)                    |
+| `nodata`        | `nodata`          | No-data value to mask                                                 |
+| `expression`    | `expression`      | Band math expression (e.g., `"(nir-red)/(nir+red)"`)                  |
+| `resampling`    | `resampling`      | Resampling method (e.g., `"nearest"`, `"bilinear"`)                   |
+
+#### Example STAC Collection with Render Extension
+
+```json
+{
+  "id": "sentinel-2-l2a",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/render/v2.0.0/schema.json"
+  ],
+  "renders": {
+    "true-color": {
+      "title": "True Color",
+      "assets": ["red", "green", "blue"],
+      "rescale": [
+        [0, 10000],
+        [0, 10000],
+        [0, 10000]
+      ],
+      "color_formula": "Gamma RGB 3.5"
+    },
+    "ndvi": {
+      "title": "NDVI",
+      "assets": ["nir", "red"],
+      "expression": "(nir-red)/(nir+red)",
+      "rescale": [[-1, 1]],
+      "colormap_name": "rdylgn"
+    }
+  }
+}
+```
+
+FilmDrop UI will automatically:
+
+- Store **all render definitions** in the `renders` field of `COLLECTIONS_CONFIG`
+- Use the **first render definition** (`true-color` in this example) to populate `sceneTilerParams` for backwards compatibility
+
+This means you have access to all available render options while maintaining compatibility with existing code that uses `sceneTilerParams`.
+
+#### Overriding Auto-Configuration
+
+Auto-configuration is **skipped** for collections where you have manually configured
+`sceneTilerParams` in `COLLECTIONS_CONFIG`. This allows you to override the automatic
+configuration when needed.
+
+```json
+{
+  "COLLECTIONS_CONFIG": {
+    "sentinel-2-l2a": {
+      "sceneTilerParams": {
+        "assets": ["B08", "B04", "B03"],
+        "rescale": ["0,3000", "0,3000", "0,3000"]
+      }
+    }
+  }
+}
+```
+
+#### Example Auto-Configured Scenarios
+
+**Scenario 1: True color visualization**
+
+```json
+// STAC Collection renders:
+{
+  "true-color": {
+    "assets": ["red", "green", "blue"],
+    "rescale": [
+      [0, 10000],
+      [0, 10000],
+      [0, 10000]
+    ]
+  }
+}
+// Result:
+// sceneTilerParams.assets = ["red", "green", "blue"]
+// sceneTilerParams.rescale = ["0,10000,0,10000,0,10000"]
+```
+
+**Scenario 2: NDVI with colormap**
+
+```json
+// STAC Collection renders:
+{
+  "ndvi": {
+    "assets": ["nir", "red"],
+    "expression": "(nir-red)/(nir+red)",
+    "rescale": [[-1, 1]],
+    "colormap_name": "rdylgn",
+    "resampling": "nearest"
+  }
+}
+// Result:
+// sceneTilerParams.assets = ["nir", "red"]
+// sceneTilerParams.expression = "(nir-red)/(nir+red)"
+// sceneTilerParams.rescale = ["-1,1"]
+// sceneTilerParams.colormap_name = "rdylgn"
+// sceneTilerParams.resampling = "nearest"
+```
+
+**Scenario 3: Custom colormap for elevation**
+
+```json
+// STAC Collection renders:
+{
+  "elevation": {
+    "assets": ["data"],
+    "colormap": {
+      "0": "#d7191c",
+      "1000": "#fdae61",
+      "2000": "#ffffbf",
+      "3000": "#a6d96a",
+      "4000": "#1a9641"
+    },
+    "nodata": -9999
+  }
+}
+// Result:
+// sceneTilerParams.assets = ["data"]
+// sceneTilerParams.colormap = { "0": "#d7191c", ... }
+// sceneTilerParams.nodata = -9999
+```
 
 ### Collection Configuration
 
@@ -143,6 +386,7 @@ improves maintainability.
 {
   "COLLECTIONS_CONFIG": {
     "collection-id": {
+      "visualizations": {},
       "sceneTilerParams": {},
       "mosaicTilerParams": {},
       "sceneMinZoom": 7,
@@ -156,14 +400,15 @@ improves maintainability.
 
 **Properties:**
 
-| Property                | Type   | Description                                                                                                                 |
-| ----------------------- | ------ | --------------------------------------------------------------------------------------------------------------------------- |
-| `sceneTilerParams`      | Object | TiTiler scene parameters: `assets`, `color_formula`, `bidx`, `rescale`, `expression`, `colormap_name`, `colormap`, `nodata` |
-| `mosaicTilerParams`     | Object | TiTiler mosaic parameters (same as sceneTilerParams)                                                                        |
-| `sceneMinZoom`          | Number | Minimum zoom level required for Scene and Mosaic views (default: 7)                                                         |
-| `popupDisplayFields`    | Array  | STAC property names to display in popup (e.g., `["datetime", "platform"]`)                                                  |
-| `tileLayerParams`       | Object | Leaflet tile layer options (e.g., `minZoom`, `maxZoom`, `opacity`)                                                          |
-| `enhancedDisplayConfig` | Object | Enhanced details configuration with `property_groups` and `asset_groups`                                                    |
+| Property                | Type   | Description                                                                                                                   |
+| ----------------------- | ------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| `visualizations`        | Object | Dictionary of visualization definitions, keyed by name. Auto-populated from STAC Render Extension when available.             |
+|                         |        | **Note:** This is the recommended way to define visualizations. The first visualization is used as the default for rendering. |
+| `mosaicTilerParams`     | Object | TiTiler mosaic parameters (same structure as sceneTilerParams)                                                                |
+| `sceneMinZoom`          | Number | Minimum zoom level required for Scene and Mosaic views (default: 7)                                                           |
+| `popupDisplayFields`    | Array  | STAC property names to display in popup (e.g., `["datetime", "platform"]`)                                                    |
+| `tileLayerParams`       | Object | Leaflet tile layer options (e.g., `minZoom`, `maxZoom`, `opacity`)                                                            |
+| `enhancedDisplayConfig` | Object | Enhanced details configuration with `property_groups` and `asset_groups`                                                      |
 
 **Example:**
 
@@ -171,9 +416,25 @@ improves maintainability.
 {
   "COLLECTIONS_CONFIG": {
     "sentinel-2-l2a": {
-      "sceneTilerParams": {
-        "assets": ["red", "green", "blue"],
-        "color_formula": "Gamma+RGB+3.2+Saturation+0.8+Sigmoidal+RGB+12+0.35"
+      "visualizations": {
+        "true-color": {
+          "title": "True Color",
+          "assets": ["red", "green", "blue"],
+          "rescale": ["0,10000,0,10000,0,10000"],
+          "color_formula": "Gamma RGB 3.5"
+        },
+        "false-color": {
+          "title": "False Color (NIR, Red, Green)",
+          "assets": ["nir", "red", "green"],
+          "rescale": ["0,10000,0,10000,0,10000"]
+        },
+        "ndvi": {
+          "title": "NDVI",
+          "assets": ["nir", "red"],
+          "expression": "(nir-red)/(nir+red)",
+          "colormap_name": "rdylgn",
+          "rescale": ["-1,1"]
+        }
       },
       "mosaicTilerParams": {
         "assets": ["visual"]
@@ -189,11 +450,14 @@ improves maintainability.
 }
 ```
 
+**Note:** The `visualizations` field is automatically populated when auto-configuration is enabled. All render definitions from
+the STAC Collection are stored here. The first visualization is used as the default for rendering.
+
 #### Legacy Format (Deprecated)
 
 The following parameters are **deprecated** but still supported for backward compatibility:
 
-- `SCENE_TILER_PARAMS`
+- `SCENE_TILER_PARAMS` - Converted to `visualizations` dictionary with key `"default"`
 - `MOSAIC_TILER_PARAMS`
 - `SEARCH_MIN_ZOOM_LEVELS` - Legacy format `{ "medium": number, "high": number }` converted to `sceneMinZoom` (uses the "high" value)
 - `POPUP_DISPLAY_FIELDS`
@@ -205,6 +469,15 @@ The following parameters are **deprecated** but still supported for backward com
 ## Configuration Examples
 
 ### Basemap Configuration
+
+**Default:** If not provided, defaults to OpenStreetMap:
+
+```json
+{
+  "url": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+  "attribution": "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a>"
+}
+```
 
 **Single Basemap:**
 
@@ -274,9 +547,10 @@ The following parameters are **deprecated** but still supported for backward com
 
 ### Layer List Configuration
 
+The reference layer list widget is automatically enabled when `LAYER_LIST_SERVICES` is populated.
+
 ```json
 {
-  "LAYER_LIST_ENABLED": true,
   "LAYER_LIST_SERVICES": [
     {
       "name": "USGS Topography",
@@ -336,6 +610,10 @@ The following parameters are **deprecated** but still supported for backward com
 ```
 
 ### TiTiler Parameters
+
+TiTiler automatically reads metadata from COG files and STAC items, including nodata values, CRS,
+scale/offset, and band information. The parameters below allow you to override these automatic values
+when needed. For complete parameter documentation, see [TiTiler Docs](https://devseed.com/titiler/).
 
 **Basic RGB:**
 

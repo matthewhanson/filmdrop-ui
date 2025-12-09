@@ -5,11 +5,12 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 FilmDrop UI is a powerful web application for searching, visualizing, and interacting with
-geospatial imagery catalogs through STAC (SpatioTemporal Asset Catalog) APIs. It provides
-multiple visualization modes including aggregated views, mosaics, and individual scenes with
-advanced filtering and export capabilities.
+geospatial imagery catalogs through STAC (SpatioTemporal Asset Catalog) APIs. It
+provides multiple visualization modes including aggregated views, mosaics, and
+individual scenes with advanced filtering and export capabilities.
 
-Check out [FilmDrop-UI in action with Earth-Search](https://console.earth-search.aws.element84.com/).
+Check out
+[FilmDrop-UI in action with Earth-Search](https://console.earth-search.aws.element84.com/).
 
 ![Sentinel-2 L2A Scene View](screenshots/s2-hex-aggregation.png)
 
@@ -40,6 +41,12 @@ Check out [FilmDrop-UI in action with Earth-Search](https://console.earth-search
   - Draw or upload GeoJSON search bounds
   - Interactive map with Leaflet
   - Light/dark theme support
+
+- **⚙️ Auto-Configuration**
+  - Automatic collection discovery from STAC API with include/exclude filters
+  - Automatic rendering configuration using STAC Render Extension (when TiTiler is available)
+  - Minimal configuration required - works out-of-the-box with most STAC catalogs
+  - Sensible defaults for common parameters
 
 ## 🚀 Quick Start
 
@@ -81,7 +88,8 @@ npm run build
 
 ## 📖 Documentation
 
-- **[Configuration Guide](CONFIGURATION.md)** - Complete configuration reference with migration guide
+- **[Configuration Guide](CONFIGURATION.md)** - Complete configuration reference
+  with migration guide
 - **[Changelog](CHANGELOG.md)** - Version history and changes
 
 ### Configuration Quick Reference
@@ -111,7 +119,8 @@ Create `public/config/config.json` (development) or `build/config/config.json` (
 
 Some FilmDrop features require specific STAC API extensions:
 
-- **Aggregation Views** - [Aggregation Extension](https://github.com/stac-api-extensions/aggregation)
+- **Aggregation Views** -
+  [Aggregation Extension](https://github.com/stac-api-extensions/aggregation)
   - Hex view requires items with `proj:centroid` property
   - Currently supported by [stac-server](https://github.com/stac-utils/stac-server) and stac-fastapi-elasticsearch-opensearch
   - The aggregation `centroid_geohex_grid_frequency` or `grid_geohex_frequency` (Deprecated) must be advertised by the `/aggregations` endpoint
@@ -120,6 +129,14 @@ Some FilmDrop features require specific STAC API extensions:
   - Items must include grid identifier (e.g., MGRS, WRS2)
 
 - **Cloud Cover Filtering** - [EO Extension](https://github.com/stac-extensions/eo)
+
+- **Automatic Rendering** -
+  [Render Extension](https://github.com/stac-extensions/render) (Optional)
+  - When `SCENE_TILER_URL` is configured, FilmDrop will automatically configure
+    visualization
+  - Collections with the `renders` extension will have TiTiler parameters
+    auto-configured
+  - Eliminates need to manually configure `sceneTilerParams` for each collection
 
 See [CONFIGURATION.md](CONFIGURATION.md) for detailed feature configuration.
 
@@ -146,7 +163,8 @@ Minimal configuration for viewing a single collection:
 
 ### With Imagery Visualization
 
-Add TiTiler for on-the-fly tile generation:
+Add TiTiler for on-the-fly tile generation. Note that `assets` will be auto-configured
+based on the collection's STAC metadata if not specified:
 
 ```json
 {
@@ -259,9 +277,11 @@ npm test -- --watch
 ## 📚 Related Projects
 
 - [STAC Specification](https://stacspec.org/) - Core STAC specification
-- [stac-server](https://github.com/stac-utils/stac-server) - Serverless STAC API implementation
+- [stac-server](https://github.com/stac-utils/stac-server) - Serverless STAC API
+  implementation
 - [TiTiler](https://github.com/developmentseed/titiler) - Dynamic tile server
-- [NASA IMPACT TiTiler](https://github.com/NASA-IMPACT/titiler) - Extended TiTiler with mosaicjson support
+- [NASA IMPACT TiTiler](https://github.com/NASA-IMPACT/titiler) - Extended TiTiler
+  with mosaicjson support
 
 ## 📄 License
 

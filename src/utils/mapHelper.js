@@ -355,11 +355,8 @@ export const debounceTitilerOverlay = debounce(
 function addImageOverlay(item) {
   const sceneTilerURL =
     store.getState().mainSlice.appConfig.SCENE_TILER_URL || ''
-  const sceneTilerParams = getCollectionConfig(
-    item?.collection,
-    'sceneTilerParams'
-  )
-  if (!item || !sceneTilerURL || !sceneTilerParams) {
+  const visualizations = getCollectionConfig(item?.collection, 'visualizations')
+  if (!item || !sceneTilerURL || !visualizations) {
     store.dispatch(setimageOverlayLoading(false))
     return
   }
@@ -445,7 +442,23 @@ const getTileLayerParams = (collection) => {
 }
 
 const constructSceneTilerParams = (collection) => {
-  const tilerParams = getCollectionConfig(collection, 'sceneTilerParams')
+  // Get visualizations dictionary
+  const visualizations = getCollectionConfig(collection, 'visualizations')
+
+  let tilerParams = null
+  if (visualizations && typeof visualizations === 'object') {
+    // Use the first visualization as the default
+    const visualizationKeys = Object.keys(visualizations)
+    if (visualizationKeys.length > 0) {
+      const defaultVisualizationKey = visualizationKeys[0]
+      tilerParams = visualizations[defaultVisualizationKey]
+      console.log(
+        `[TiTiler Scene] Collection: ${collection}, using visualization: ${defaultVisualizationKey}`,
+        tilerParams
+      )
+    }
+  }
+
   if (!tilerParams) return ''
 
   const params = []
@@ -463,9 +476,16 @@ const constructSceneTilerParams = (collection) => {
   if (colorFormula) params.push(colorFormula)
 
   const expression = parameters.expression(tilerParams)
-  if (expression) params.push(expression)
+  if (expression) {
+    params.push(expression)
+    // When using expression with assets, tell TiTiler each asset is a 1-band dataset
+    if (tilerParams?.assets && tilerParams.assets.length > 0) {
+      params.push('asset_as_band=true')
+    }
+  }
 
   const rescale = parameters.rescale(tilerParams)
+  if (rescale) params.push(rescale)
   if (rescale) params.push(rescale)
 
   const colormapName = parameters.colormapName(tilerParams)

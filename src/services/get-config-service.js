@@ -1,7 +1,12 @@
 import { store } from '../redux/store'
 import { setappConfig } from '../redux/slices/mainSlice'
 import { showApplicationAlert } from '../utils/alertHelper'
-import { normalizeCollectionsConfig } from '../utils/configHelper'
+import {
+  normalizeCollectionsConfig,
+  applyConfigDefaults,
+  autoConfigureCollections,
+  autoConfigureRendering
+} from '../utils/configHelper'
 
 export async function LoadConfigIntoStateService() {
   const cacheBuster = Date.now()
@@ -18,10 +23,24 @@ export async function LoadConfigIntoStateService() {
       }
       throw new Error()
     })
-    .then((json) => {
+    .then(async (json) => {
       // Normalize the config to support both old and new formats
-      const normalizedConfig = normalizeCollectionsConfig(json)
-      store.dispatch(setappConfig(normalizedConfig))
+      let normalizedConfig = normalizeCollectionsConfig(json)
+
+      // Auto-configure collections from STAC API if STAC_API_URL is provided
+      if (normalizedConfig.STAC_API_URL) {
+        normalizedConfig = await autoConfigureCollections(
+          normalizedConfig.STAC_API_URL,
+          normalizedConfig
+        )
+      }
+
+      // Auto-configure rendering based on collection render extension
+      normalizedConfig = autoConfigureRendering(normalizedConfig)
+
+      // Apply defaults for optional parameters
+      const configWithDefaults = applyConfigDefaults(normalizedConfig)
+      store.dispatch(setappConfig(configWithDefaults))
     })
     .catch((error) => {
       const message = 'Error Fetching Config File'
