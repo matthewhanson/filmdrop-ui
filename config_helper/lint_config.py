@@ -51,7 +51,6 @@ def lint_config(file_path):
         "APP_FAVICON": str,
         "MAP_ZOOM": int,
         "MAP_CENTER": list,
-        "LAYER_LIST_ENABLED": bool,
         "LAYER_LIST_SERVICES": list,
         "STAC_LINK_ENABLED": bool,
         "SHOW_ITEM_AUTO_ZOOM": bool,

@@ -16,16 +16,16 @@ export async function GetCollectionsService(searchParams) {
   const isSTACTokenAuthEnabled = appConfig.APP_TOKEN_AUTH_ENABLED ?? false
 
   // Build custom headers for authentication
-  const customHeaders = {}
+  const requestHeaders = new Headers()
   if (JWT && isSTACTokenAuthEnabled) {
-    customHeaders.Authorization = `Bearer ${JWT}`
+    requestHeaders.append('Authorization', `Bearer ${JWT}`)
   }
   appendStacHeaderCookies(requestHeaders)
 
   try {
     // Use stac-api client to fetch collections
     const json = await getCollections(appConfig.STAC_API_URL, {
-      headers: customHeaders,
+      headers: requestHeaders,
       credentials: appConfig.FETCH_CREDENTIALS || 'same-origin'
     })
 

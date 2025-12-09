@@ -835,7 +835,6 @@
   "MAP_ZOOM": 3,
   "MAP_CENTER": [30, 0],
   "MAP_ZOOM_MAX": 24,
-  "LAYER_LIST_ENABLED": true,
   "LAYER_LIST_SERVICES": [
     {
       "name": "Service 1",
