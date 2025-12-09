@@ -60,7 +60,8 @@ def lint_config(file_path):
         "APP_TOKEN_AUTH_ENABLED": bool,
         "AUTH_URL": str,
         "SUPPORTS_AGGREGATIONS": bool,
-        "EXPORT_ENABLED": bool
+        "EXPORT_ENABLED": bool,
+        "STAC_HEADER_COOKIES": list
     }
 
     print("*********************************************************************")

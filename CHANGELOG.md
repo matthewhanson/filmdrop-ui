@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Git hooks now properly source nvm to ensure consistent Node.js version across all
   environments (fixes Node version mismatch issues in VS Code/GitLens) due to moving
   from pre-commit to husky
+- Added config `STAC_HEADER_COOKIES` to optionally inject STAC request header values from cookies. ([455](https://github.com/Element84/filmdrop-ui/pull/455))
 
 ### Changed
 

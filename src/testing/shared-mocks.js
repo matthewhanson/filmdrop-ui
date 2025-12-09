@@ -3586,7 +3586,8 @@ export const mockAppConfig = {
     title: 'Learn more about FilmDrop',
     alt: 'Element 84 FilmDrop Logo',
     image: './logo-filmdrop-e84.png'
-  }
+  },
+  STAC_HEADER_COOKIES: []
 }
 
 export const mockClickResults = [

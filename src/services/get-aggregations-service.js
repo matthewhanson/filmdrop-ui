@@ -1,4 +1,5 @@
 import { store } from '../redux/store'
+import { appendStacHeaderCookies } from '../utils/stacRequest'
 
 export async function GetCollectionAggregationsService(collectionId) {
   const requestHeaders = new Headers()
@@ -8,6 +9,8 @@ export async function GetCollectionAggregationsService(collectionId) {
   if (JWT && isSTACTokenAuthEnabled) {
     requestHeaders.append('Authorization', `Bearer ${JWT}`)
   }
+  appendStacHeaderCookies(requestHeaders)
+
   return fetch(
     `${
       store.getState().mainSlice.appConfig.STAC_API_URL
