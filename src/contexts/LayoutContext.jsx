@@ -1,0 +1,47 @@
+import { createContext, useContext, useState, useCallback } from 'react'
+import PropTypes from 'prop-types'
+
+const LayoutContext = createContext(null)
+
+export const useLayout = () => {
+  const context = useContext(LayoutContext)
+  if (!context) {
+    throw new Error('useLayout must be used within LayoutProvider')
+  }
+  return context
+}
+
+export const LayoutProvider = ({ children }) => {
+  const [leftPanelWidth, setLeftPanelWidth] = useState(320)
+  const [isLeftPanelVisible, setIsLeftPanelVisible] = useState(true)
+  const [enhancedColumns, setEnhancedColumns] = useState(Math.floor(320 / 250))
+
+  const toggleLeftPanel = useCallback(() => {
+    setIsLeftPanelVisible((prev) => !prev)
+  }, [])
+
+  const updateLeftPanelWidth = useCallback((width) => {
+    setLeftPanelWidth(width)
+  }, [])
+
+  const updateEnhancedColumns = useCallback((columns) => {
+    setEnhancedColumns(columns)
+  }, [])
+
+  const value = {
+    leftPanelWidth,
+    isLeftPanelVisible,
+    enhancedColumns,
+    toggleLeftPanel,
+    updateLeftPanelWidth,
+    updateEnhancedColumns
+  }
+
+  return (
+    <LayoutContext.Provider value={value}>{children}</LayoutContext.Provider>
+  )
+}
+
+LayoutProvider.propTypes = {
+  children: PropTypes.node.isRequired
+}

@@ -3,6 +3,7 @@ import { render, screen, fireEvent, within } from '@testing-library/react'
 import PopupResults from './PopupResults'
 import { Provider } from 'react-redux'
 import { store } from '../../redux/store'
+import { LayoutProvider } from '../../contexts/LayoutContext'
 import {
   setShowPopupModal,
   setappConfig,
@@ -16,7 +17,9 @@ describe('PopupResult', () => {
   const setup = () =>
     render(
       <Provider store={store}>
-        <PopupResults results={mockClickResults} />
+        <LayoutProvider>
+          <PopupResults results={mockClickResults} />
+        </LayoutProvider>
       </Provider>
     )
 

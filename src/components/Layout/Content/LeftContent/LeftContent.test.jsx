@@ -4,6 +4,7 @@ import { render, screen } from '@testing-library/react'
 import LeftContent from './LeftContent'
 import { Provider } from 'react-redux'
 import { store } from '../../../../redux/store'
+import { LayoutProvider } from '../../../../contexts/LayoutContext'
 import {
   setappConfig,
   setSearchLoading,
@@ -17,7 +18,9 @@ describe('LeftContent', () => {
   const setup = () =>
     render(
       <Provider store={store}>
-        <LeftContent />
+        <LayoutProvider>
+          <LeftContent />
+        </LayoutProvider>
       </Provider>
     )
 

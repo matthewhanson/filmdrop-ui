@@ -1,6 +1,7 @@
-import { React, useEffect } from 'react'
+import React, { useEffect, useCallback } from 'react'
 import PropTypes from 'prop-types'
 import './PopupResults.css'
+import '../EnhancedDetails/EnhancedDetails.css'
 import { useDispatch, useSelector } from 'react-redux'
 import PopupResult from '../PopupResult/PopupResult'
 import {
@@ -16,9 +17,13 @@ import {
   areAllScenesSelectedInCart
 } from '../../utils/dataHelper'
 import { debounceTitilerOverlay } from '../../utils/mapHelper'
+import { useLayout } from '../../contexts/LayoutContext'
+import { EnhancedDetailsProvider } from '../../contexts/EnhancedDetailsContext'
+import EnhancedDetailsDisplay from '../EnhancedDetails/EnhancedDetailsDisplay.jsx'
 
 const PopupResults = (props) => {
   const dispatch = useDispatch()
+  const { enhancedColumns: _enhancedColumns } = useLayout()
   const _cartItems = useSelector((state) => state.mainSlice.cartItems)
   const _appConfig = useSelector((state) => state.mainSlice.appConfig)
   const _currentPopupResult = useSelector(
@@ -42,25 +47,25 @@ const PopupResults = (props) => {
     return () => {
       dispatch(setimageOverlayLoading(false))
     }
-  }, [props.results])
+  }, [props.results, _selectedPopupResultIndex])
 
   useEffect(() => {
     if (props.results.length > 0) {
       dispatch(setCurrentPopupResult(props.results[_selectedPopupResultIndex]))
     }
-  }, [_selectedPopupResultIndex])
+  }, [_selectedPopupResultIndex, props.results])
 
-  function onNextClick() {
+  const onNextClick = useCallback(() => {
     if (_selectedPopupResultIndex < props.results.length - 1) {
       dispatch(setselectedPopupResultIndex(_selectedPopupResultIndex + 1))
     }
-  }
+  }, [_selectedPopupResultIndex, props.results.length])
 
-  function onPrevClick() {
+  const onPrevClick = useCallback(() => {
     if (_selectedPopupResultIndex > 0) {
       dispatch(setselectedPopupResultIndex(_selectedPopupResultIndex - 1))
     }
-  }
+  }, [_selectedPopupResultIndex])
 
   function onAddRemoveSceneToCartClicked() {
     if (isSceneInCart(props.results[_selectedPopupResultIndex])) {
@@ -128,10 +133,20 @@ const PopupResults = (props) => {
                 ? 'popupResultsContent popupResultsContentCartEnabled'
                 : 'popupResultsContent'
             }
+            style={{ '--columns': _enhancedColumns }}
           >
             <PopupResult
               result={props.results[_selectedPopupResultIndex]}
             ></PopupResult>
+
+            <EnhancedDetailsProvider
+              item={_currentPopupResult}
+              enhancedColumns={_enhancedColumns}
+              appConfig={_appConfig}
+            >
+              <EnhancedDetailsDisplay />
+            </EnhancedDetailsProvider>
+
             {_appConfig.CART_ENABLED ? (
               <div className="popupResultsBottom">
                 <button

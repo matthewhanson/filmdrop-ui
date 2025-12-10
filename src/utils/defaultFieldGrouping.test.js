@@ -51,14 +51,14 @@ describe('Default Field Grouping', () => {
     expect(coreGroup.fields.map((f) => f.name)).toContain('platform')
 
     // Check Projection group
-    const projGroup = groups.find((g) => g.name === 'Proj')
+    const projGroup = groups.find((g) => g.name === 'Projection')
     expect(projGroup).toBeDefined()
     expect(projGroup.fields).toHaveLength(3)
     expect(projGroup.fields.map((f) => f.name)).toContain('proj:epsg')
     expect(projGroup.fields.map((f) => f.name)).toContain('proj:centroid')
 
     // Check Earth Observation group
-    const eoGroup = groups.find((g) => g.name === 'Eo')
+    const eoGroup = groups.find((g) => g.name === 'EO')
     expect(eoGroup).toBeDefined()
     expect(eoGroup.fields).toHaveLength(3)
     expect(eoGroup.fields.map((f) => f.name)).toContain('eo:cloud_cover')
@@ -77,8 +77,8 @@ describe('Default Field Grouping', () => {
 
     const groupNames = groups.map((g) => g.name)
     expect(groupNames[0]).toBe('Core Fields')
-    expect(groupNames[1]).toBe('Proj')
-    expect(groupNames[2]).toBe('Eo')
+    expect(groupNames[1]).toBe('Projection')
+    expect(groupNames[2]).toBe('EO')
   })
 
   test('orders fields within groups correctly', () => {
@@ -118,5 +118,35 @@ describe('Default Field Grouping', () => {
     expect(isFieldSupported('datetime')).toBe(true)
     expect(isFieldSupported('custom:unknown_field')).toBe(false)
     expect(isFieldSupported('ursa:special_property')).toBe(false)
+  })
+
+  test('generates correct extension titles from STAC extension prefixes', () => {
+    const testCases = {
+      'eo:cloud_cover': 'EO',
+      'proj:epsg': 'Projection',
+      'view:off_nadir': 'View',
+      'sar:instrument_mode': 'SAR',
+      'sat:orbit_state': 'Satellite',
+      's1:resolution': 'Sentinel-1',
+      's2:processing_baseline': 'Sentinel-2',
+      'mgrs:utm_zone': 'MGRS',
+      'grid:code': 'Grid',
+      'storage:platform': 'Storage',
+      'sci:doi': 'Scientific',
+      'landsat:correction': 'Landsat',
+      'naip:state': 'NAIP'
+    }
+
+    Object.entries(testCases).forEach(([fieldName, expectedTitle]) => {
+      const groups = groupPropertiesByExtension({ [fieldName]: 'test-value' })
+      const groupName = groups.find((g) => g.name !== 'Core Fields')?.name
+      expect(groupName).toBe(expectedTitle)
+    })
+  })
+
+  test('falls back to title case for unknown extensions', () => {
+    const groups = groupPropertiesByExtension({ 'xyz:data': 'test-value' })
+    const groupName = groups.find((g) => g.name !== 'Core Fields')?.name
+    expect(groupName).toBe('Xyz')
   })
 })

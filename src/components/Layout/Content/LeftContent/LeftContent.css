@@ -1,12 +1,14 @@
 .LeftContent {
   height: 100%;
-  width: 300px;
+  width: 320px;
   background-color: var(--side-panel-background);
   transition: width 0.3s ease-in-out;
+  position: relative;
 }
 
-.LeftContent.expanded {
-  width: 800px;
+.LeftContent.hidden {
+  width: 0px !important;
+  overflow: hidden;
 }
 
 .LeftContentTabs {
@@ -19,7 +21,7 @@
 }
 
 .LeftContentTab {
-  width: 33.33%;
+  width: 50%;
   height: 100%;
   display: flex;
   align-items: center;
@@ -36,23 +38,6 @@
   border-top: 4px solid var(--side-panel-tab-border);
   font-weight: bold;
   transition: width 0.3s ease-in-out;
-}
-
-/* Enhanced Details tab when collapsed (icon-only) */
-.LeftContentTab.enhanced-collapsed {
-  width: 60px;
-  min-width: 60px;
-}
-
-/* Enhanced Details tab when expanded */
-.LeftContentTab.enhanced-expanded {
-  width: 50%;
-}
-
-/* When Enhanced Details is collapsed, other tabs take up remaining space */
-.LeftContentTabs:has(.enhanced-collapsed)
-  .LeftContentTab:not(.enhanced-collapsed) {
-  width: calc((100% - 60px) / 2);
 }
 
 .LeftContentTabSelected {
@@ -98,14 +83,37 @@
   left: 0px;
 }
 
-.popupResultsEmptyPrimaryText,
-.enhancedDetailsTabEmptyPrimaryText {
-  font-weight: bold;
-  margin-bottom: 20px;
+/* Resize handle for panel */
+.resize-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 12px;
+  height: 100%;
+  cursor: ew-resize;
+  background-color: transparent;
+  transition: background-color 0.2s ease;
+  z-index: 100;
+  border: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
 }
 
-.popupResultsEmptySecondaryText,
-.enhancedDetailsTabEmptySecondaryText {
-  font-size: 14px;
-  max-width: 80%;
+.resize-handle:hover,
+.resize-handle:active {
+  background-color: var(--resize-handle-hover-background);
+}
+
+.resize-handle:hover .resize-handle-icon {
+  color: var(--brand-accent-primary);
+}
+
+.resize-handle-icon {
+  color: var(--brand-accent-primary-dark);
+  transform: rotate(90deg);
+  font-size: 20px;
+  pointer-events: none;
 }

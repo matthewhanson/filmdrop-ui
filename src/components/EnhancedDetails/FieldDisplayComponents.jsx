@@ -103,7 +103,12 @@ export const CoordinateFieldDisplay = ({ components }) => {
         ? c.lon.toFixed(6)
         : sanitizeFieldValue(c.lon, false)
 
-    return `Lat: ${lat}°, Lon: ${lon}°`
+    return (
+      <>
+        Lat: {lat}°<br />
+        Lon: {lon}°
+      </>
+    )
   }
 
   if (c.type === 'bbox') {
@@ -167,6 +172,24 @@ export const BooleanFieldDisplay = ({ components }) => {
 }
 
 /**
+ * Processing Field Display Component
+ * Renders processing software information with name and version
+ */
+export const ProcessingFieldDisplay = ({ components }) => {
+  if (!components || components.length === 0) return null
+
+  const parts = components
+    .filter((c) => c.type === 'software')
+    .map((c) => {
+      const name = sanitizeFieldValue(c.name, false)
+      const version = sanitizeFieldValue(c.version, false)
+      return `${name} (${version})`
+    })
+
+  return parts.join(', ')
+}
+
+/**
  * Percentage Field Display Component
  * Renders percentage values with % symbol
  */
@@ -190,6 +213,42 @@ export const StandardFieldDisplay = ({ components }) => {
 }
 
 /**
+ * Datetime Field Display Component
+ * Renders ISO 8601 datetime strings in formatted local time
+ */
+export const DatetimeFieldDisplay = ({ value }) => {
+  const formatDatetime = (isoString) => {
+    try {
+      const date = new Date(isoString)
+      if (isNaN(date.getTime())) return isoString
+
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      const hours = String(date.getHours()).padStart(2, '0')
+      const minutes = String(date.getMinutes()).padStart(2, '0')
+      const seconds = String(date.getSeconds()).padStart(2, '0')
+
+      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+    } catch (e) {
+      return isoString
+    }
+  }
+
+  return <span className="datetime-field">{formatDatetime(value)}</span>
+}
+
+// PropTypes validation
+GridFieldDisplay.propTypes = {
+  components: PropTypes.arrayOf(
+    PropTypes.shape({
+      type: PropTypes.string,
+      value: PropTypes.any
+    })
+  )
+}
+
+/**
  * Universal Field Display Component
  * Routes to appropriate specialized component based on field type
  */
@@ -203,14 +262,17 @@ export const FieldDisplay = ({ fieldType, components, field }) => {
       return <ShapeFieldDisplay components={components} />
     case 'boolean':
       return <BooleanFieldDisplay components={components} />
+    case 'processing':
+      return <ProcessingFieldDisplay components={components} />
     case 'percentage':
       return <PercentageFieldDisplay components={components} />
+    case 'datetime':
+      return <DatetimeFieldDisplay value={components[0]?.value} />
     default:
       return <StandardFieldDisplay components={components} />
   }
 }
 
-// PropTypes validation
 GridFieldDisplay.propTypes = {
   components: PropTypes.arrayOf(
     PropTypes.shape({
@@ -271,6 +333,10 @@ StandardFieldDisplay.propTypes = {
       value: PropTypes.any
     })
   ).isRequired
+}
+
+DatetimeFieldDisplay.propTypes = {
+  value: PropTypes.string.isRequired
 }
 
 FieldDisplay.propTypes = {

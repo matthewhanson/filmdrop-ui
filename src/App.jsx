@@ -14,6 +14,7 @@ import { InitializeAppFromConfig } from './utils/configHelper'
 import Login from './components/Login/Login'
 import { setauthTokenExists, setCurrentTheme } from './redux/slices/mainSlice'
 import { initializeTheme, applyTheme } from './utils/themeHelper'
+import { LayoutProvider } from './contexts/LayoutContext'
 
 function App() {
   const dispatch = useDispatch()
@@ -68,29 +69,31 @@ function App() {
 
   return (
     <React.StrictMode>
-      {_appConfig ? (
-        showLogin ? (
-          <div className="App">
-            <Login></Login>
-            {_showApplicationAlert ? <SystemMessage></SystemMessage> : null}
-          </div>
+      <LayoutProvider>
+        {_appConfig ? (
+          showLogin ? (
+            <div className="App">
+              <Login></Login>
+              {_showApplicationAlert ? <SystemMessage></SystemMessage> : null}
+            </div>
+          ) : (
+            <div className="App">
+              <PageHeader></PageHeader>
+              <Content></Content>
+              {_showUploadGeojsonModal ? (
+                <UploadGeojsonModal></UploadGeojsonModal>
+              ) : null}
+              {_showApplicationAlert ? <SystemMessage></SystemMessage> : null}
+              {_showCartModal ? <CartModal></CartModal> : null}
+            </div>
+          )
         ) : (
           <div className="App">
-            <PageHeader></PageHeader>
-            <Content></Content>
-            {_showUploadGeojsonModal ? (
-              <UploadGeojsonModal></UploadGeojsonModal>
-            ) : null}
+            <div className="appLoading" data-testid="testAppLoading"></div>
             {_showApplicationAlert ? <SystemMessage></SystemMessage> : null}
-            {_showCartModal ? <CartModal></CartModal> : null}
           </div>
-        )
-      ) : (
-        <div className="App">
-          <div className="appLoading" data-testid="testAppLoading"></div>
-          {_showApplicationAlert ? <SystemMessage></SystemMessage> : null}
-        </div>
-      )}
+        )}
+      </LayoutProvider>
     </React.StrictMode>
   )
 }
