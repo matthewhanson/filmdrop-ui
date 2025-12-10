@@ -6,6 +6,54 @@
 import StacFields from '@radiantearth/stac-fields'
 
 /**
+ * Map of STAC extension prefixes to their display titles
+ * Based on official STAC extension specifications (Stable, Candidate, and Pilot maturity levels)
+ * @see https://stac-extensions.github.io/
+ */
+const EXTENSION_TITLE_MAP = {
+  // Stable extensions
+  eo: 'EO',
+  file: 'File',
+  landsat: 'Landsat',
+  proj: 'Projection',
+  sar: 'SAR',
+  sci: 'Scientific',
+  view: 'View',
+
+  // Candidate extensions
+  cube: 'Datacube',
+  mlm: 'Machine Learning Model',
+  processing: 'Processing',
+  raster: 'Raster',
+  sat: 'Satellite',
+
+  // Pilot extensions
+  altm: 'Altimetry',
+  anon: 'Anonymized Location',
+  card4l: 'CARD4L',
+  classification: 'Classification',
+  goes: 'GOES',
+  grid: 'Grid',
+  label: 'Label',
+  mgrs: 'MGRS',
+  noaa_mrms_qpe: 'NOAA MRMS QPE',
+  order: 'Order',
+  pc: 'Point Cloud',
+  rendering: 'Rendering',
+  stats: 'Stats',
+  storage: 'Storage',
+  table: 'Table',
+  timestamps: 'Timestamps',
+
+  // Mission-specific (Stable/Candidate/Proposal)
+  s1: 'Sentinel-1',
+  s2: 'Sentinel-2',
+  s3: 'Sentinel-3',
+  s5p: 'Sentinel-5P',
+  naip: 'NAIP'
+}
+
+/**
  * Get all extension prefixes from stac-fields registry
  * @returns {Array} Array of extension prefixes found in stac-fields
  */
@@ -33,7 +81,12 @@ function getExtensionPrefixes() {
  * @returns {string} Human-readable extension name
  */
 function generateExtensionName(prefix) {
-  // Generate intelligent name from prefix
+  // Check if prefix has a defined title mapping first
+  if (EXTENSION_TITLE_MAP[prefix]) {
+    return EXTENSION_TITLE_MAP[prefix]
+  }
+
+  // Fallback: Generate intelligent name from prefix
   return prefix
     .replace(/_/g, ' ') // Replace underscores with spaces
     .replace(/([a-z])([A-Z])/g, '$1 $2') // Add space before capital letters

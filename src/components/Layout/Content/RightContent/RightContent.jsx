@@ -36,6 +36,8 @@ import { Tooltip } from 'react-tooltip'
 import LayersIcon from '@mui/icons-material/Layers'
 import LayerList from '../../../LayerList/LayerList'
 import ExportButton from '../../../ExportButton/ExportButton'
+import { useLayout } from '../../../../contexts/LayoutContext'
+import { useMapResizeHandler } from '../../../../hooks/useMapResizeHandler'
 
 const RightContent = () => {
   const [allScenesLoading, setallScenesLoading] = useState(false)
@@ -68,17 +70,20 @@ const RightContent = () => {
   const _appName = useSelector((state) => state.mainSlice.appName)
   const _showLayerList = useSelector((state) => state.mainSlice.showLayerList)
   const _currentTheme = useSelector((state) => state.mainSlice.currentTheme)
-  const _isEnhancedDetailsExpanded = useSelector(
-    (state) => state.mainSlice.isEnhancedDetailsExpanded
-  )
   const _selectedCollectionData = useSelector(
     (state) => state.mainSlice.selectedCollectionData
   )
+  const _map = useSelector((state) => state.mainSlice.map)
+  const {
+    leftPanelWidth: _leftPanelWidth,
+    isLeftPanelVisible: _isLeftPanelVisible
+  } = useLayout()
 
   const dispatch = useDispatch()
 
   const abortControllerRef = useRef(null)
   const attributionTimeout = useRef(null)
+  const rightContentRef = useRef(null)
 
   const resultType = _searchType === 'hex' ? 'hex cells' : 'grid cells'
 
@@ -199,9 +204,19 @@ const RightContent = () => {
     dispatch(setshowLayerList(!_showLayerList))
   }
 
+  // Use custom hook to handle map resize with debouncing
+  useMapResizeHandler(_map, rightContentRef)
+
+  const effectiveLeftWidth = _isLeftPanelVisible ? _leftPanelWidth : 0
+
   return (
     <div
-      className={`RightContent ${_isEnhancedDetailsExpanded ? 'expanded' : ''}`}
+      ref={rightContentRef}
+      className="RightContent"
+      style={{
+        width: `calc(100% - ${effectiveLeftWidth}px)`,
+        left: `${effectiveLeftWidth}px`
+      }}
     >
       <LeafMap></LeafMap>
       {_showZoomNotice && (

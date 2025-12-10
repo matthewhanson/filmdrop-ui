@@ -69,14 +69,109 @@ After building with `npm run build`, place your config at `build/config/config.j
 
 #### UI Features
 
-| Parameter                 | Type    | Default | Description                                             |
-| ------------------------- | ------- | ------- | ------------------------------------------------------- |
-| `CART_ENABLED`            | Boolean | `false` | Enable shopping cart features for scene selection       |
-| `EXPORT_ENABLED`          | Boolean | `true`  | Enable GeoJSON export of search results                 |
-| `SEARCH_BY_GEOM_ENABLED`  | Boolean | `true`  | Allow users to draw or upload GeoJSON for search bounds |
-| `STAC_LINK_ENABLED`       | Boolean | `false` | Show link to STAC API item in details                   |
-| `SHOW_ITEM_AUTO_ZOOM`     | Boolean | `true`  | Show toggle to auto-center map on selected item         |
-| `THEME_SWITCHING_ENABLED` | Boolean | `true`  | Enable light/dark theme switching                       |
+| Parameter                    | Type    | Default  | Description                                             |
+| ---------------------------- | ------- | -------- | ------------------------------------------------------- |
+| `CART_ENABLED`               | Boolean | `false`  | Enable shopping cart features for scene selection       |
+| `EXPORT_ENABLED`             | Boolean | `true`   | Enable GeoJSON export of search results                 |
+| `SEARCH_BY_GEOM_ENABLED`     | Boolean | `true`   | Allow users to draw or upload GeoJSON for search bounds |
+| `STAC_LINK_ENABLED`          | Boolean | `false`  | Show STAC API Item link in Links section                |
+| `STAC_LINKS_SECTION_ENABLED` | Boolean | `false`  | Show comprehensive Links section (grouped by rel type)  |
+| `STAC_LINKS_EXCLUDE_LIST`    | Array   | See note | Link rel types to hide from Links section (power-users) |
+| `SHOW_ITEM_AUTO_ZOOM`        | Boolean | `true`   | Show toggle to auto-center map on selected item         |
+| `THEME_SWITCHING_ENABLED`    | Boolean | `true`   | Enable light/dark theme switching                       |
+
+**STAC Links Configuration:**
+
+The Links section displays STAC item links through two independent feature flags:
+
+- **`STAC_LINK_ENABLED`** (`false` by default): Shows the STAC API Item link (the item's canonical link to itself)
+- **`STAC_LINKS_SECTION_ENABLED`** (`false` by default): Shows a comprehensive Links section with all other item links grouped by relationship type
+
+Both flags can be enabled independently. Links are displayed under a single "Links" header when at least one flag is enabled.
+
+#### Configuration Examples
+
+**Show only STAC API Item link:**
+
+```json
+{
+  "STAC_LINK_ENABLED": true,
+  "STAC_LINKS_SECTION_ENABLED": false
+}
+```
+
+**Show only comprehensive Links section:**
+
+```json
+{
+  "STAC_LINK_ENABLED": false,
+  "STAC_LINKS_SECTION_ENABLED": true,
+  "STAC_LINKS_EXCLUDE_LIST": [
+    "parent",
+    "collection",
+    "root",
+    "items",
+    "aggregate",
+    "aggregations",
+    "http://www.opengis.net/def/rel/ogc/1.0/queryables",
+    "conformance",
+    "service-desc",
+    "service-doc",
+    "data",
+    "thumbnail"
+  ]
+}
+```
+
+**Show both STAC API Item and comprehensive Links section:**
+
+```json
+{
+  "STAC_LINK_ENABLED": true,
+  "STAC_LINKS_SECTION_ENABLED": true,
+  "STAC_LINKS_EXCLUDE_LIST": [
+    "parent",
+    "collection",
+    "root",
+    "items",
+    "aggregate",
+    "aggregations",
+    "http://www.opengis.net/def/rel/ogc/1.0/queryables",
+    "conformance",
+    "service-desc",
+    "service-doc",
+    "data",
+    "thumbnail"
+  ]
+}
+```
+
+**Hide all links (default):**
+
+```json
+{
+  "STAC_LINK_ENABLED": false,
+  "STAC_LINKS_SECTION_ENABLED": false
+}
+```
+
+#### STAC_LINKS_EXCLUDE_LIST Configuration
+
+By default, the comprehensive Links section excludes navigation and API plumbing links:
+
+**Default excluded rels:**
+
+- **Navigation hierarchy:** `parent`, `collection`, `root` — organizational links not useful in per-item context
+- **API endpoints:** `items`, `aggregate`, `aggregations` — programmatic API navigation
+- **Technical links:** OGC queryables, conformance, service descriptors — low-level API plumbing
+
+**To show all links** (including navigation/API links for power-users), set to an empty array:
+
+```json
+{ "STAC_LINKS_EXCLUDE_LIST": [] }
+```
+
+**Links shown by default:** `canonical` (original JSON), `license` (license information), `derived_from` (source data), `about` (item information), `alternate` (alternate formats), and custom links.
 
 #### Navigation Buttons
 
