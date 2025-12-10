@@ -10,9 +10,15 @@ import {
   addToPaginationHistory,
   setpaginationHistory
 } from '../redux/slices/mainSlice'
-import { addDataToLayer, footprintLayerStyle, clearLayer, clearMapSelection } from '../utils/mapHelper'
+import {
+  addDataToLayer,
+  footprintLayerStyle,
+  clearLayer,
+  clearMapSelection
+} from '../utils/mapHelper'
 import { appendStacHeaderCookies } from '../utils/stacRequest'
 import { DEFAULT_API_MAX_ITEMS } from '../components/defaults'
+import { router } from '../router'
 
 /**
  * Fetch a specific page of search results using pagination links
@@ -28,6 +34,11 @@ export async function FetchPageService(pageUrl, pageNumber) {
     requestHeaders.append('Authorization', `Bearer ${JWT}`)
   }
   appendStacHeaderCookies(requestHeaders)
+
+  // Reset URL to root if currently on a STAC item route
+  if (window.location.pathname.startsWith('/item/')) {
+    router.navigate({ to: '/' })
+  }
 
   store.dispatch(setSearchLoading(true))
 
@@ -57,22 +68,32 @@ export async function FetchPageService(pageUrl, pageNumber) {
 
       store.dispatch(setpaginationNextLink(nextLink?.href || null))
       store.dispatch(setpaginationPrevLink(prevLink?.href || null))
-      
+
       // Only update page number if we have features or if it's valid within totalPages
       const currentTotalPages = store.getState().mainSlice.totalPages
-      if (json.features?.length > 0 || !currentTotalPages || pageNumber <= currentTotalPages) {
+      if (
+        json.features?.length > 0 ||
+        !currentTotalPages ||
+        pageNumber <= currentTotalPages
+      ) {
         store.dispatch(setcurrentPage(pageNumber))
-        
+
         // Update pagination history
         const history = store.getState().mainSlice.paginationHistory
-        const existingPageIndex = history.findIndex(h => h.page === pageNumber)
-        
+        const existingPageIndex = history.findIndex(
+          (h) => h.page === pageNumber
+        )
+
         if (existingPageIndex === -1) {
           // Add new page to history
-          store.dispatch(addToPaginationHistory({ page: pageNumber, url: pageUrl }))
+          store.dispatch(
+            addToPaginationHistory({ page: pageNumber, url: pageUrl })
+          )
         } else {
           // Trim history to this page (going back)
-          store.dispatch(setpaginationHistory(history.slice(0, existingPageIndex + 1)))
+          store.dispatch(
+            setpaginationHistory(history.slice(0, existingPageIndex + 1))
+          )
         }
       }
 
