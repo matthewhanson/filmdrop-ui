@@ -14,13 +14,16 @@ const SystemMessage = () => {
   const _applicationAlertSeverity = useSelector(
     (state) => state.mainSlice.applicationAlertSeverity
   )
+  const _isAuthErrorAlert = useSelector(
+    (state) => state.mainSlice.isAuthErrorAlert
+  )
 
   return (
     <div className="SystemMessage" data-testid="testSystemMessage">
       <Alert
         onClose={() => {
           store.dispatch(setshowApplicationAlert(false))
-          if (_applicationAlertSeverity === 'error') {
+          if (_applicationAlertSeverity === 'error' && _isAuthErrorAlert) {
             logoutUser()
           }
         }}
