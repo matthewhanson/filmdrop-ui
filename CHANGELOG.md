@@ -73,6 +73,30 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Field formatting tests for component extraction and value parsing
   - Field grouping tests for display configuration
   - Asset grouping tests for file type classification and thumbnail detection
+- Asset cards now display file size when available in STAC data (`file:size` or `size` field)
+- Added STAC item links section with independent feature flags (`src/components/EnhancedDetails/LinkDisplay.jsx` and related components):
+  - Two independent feature flags control link display:
+    - `STAC_LINK_ENABLED`: Shows STAC API Item link (the item's canonical self-reference)
+    - `STAC_LINKS_SECTION_ENABLED`: Shows comprehensive Links section with all other links grouped by rel type
+  - Both flags default to `false` (opt-in feature for backwards compatibility)
+  - Links render under single "Links" header when at least one flag is enabled
+  - New `LinkDisplay` component handles orchestration of self-link and grouped links
+  - New `LinkItem` component for individual link cards with copy-to-clipboard, type icons, and open actions
+  - New `defaultLinkGrouping.js` utility with filtering, grouping, and formatting functions
+  - Smart href truncation showing meaningful URL parts (domain + important segments + filename)
+  - Links grouped by rel type (e.g., "STAC API Item", "License", "Canonical URL")
+  - Supports multiple links per rel type with count display (e.g., "License (3)")
+  - Copy-to-clipboard functionality for all links with tooltip feedback
+  - Type hint icons (JSON, HTML, Image, PDF) inferred from MIME type or URL extension
+  - Special handling for non-HTTP links (S3, etc.) with "Requires S3 access" tooltip
+  - Responsive grid layout respecting the column resize control (same as Assets section)
+  - Configurable link rel type exclusion via `STAC_LINKS_EXCLUDE_LIST` for power users
+  - Links exclude navigation/API plumbing by default: `parent`, `collection`, `root`, `items`, `aggregate`, `aggregations`, `conformance`, `service-desc`, `service-doc`, `data`, OGC queryables, `thumbnail`
+  - Comprehensive links section displays: `canonical`, `license`, `derived_from`, `about`, `alternate`, and custom links
+- Added `LayoutContext` for managing UI layout state (panel width, visibility)
+- Added `EnhancedDetailsContext` for sharing STAC item and rendering data across component hierarchy
+- Added strict ISO 8601 datetime validation to field discovery system
+- Added `DatetimeFieldDisplay` component for formatted datetime rendering
 
 ### Changed
 
@@ -130,6 +154,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Field rendering delegated to `FieldRenderer` component for type-safe display
   - Asset rendering delegated to `AssetsContainer` component with file type grouping
   - Item metadata displayed via `EnhancedDetailsHeader` component
+- Enhanced details rendering extracted to dedicated `EnhancedDetailsDisplay` component:
+  - Created new `src/components/EnhancedDetails/EnhancedDetailsDisplay.jsx` for improved maintainability
+  - Separates field grouping, asset rendering, and link display logic from popup navigation concerns
+  - Reduces `PopupResults.jsx` complexity from 350 to 180 lines (50% reduction)
+  - Enables independent testing of enhanced details rendering following React Testing Library principles
+  - Component accepts `currentPopupResult` and `enhancedColumns` props for clean interface
+- Enhanced CSS variable infrastructure for responsive layout:
+  - Added `--columns` CSS variable to both dark and light themes in `src/themes/theme.css`
+  - Ensures robust grid layout inheritance across `.field-grid`, `.asset-grid`, and `.link-grid` containers
+  - Improves browser compatibility and eliminates potential CSS variable inheritance edge cases
+- Code consistency improvements across Enhanced Details components:
+  - Renamed `copiedHref` state variable to `copiedUrl` in `LinkItem.jsx` for naming alignment with `AssetItem` component
+  - Fixed `enhancedColumns` initialization in Redux state to use correct panel width (320px) for semantic accuracy
+  - Restored JSDoc comment above `GridFieldDisplay.propTypes` for improved code documentation
 - Asset display now automatically groups by file type and excludes thumbnails from main asset view:
   - `src/utils/defaultAssetGrouping.js` enhanced with file type detection and asset classification
   - Thumbnails excluded from asset container (displayed separately if needed)
@@ -190,6 +228,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - New names: `centroid_geohex_grid_frequency`, `centroid_geohash_grid_frequency`, `centroid_geotile_grid_frequency`
   - Old names: `grid_geohex_frequency`, `grid_geohash_frequency`, `grid_geotile_frequency`
   - Ensures compatibility with Earth Search STAC API and other APIs using deprecated names
+- Asset grouping now prioritizes STAC roles (data, visual, metadata, thumbnail) with MIME type fallback for legacy items.
+- Asset cards display custom roles and file type abbreviations for improved clarity.
+- Processing software information now displays correctly in Enhanced Details (e.g., "sentinel2-to-stac (0.1.0)")
+- STAC API Item link moved from top of popup to bottom, after all asset groups
+- Refactored panel state management from Redux to React Context API:
+  - `leftPanelWidth`, `isLeftPanelVisible`, and `enhancedColumns` now managed by `LayoutContext`
+  - Reduces Redux store footprint and improves component isolation
+- Eliminated prop drilling through EnhancedDetails component hierarchy using Context API:
+  - Item data, enhanced columns, and app config now provided via `EnhancedDetailsContext`
+  - Simplifies component signatures and improves maintainability
+- DateTime field detection moved from regex fallback in `EnhancedFieldRenderer` to structured `fieldDiscovery` system
+  - Validates ISO 8601 format (YYYY-MM-DDTHH:MM:SS[.sss][Z|±HH:MM])
+  - Outputs formatted datetime as "YYYY-MM-DD HH:MM:SS"
 
 ### Fixed
 
@@ -231,6 +282,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Removed dead code that was trying to use `.includes()` on COLLECTIONS object
   - Consolidated to single async/await implementation that properly handles new COLLECTIONS object structure
   - Prevents TypeError when collections are auto-configured from STAC API
+- Fixed empty "Processing" and "Software:" labels appearing when processing software data was present but not rendering
 
 ### Removed
 

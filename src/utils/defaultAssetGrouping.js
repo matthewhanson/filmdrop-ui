@@ -4,6 +4,88 @@
  */
 
 /**
+ * Standard STAC roles used for asset classification
+ * @type {Object}
+ */
+export const STANDARD_ROLES = {
+  DATA: 'data',
+  METADATA: 'metadata',
+  THUMBNAIL: 'thumbnail',
+  VISUAL: 'visual'
+}
+
+/**
+ * File type abbreviations for compact display
+ * Maps from getFileType() output to abbreviation
+ * @type {Object}
+ */
+export const FILE_TYPE_ABBREVIATIONS = {
+  GeoTIFF: 'COG',
+  JPEG: 'JPG',
+  JPEG2000: 'JP2',
+  PNG: 'PNG',
+  NetCDF: 'NC',
+  HDF: 'HDF',
+  Zarr: 'Zarr',
+  XML: 'XML',
+  JSON: 'JSON',
+  Data: 'BIN'
+}
+
+/**
+ * Get the primary standard role from an asset
+ * @param {Object} asset - STAC asset object
+ * @returns {string|null} Standard role or null if none found
+ */
+export function getStandardRole(asset) {
+  if (!asset?.roles || !Array.isArray(asset.roles)) return null
+  const roleValues = Object.values(STANDARD_ROLES)
+  return asset.roles.find((role) => roleValues.includes(role)) || null
+}
+
+/**
+ * Get custom (non-standard) roles from an asset
+ * @param {Object} asset - STAC asset object
+ * @returns {string[]} Array of custom roles
+ */
+export function getCustomRoles(asset) {
+  if (!asset?.roles || !Array.isArray(asset.roles)) return []
+  const standardRoleValues = Object.values(STANDARD_ROLES)
+  return asset.roles.filter((role) => !standardRoleValues.includes(role))
+}
+
+/**
+ * Get abbreviated file type for display
+ * @param {string} fileType - File type from getFileType()
+ * @returns {string} Abbreviated file type
+ */
+export function getFileTypeAbbreviation(fileType) {
+  if (!fileType) return ''
+  return (
+    FILE_TYPE_ABBREVIATIONS[fileType] || fileType.substring(0, 4).toUpperCase()
+  )
+}
+
+/**
+ * Determine asset group name based on STAC roles with MIME type fallback
+ * @param {Object} asset - STAC asset object
+ * @returns {string} Group name for display
+ */
+export function getRoleBasedGroup(asset) {
+  // Try role-based grouping first
+  const standardRole = getStandardRole(asset)
+  if (standardRole) {
+    // Capitalize and pluralize for display
+    if (standardRole === STANDARD_ROLES.THUMBNAIL) return 'Thumbnails'
+    return standardRole.charAt(0).toUpperCase() + standardRole.slice(1)
+  }
+
+  // Fallback to MIME type detection for legacy items without roles
+  const fileType = getFileType(asset.type || asset.href)
+  return fileType === 'Data' ? 'Data' : `${fileType} Files`
+}
+
+/**
  * Determine file type from MIME type or URL
  * @param {string} typeOrUrl - MIME type or URL
  * @returns {string} File type category
@@ -72,8 +154,12 @@ export function getFileType(typeOrUrl) {
  * @returns {boolean} True if asset is a thumbnail
  */
 export function isThumbnail(key, asset) {
+  // Check roles first
+  if (asset?.roles?.includes(STANDARD_ROLES.THUMBNAIL)) return true
+
+  // Fallback to heuristic detection for legacy items
   const lowerKey = key.toLowerCase()
-  const lowerTitle = (asset.title || '').toLowerCase()
+  const lowerTitle = (asset?.title || '').toLowerCase()
 
   return (
     lowerKey.includes('thumbnail') ||
@@ -86,62 +172,13 @@ export function isThumbnail(key, asset) {
 }
 
 /**
- * Determine if an asset is metadata
- * @param {string} key - Asset key
- * @param {Object} asset - Asset object
- * @returns {boolean} True if asset is metadata
- */
-function isMetadata(key, asset) {
-  const lowerKey = key.toLowerCase()
-  const lowerTitle = (asset.title || '').toLowerCase()
-  const fileType = getFileType(asset.type || asset.href)
-
-  return (
-    lowerKey.includes('metadata') ||
-    lowerKey.includes('meta') ||
-    lowerKey.includes('info') ||
-    lowerTitle.includes('metadata') ||
-    lowerTitle.includes('meta') ||
-    lowerTitle.includes('info') ||
-    fileType === 'XML' ||
-    fileType === 'JSON'
-  )
-}
-
-/**
- * Determine if an asset is a COG (Cloud Optimized GeoTIFF)
- * @param {string} key - Asset key
- * @param {Object} asset - Asset object
- * @returns {boolean} True if asset is a COG
- */
-function isCOG(key, asset) {
-  const fileType = getFileType(asset.type || asset.href)
-
-  // All GeoTIFFs are considered COGs by default
-  return fileType === 'GeoTIFF'
-}
-
-/**
  * Get asset group name based on asset characteristics
  * @param {string} key - Asset key
  * @param {Object} asset - Asset object
  * @returns {string} Group name
  */
 function getAssetGroupName(key, asset) {
-  if (isThumbnail(key, asset)) {
-    return 'Thumbnails'
-  }
-
-  if (isCOG(key, asset)) {
-    return 'COGs'
-  }
-
-  if (isMetadata(key, asset)) {
-    return 'Metadata'
-  }
-
-  const fileType = getFileType(asset.type || asset.href)
-  return `${fileType} Files`
+  return getRoleBasedGroup(asset)
 }
 
 /**
@@ -151,17 +188,23 @@ function getAssetGroupName(key, asset) {
  */
 function getGroupOrder(groupName) {
   const orderMap = {
-    COGs: 1,
-    'GeoTIFF Files': 2,
-    'JPEG Files': 3,
-    'PNG Files': 4,
-    'JPEG2000 Files': 5,
-    'NetCDF Files': 6,
-    'HDF Files': 7,
-    'Zarr Files': 8,
-    Metadata: 9,
-    Thumbnails: 10,
-    'Data Files': 11
+    Data: 1,
+    Visual: 2,
+    Metadata: 3,
+    Thumbnails: 4,
+    'GeoTIFF Files': 5,
+    'JPEG Files': 6,
+    'JPG Files': 6,
+    'PNG Files': 7,
+    'JP2 Files': 8,
+    'JPEG2000 Files': 8,
+    'NetCDF Files': 9,
+    'NC Files': 9,
+    'HDF Files': 10,
+    'Zarr Files': 11,
+    'XML Files': 12,
+    'JSON Files': 12,
+    'Data Files': 100
   }
 
   return orderMap[groupName] || 100

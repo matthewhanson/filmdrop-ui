@@ -53,60 +53,6 @@ describe('PopupResult', () => {
     })
   })
 
-  describe('STAC API link display', () => {
-    it('should render STAC API link when STAC_LINK_ENABLED is true in config', () => {
-      const configWithStacLink = {
-        ...mockAppConfig,
-        STAC_LINK_ENABLED: true
-      }
-      store.dispatch(setappConfig(configWithStacLink))
-      setup()
-
-      const stacLink = screen.getByRole('link', { name: /stac api item/i })
-      expect(stacLink).toBeInTheDocument()
-    })
-
-    it('should not render STAC API link when STAC_LINK_ENABLED is false in config', () => {
-      const configWithoutStacLink = {
-        ...mockAppConfig,
-        STAC_LINK_ENABLED: false
-      }
-      store.dispatch(setappConfig(configWithoutStacLink))
-      setup()
-
-      const stacLink = screen.queryByRole('link', { name: /stac api item/i })
-      expect(stacLink).not.toBeInTheDocument()
-    })
-
-    it('should have valid href pointing to item self link', () => {
-      const configWithStacLink = {
-        ...mockAppConfig,
-        STAC_LINK_ENABLED: true
-      }
-      store.dispatch(setappConfig(configWithStacLink))
-      setup()
-
-      const stacLink = screen.getByRole('link', { name: /stac api item/i })
-      expect(stacLink).toHaveAttribute('href')
-      const href = stacLink.getAttribute('href')
-      expect(href).toBeTruthy()
-      expect(href).toMatch(/^https?:\/\//)
-    })
-
-    it('should open STAC API link in new tab with security attributes', () => {
-      const configWithStacLink = {
-        ...mockAppConfig,
-        STAC_LINK_ENABLED: true
-      }
-      store.dispatch(setappConfig(configWithStacLink))
-      setup()
-
-      const stacLink = screen.getByRole('link', { name: /stac api item/i })
-      expect(stacLink).toHaveAttribute('target', '_blank')
-      expect(stacLink).toHaveAttribute('rel', 'noreferrer')
-    })
-  })
-
   describe('empty state', () => {
     it('should render nothing when result is null', () => {
       setup(null)

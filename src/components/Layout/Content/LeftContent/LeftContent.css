@@ -1,6 +1,6 @@
 .LeftContent {
   height: 100%;
-  width: 300px;
+  width: 320px;
   background-color: var(--side-panel-background);
   transition: width 0.3s ease-in-out;
   position: relative;

@@ -74,6 +74,8 @@ function extractFieldComponents(field, value, item, fieldType) {
       return extractBooleanComponents(field, value)
     case 'percentage':
       return extractPercentageComponents(field, value)
+    case 'datetime':
+      return [{ value }]
     default:
       return null
   }

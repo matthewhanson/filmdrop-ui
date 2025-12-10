@@ -10,7 +10,6 @@ import GroupContainer from './GroupContainer.jsx'
 const FieldGroup = React.memo(function FieldGroup({
   group,
   sortFields,
-  item,
   isConfigured = false,
   defaultExpanded = false
 }) {
@@ -44,7 +43,7 @@ const FieldGroup = React.memo(function FieldGroup({
   return (
     <GroupContainer groupName={groupTitle} defaultExpanded={defaultExpanded}>
       {fieldItems.map(([field, value]) => (
-        <FieldItem key={field} field={field} value={value} item={item} />
+        <FieldItem key={field} field={field} value={value} />
       ))}
     </GroupContainer>
   )
@@ -53,7 +52,6 @@ const FieldGroup = React.memo(function FieldGroup({
 FieldGroup.propTypes = {
   group: PropTypes.oneOfType([PropTypes.array, PropTypes.object]).isRequired,
   sortFields: PropTypes.func,
-  item: PropTypes.object.isRequired,
   isConfigured: PropTypes.bool,
   defaultExpanded: PropTypes.bool
 }

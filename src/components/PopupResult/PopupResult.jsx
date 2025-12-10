@@ -61,23 +61,6 @@ const PopupResult = (props) => {
               </picture>
             ) : null}
           </div>
-
-          <div className="popupResultDetails">
-            {_appConfig.STAC_LINK_ENABLED && (
-              <div className="detailRow">
-                <a
-                  href={props.result?.links
-                    ?.find((x) => x?.rel === 'self')
-                    ?.href?.toString()}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="popupResultDetailsRowValue popupResultDetailsHrefLink"
-                >
-                  STAC API Item
-                </a>
-              </div>
-            )}
-          </div>
         </div>
       ) : null}
     </div>

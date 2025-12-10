@@ -46,10 +46,7 @@ const initialState = {
   autoCenterOnItemChanged: false,
   hasLeftPanelTabChanged: false,
   authTokenExists: false,
-  currentTheme: null,
-  leftPanelWidth: 300,
-  isLeftPanelVisible: true,
-  enhancedColumns: Math.floor(300 / 250)
+  currentTheme: null
 }
 
 // next, for every key in the initialState
@@ -186,15 +183,6 @@ export const mainSlice = createSlice({
     },
     setCurrentTheme: (state, action) => {
       state.currentTheme = action.payload
-    },
-    setLeftPanelWidth: (state, action) => {
-      state.leftPanelWidth = action.payload
-    },
-    setIsLeftPanelVisible: (state, action) => {
-      state.isLeftPanelVisible = action.payload
-    },
-    setEnhancedColumns: (state, action) => {
-      state.enhancedColumns = action.payload
     }
   }
 })
@@ -244,8 +232,5 @@ export const { setautoCenterOnItemChanged } = mainSlice.actions
 export const { sethasLeftPanelTabChanged } = mainSlice.actions
 export const { setauthTokenExists } = mainSlice.actions
 export const { setCurrentTheme } = mainSlice.actions
-export const { setLeftPanelWidth } = mainSlice.actions
-export const { setIsLeftPanelVisible } = mainSlice.actions
-export const { setEnhancedColumns } = mainSlice.actions
 
 export default mainSlice.reducer

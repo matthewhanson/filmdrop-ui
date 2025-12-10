@@ -4,7 +4,30 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import InfoIcon from '@mui/icons-material/Info'
 import Tooltip from '@mui/material/Tooltip'
 import { sanitizeFieldValue } from '../../utils/securityHelper.js'
-import { getAssetLabel } from '../../utils/defaultAssetGrouping.js'
+import {
+  getAssetLabel,
+  getCustomRoles,
+  getFileTypeAbbreviation,
+  getFileType
+} from '../../utils/defaultAssetGrouping.js'
+
+/**
+ * Format file size in human-readable format
+ */
+function formatFileSize(bytes) {
+  if (typeof bytes !== 'number' || bytes < 0) return 'Unknown'
+
+  const units = ['B', 'KB', 'MB', 'GB', 'TB']
+  let size = bytes
+  let unitIndex = 0
+
+  while (size >= 1024 && unitIndex < units.length - 1) {
+    size /= 1024
+    unitIndex++
+  }
+
+  return `${size.toFixed(unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`
+}
 
 /**
  * Individual asset item component
@@ -12,14 +35,35 @@ import { getAssetLabel } from '../../utils/defaultAssetGrouping.js'
 const AssetItem = React.memo(({ asset, copiedUrl, onCopyToClipboard }) => {
   const assetLabel = getAssetLabel(asset.key, asset)
 
-  // Build the details string (excluding media type since it's already grouped by media type)
+  // Build the details string with custom roles and file type abbreviation
   const detailsParts = []
-  if (asset.roles && asset.roles.length > 0) {
-    detailsParts.push(`Roles: ${asset.roles.join(', ')}`)
+
+  // Show custom roles (non-standard roles like 'reflectance', 'temperature', etc.)
+  const customRoles = getCustomRoles(asset)
+  if (customRoles.length > 0) {
+    detailsParts.push(`Roles: ${customRoles.join(', ')}`)
   }
+
+  // Show file type abbreviation (e.g., COG, JP2, JSON)
+  const fileType = getFileType(asset.type || asset.href)
+  if (fileType) {
+    const abbreviation = getFileTypeAbbreviation(fileType)
+    detailsParts.push(`Type: ${abbreviation}`)
+  }
+
+  // Show GSD if available
   if (asset.gsd) {
     detailsParts.push(`GSD: ${asset.gsd}`)
   }
+
+  // Show file size if available
+  if (asset['file:size'] || asset.size) {
+    const sizeBytes = asset['file:size'] || asset.size
+    const sizeFormatted = formatFileSize(sizeBytes)
+    detailsParts.push(`Size: ${sizeFormatted}`)
+  }
+
+  // Show title if different from label
   if (asset.title && asset.title !== assetLabel) {
     detailsParts.push(asset.title)
   }

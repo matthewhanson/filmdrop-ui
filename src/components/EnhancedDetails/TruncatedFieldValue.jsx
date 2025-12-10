@@ -8,7 +8,7 @@ import EnhancedFieldRenderer from './EnhancedFieldRenderer.jsx'
  * Wraps EnhancedFieldRenderer with smart text truncation detection
  * Truncates text without spaces when it overflows its container, shows tooltip with full text
  */
-const TruncatedFieldValue = ({ field, value, item }) => {
+const TruncatedFieldValue = ({ field, value }) => {
   const containerRef = useRef(null)
   const [shouldTruncate, setShouldTruncate] = useState(false)
   const [displayText, setDisplayText] = useState('')
@@ -63,7 +63,7 @@ const TruncatedFieldValue = ({ field, value, item }) => {
     requestAnimationFrame(checkOverflow)
 
     return () => resizeObserver.disconnect()
-  }, [field, value, item])
+  }, [field, value])
 
   return (
     <Tooltip
@@ -81,7 +81,7 @@ const TruncatedFieldValue = ({ field, value, item }) => {
         ref={containerRef}
         className={shouldTruncate ? 'field-value-truncated' : ''}
       >
-        <EnhancedFieldRenderer field={field} value={value} item={item} />
+        <EnhancedFieldRenderer field={field} value={value} />
       </span>
     </Tooltip>
   )
@@ -89,8 +89,7 @@ const TruncatedFieldValue = ({ field, value, item }) => {
 
 TruncatedFieldValue.propTypes = {
   field: PropTypes.string.isRequired,
-  value: PropTypes.any.isRequired,
-  item: PropTypes.object.isRequired
+  value: PropTypes.any.isRequired
 }
 
 export default TruncatedFieldValue

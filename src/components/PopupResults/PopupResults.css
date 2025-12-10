@@ -150,3 +150,18 @@
   gap: 5px;
   margin-top: 10px;
 }
+
+.stac-link-section {
+  padding: 12px 0;
+  text-align: center;
+}
+
+.stac-link-section a {
+  color: var(--brand-accent-primary);
+  text-decoration: underline;
+  font-size: 14px;
+}
+
+.stac-link-section a:hover {
+  color: var(--side-panel-link-color-hover);
+}

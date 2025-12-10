@@ -1,0 +1,201 @@
+import React, { useMemo, useCallback } from 'react'
+import { useSelector } from 'react-redux'
+import { useEnhancedDetails } from '../../contexts/EnhancedDetailsContext'
+import {
+  groupFieldsSemantically,
+  createEnhancedDisplayFieldPredicate,
+  normalizeGroupName
+} from '../../utils/fieldGrouping.js'
+import { groupPropertiesByExtension } from '../../utils/defaultFieldGrouping.js'
+import { getCollectionFieldPriorities } from '../../utils/fieldPriorities.js'
+import { getCollectionConfig } from '../../utils/configHelper.js'
+import FieldGroup from './FieldGroup.jsx'
+import ItemHeader from './ItemHeader.jsx'
+import AssetDisplay from './AssetDisplay.jsx'
+import DefaultAssetDisplay from './DefaultAssetDisplay.jsx'
+import LinkDisplay from './LinkDisplay.jsx'
+import { showApplicationAlert } from '../../utils/alertHelper.js'
+
+/**
+ * EnhancedDetailsDisplay Component
+ * Renders STAC item fields, assets, and links with semantic grouping
+ * Handles both configured and auto-discovery field grouping
+ */
+const EnhancedDetailsDisplay = () => {
+  const {
+    item: currentPopupResult,
+    enhancedColumns,
+    appConfig
+  } = useEnhancedDetails()
+  const _appConfig = useSelector((state) => state.mainSlice.appConfig)
+
+  // Error handling for field processing
+  const handleFieldProcessingError = useCallback((error, context) => {
+    console.error(`Enhanced Details ${context} error:`, error)
+    showApplicationAlert(
+      'error',
+      `Failed to process ${context}. Please try again.`
+    )
+  }, [])
+
+  // Calculate enhanced display configuration once (single source of truth)
+  const enhancedDisplayConfig = useMemo(() => {
+    if (!currentPopupResult) return null
+    const { collection } = currentPopupResult
+    return getCollectionConfig(collection, 'enhancedDisplayConfig')
+  }, [currentPopupResult])
+
+  const hasEnhancedConfig = useMemo(() => {
+    return !!enhancedDisplayConfig
+  }, [enhancedDisplayConfig])
+
+  // Enhanced Details logic - field grouping
+  const groupedFields = useMemo(() => {
+    if (!currentPopupResult) return {}
+    const { properties, collection } = currentPopupResult
+
+    try {
+      if (hasEnhancedConfig) {
+        if (enhancedDisplayConfig?.property_groups) {
+          const orderedGroups = {}
+          enhancedDisplayConfig.property_groups.forEach((group) => {
+            const groupFields = {}
+            group.fields.forEach((field) => {
+              if (properties[field.name] !== undefined) {
+                groupFields[field.name] = properties[field.name]
+              }
+            })
+            if (Object.keys(groupFields).length > 0) {
+              orderedGroups[group.name] = groupFields
+            }
+          })
+          return orderedGroups
+        }
+        const shouldShowField = createEnhancedDisplayFieldPredicate(collection)
+        return groupFieldsSemantically(properties, shouldShowField)
+      }
+      return groupPropertiesByExtension(properties)
+    } catch (error) {
+      handleFieldProcessingError(error, 'field grouping')
+      return {}
+    }
+  }, [
+    currentPopupResult,
+    hasEnhancedConfig,
+    enhancedDisplayConfig,
+    handleFieldProcessingError
+  ])
+
+  const sortFields = useMemo(() => {
+    if (!currentPopupResult) return () => []
+
+    if (hasEnhancedConfig) {
+      return (fields) => Object.entries(fields)
+    }
+    const priorities = getCollectionFieldPriorities(currentPopupResult)
+    return (fields) => {
+      return Object.entries(fields).sort(([a], [b]) => {
+        const aIndex = priorities.indexOf(a)
+        const bIndex = priorities.indexOf(b)
+        if (aIndex === -1 && bIndex === -1) return a.localeCompare(b)
+        if (aIndex === -1) return 1
+        if (bIndex === -1) return -1
+        return aIndex - bIndex
+      })
+    }
+  }, [currentPopupResult, hasEnhancedConfig])
+
+  if (!currentPopupResult) {
+    return null
+  }
+
+  return (
+    <div
+      className="enhancedDetailsSection"
+      style={{ '--columns': enhancedColumns }}
+    >
+      <ItemHeader
+        id={currentPopupResult.id}
+        collection={currentPopupResult.collection}
+      />
+
+      <div className="fields-container">
+        {hasEnhancedConfig
+          ? Object.entries(groupedFields).map(
+              ([groupName, fields], index, array) => {
+                const normalized = normalizeGroupName(groupName)
+                const isCore =
+                  normalized === 'group-core-fields' ||
+                  normalized === 'core-fields'
+                return (
+                  <React.Fragment key={groupName}>
+                    <FieldGroup
+                      group={[groupName, fields]}
+                      sortFields={sortFields}
+                      isConfigured={true}
+                      defaultExpanded={isCore}
+                    />
+                    {index < array.length - 1 && (
+                      <div className="group-divider" />
+                    )}
+                  </React.Fragment>
+                )
+              }
+            )
+          : groupedFields.map((group, index, array) => (
+              <React.Fragment key={group.name}>
+                <FieldGroup
+                  group={group}
+                  isConfigured={false}
+                  defaultExpanded={index === 0}
+                />
+                {index < array.length - 1 && <div className="group-divider" />}
+              </React.Fragment>
+            ))}
+      </div>
+      <div className="group-divider" />
+
+      {currentPopupResult.assets &&
+        Object.keys(currentPopupResult.assets).length > 0 && (
+          <>
+            <div className="data-files-section">
+              <h3 className="data-files-title">Assets</h3>
+              {hasEnhancedConfig ? (
+                <AssetDisplay assets={currentPopupResult.assets} />
+              ) : (
+                <DefaultAssetDisplay assets={currentPopupResult.assets} />
+              )}
+            </div>
+          </>
+        )}
+
+      {(() => {
+        // Extract self link and other links separately
+        const allLinks = currentPopupResult?.links || []
+        const selfLink = allLinks.find((link) => link.rel === 'self')
+        const otherLinks = allLinks.filter((link) => link.rel !== 'self')
+
+        // Determine visibility: show Links section if either flag is true
+        const hasSelfLink = selfLink && _appConfig.STAC_LINK_ENABLED
+        const hasOtherLinks =
+          otherLinks.length > 0 && _appConfig.STAC_LINKS_SECTION_ENABLED
+
+        if (!hasSelfLink && !hasOtherLinks) {
+          return null
+        }
+
+        return (
+          <>
+            <div className="group-divider" />
+            <div className="data-files-section">
+              <h3 className="data-files-title">Links</h3>
+              <LinkDisplay selfLink={selfLink} otherLinks={otherLinks} />
+            </div>
+          </>
+        )
+      })()}
+    </div>
+  )
+}
+
+export default EnhancedDetailsDisplay

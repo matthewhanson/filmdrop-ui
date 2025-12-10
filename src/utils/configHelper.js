@@ -5,6 +5,8 @@ import {
   DEFAULT_EXPORT_ENABLED,
   DEFAULT_SHOW_ITEM_AUTO_ZOOM,
   DEFAULT_SEARCH_BY_GEOM_ENABLED,
+  DEFAULT_STAC_LINK_ENABLED,
+  DEFAULT_STAC_LINKS_SECTION_ENABLED,
   DEFAULT_API_MAX_ITEMS,
   DEFAULT_MOSAIC_MAX_ITEMS,
   DEFAULT_MAP_CENTER,
@@ -12,6 +14,7 @@ import {
   DEFAULT_MAP_ZOOM_MAX,
   DEFAULT_COLORMAP
 } from '../components/defaults'
+import { DEFAULT_REL_TYPE_EXCLUDE_LIST } from './defaultLinkGrouping.js'
 import { store } from '../redux/store'
 import { DoesFaviconExistService } from '../services/get-config-service'
 import { setappName, setreferenceLayers } from '../redux/slices/mainSlice'
@@ -569,6 +572,12 @@ export function applyConfigDefaults(config) {
       config.SHOW_ITEM_AUTO_ZOOM ?? DEFAULT_SHOW_ITEM_AUTO_ZOOM,
     SEARCH_BY_GEOM_ENABLED:
       config.SEARCH_BY_GEOM_ENABLED ?? DEFAULT_SEARCH_BY_GEOM_ENABLED,
+    // STAC Links configuration
+    STAC_LINK_ENABLED: config.STAC_LINK_ENABLED ?? DEFAULT_STAC_LINK_ENABLED,
+    STAC_LINKS_SECTION_ENABLED:
+      config.STAC_LINKS_SECTION_ENABLED ?? DEFAULT_STAC_LINKS_SECTION_ENABLED,
+    STAC_LINKS_EXCLUDE_LIST:
+      config.STAC_LINKS_EXCLUDE_LIST ?? DEFAULT_REL_TYPE_EXCLUDE_LIST,
     // API and search limits
     API_MAX_ITEMS: config.API_MAX_ITEMS ?? DEFAULT_API_MAX_ITEMS,
     MOSAIC_MAX_ITEMS: config.MOSAIC_MAX_ITEMS ?? DEFAULT_MOSAIC_MAX_ITEMS,

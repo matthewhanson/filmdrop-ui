@@ -9,11 +9,13 @@ import {
   sethasLeftPanelTabChanged
 } from '../../../../redux/slices/mainSlice'
 import { useResizablePanel } from '../../../../hooks/useResizablePanel'
+import { useLayout } from '../../../../contexts/LayoutContext'
 import DragHandleIcon from '@mui/icons-material/DragHandle'
 
 const LeftContent = () => {
   const dispatch = useDispatch()
   const panelRef = useRef(null)
+  const { isLeftPanelVisible } = useLayout()
 
   const _clickResults = useSelector((state) => state.mainSlice.clickResults)
   const _searchLoading = useSelector((state) => state.mainSlice.searchLoading)
@@ -21,9 +23,6 @@ const LeftContent = () => {
     (state) => state.mainSlice.isDrawingEnabled
   )
   const _tabSelected = useSelector((state) => state.mainSlice.tabSelected)
-  const _isLeftPanelVisible = useSelector(
-    (state) => state.mainSlice.isLeftPanelVisible
-  )
 
   const { handleMouseDown, currentWidth } = useResizablePanel(panelRef)
 
@@ -52,8 +51,8 @@ const LeftContent = () => {
   return (
     <div
       ref={panelRef}
-      className={`LeftContent ${!_isLeftPanelVisible ? 'hidden' : ''}`}
-      style={{ width: _isLeftPanelVisible ? `${currentWidth}px` : '0px' }}
+      className={`LeftContent ${!isLeftPanelVisible ? 'hidden' : ''}`}
+      style={{ width: isLeftPanelVisible ? `${currentWidth}px` : '0px' }}
     >
       <div className="LeftContentHolder">
         {_isDrawingEnabled || _searchLoading ? (
@@ -94,7 +93,7 @@ const LeftContent = () => {
           )}
         </div>
       </div>
-      {_isLeftPanelVisible && (
+      {isLeftPanelVisible && (
         <button
           className="resize-handle"
           onMouseDown={handleMouseDown}

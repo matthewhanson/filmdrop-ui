@@ -1,9 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import {
-  setLeftPanelWidth,
-  setEnhancedColumns
-} from '../redux/slices/mainSlice'
+import { useLayout } from '../contexts/LayoutContext'
 
 // Minimum card width for column calculation (design token)
 const CARD_MIN_WIDTH = 250
@@ -16,8 +12,8 @@ const MAX_PANEL_WIDTH = 1200
  * @returns {Object} - Drag handlers and current width
  */
 export const useResizablePanel = (panelRef) => {
-  const dispatch = useDispatch()
-  const leftPanelWidth = useSelector((state) => state.mainSlice.leftPanelWidth)
+  const { leftPanelWidth, updateLeftPanelWidth, updateEnhancedColumns } =
+    useLayout()
   const isDraggingRef = useRef(false)
   const startXRef = useRef(0)
   const startWidthRef = useRef(0)
@@ -38,10 +34,10 @@ export const useResizablePanel = (panelRef) => {
       }
       updateColumnsDebounced.current = setTimeout(() => {
         const columns = calculateColumns(width)
-        dispatch(setEnhancedColumns(columns))
+        updateEnhancedColumns(columns)
       }, 100)
     },
-    [dispatch, calculateColumns]
+    [calculateColumns, updateEnhancedColumns]
   )
 
   // ResizeObserver to track panel size changes
@@ -83,10 +79,10 @@ export const useResizablePanel = (panelRef) => {
         Math.max(MIN_PANEL_WIDTH, startWidthRef.current + deltaX)
       )
 
-      dispatch(setLeftPanelWidth(newWidth))
+      updateLeftPanelWidth(newWidth)
       updateColumns(newWidth)
     },
-    [dispatch, updateColumns]
+    [updateLeftPanelWidth, updateColumns]
   )
 
   // Mouse up handler

@@ -36,6 +36,8 @@ import { Tooltip } from 'react-tooltip'
 import LayersIcon from '@mui/icons-material/Layers'
 import LayerList from '../../../LayerList/LayerList'
 import ExportButton from '../../../ExportButton/ExportButton'
+import { useLayout } from '../../../../contexts/LayoutContext'
+import { useMapResizeHandler } from '../../../../hooks/useMapResizeHandler'
 
 const RightContent = () => {
   const [allScenesLoading, setallScenesLoading] = useState(false)
@@ -71,11 +73,11 @@ const RightContent = () => {
   const _selectedCollectionData = useSelector(
     (state) => state.mainSlice.selectedCollectionData
   )
-  const _leftPanelWidth = useSelector((state) => state.mainSlice.leftPanelWidth)
-  const _isLeftPanelVisible = useSelector(
-    (state) => state.mainSlice.isLeftPanelVisible
-  )
   const _map = useSelector((state) => state.mainSlice.map)
+  const {
+    leftPanelWidth: _leftPanelWidth,
+    isLeftPanelVisible: _isLeftPanelVisible
+  } = useLayout()
 
   const dispatch = useDispatch()
 
@@ -202,19 +204,8 @@ const RightContent = () => {
     dispatch(setshowLayerList(!_showLayerList))
   }
 
-  // Observe RightContent size changes and update map
-  useEffect(() => {
-    if (!rightContentRef.current) return
-
-    const resizeObserver = new ResizeObserver(() => {
-      if (_map && Object.keys(_map).length > 0) {
-        setTimeout(() => _map.invalidateSize(), 100)
-      }
-    })
-
-    resizeObserver.observe(rightContentRef.current)
-    return () => resizeObserver.disconnect()
-  }, [_map])
+  // Use custom hook to handle map resize with debouncing
+  useMapResizeHandler(_map, rightContentRef)
 
   const effectiveLeftWidth = _isLeftPanelVisible ? _leftPanelWidth : 0
 
