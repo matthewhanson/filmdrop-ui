@@ -620,7 +620,7 @@ The following parameters are **deprecated** but still supported for backward com
     "url": "https://your-company.com",
     "title": "Visit Your Company",
     "alt": "Your Company Logo",
-    "image": "./your-logo.png"
+    "image": "/your-logo.png"
   }
 }
 ```
@@ -634,8 +634,8 @@ The following parameters are **deprecated** but still supported for backward com
     "title": "Visit Your Company",
     "alt": "Your Company Logo",
     "image": null,
-    "image_light": "./your-logo-light.png",
-    "image_dark": "./your-logo-dark.png"
+    "image_light": "/your-logo-light.png",
+    "image_dark": "/your-logo-dark.png"
   }
 }
 ```

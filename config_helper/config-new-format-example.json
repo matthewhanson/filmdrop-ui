@@ -3,7 +3,7 @@
   "_comment2": "This format consolidates all per-collection parameters into a single object for easier maintenance.",
 
   "PUBLIC_URL": "http://example.com/",
-  "LOGO_URL": "./logo.png",
+  "LOGO_URL": "/logo.png",
   "LOGO_ALT": "Alt description for my custom logo",
   "COLLECTIONS": {
     "default": "sentinel-2-l2a",
