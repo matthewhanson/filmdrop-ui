@@ -23,3 +23,17 @@ export function convertToUTC(dateString) {
 
   return correctDate
 }
+
+// Format ISO datetime strings for display in Enhanced Details
+// Example: '2025-11-28T16:14:09.311000Z' -> '2025-11-28 16:14:09.311000'
+export function formatStacDatetime(isoString) {
+  if (!isoString) return ''
+  const s = String(isoString)
+  // Replace the 'T' separator with a space
+  let out = s.replace('T', ' ')
+  // Remove trailing 'Z' if present
+  if (out.endsWith('Z')) {
+    out = out.slice(0, -1)
+  }
+  return out
+}

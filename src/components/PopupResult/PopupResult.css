@@ -28,6 +28,7 @@
 
 .detailRow {
   width: 240px;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   line-height: 1.6;
@@ -53,36 +54,4 @@
 
 .popupResultDetailsHrefLink:hover {
   color: var(--side-panel-link-color-hover);
-}
-
-.enhancedDetailsButtonRow {
-  margin-top: 16px;
-  align-items: center;
-}
-
-.enhancedDetailsButton {
-  background-color: var(--side-panel-button-background);
-  border: 1px solid var(--side-panel-button-border);
-  color: var(--side-panel-button-color);
-  padding: 12px 24px;
-  text-align: center;
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-  width: 100%;
-  max-width: 200px;
-}
-
-.enhancedDetailsButton:hover {
-  background-color: var(--side-panel-button-background-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.enhancedDetailsButton:active {
-  transform: translateY(0);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
 }

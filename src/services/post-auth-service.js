@@ -36,6 +36,14 @@ export async function AuthService(username, password) {
       localStorage.setItem('APP_AUTH_TOKEN', json.access_token)
       store.dispatch(setauthTokenExists(true))
       store.dispatch(clearApplicationAlert())
+
+      // Check for post-auth redirect URL
+      const redirectUrl = sessionStorage.getItem('POST_AUTH_REDIRECT_URL')
+      if (redirectUrl) {
+        sessionStorage.removeItem('POST_AUTH_REDIRECT_URL')
+        // Use window.location for navigation to trigger router
+        window.location.href = redirectUrl
+      }
     })
     .catch((error) => {
       store.dispatch(setauthTokenExists(false))

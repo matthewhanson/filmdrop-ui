@@ -1,6 +1,6 @@
 /**
  * ENHANCED FIELD RENDERER
- * React component for rendering STAC fields using React components instead of HTML strings
+ * Render STAC fields using React components
  * Eliminates dangerouslySetInnerHTML usage
  */
 
@@ -9,12 +9,15 @@ import PropTypes from 'prop-types'
 import { getStacFieldType } from '../../utils/fieldDiscovery.js'
 import { extractFieldComponents } from '../../utils/fieldFormatting.js'
 import { FieldDisplay } from './FieldDisplayComponents.jsx'
+import { useEnhancedDetails } from '../../contexts/EnhancedDetailsContext'
 
 /**
  * Enhanced Field Renderer Component
  * Renders STAC field values using React components for maximum security
  */
-const EnhancedFieldRenderer = ({ field, value, item }) => {
+const EnhancedFieldRenderer = ({ field, value }) => {
+  const { item } = useEnhancedDetails()
+
   // Discover field type and extract components
   const fieldType = useMemo(() => {
     return getStacFieldType(field, value, item)
@@ -36,8 +39,7 @@ const EnhancedFieldRenderer = ({ field, value, item }) => {
 
 EnhancedFieldRenderer.propTypes = {
   field: PropTypes.string.isRequired,
-  value: PropTypes.any.isRequired,
-  item: PropTypes.object.isRequired
+  value: PropTypes.any.isRequired
 }
 
 export default EnhancedFieldRenderer

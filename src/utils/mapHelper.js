@@ -10,14 +10,14 @@ import {
   setSearchLoading,
   settabSelected,
   setCurrentPopupResult,
-  sethasLeftPanelTabChanged,
-  setIsEnhancedDetailsExpanded
+  sethasLeftPanelTabChanged
 } from '../redux/slices/mainSlice'
 import { searchGridCodeScenes } from './searchHelper'
 import debounce from './debounce'
 import { GetMosaicBoundsService } from '../services/get-mosaic-bounds'
 import GeoJSONValidation from './geojsonValidation'
 import { DEFAULT_TILE_LAYER_PARAMS } from '../components/defaults'
+import { router } from '../router'
 import { getCollectionConfig } from './configHelper'
 
 export const footprintLayerStyle = {
@@ -92,8 +92,6 @@ export function mapClickHandler(e) {
     const _searchType = store.getState().mainSlice.searchType
     const _searchResults = store.getState().mainSlice.searchResults
 
-    clearMapSelection()
-
     if (
       e.originalEvent.detail === 2 ||
       store.getState().mainSlice.viewMode === 'mosaic' ||
@@ -129,8 +127,19 @@ export function mapClickHandler(e) {
               // push to store
               store.dispatch(setClickResults(intersectingFeatures))
               store.dispatch(settabSelected('details'))
-              store.dispatch(setIsEnhancedDetailsExpanded(false))
               store.dispatch(sethasLeftPanelTabChanged(true))
+
+              // Navigate to first item URL
+              const firstItem = intersectingFeatures[0]
+              if (firstItem.collection && firstItem.id) {
+                router.navigate({
+                  to: '/item/$collectionId/$itemId',
+                  params: {
+                    collectionId: firstItem.collection,
+                    itemId: firstItem.id
+                  }
+                })
+              }
             }
           } else if (_searchType === 'grid-code') {
             for (const i in intersectingFeatures) {
@@ -357,6 +366,11 @@ function addImageOverlay(item) {
     store.getState().mainSlice.appConfig.SCENE_TILER_URL || ''
   const visualizations = getCollectionConfig(item?.collection, 'visualizations')
   if (!item || !sceneTilerURL || !visualizations) {
+    if (!visualizations && item?.collection) {
+      console.warn(
+        `[TiTiler Scene] Cannot display scene imagery - no visualizations configured for collection '${item.collection}'`
+      )
+    }
     store.dispatch(setimageOverlayLoading(false))
     return
   }
@@ -445,19 +459,39 @@ const constructSceneTilerParams = (collection) => {
   // Get visualizations dictionary
   const visualizations = getCollectionConfig(collection, 'visualizations')
 
-  let tilerParams = null
-  if (visualizations && typeof visualizations === 'object') {
-    // Use the first visualization as the default
-    const visualizationKeys = Object.keys(visualizations)
-    if (visualizationKeys.length > 0) {
-      const defaultVisualizationKey = visualizationKeys[0]
-      tilerParams = visualizations[defaultVisualizationKey]
-      console.log(
-        `[TiTiler Scene] Collection: ${collection}, using visualization: ${defaultVisualizationKey}`,
-        tilerParams
-      )
-    }
+  if (!visualizations) {
+    console.warn(
+      `[TiTiler Scene] No visualizations configured for collection '${collection}'. ` +
+        `Scene imagery will not be available. Configure visualizations in COLLECTIONS_CONFIG.`
+    )
+    return ''
   }
+
+  if (typeof visualizations !== 'object') {
+    console.warn(
+      `[TiTiler Scene] Invalid visualizations config for collection '${collection}'. ` +
+        `Expected object, got ${typeof visualizations}.`
+    )
+    return ''
+  }
+
+  const visualizationKeys = Object.keys(visualizations)
+  if (visualizationKeys.length === 0) {
+    console.warn(
+      `[TiTiler Scene] Visualizations object is empty for collection '${collection}'. ` +
+        `Add at least one visualization definition.`
+    )
+    return ''
+  }
+
+  // Use the first visualization as the default
+  const defaultVisualizationKey = visualizationKeys[0]
+  const tilerParams = visualizations[defaultVisualizationKey]
+
+  console.log(
+    `[TiTiler Scene] Collection: ${collection}, using visualization: ${defaultVisualizationKey}`,
+    tilerParams
+  )
 
   if (!tilerParams) return ''
 
@@ -485,7 +519,6 @@ const constructSceneTilerParams = (collection) => {
   }
 
   const rescale = parameters.rescale(tilerParams)
-  if (rescale) params.push(rescale)
   if (rescale) params.push(rescale)
 
   const colormapName = parameters.colormapName(tilerParams)

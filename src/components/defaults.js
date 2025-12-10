@@ -17,6 +17,8 @@ export const DEFAULT_THEME_SWITCHING_ENABLED = true
 export const DEFAULT_EXPORT_ENABLED = true
 export const DEFAULT_SHOW_ITEM_AUTO_ZOOM = true
 export const DEFAULT_SEARCH_BY_GEOM_ENABLED = true
+export const DEFAULT_STAC_LINK_ENABLED = true
+export const DEFAULT_STAC_LINKS_SECTION_ENABLED = true
 // sets default date range (current minus 24hrs * 60min * 60sec * 1000ms per day * 14 days)
 const twoWeeksAgo = new Date(Date.now() - 24 * 60 * 60 * 1000 * 14)
 export const DEFAULT_DATE_RANGE = [twoWeeksAgo, new Date()]

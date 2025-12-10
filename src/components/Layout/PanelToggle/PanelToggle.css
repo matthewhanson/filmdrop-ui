@@ -1,0 +1,51 @@
+.PanelToggle {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 99;
+  width: 16px;
+  background-color: var(--side-panel-background);
+  border: 1px solid var(--side-panel-background);
+  border-left: none;
+  border-radius: 0 4px 4px 0;
+  padding: 8px 0px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    left 0.3s ease-in-out,
+    background-color 0.2s ease;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+}
+
+.PanelToggle:before,
+.PanelToggle:after {
+  content: '';
+  position: absolute;
+  left: -3px;
+  width: 6px;
+  height: 6px;
+  border-left: 3px solid var(--side-panel-background);
+}
+
+.PanelToggle:before {
+  top: -7px;
+  border-bottom: 3px solid var(--side-panel-background);
+  border-radius: 0px 0px 0px 6px;
+}
+
+.PanelToggle:after {
+  bottom: -7px;
+  border-top: 3px solid var(--side-panel-background);
+  border-radius: 6px 0px 0px 0px;
+}
+
+.PanelToggle:hover svg {
+  color: var(--brand-accent-primary);
+}
+
+.PanelToggle svg {
+  font-size: 20px;
+  color: var(--brand-accent-primary-dark);
+}

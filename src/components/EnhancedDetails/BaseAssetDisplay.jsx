@@ -20,16 +20,14 @@ const BaseAssetDisplay = React.memo(
 
     // Memoize the rendered groups to prevent unnecessary re-renders
     const renderedGroups = useMemo(() => {
-      return groupedAssets.map((group, index, array) => (
-        <React.Fragment key={group.name || group.fileType}>
-          <AssetGroup
-            groupName={group.name || `${group.fileType} Files`}
-            assets={group.assets}
-            copiedUrl={copiedUrl}
-            onCopyToClipboard={handleCopyToClipboard}
-          />
-          {index < array.length - 1 && <div className="group-divider" />}
-        </React.Fragment>
+      return groupedAssets.map((group) => (
+        <AssetGroup
+          key={group.name || group.fileType}
+          groupName={group.name || `${group.fileType} Files`}
+          assets={group.assets}
+          copiedUrl={copiedUrl}
+          onCopyToClipboard={handleCopyToClipboard}
+        />
       ))
     }, [groupedAssets, copiedUrl, handleCopyToClipboard])
 

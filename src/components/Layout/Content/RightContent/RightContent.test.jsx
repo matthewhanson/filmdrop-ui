@@ -4,6 +4,7 @@ import { render, screen } from '@testing-library/react'
 import RightContent from './RightContent'
 import { Provider } from 'react-redux'
 import { store } from '../../../../redux/store'
+import { LayoutProvider } from '../../../../contexts/LayoutContext'
 import {
   setSearchResults,
   setisDrawingEnabled,
@@ -34,7 +35,9 @@ describe('RightContent', () => {
   const setup = () =>
     render(
       <Provider store={store}>
-        <RightContent />
+        <LayoutProvider>
+          <RightContent />
+        </LayoutProvider>
       </Provider>
     )
 
