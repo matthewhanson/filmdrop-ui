@@ -376,6 +376,8 @@ function addImageOverlay(item) {
   }
   const _selectedCollectionData =
     store.getState().mainSlice.selectedCollectionData
+  const _selectedVisualization =
+    store.getState().mainSlice.selectedVisualization
   // TODO: consider changing how spinner loads, or not at all?
   // maybe load spinner in footprint extent? or different loading spinner?
   store.dispatch(setimageOverlayLoading(true))
@@ -385,7 +387,10 @@ function addImageOverlay(item) {
   const featureURL = item?.links
     ?.find((x) => x?.rel === 'self')
     ?.href?.toString()
-  const tilerParams = constructSceneTilerParams(_selectedCollectionData.id)
+  const tilerParams = constructSceneTilerParams(
+    _selectedCollectionData.id,
+    _selectedVisualization
+  )
 
   fetch(featureURL, {
     credentials:
@@ -455,7 +460,10 @@ const getTileLayerParams = (collection) => {
   return collectionTileLayerParams
 }
 
-const constructSceneTilerParams = (collection) => {
+const constructSceneTilerParams = (
+  collection,
+  selectedVisualizationKey = null
+) => {
   // Get visualizations dictionary
   const visualizations = getCollectionConfig(collection, 'visualizations')
 
@@ -484,12 +492,22 @@ const constructSceneTilerParams = (collection) => {
     return ''
   }
 
-  // Use the first visualization as the default
-  const defaultVisualizationKey = visualizationKeys[0]
-  const tilerParams = visualizations[defaultVisualizationKey]
+  const visualizationKey =
+    selectedVisualizationKey && visualizations[selectedVisualizationKey]
+      ? selectedVisualizationKey
+      : visualizationKeys[0]
+
+  if (selectedVisualizationKey && !visualizations[selectedVisualizationKey]) {
+    console.warn(
+      `[TiTiler Scene] Selected visualization '${selectedVisualizationKey}' not found for collection '${collection}'. ` +
+        `Falling back to first available visualization.`
+    )
+  }
+
+  const tilerParams = visualizations[visualizationKey]
 
   console.log(
-    `[TiTiler Scene] Collection: ${collection}, using visualization: ${defaultVisualizationKey}`,
+    `[TiTiler Scene] Collection: ${collection}, using visualization: ${visualizationKey}`,
     tilerParams
   )
 

@@ -41,6 +41,7 @@ const initialState = {
   showLayerList: false,
   referenceLayers: [],
   selectedCollection: 'Select Collection',
+  selectedVisualization: null,
   tabSelected: 'filters',
   selectedPopupResultIndex: 0,
   autoCenterOnItemChanged: false,
@@ -69,6 +70,9 @@ export const mainSlice = createSlice({
     },
     setSelectedCollection: (state, action) => {
       state.selectedCollection = action.payload
+    },
+    setSelectedVisualization: (state, action) => {
+      state.selectedVisualization = action.payload
     },
     setSearchResults: (state, action) => {
       state.searchResults = action.payload
@@ -194,6 +198,7 @@ export const { setMap } = mainSlice.actions
 export const { setCloudCover } = mainSlice.actions
 export const { setShowCloudSlider } = mainSlice.actions
 export const { setSelectedCollection } = mainSlice.actions
+export const { setSelectedVisualization } = mainSlice.actions
 export const { setSearchResults } = mainSlice.actions
 export const { setClickResults } = mainSlice.actions
 export const { setSearchLoading } = mainSlice.actions

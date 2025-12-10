@@ -12,6 +12,7 @@ import 'react-tooltip/dist/react-tooltip.css'
 import DateTimeRangeSelector from '../DateTimeRangeSelector/DateTimeRangeSelector'
 import CloudSlider from '../CloudSlider/CloudSlider'
 import CollectionDropdown from '../CollectionDropdown/CollectionDropdown'
+import VisualizationSelector from '../VisualizationSelector/VisualizationSelector'
 import ViewSelector from '../ViewSelector/ViewSelector'
 import { newSearch } from '../../utils/searchHelper'
 import { enableMapPolyDrawing, clearLayer } from '../../utils/mapHelper'
@@ -93,6 +94,11 @@ const Search = () => {
         {mosaicTilerURL && (
           <div className="searchContainer viewSelectorComponent">
             <ViewSelector></ViewSelector>
+          </div>
+        )}
+        {_appConfig.SCENE_TILER_URL && (
+          <div className="searchContainer visualizationSelector">
+            <VisualizationSelector />
           </div>
         )}
         {_appConfig.SEARCH_BY_GEOM_ENABLED && (
