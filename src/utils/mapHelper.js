@@ -17,6 +17,7 @@ import debounce from './debounce'
 import { GetMosaicBoundsService } from '../services/get-mosaic-bounds'
 import GeoJSONValidation from './geojsonValidation'
 import { DEFAULT_TILE_LAYER_PARAMS } from '../components/defaults'
+import { router } from '../router'
 import { getCollectionConfig } from './configHelper'
 
 export const footprintLayerStyle = {
@@ -91,8 +92,6 @@ export function mapClickHandler(e) {
     const _searchType = store.getState().mainSlice.searchType
     const _searchResults = store.getState().mainSlice.searchResults
 
-    clearMapSelection()
-
     if (
       e.originalEvent.detail === 2 ||
       store.getState().mainSlice.viewMode === 'mosaic' ||
@@ -129,6 +128,18 @@ export function mapClickHandler(e) {
               store.dispatch(setClickResults(intersectingFeatures))
               store.dispatch(settabSelected('details'))
               store.dispatch(sethasLeftPanelTabChanged(true))
+
+              // Navigate to first item URL
+              const firstItem = intersectingFeatures[0]
+              if (firstItem.collection && firstItem.id) {
+                router.navigate({
+                  to: '/item/$collectionId/$itemId',
+                  params: {
+                    collectionId: firstItem.collection,
+                    itemId: firstItem.id
+                  }
+                })
+              }
             }
           } else if (_searchType === 'grid-code') {
             for (const i in intersectingFeatures) {

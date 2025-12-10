@@ -14,6 +14,12 @@ import { InitializeAppFromConfig } from './utils/configHelper'
 import Login from './components/Login/Login'
 import { setauthTokenExists, setCurrentTheme } from './redux/slices/mainSlice'
 import { initializeTheme, applyTheme } from './utils/themeHelper'
+import L from 'leaflet'
+import {
+  clickedFootprintLayerStyle,
+  clearLayer,
+  zoomToItemExtent
+} from './utils/mapHelper'
 import { LayoutProvider } from './contexts/LayoutContext'
 
 function App() {
@@ -29,6 +35,10 @@ function App() {
   const _authTokenExists = useSelector(
     (state) => state.mainSlice.authTokenExists
   )
+  const _currentPopupResult = useSelector(
+    (state) => state.mainSlice.currentPopupResult
+  )
+  const _map = useSelector((state) => state.mainSlice.map)
   const [showLogin, setShowLogin] = useState(false)
 
   useEffect(() => {
@@ -43,6 +53,10 @@ function App() {
     }
   }, [])
 
+  const _collectionsData = useSelector(
+    (state) => state.mainSlice.collectionsData
+  )
+
   useEffect(() => {
     if (_appConfig) {
       if (_appConfig.APP_TOKEN_AUTH_ENABLED && !_authTokenExists) {
@@ -51,9 +65,12 @@ function App() {
       }
       setShowLogin(false)
       InitializeAppFromConfig()
-      GetCollectionsService()
+      // Only load collections if not already loaded (router may have loaded them)
+      if (!_collectionsData || _collectionsData.length === 0) {
+        GetCollectionsService()
+      }
     }
-  }, [_appConfig, _authTokenExists])
+  }, [_appConfig, _authTokenExists, _collectionsData])
 
   useEffect(() => {
     if (_appConfig) {
@@ -66,6 +83,29 @@ function App() {
       applyTheme(currentTheme)
     }
   }, [_appConfig])
+
+  // Render footprint when currentPopupResult changes (for routed items)
+  useEffect(() => {
+    if (_currentPopupResult && _map && Object.keys(_map).length > 0) {
+      // Clear previous footprint
+      clearLayer('clickedSceneHighlightLayer')
+
+      // Render new footprint
+      const clickedFootprintsFound = L.geoJSON(_currentPopupResult, {
+        style: clickedFootprintLayerStyle
+      })
+      _map.eachLayer(function (layer) {
+        if (layer.layer_name === 'clickedSceneHighlightLayer') {
+          clickedFootprintsFound.addTo(layer)
+        }
+      })
+
+      // Auto-zoom to item extent if enabled in config
+      if (_appConfig?.SHOW_ITEM_AUTO_ZOOM) {
+        zoomToItemExtent(_currentPopupResult)
+      }
+    }
+  }, [_currentPopupResult, _map, _appConfig])
 
   return (
     <React.StrictMode>

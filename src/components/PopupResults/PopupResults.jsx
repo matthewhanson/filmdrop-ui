@@ -20,6 +20,7 @@ import { debounceTitilerOverlay } from '../../utils/mapHelper'
 import { useLayout } from '../../contexts/LayoutContext'
 import { EnhancedDetailsProvider } from '../../contexts/EnhancedDetailsContext'
 import EnhancedDetailsDisplay from '../EnhancedDetails/EnhancedDetailsDisplay.jsx'
+import { router } from '../../router'
 
 const PopupResults = (props) => {
   const dispatch = useDispatch()
@@ -52,6 +53,18 @@ const PopupResults = (props) => {
   useEffect(() => {
     if (props.results.length > 0) {
       dispatch(setCurrentPopupResult(props.results[_selectedPopupResultIndex]))
+
+      // Update URL when navigating between items
+      const currentItem = props.results[_selectedPopupResultIndex]
+      if (currentItem && currentItem.collection && currentItem.id) {
+        router.navigate({
+          to: '/item/$collectionId/$itemId',
+          params: {
+            collectionId: currentItem.collection,
+            itemId: currentItem.id
+          }
+        })
+      }
     }
   }, [_selectedPopupResultIndex, props.results])
 

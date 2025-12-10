@@ -48,6 +48,11 @@ Check out
   - Minimal configuration required - works out-of-the-box with most STAC catalogs
   - Sensible defaults for common parameters
 
+- **🔗 Direct Linking**
+  - Share URLs to specific STAC items
+  - Browser back/forward navigation
+  - Bookmark scenes for later reference
+
 ## 🚀 Quick Start
 
 ### Prerequisites
