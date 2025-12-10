@@ -31,6 +31,7 @@ const initialState = {
   showApplicationAlert: false,
   applicationAlertMessage: 'System Error',
   applicationAlertSeverity: 'error',
+  isAuthErrorAlert: false,
   appConfig: null,
   cartItems: [],
   showCartModal: false,
@@ -139,6 +140,15 @@ export const mainSlice = createSlice({
     setapplicationAlertSeverity: (state, action) => {
       state.applicationAlertSeverity = action.payload
     },
+    setisAuthErrorAlert: (state, action) => {
+      state.isAuthErrorAlert = action.payload
+    },
+    clearApplicationAlert: (state) => {
+      state.showApplicationAlert = false
+      state.applicationAlertMessage = 'System Error'
+      state.applicationAlertSeverity = 'error'
+      state.isAuthErrorAlert = false
+    },
     setappConfig: (state, action) => {
       state.appConfig = action.payload
     },
@@ -217,6 +227,8 @@ export const { setshowUploadGeojsonModal } = mainSlice.actions
 export const { setshowApplicationAlert } = mainSlice.actions
 export const { setapplicationAlertMessage } = mainSlice.actions
 export const { setapplicationAlertSeverity } = mainSlice.actions
+export const { setisAuthErrorAlert } = mainSlice.actions
+export const { clearApplicationAlert } = mainSlice.actions
 export const { setappConfig } = mainSlice.actions
 export const { setcartItems } = mainSlice.actions
 export const { setshowCartModal } = mainSlice.actions

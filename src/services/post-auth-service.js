@@ -1,5 +1,8 @@
 import { store } from '../redux/store'
-import { setauthTokenExists } from '../redux/slices/mainSlice'
+import {
+  setauthTokenExists,
+  clearApplicationAlert
+} from '../redux/slices/mainSlice'
 import { showApplicationAlert } from '../utils/alertHelper'
 
 export async function AuthService(username, password) {
@@ -32,6 +35,7 @@ export async function AuthService(username, password) {
       }
       localStorage.setItem('APP_AUTH_TOKEN', json.access_token)
       store.dispatch(setauthTokenExists(true))
+      store.dispatch(clearApplicationAlert())
 
       // Check for post-auth redirect URL
       const redirectUrl = sessionStorage.getItem('POST_AUTH_REDIRECT_URL')
