@@ -13,7 +13,7 @@
     "@reduxjs/toolkit": "^2.11.0",
     "@vitejs/plugin-react": "^5.1.2",
     "colormap": "^2.3.2",
-    "dayjs": "^1.11.18",
+    "dayjs": "^1.11.19",
     "dayjs-plugin-utc": "^0.1.2",
     "dompurify": "^3.2.7",
     "h3-js": "^4.3.0",
