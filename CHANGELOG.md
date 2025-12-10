@@ -297,6 +297,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Consolidated to single async/await implementation that properly handles new COLLECTIONS object structure
   - Prevents TypeError when collections are auto-configured from STAC API
 - Fixed empty "Processing" and "Software:" labels appearing when processing software data was present but not rendering
+- Fixed authentication session error persistence bug (#484):
+  - Error alerts now automatically clear when user successfully re-authenticates
+  - Closing error alerts no longer logs out user unless the error was authentication-related
+  - Added `isAuthErrorAlert` Redux state flag to distinguish auth errors from generic errors
+  - Added `clearApplicationAlert` action for atomic alert state reset on successful login
+  - Enhanced `showApplicationAlert()` helper with optional `isAuthError` parameter
+  - Removed immediate logout on 403 errors to allow re-authentication attempts
 
 ### Removed
 
