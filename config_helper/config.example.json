@@ -1,6 +1,6 @@
 {
   "PUBLIC_URL": "http://example.com/",
-  "LOGO_URL": "./logo.png",
+  "LOGO_URL": "/logo.png",
   "LOGO_ALT": "Alt description for my custom logo",
   "COLLECTIONS": {
     "default": "collection-name"
@@ -156,8 +156,8 @@
     "title": "Visit Your Company",
     "alt": "Your Company Logo",
     "image": "./your-brand-logo.png",
-    "image_light": "./your-brand-logo-light-mode.png",
-    "image_dark": "./your-brand-logo-dark-mode.png"
+    "image_light": "/your-brand-logo-light-mode.png",
+    "image_dark": "/your-brand-logo-dark-mode.png"
   },
   "POPUP_DISPLAY_FIELDS": {
     "sentinel-2-l2a": ["datetime", "platform", "eo:cloud_cover"],

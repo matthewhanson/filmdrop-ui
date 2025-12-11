@@ -3475,7 +3475,7 @@ export const mockSceneSearchResult = {
 
 export const mockAppConfig = {
   PUBLIC_URL: 'http://example.com/',
-  LOGO_URL: './logo.png',
+  LOGO_URL: '/logo.png',
   LOGO_ALT: 'Alt description for my custom logo',
   COLLECTIONS: {
     default: 'cop-dem-glo-30'
@@ -3587,7 +3587,7 @@ export const mockAppConfig = {
     url: 'https://element84.com/filmdrop',
     title: 'Learn more about FilmDrop',
     alt: 'Element 84 FilmDrop Logo',
-    image: './logo-filmdrop-e84.png'
+    image: '/logo-filmdrop-e84.png'
   },
   STAC_HEADER_COOKIES: []
 }

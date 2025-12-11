@@ -36,6 +36,7 @@ import { Tooltip } from 'react-tooltip'
 import LayersIcon from '@mui/icons-material/Layers'
 import LayerList from '../../../LayerList/LayerList'
 import ExportButton from '../../../ExportButton/ExportButton'
+import Pagination from '../../../Pagination/Pagination'
 import { useLayout } from '../../../../contexts/LayoutContext'
 import { useMapResizeHandler } from '../../../../hooks/useMapResizeHandler'
 
@@ -262,61 +263,8 @@ const RightContent = () => {
             Showing {_mappedScenes.length} of {_searchResults.numberMatched}{' '}
             scenes
           </div>
-          <div className="resultCountButtons">
-            {_searchResults.numberReturned < _searchResults.numberMatched ? (
-              <div>
-                {allScenesLoading ? (
-                  <button
-                    onClick={onCancelLoadAllScenesClicked}
-                    className="countButton"
-                  >
-                    <span>
-                      <span className="countButtonCancelText">Cancel</span>
-                      <CircularProgress
-                        size={14}
-                        color="inherit"
-                      ></CircularProgress>
-                    </span>
-                  </button>
-                ) : (
-                  <button
-                    onClick={
-                      _mappedScenes.length === _searchResults.numberMatched ||
-                      _mappedScenes.length >= DEFAULT_MAX_SCENES_RENDERED
-                        ? null
-                        : onLoadAllScenesClicked
-                    }
-                    className={
-                      _mappedScenes.length === _searchResults.numberMatched ||
-                      _mappedScenes.length >= DEFAULT_MAX_SCENES_RENDERED
-                        ? 'countButton disabledCountButton'
-                        : 'countButton'
-                    }
-                  >
-                    {_mappedScenes.length === _searchResults.numberMatched ||
-                    _mappedScenes.length >= DEFAULT_MAX_SCENES_RENDERED
-                      ? 'Max scenes loaded'
-                      : 'Load more scenes'}
-                  </button>
-                )}
-              </div>
-            ) : null}
-            <button
-              onClick={
-                allScenesLoading ||
-                _mappedScenes.length === _clickResults.length
-                  ? null
-                  : onSelectAllScenesClicked
-              }
-              className={
-                allScenesLoading ||
-                _mappedScenes.length === _clickResults.length
-                  ? 'countButton disabledCountButton'
-                  : 'countButton'
-              }
-            >
-              Select scenes
-            </button>
+          <div className="pagination">
+            <Pagination />
           </div>
         </div>
       ) : null}
