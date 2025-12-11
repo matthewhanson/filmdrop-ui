@@ -48,7 +48,12 @@ const initialState = {
   autoCenterOnItemChanged: false,
   hasLeftPanelTabChanged: false,
   authTokenExists: false,
-  currentTheme: null
+  currentTheme: null,
+  paginationNextLink: null,
+  paginationPrevLink: null,
+  currentPage: 1,
+  totalPages: null,
+  paginationHistory: []
 }
 
 // next, for every key in the initialState
@@ -197,6 +202,24 @@ export const mainSlice = createSlice({
     },
     setCurrentTheme: (state, action) => {
       state.currentTheme = action.payload
+    },
+    setpaginationNextLink: (state, action) => {
+      state.paginationNextLink = action.payload
+    },
+    setpaginationPrevLink: (state, action) => {
+      state.paginationPrevLink = action.payload
+    },
+    setcurrentPage: (state, action) => {
+      state.currentPage = action.payload
+    },
+    settotalPages: (state, action) => {
+      state.totalPages = action.payload
+    },
+    setpaginationHistory: (state, action) => {
+      state.paginationHistory = action.payload
+    },
+    addToPaginationHistory: (state, action) => {
+      state.paginationHistory = [...state.paginationHistory, action.payload]
     }
   }
 })
@@ -249,5 +272,11 @@ export const { setautoCenterOnItemChanged } = mainSlice.actions
 export const { sethasLeftPanelTabChanged } = mainSlice.actions
 export const { setauthTokenExists } = mainSlice.actions
 export const { setCurrentTheme } = mainSlice.actions
+export const { setpaginationNextLink } = mainSlice.actions
+export const { setpaginationPrevLink } = mainSlice.actions
+export const { setcurrentPage } = mainSlice.actions
+export const { settotalPages } = mainSlice.actions
+export const { setpaginationHistory } = mainSlice.actions
+export const { addToPaginationHistory } = mainSlice.actions
 
 export default mainSlice.reducer

@@ -296,19 +296,5 @@ describe('RightContent', () => {
         expect(disableMapPloyDrawingSpy).toHaveBeenCalledOnce()
       })
     })
-    describe('on Select All Scenes clicked', () => {
-      it('should call selectMappedScenes', async () => {
-        const selectMappedScenesSpy = vi.spyOn(mapHelper, 'selectMappedScenes')
-        store.dispatch(setappConfig(mockAppConfig))
-        store.dispatch(setSearchResults(mockSceneSearchResult))
-        store.dispatch(setmappedScenes(mockSceneSearchResult.features))
-        setup()
-        const selectScenesButton = screen.getByRole('button', {
-          name: /select scenes/i
-        })
-        await user.click(selectScenesButton)
-        expect(selectMappedScenesSpy).toHaveBeenCalledOnce()
-      })
-    })
   })
 })

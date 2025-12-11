@@ -58,14 +58,14 @@ After building with `npm run build`, place your config at `build/config/config.j
 
 #### Application Branding
 
-| Parameter     | Type   | Default         | Description                                                                                                  |
-| ------------- | ------ | --------------- | ------------------------------------------------------------------------------------------------------------ |
-| `APP_NAME`    | String | `"FilmDrop UI"` | Application name used in HTML title and UI                                                                   |
-| `APP_FAVICON` | String | -               | Custom favicon filename (`.ico` or `.png`) in `/config` directory                                            |
-| `LOGO_URL`    | String | -               | URL to custom logo image                                                                                     |
-| `LOGO_ALT`    | String | -               | Alt text for custom logo                                                                                     |
-| `PUBLIC_URL`  | String | -               | Public URL for the application (useful with CDNs)                                                            |
-| `BRAND_LOGO`  | Object | -               | Brand logo configuration with clickable hyperlink. See [Brand Logo Configuration](#brand-logo-configuration) |
+| Parameter     | Type   | Default         | Description                                                                                                         |
+| ------------- | ------ | --------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `APP_NAME`    | String | `"FilmDrop UI"` | Application name used in HTML title and UI                                                                          |
+| `APP_FAVICON` | String | -               | Custom favicon filename (`.ico` or `.png`) in `/config` directory                                                   |
+| `LOGO_URL`    | String | -               | URL to custom logo image (as of 7.0, client-side routing introduced this should be absolute path, i.e. `/logo.png`) |
+| `LOGO_ALT`    | String | -               | Alt text for custom logo                                                                                            |
+| `PUBLIC_URL`  | String | -               | Public URL for the application (useful with CDNs)                                                                   |
+| `BRAND_LOGO`  | Object | -               | Brand logo configuration with clickable hyperlink. See [Brand Logo Configuration](#brand-logo-configuration)        |
 
 #### UI Features
 
@@ -620,7 +620,7 @@ The following parameters are **deprecated** but still supported for backward com
     "url": "https://your-company.com",
     "title": "Visit Your Company",
     "alt": "Your Company Logo",
-    "image": "./your-logo.png"
+    "image": "/your-logo.png"
   }
 }
 ```
@@ -634,11 +634,14 @@ The following parameters are **deprecated** but still supported for backward com
     "title": "Visit Your Company",
     "alt": "Your Company Logo",
     "image": null,
-    "image_light": "./your-logo-light.png",
-    "image_dark": "./your-logo-dark.png"
+    "image_light": "/your-logo-light.png",
+    "image_dark": "/your-logo-dark.png"
   }
 }
 ```
+
+> Note: As of 7.0 with client-side routing introduced, the path to `image`, `image_light`, and `image_dark` should be absolute
+> (✅ `/brand_logo.png`) and not relative (🚫 ~~`./brand_logo.png`~~ or 🚫 ~~`brand_logo.png`~~).
 
 ### Layer List Configuration
 

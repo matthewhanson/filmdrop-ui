@@ -100,6 +100,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added `EnhancedDetailsContext` for sharing STAC item and rendering data across component hierarchy
 - Added strict ISO 8601 datetime validation to field discovery system
 - Added `DatetimeFieldDisplay` component for formatted datetime rendering
+- Added Pagination functionality for viewing stac search results
 - Added collection-specific visualization dropdown to search filters panel:
   - New `VisualizationSelector` component allows users to switch between available scene renderings (e.g., true-color, false-color, NDVI) for each collection
   - Dropdown dynamically populates from the `visualizations` field in `COLLECTIONS_CONFIG`

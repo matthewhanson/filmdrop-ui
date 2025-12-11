@@ -19,11 +19,17 @@ import {
   setSearchType,
   setShowZoomNotice,
   setZoomLevelNeeded,
-  setSearchResults
+  setSearchResults,
+  setpaginationNextLink,
+  setpaginationPrevLink,
+  setcurrentPage,
+  settotalPages,
+  setpaginationHistory
 } from '../redux/slices/mainSlice'
 import * as h3 from 'h3-js'
 import debounce from './debounce'
 import { AddMosaicService } from '../services/post-mosaic-service'
+import { router } from '../router'
 
 export function newSearch() {
   clearMapSelection()
@@ -31,6 +37,18 @@ export function newSearch() {
   store.dispatch(setSearchResults(null))
   store.dispatch(setShowZoomNotice(false))
   store.dispatch(setSearchLoading(false))
+
+  // Reset URL to root if currently on a STAC item route
+  if (window.location.pathname.startsWith('/item/')) {
+    router.navigate({ to: '/' })
+  }
+
+  // Reset pagination state for new search
+  store.dispatch(setpaginationNextLink(null))
+  store.dispatch(setpaginationPrevLink(null))
+  store.dispatch(setcurrentPage(1))
+  store.dispatch(settotalPages(null))
+  store.dispatch(setpaginationHistory([]))
 
   const _selectedCollection = store.getState().mainSlice.selectedCollectionData
 
