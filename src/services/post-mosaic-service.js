@@ -1,9 +1,12 @@
 import { store } from '../redux/store'
 import { setSearchLoading } from '../redux/slices/mainSlice'
 import { addMosaicLayer } from '../utils/mapHelper'
+import { appendStacHeaderCookies } from '../utils/stacRequest'
 
 export async function AddMosaicService(reqParams) {
   const mosaicTilerURL = store.getState().mainSlice.appConfig.MOSAIC_TILER_URL
+  const requestHeaders = new Headers()
+  appendStacHeaderCookies(requestHeaders)
   await fetch(`${mosaicTilerURL}/mosaicjson/mosaics`, reqParams)
     .then((response) => {
       if (response.ok) {

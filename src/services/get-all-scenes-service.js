@@ -6,8 +6,11 @@ import {
   clearLayer
 } from '../utils/mapHelper'
 import { DEFAULT_MAX_SCENES_RENDERED } from '../components/defaults'
+import { appendStacHeaderCookies } from '../utils/stacRequest'
 
 async function fetchFeatures(url, abortSignal) {
+  const requestHeaders = new Headers()
+  appendStacHeaderCookies(requestHeaders)
   const response = await fetch(url, {
     signal: abortSignal,
     credentials:
