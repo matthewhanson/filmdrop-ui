@@ -1,11 +1,15 @@
-import { React, useState, useEffect } from 'react'
+import { React, useState, useEffect, useMemo } from 'react'
 import './VisualizationSelector.css'
 import { Stack } from '@mui/material'
 import Grid from '@mui/material/Grid'
 import NativeSelect from '@mui/material/NativeSelect'
 import { useDispatch, useSelector } from 'react-redux'
 import { setSelectedVisualization } from '../../redux/slices/mainSlice'
-import { getCollectionConfig } from '../../utils/configHelper'
+import {
+  getCollectionConfig,
+  getCollectionVisualizations
+} from '../../utils/configHelper'
+import { router } from '../../router'
 
 /**
  * Gets the default visualization key, preferring the selected visualization
@@ -28,6 +32,20 @@ const getDefaultVisualizationKey = (
   return visualizationKeys[0] || null
 }
 
+/**
+ * VisualizationSelector component allows users to switch between available scene renderings
+ * (e.g., true-color, false-color, NDVI) for each collection.
+ *
+ * @component
+ * @description
+ * - Only renders in Scene view mode (hidden in Mosaic view)
+ * - Only displays when collection has 2+ visualizations (hides when 0 or 1)
+ * - Requires SCENE_TILER_URL to be configured in app config
+ * - Integrates with Redux to persist selected visualization across view mode changes
+ * - Updates URL when visualization changes and user is viewing an item
+ *
+ * @returns {JSX.Element|null} The visualization selector dropdown or null if conditions not met
+ */
 const VisualizationSelector = () => {
   const _selectedCollectionData = useSelector(
     (state) => state.mainSlice.selectedCollectionData
@@ -37,14 +55,21 @@ const VisualizationSelector = () => {
   const _selectedVisualization = useSelector(
     (state) => state.mainSlice.selectedVisualization
   )
+  const _currentPopupResult = useSelector(
+    (state) => state.mainSlice.currentPopupResult
+  )
 
   const dispatch = useDispatch()
 
-  const visualizations = _selectedCollectionData
-    ? getCollectionConfig(_selectedCollectionData.id, 'visualizations')
-    : null
+  const { visualizations, visualizationKeys } = useMemo(() => {
+    return _selectedCollectionData
+      ? getCollectionVisualizations(_selectedCollectionData.id)
+      : {
+          visualizations: null,
+          visualizationKeys: []
+        }
+  }, [_selectedCollectionData])
 
-  const visualizationKeys = visualizations ? Object.keys(visualizations) : []
   const visualizationCount = visualizationKeys.length
 
   const [visualizationKey, setVisualizationKey] = useState(() =>
@@ -97,8 +122,25 @@ const VisualizationSelector = () => {
     return null
   }
 
-  function onVisualizationChanged(e) {
-    setVisualizationKey(e.target.value)
+  const onVisualizationChanged = (e) => {
+    const newVisualizationKey = e.target.value
+    setVisualizationKey(newVisualizationKey)
+
+    // Update URL if user is viewing an item
+    if (
+      _currentPopupResult &&
+      _currentPopupResult.collection &&
+      _currentPopupResult.id
+    ) {
+      router.navigate({
+        to: '/item/$collectionId/$itemId/{-$visualizationId}',
+        params: {
+          collectionId: _currentPopupResult.collection,
+          itemId: _currentPopupResult.id,
+          visualizationId: newVisualizationKey
+        }
+      })
+    }
   }
 
   return (

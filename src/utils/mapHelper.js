@@ -18,7 +18,10 @@ import { GetMosaicBoundsService } from '../services/get-mosaic-bounds'
 import GeoJSONValidation from './geojsonValidation'
 import { DEFAULT_TILE_LAYER_PARAMS } from '../components/defaults'
 import { router } from '../router'
-import { getCollectionConfig } from './configHelper'
+import {
+  getCollectionConfig,
+  getCollectionVisualizations
+} from './configHelper'
 
 export const footprintLayerStyle = {
   color: '#3183f5',
@@ -132,12 +135,25 @@ export function mapClickHandler(e) {
               // Navigate to first item URL
               const firstItem = intersectingFeatures[0]
               if (firstItem.collection && firstItem.id) {
+                const collectionId = firstItem.collection
+                const { hasVisualizations } =
+                  getCollectionVisualizations(collectionId)
+                const _selectedVisualization =
+                  store.getState().mainSlice.selectedVisualization
+
+                const navigateParams = {
+                  collectionId,
+                  itemId: firstItem.id
+                }
+
+                // Only include visualization if collection has >= 1 visualization
+                if (hasVisualizations && _selectedVisualization) {
+                  navigateParams.visualizationId = _selectedVisualization
+                }
+
                 router.navigate({
-                  to: '/item/$collectionId/$itemId',
-                  params: {
-                    collectionId: firstItem.collection,
-                    itemId: firstItem.id
-                  }
+                  to: '/item/$collectionId/$itemId/{-$visualizationId}',
+                  params: navigateParams
                 })
               }
             }

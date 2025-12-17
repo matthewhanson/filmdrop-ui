@@ -101,17 +101,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added strict ISO 8601 datetime validation to field discovery system
 - Added `DatetimeFieldDisplay` component for formatted datetime rendering
 - Added Pagination functionality for viewing stac search results
-- Added collection-specific visualization dropdown to search filters panel:
-  - New `VisualizationSelector` component allows users to switch between available scene renderings (e.g., true-color, false-color, NDVI) for each collection
-  - Dropdown dynamically populates from the `visualizations` field in `COLLECTIONS_CONFIG`
-  - Only displays in Scene view mode (hidden in Mosaic view)
-  - Automatically hides when collection has 0 or 1 visualizations (no selection needed)
-  - Respects user selection across view mode changes (state persists when switching to Mosaic and back)
-  - Added `selectedVisualization` to Redux state in `mainSlice.js` with `setSelectedVisualization` action
-  - Updated `constructSceneTilerParams()` in `mapHelper.js` to accept and use selected visualization key
-  - Updated `addImageOverlay()` to retrieve selected visualization from Redux and pass to tiler params
-  - Component follows existing patterns from `CollectionDropdown` and `ViewSelector` for consistency
-  - Comprehensive test coverage (14 tests) including view mode switching, collection changes, and state persistence
+- Added collection-specific visualization dropdown to search filters panel for switching between scene renderings (e.g., true-color, false-color, NDVI)
+- Added visualization parameter to item route URLs (`/item/:collection/:item/:visualization`) so selected visualization persists on page refresh
 
 ### Changed
 

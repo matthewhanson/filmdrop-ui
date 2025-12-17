@@ -8,10 +8,19 @@ import {
   setappConfig,
   setSelectedCollectionData,
   setViewMode,
-  setSelectedVisualization
+  setSelectedVisualization,
+  setCurrentPopupResult
 } from '../../redux/slices/mainSlice'
 import { mockAppConfig, mockCollectionsData } from '../../testing/shared-mocks'
 import userEvent from '@testing-library/user-event'
+import { router } from '../../router'
+
+// Mock router module
+vi.mock('../../router', () => ({
+  router: {
+    navigate: vi.fn()
+  }
+}))
 
 describe('VisualizationSelector', () => {
   const setup = () =>
@@ -201,6 +210,59 @@ describe('VisualizationSelector', () => {
         expect(select.value).toBe('ndvi')
         expect(store.getState().mainSlice.selectedVisualization).toBe('ndvi')
       })
+    })
+
+    it('should update URL when visualization changes and item is selected', async () => {
+      const navigateSpy = vi.spyOn(router, 'navigate')
+
+      const sentinelCollection = mockCollectionsData.find(
+        (c) => c.id === 'sentinel-2-l2a'
+      )
+      store.dispatch(setSelectedCollectionData(sentinelCollection))
+
+      // Set up a mock item that the user is viewing
+      const mockItem = {
+        id: 'S2A_17SNB_20230617_0_L2A',
+        collection: 'sentinel-2-l2a',
+        type: 'Feature',
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [-122.5, 37.5],
+              [-122.4, 37.5],
+              [-122.4, 37.6],
+              [-122.5, 37.6],
+              [-122.5, 37.5]
+            ]
+          ]
+        },
+        properties: {}
+      }
+      store.dispatch(setCurrentPopupResult(mockItem))
+
+      setup()
+
+      const select = screen.getByRole('combobox', {
+        name: /visualization/i
+      })
+
+      // User changes visualization selection
+      await userEvent.selectOptions(select, 'false-color')
+
+      // Verify router.navigate was called with correct parameters
+      await waitFor(() => {
+        expect(navigateSpy).toHaveBeenCalledWith({
+          to: '/item/$collectionId/$itemId/{-$visualizationId}',
+          params: {
+            collectionId: 'sentinel-2-l2a',
+            itemId: 'S2A_17SNB_20230617_0_L2A',
+            visualizationId: 'false-color'
+          }
+        })
+      })
+
+      navigateSpy.mockRestore()
     })
   })
 

@@ -20,12 +20,6 @@
   background-color: var(--side-panel-dropdown-background) !important;
 }
 
-.visualizationSelector.error-true select {
-  color: #bc3131 !important;
-  font-weight: bold;
-  border-bottom: 1px solid #bc3131;
-}
-
 .visualizationSelector div[label='Visualization'] {
   top: -2.5px;
   padding-top: 1px;

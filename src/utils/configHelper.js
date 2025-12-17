@@ -302,6 +302,26 @@ export function getCollectionConfig(collectionId, paramName, config = null) {
 }
 
 /**
+ * Gets visualization keys for a collection and checks if it has visualizations
+ * @param {string} collectionId - The collection ID
+ * @param {Object} config - Optional config object for testing (uses store if not provided)
+ * @returns {{visualizations: Object|null|undefined, visualizationKeys: string[], hasVisualizations: boolean}}
+ */
+export function getCollectionVisualizations(collectionId, config = null) {
+  const visualizations = getCollectionConfig(
+    collectionId,
+    'visualizations',
+    config
+  )
+  const visualizationKeys = visualizations ? Object.keys(visualizations) : []
+  return {
+    visualizations,
+    visualizationKeys,
+    hasVisualizations: visualizationKeys.length >= 1
+  }
+}
+
+/**
  * Auto-configures collections from the STAC API
  * @param {string} apiUrl - The STAC API URL
  * @param {Object} config - The configuration object
