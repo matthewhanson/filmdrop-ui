@@ -19,6 +19,7 @@ const initialState = {
   showAppLoading: true,
   searchType: null,
   collectionsData: [],
+  collectionsLoadError: false,
   selectedCollectionData: null,
   searchDateRangeValue: DEFAULT_DATE_RANGE,
   localGridData: {},
@@ -108,6 +109,9 @@ export const mainSlice = createSlice({
     },
     setCollectionsData: (state, action) => {
       state.collectionsData = action.payload
+    },
+    setCollectionsLoadError: (state, action) => {
+      state.collectionsLoadError = action.payload
     },
     setSelectedCollectionData: (state, action) => {
       state.selectedCollectionData = action.payload
@@ -238,6 +242,7 @@ export const { setViewMode } = mainSlice.actions
 export const { setShowAppLoading } = mainSlice.actions
 export const { setSearchType } = mainSlice.actions
 export const { setCollectionsData } = mainSlice.actions
+export const { setCollectionsLoadError } = mainSlice.actions
 export const { setSelectedCollectionData } = mainSlice.actions
 export const { setSearchDateRangeValue } = mainSlice.actions
 export const { setLocalGridData } = mainSlice.actions
