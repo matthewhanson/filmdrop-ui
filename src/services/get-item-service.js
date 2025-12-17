@@ -1,5 +1,6 @@
 import { store } from '../redux/store'
 import { logoutUser } from '../utils/authHelper'
+import { appendStacHeaderCookies } from '../utils/stacRequest'
 
 /**
  * Fetches a single STAC item from the API
@@ -22,6 +23,7 @@ export async function GetItemService(collectionId, itemId) {
   if (JWT && isSTACTokenAuthEnabled) {
     requestHeaders.append('Authorization', `Bearer ${JWT}`)
   }
+  appendStacHeaderCookies(requestHeaders)
 
   try {
     const response = await fetch(
