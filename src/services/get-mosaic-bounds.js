@@ -6,6 +6,7 @@ export function GetMosaicBoundsService(mosaicURL) {
     const requestHeaders = new Headers()
     appendStacHeaderCookies(requestHeaders)
     fetch(mosaicURL, {
+      headers: requestHeaders,
       credentials:
         store.getState().mainSlice.appConfig.FETCH_CREDENTIALS || 'same-origin'
     })

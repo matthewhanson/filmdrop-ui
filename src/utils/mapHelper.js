@@ -22,6 +22,7 @@ import {
   getCollectionConfig,
   getCollectionVisualizations
 } from './configHelper'
+import { appendStacHeaderCookies } from '../utils/stacRequest'
 
 export const footprintLayerStyle = {
   color: '#3183f5',
@@ -408,7 +409,10 @@ function addImageOverlay(item) {
     _selectedVisualization
   )
 
+  const requestHeaders = new Headers()
+  appendStacHeaderCookies(requestHeaders)
   fetch(featureURL, {
+    headers: requestHeaders,
     credentials:
       store.getState().mainSlice.appConfig.FETCH_CREDENTIALS || 'same-origin'
   })

@@ -13,6 +13,7 @@ async function fetchFeatures(url, abortSignal) {
   appendStacHeaderCookies(requestHeaders)
   const response = await fetch(url, {
     signal: abortSignal,
+    headers: requestHeaders,
     credentials:
       store.getState().mainSlice.appConfig.FETCH_CREDENTIALS || 'same-origin'
   })
