@@ -38,7 +38,7 @@ import DOMPurify from 'dompurify'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import { Tooltip } from 'react-tooltip'
 import LayersIcon from '@mui/icons-material/Layers'
-import InsertChartIcon from '@mui/icons-material/InsertChart'
+import Filter from '@mui/icons-material/Filter'
 import LayerList from '../../../LayerList/LayerList'
 import VisualizationList from '../../../VisualizationList/VisualizationList'
 import ExportButton from '../../../ExportButton/ExportButton'
@@ -270,10 +270,10 @@ const RightContent = () => {
         )}
       {shouldShowVisualizationButton() && (
         <div className="visualizationButton" title="Change visualization type">
-          <InsertChartIcon
+          <Filter
             className="visualizationButtonIcon"
             onClick={() => onVisualizationButtonClick()}
-          ></InsertChartIcon>
+          ></Filter>
         </div>
       )}
       {_showLayerList && <LayerList></LayerList>}

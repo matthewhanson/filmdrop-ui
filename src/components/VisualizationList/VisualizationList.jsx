@@ -35,14 +35,18 @@ const VisualizationList = () => {
       _currentPopupResult.collection &&
       _currentPopupResult.id
     ) {
-      router.navigate({
-        to: '/item/$collectionId/$itemId/{-$visualizationId}',
-        params: {
-          collectionId: _currentPopupResult.collection,
-          itemId: _currentPopupResult.id,
-          visualizationId: visualizationKey
-        }
-      })
+      try {
+        router.navigate({
+          to: '/item/$collectionId/$itemId/{-$visualizationId}',
+          params: {
+            collectionId: _currentPopupResult.collection,
+            itemId: _currentPopupResult.id,
+            visualizationId: visualizationKey
+          }
+        })
+      } catch (error) {
+        console.error('Failed to update URL:', error)
+      }
     }
   }
 
