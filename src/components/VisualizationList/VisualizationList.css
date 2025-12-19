@@ -1,0 +1,100 @@
+.VisualizationList {
+  position: absolute;
+  top: 171px;
+  left: 54px;
+  z-index: 1;
+  background-color: var(--map-info-overlay-background);
+  background-clip: padding-box;
+  border-radius: 4px;
+  min-width: 200px;
+  max-width: 400px;
+  max-height: 300px;
+  font-size: 16px;
+  display: flex;
+  flex-direction: column;
+  color: var(--map-info-overlay-color);
+}
+
+.VisualizationListTitle {
+  border-bottom: solid 2px var(--map-info-overlay-heading-border);
+  height: 35px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.VisualizationListTitleText {
+  margin-left: 15px;
+}
+
+.VisualizationListItems {
+  overflow-y: auto;
+  margin-left: 14px;
+  margin-bottom: 5px;
+}
+
+.VisualizationListItem {
+  display: flex;
+  flex-direction: row;
+}
+
+.VisualizationListItemContainer {
+  display: block;
+  position: relative;
+  padding-left: 25px;
+  margin-bottom: 12px;
+  margin-right: 15px;
+  cursor: pointer;
+  font-size: 14px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.VisualizationListItemContainer input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.VisualizationListRadio {
+  position: absolute;
+  top: 2px;
+  left: 0;
+  height: 16px;
+  width: 16px;
+  background-color: var(--map-info-overlay-background);
+  border-radius: 50%;
+  border: 2px solid var(--map-info-overlay-border);
+}
+
+.VisualizationListItemContainer:hover input ~ .VisualizationListRadio {
+  background-color: var(--map-info-overlay-background-hover);
+}
+
+.VisualizationListItemContainer input:checked ~ .VisualizationListRadio {
+  background-color: var(--brand-accent-primary);
+  border-color: var(--brand-accent-primary);
+}
+
+.VisualizationListRadio:after {
+  content: '';
+  position: absolute;
+  display: none;
+}
+
+.VisualizationListItemContainer input:checked ~ .VisualizationListRadio:after {
+  display: block;
+}
+
+.VisualizationListItemContainer .VisualizationListRadio:after {
+  top: 3px;
+  left: 3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: white;
+}
