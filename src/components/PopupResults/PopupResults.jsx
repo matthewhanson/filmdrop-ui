@@ -10,6 +10,10 @@ import {
   setimageOverlayLoading,
   setselectedPopupResultIndex
 } from '../../redux/slices/mainSlice'
+import {
+  getCollectionConfig,
+  getCollectionVisualizations
+} from '../../utils/configHelper'
 import PopupFooter from '../PopupFooter/PopupFooter.jsx'
 import {
   isSceneInCart,
@@ -32,6 +36,9 @@ const PopupResults = (props) => {
   )
   const _selectedPopupResultIndex = useSelector(
     (state) => state.mainSlice.selectedPopupResultIndex
+  )
+  const _selectedVisualization = useSelector(
+    (state) => state.mainSlice.selectedVisualization
   )
 
   useEffect(() => {
@@ -57,16 +64,26 @@ const PopupResults = (props) => {
       // Update URL when navigating between items
       const currentItem = props.results[_selectedPopupResultIndex]
       if (currentItem && currentItem.collection && currentItem.id) {
+        const collectionId = currentItem.collection
+        const { hasVisualizations } = getCollectionVisualizations(collectionId)
+
+        const navigateParams = {
+          collectionId,
+          itemId: currentItem.id
+        }
+
+        // Only include visualization if collection has >= 1 visualization
+        if (hasVisualizations && _selectedVisualization) {
+          navigateParams.visualizationId = _selectedVisualization
+        }
+
         router.navigate({
-          to: '/item/$collectionId/$itemId',
-          params: {
-            collectionId: currentItem.collection,
-            itemId: currentItem.id
-          }
+          to: '/item/$collectionId/$itemId/{-$visualizationId}',
+          params: navigateParams
         })
       }
     }
-  }, [_selectedPopupResultIndex, props.results])
+  }, [_selectedPopupResultIndex, props.results, _selectedVisualization])
 
   const onNextClick = useCallback(() => {
     if (_selectedPopupResultIndex < props.results.length - 1) {

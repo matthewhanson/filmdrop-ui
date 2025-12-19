@@ -40,8 +40,10 @@ const initialState = {
   showMapAttribution: true,
   appName: '',
   showLayerList: false,
+  showVisualizationList: false,
   referenceLayers: [],
   selectedCollection: 'Select Collection',
+  selectedVisualization: null,
   tabSelected: 'filters',
   selectedPopupResultIndex: 0,
   autoCenterOnItemChanged: false,
@@ -75,6 +77,9 @@ export const mainSlice = createSlice({
     },
     setSelectedCollection: (state, action) => {
       state.selectedCollection = action.payload
+    },
+    setSelectedVisualization: (state, action) => {
+      state.selectedVisualization = action.payload
     },
     setSearchResults: (state, action) => {
       state.searchResults = action.payload
@@ -178,6 +183,9 @@ export const mainSlice = createSlice({
     setshowLayerList: (state, action) => {
       state.showLayerList = action.payload
     },
+    setshowVisualizationList: (state, action) => {
+      state.showVisualizationList = action.payload
+    },
     setreferenceLayers: (state, action) => {
       state.referenceLayers = action.payload
     },
@@ -227,6 +235,7 @@ export const { setMap } = mainSlice.actions
 export const { setCloudCover } = mainSlice.actions
 export const { setShowCloudSlider } = mainSlice.actions
 export const { setSelectedCollection } = mainSlice.actions
+export const { setSelectedVisualization } = mainSlice.actions
 export const { setSearchResults } = mainSlice.actions
 export const { setClickResults } = mainSlice.actions
 export const { setSearchLoading } = mainSlice.actions
@@ -260,6 +269,7 @@ export const { setimageOverlayLoading } = mainSlice.actions
 export const { setshowMapAttribution } = mainSlice.actions
 export const { setappName } = mainSlice.actions
 export const { setshowLayerList } = mainSlice.actions
+export const { setshowVisualizationList } = mainSlice.actions
 export const { setreferenceLayers } = mainSlice.actions
 export const { settabSelected } = mainSlice.actions
 export const { setselectedPopupResultIndex } = mainSlice.actions

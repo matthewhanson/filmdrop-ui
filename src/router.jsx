@@ -22,7 +22,10 @@ import {
 } from '@tanstack/react-router'
 import App from './App'
 import { GetItemService } from './services/get-item-service'
-import { getCollectionConfig } from './utils/configHelper'
+import {
+  getCollectionConfig,
+  getCollectionVisualizations
+} from './utils/configHelper'
 import { showApplicationAlert } from './utils/alertHelper'
 import { store } from './redux/store'
 import {
@@ -33,7 +36,8 @@ import {
   setSelectedCollectionData,
   setSelectedCollection,
   setSearchResults,
-  setmappedScenes
+  setmappedScenes,
+  setSelectedVisualization
 } from './redux/slices/mainSlice'
 import { LoadConfigIntoStateService } from './services/get-config-service'
 import { GetCollectionsService } from './services/get-collections-service'
@@ -50,6 +54,7 @@ function clearItemRouteState() {
   store.dispatch(setClickResults([]))
   store.dispatch(setCurrentPopupResult(null))
   store.dispatch(setselectedPopupResultIndex(-1))
+  store.dispatch(setSelectedVisualization(null))
   // Don't clear searchResults/mappedScenes - preserve existing search state
 }
 
@@ -68,7 +73,7 @@ const indexRoute = createRoute({
 // Item route with loader for fetching and displaying items
 const itemRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/item/$collectionId/$itemId',
+  path: '/item/$collectionId/$itemId/{-$visualizationId}',
   beforeLoad: async ({ location }) => {
     // CRITICAL SECURITY: Ensure config is loaded BEFORE checking authentication
     // If config isn't loaded yet, APP_TOKEN_AUTH_ENABLED will be undefined/false,
@@ -117,7 +122,7 @@ const itemRoute = createRoute({
   loader: async ({ params }) => {
     try {
       // TanStack Router automatically decodes path parameters
-      const { collectionId, itemId } = params
+      const { collectionId, itemId, visualizationId } = params
 
       // Ensure config is loaded - trigger load if not already loading
       let appConfig = store.getState().mainSlice.appConfig
@@ -269,6 +274,26 @@ const itemRoute = createRoute({
       store.dispatch(setselectedPopupResultIndex(0))
       store.dispatch(setCurrentPopupResult(result))
       store.dispatch(settabSelected('details'))
+
+      // Handle visualization from URL
+      const { visualizationKeys, hasVisualizations } =
+        getCollectionVisualizations(collectionId)
+
+      if (hasVisualizations) {
+        // Collection has visualizations - process visualization from URL
+        if (visualizationId && visualizationKeys.includes(visualizationId)) {
+          // Valid visualization in URL
+          store.dispatch(setSelectedVisualization(visualizationId))
+        } else {
+          // Missing or invalid visualization - use default (first available)
+          const defaultVisualization = visualizationKeys[0]
+          store.dispatch(setSelectedVisualization(defaultVisualization))
+        }
+      } else {
+        // Collection has 0 visualizations - clear visualization state
+        store.dispatch(setSelectedVisualization(null))
+      }
+
       console.log('Router: Item loaded successfully')
     } catch (error) {
       // Catch any unexpected errors and ensure clean state
