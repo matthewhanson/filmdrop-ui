@@ -56,6 +56,9 @@ function App() {
   const _collectionsData = useSelector(
     (state) => state.mainSlice.collectionsData
   )
+  const _collectionsLoadError = useSelector(
+    (state) => state.mainSlice.collectionsLoadError
+  )
 
   useEffect(() => {
     if (_appConfig) {
@@ -66,11 +69,15 @@ function App() {
       setShowLogin(false)
       InitializeAppFromConfig()
       // Only load collections if not already loaded (router may have loaded them)
-      if (!_collectionsData || _collectionsData.length === 0) {
+      // Don't retry if there was a previous load error to prevent infinite loops
+      if (
+        !_collectionsLoadError &&
+        (!_collectionsData || _collectionsData.length === 0)
+      ) {
         GetCollectionsService()
       }
     }
-  }, [_appConfig, _authTokenExists, _collectionsData])
+  }, [_appConfig, _authTokenExists, _collectionsData, _collectionsLoadError])
 
   useEffect(() => {
     if (_appConfig) {

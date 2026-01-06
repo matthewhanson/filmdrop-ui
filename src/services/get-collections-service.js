@@ -1,6 +1,7 @@
 import { store } from '../redux/store'
 import {
   setCollectionsData,
+  setCollectionsLoadError,
   setShowAppLoading,
   setapplicationAlertMessage,
   setshowApplicationAlert
@@ -47,11 +48,13 @@ export async function GetCollectionsService(searchParams) {
     }
 
     store.dispatch(setCollectionsData(formattedData))
+    store.dispatch(setCollectionsLoadError(false))
     store.dispatch(setShowAppLoading(false))
     loadLocalGridData()
   } catch (error) {
     // Set empty collections data to prevent UI errors
     store.dispatch(setCollectionsData([]))
+    store.dispatch(setCollectionsLoadError(true))
     store.dispatch(setShowAppLoading(false))
 
     if (error.status === 403) {
