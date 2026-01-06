@@ -7,9 +7,7 @@ import {
   getStandardRole,
   getCustomRoles,
   getFileTypeAbbreviation,
-  getRoleBasedGroup,
-  STANDARD_ROLES,
-  FILE_TYPE_ABBREVIATIONS
+  getRoleBasedGroup
 } from './defaultAssetGrouping.js'
 
 describe('Default Asset Grouping', () => {
