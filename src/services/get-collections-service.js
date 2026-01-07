@@ -7,7 +7,6 @@ import {
   setshowApplicationAlert
 } from '../redux/slices/mainSlice'
 import { buildCollectionsData, loadLocalGridData } from '../utils/dataHelper'
-import { logoutUser } from '../utils/authHelper'
 import { showApplicationAlert } from '../utils/alertHelper'
 import { getCollections } from './stac-api'
 import { appendStacHeaderCookies } from '../utils/stacRequest'
