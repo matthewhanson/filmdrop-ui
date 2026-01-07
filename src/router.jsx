@@ -42,6 +42,7 @@ import {
 import { LoadConfigIntoStateService } from './services/get-config-service'
 import { GetCollectionsService } from './services/get-collections-service'
 import { addDataToLayer, footprintLayerStyle } from './utils/mapHelper'
+import { syncSelectionWithFetchedItem } from './utils/selectionSync'
 
 /**
  * Clear Redux state to prevent inconsistencies when route loading fails.
@@ -270,9 +271,13 @@ const itemRoute = createRoute({
         addDataToLayer(searchResultsObject, 'searchResultsLayer', options, true)
       }
 
-      store.dispatch(setClickResults(searchResultsObject.features))
-      store.dispatch(setselectedPopupResultIndex(0))
-      store.dispatch(setCurrentPopupResult(result))
+      const existingClickResults = store.getState().mainSlice.clickResults
+      const { clickResults, selectedIndex, currentResult } =
+        syncSelectionWithFetchedItem(existingClickResults, result)
+
+      store.dispatch(setClickResults(clickResults))
+      store.dispatch(setselectedPopupResultIndex(selectedIndex))
+      store.dispatch(setCurrentPopupResult(currentResult))
       store.dispatch(settabSelected('details'))
 
       // Handle visualization from URL
