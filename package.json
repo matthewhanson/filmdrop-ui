@@ -17,7 +17,6 @@
     "dayjs": "^1.11.19",
     "dayjs-plugin-utc": "^0.1.2",
     "dompurify": "^3.3.0",
-    "eslint-config-standard": "^17.1.0",
     "h3-js": "^4.4.0",
     "js-cookie": "^3.0.5",
     "leaflet": "^1.9.4",
@@ -47,6 +46,7 @@
     "cross-env": "^7.0.3",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^10.1.8",
+    "eslint-config-standard": "^17.1.0",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsx-a11y": "^6.8.0",
     "eslint-plugin-n": "^16.3.1",
@@ -91,12 +91,6 @@
     "audit-prod": "npx better-npm-audit audit --production",
     "check-markdown": "remark . --frail",
     "prepare": "husky"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
   },
   "browserslist": {
     "production": [
