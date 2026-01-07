@@ -23,6 +23,9 @@ const LeftContent = () => {
     (state) => state.mainSlice.isDrawingEnabled
   )
   const _tabSelected = useSelector((state) => state.mainSlice.tabSelected)
+  const _isRightSidebarEnabled = useSelector(
+    (state) => state.mainSlice.appConfig?.RIGHT_SIDEBAR_ENABLED ?? false
+  )
 
   const { handleMouseDown, currentWidth } = useResizablePanel(panelRef)
 
@@ -51,7 +54,7 @@ const LeftContent = () => {
   return (
     <div
       ref={panelRef}
-      className={`LeftContent ${!isLeftPanelVisible ? 'hidden' : ''}`}
+      className={`LeftContent ${_isRightSidebarEnabled ? 'rightSidebar' : ''} ${!isLeftPanelVisible ? 'hidden' : ''}`}
       style={{ width: isLeftPanelVisible ? `${currentWidth}px` : '0px' }}
     >
       <div className="LeftContentHolder">

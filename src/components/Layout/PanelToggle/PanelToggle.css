@@ -15,8 +15,16 @@
   justify-content: center;
   transition:
     left 0.3s ease-in-out,
+    right 0.3s ease-in-out,
     background-color 0.2s ease;
   box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+}
+
+.PanelToggle.rightSidebar {
+  border-left: 1px solid var(--side-panel-background);
+  border-right: none;
+  border-radius: 4px 0 0 4px;
+  box-shadow: -2px 0 4px rgba(0, 0, 0, 0.1);
 }
 
 .PanelToggle:before,
@@ -29,16 +37,32 @@
   border-left: 3px solid var(--side-panel-background);
 }
 
+.PanelToggle.rightSidebar:before,
+.PanelToggle.rightSidebar:after {
+  left: auto;
+  right: -3px;
+  border-left: none;
+  border-right: 3px solid var(--side-panel-background);
+}
+
 .PanelToggle:before {
   top: -7px;
   border-bottom: 3px solid var(--side-panel-background);
   border-radius: 0px 0px 0px 6px;
 }
 
+.PanelToggle.rightSidebar:before {
+  border-radius: 0px 0px 6px 0px;
+}
+
 .PanelToggle:after {
   bottom: -7px;
   border-top: 3px solid var(--side-panel-background);
   border-radius: 6px 0px 0px 0px;
+}
+
+.PanelToggle.rightSidebar:after {
+  border-radius: 0px 6px 0px 0px;
 }
 
 .PanelToggle:hover svg {

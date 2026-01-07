@@ -239,16 +239,24 @@ const RightContent = () => {
   // Use custom hook to handle map resize with debouncing
   useMapResizeHandler(_map, rightContentRef)
 
-  const effectiveLeftWidth = _isLeftPanelVisible ? _leftPanelWidth : 0
+  const isRightSidebarEnabled = _appConfig?.RIGHT_SIDEBAR_ENABLED ?? false
+  const effectiveSidebarWidth = _isLeftPanelVisible ? _leftPanelWidth : 0
+
+  const rightContentStyle = isRightSidebarEnabled
+    ? {
+        width: `calc(100% - ${effectiveSidebarWidth}px)`,
+        right: `${effectiveSidebarWidth}px`
+      }
+    : {
+        width: `calc(100% - ${effectiveSidebarWidth}px)`,
+        left: `${effectiveSidebarWidth}px`
+      }
 
   return (
     <div
       ref={rightContentRef}
       className="RightContent"
-      style={{
-        width: `calc(100% - ${effectiveLeftWidth}px)`,
-        left: `${effectiveLeftWidth}px`
-      }}
+      style={rightContentStyle}
     >
       <LeafMap></LeafMap>
       {_showZoomNotice && (
