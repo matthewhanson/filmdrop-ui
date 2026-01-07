@@ -4,6 +4,22 @@
  * without collapsing the rest of the list. Falls back to a single-item selection when
  * no prior results exist or the item is absent.
  */
+function mergeDefinedFields(existingItem, incomingItem) {
+  const safeExisting =
+    existingItem && typeof existingItem === 'object' ? existingItem : {}
+  const safeIncoming =
+    incomingItem && typeof incomingItem === 'object' ? incomingItem : {}
+
+  const merged = { ...safeExisting }
+  for (const [key, value] of Object.entries(safeIncoming)) {
+    if (value !== undefined && value !== null) {
+      merged[key] = value
+    }
+  }
+
+  return merged
+}
+
 export function syncSelectionWithFetchedItem(
   existingClickResults,
   fetchedItem
@@ -54,11 +70,8 @@ export function syncSelectionWithFetchedItem(
         }
       : undefined
 
-  const mergedItem = {
-    ...existingMatch,
-    ...fetchedItem,
-    properties: mergedProperties
-  }
+  const mergedItem = mergeDefinedFields(existingMatch, fetchedItem)
+  mergedItem.properties = mergedProperties
 
   if (mergedAssets) {
     mergedItem.assets = mergedAssets

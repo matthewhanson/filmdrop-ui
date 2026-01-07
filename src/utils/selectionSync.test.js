@@ -76,4 +76,37 @@ describe('syncSelectionWithFetchedItem', () => {
     expect(clickResults).toEqual([fetchedItem])
     expect(currentResult).toBe(fetchedItem)
   })
+
+  it('does not drop existing fields when fetched values are undefined or null', () => {
+    const existingClickResults = [
+      {
+        id: 'scene-z',
+        collection: 'sentinel-2',
+        geometry: { type: 'Point', coordinates: [10, 20] },
+        otherField: 'keep',
+        properties: { title: 'existing' }
+      }
+    ]
+
+    const fetchedItem = {
+      id: 'scene-z',
+      collection: 'sentinel-2',
+      properties: { title: 'fetched' },
+      geometry: null,
+      otherField: undefined
+    }
+
+    const { clickResults, selectedIndex, currentResult } =
+      syncSelectionWithFetchedItem(existingClickResults, fetchedItem)
+
+    expect(selectedIndex).toBe(0)
+    expect(clickResults).toHaveLength(1)
+    expect(clickResults[0].geometry).toEqual({
+      type: 'Point',
+      coordinates: [10, 20]
+    })
+    expect(clickResults[0].otherField).toBe('keep')
+    expect(clickResults[0].properties.title).toBe('fetched')
+    expect(currentResult).toEqual(clickResults[0])
+  })
 })
