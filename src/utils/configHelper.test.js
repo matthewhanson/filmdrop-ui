@@ -6,6 +6,7 @@ import {
   loadAppTitle,
   loadAppFavicon,
   normalizeCollectionsConfig,
+  applyConfigDefaults,
   getCollectionConfig,
   autoConfigureRendering
 } from './configHelper'
@@ -270,6 +271,26 @@ describe('ConfigHelper', () => {
       expect(result.COLLECTIONS_CONFIG).toBeDefined()
       expect(result.COLLECTIONS_CONFIG.collection1).toBeDefined()
       expect(Object.keys(result.COLLECTIONS_CONFIG.collection1)).toHaveLength(0)
+    })
+  })
+
+  describe('applyConfigDefaults', () => {
+    it('should default RIGHT_SIDEBAR_ENABLED to false when missing', () => {
+      const inputConfig = {
+        BASEMAP: mockAppConfig.BASEMAP
+      }
+
+      const result = applyConfigDefaults(inputConfig)
+      expect(result.RIGHT_SIDEBAR_ENABLED).toBe(false)
+    })
+
+    it('should preserve RIGHT_SIDEBAR_ENABLED=true when provided', () => {
+      const inputConfig = {
+        RIGHT_SIDEBAR_ENABLED: true
+      }
+
+      const result = applyConfigDefaults(inputConfig)
+      expect(result.RIGHT_SIDEBAR_ENABLED).toBe(true)
     })
   })
 

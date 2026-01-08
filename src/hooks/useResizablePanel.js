@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react'
 import { useLayout } from '../contexts/LayoutContext'
+import { useSelector } from 'react-redux'
 
 // Minimum card width for column calculation (design token)
 const CARD_MIN_WIDTH = 250
@@ -14,6 +15,9 @@ const MAX_PANEL_WIDTH = 1200
 export const useResizablePanel = (panelRef) => {
   const { leftPanelWidth, updateLeftPanelWidth, updateEnhancedColumns } =
     useLayout()
+  const isRightSidebarEnabled = useSelector(
+    (state) => state.mainSlice.appConfig?.RIGHT_SIDEBAR_ENABLED ?? false
+  )
   const isDraggingRef = useRef(false)
   const startXRef = useRef(0)
   const startWidthRef = useRef(0)
@@ -74,15 +78,16 @@ export const useResizablePanel = (panelRef) => {
       if (!isDraggingRef.current) return
 
       const deltaX = e.clientX - startXRef.current
+      const signedDeltaX = isRightSidebarEnabled ? -deltaX : deltaX
       const newWidth = Math.min(
         MAX_PANEL_WIDTH,
-        Math.max(MIN_PANEL_WIDTH, startWidthRef.current + deltaX)
+        Math.max(MIN_PANEL_WIDTH, startWidthRef.current + signedDeltaX)
       )
 
       updateLeftPanelWidth(newWidth)
       updateColumns(newWidth)
     },
-    [updateLeftPanelWidth, updateColumns]
+    [isRightSidebarEnabled, updateLeftPanelWidth, updateColumns]
   )
 
   // Mouse up handler

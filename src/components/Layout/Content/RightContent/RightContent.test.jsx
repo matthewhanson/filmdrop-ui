@@ -50,6 +50,31 @@ describe('RightContent', () => {
   })
 
   describe('on render', () => {
+    it('should position using left offset when RIGHT_SIDEBAR_ENABLED is false', () => {
+      store.dispatch(
+        setappConfig({
+          ...mockAppConfig,
+          RIGHT_SIDEBAR_ENABLED: false
+        })
+      )
+      const { container } = setup()
+      const rightContent = container.querySelector('.RightContent')
+      expect(rightContent.style.left).toBe('320px')
+      expect(rightContent.style.right).toBe('')
+    })
+
+    it('should position using right offset when RIGHT_SIDEBAR_ENABLED is true', () => {
+      store.dispatch(
+        setappConfig({
+          ...mockAppConfig,
+          RIGHT_SIDEBAR_ENABLED: true
+        })
+      )
+      const { container } = setup()
+      const rightContent = container.querySelector('.RightContent')
+      expect(rightContent.style.right).toBe('320px')
+    })
+
     it('should render action button if ACTION_BUTTON set in config', () => {
       setup()
       expect(

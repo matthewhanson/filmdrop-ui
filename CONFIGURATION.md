@@ -73,6 +73,7 @@ After building with `npm run build`, place your config at `build/config/config.j
 | ---------------------------- | ------- | -------- | ------------------------------------------------------- |
 | `CART_ENABLED`               | Boolean | `false`  | Enable shopping cart features for scene selection       |
 | `EXPORT_ENABLED`             | Boolean | `true`   | Enable GeoJSON export of search results                 |
+| `RIGHT_SIDEBAR_ENABLED`      | Boolean | `false`  | Anchor the sidebar panel on the right                   |
 | `SEARCH_BY_GEOM_ENABLED`     | Boolean | `true`   | Allow users to draw or upload GeoJSON for search bounds |
 | `STAC_LINK_ENABLED`          | Boolean | `false`  | Show STAC API Item link in Links section                |
 | `STAC_LINKS_SECTION_ENABLED` | Boolean | `false`  | Show comprehensive Links section (grouped by rel type)  |

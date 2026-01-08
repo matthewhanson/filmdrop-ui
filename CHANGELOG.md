@@ -97,6 +97,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Links exclude navigation/API plumbing by default: `parent`, `collection`, `root`, `items`, `aggregate`, `aggregations`, `conformance`, `service-desc`, `service-doc`, `data`, OGC queryables, `thumbnail`
   - Comprehensive links section displays: `canonical`, `license`, `derived_from`, `about`, `alternate`, and custom links
 - Added `LayoutContext` for managing UI layout state (panel width, visibility)
+- Added `RIGHT_SIDEBAR_ENABLED` config flag to anchor the sidebar on the right
 - Added `EnhancedDetailsContext` for sharing STAC item and rendering data across component hierarchy
 - Added strict ISO 8601 datetime validation to field discovery system
 - Added `DatetimeFieldDisplay` component for formatted datetime rendering
