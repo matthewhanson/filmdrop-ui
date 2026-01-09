@@ -9,7 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
+- new migration script (migrate_config.py) to convert legacy config formats to the new structure
+
 ### Changed
+
+- lint_config suports detecting config formats (legacy, new, mixed)
 
 ### Removed
 

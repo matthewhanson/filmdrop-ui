@@ -2,6 +2,18 @@
 
 Complete reference for configuring FilmDrop UI.
 
+## ✅ Backward Compatibility Notice
+
+**Your existing configuration files will continue to work without any changes.** FilmDrop UI maintains full backward compatibility with legacy configuration formats.
+Old configs are automatically converted to the new format when your application loads.
+
+- **No action required** - Your current setup is not broken
+- **Optional migration** - Migrate to the new format when convenient for better maintainability
+- **Migration tools available** - Use the [migration script](#migration-script) to automatically convert your config
+- **See [Migration Guide](#migration-guide)** - Learn when and why you might want to upgrade
+
+---
+
 ## Table of Contents
 
 - [Overview](#overview)
@@ -776,13 +788,205 @@ when needed. For complete parameter documentation, see [TiTiler Docs](https://de
 
 ## Migration Guide
 
-### Overview
+### Quick Answer: Do I Need to Migrate?
+
+**No.** Your existing configuration will continue to work. However, migrating offers benefits:
+
+- **Reduced duplication** - Each collection ID appears once instead of scattered across multiple top-level objects
+- **Better maintainability** - Easier to add/remove collections and parameters
+- **Future-proofing** - New features will be added to `COLLECTIONS_CONFIG` structure
+- **Simpler config files** - Less repetition = easier to review and edit
+
+### Understanding the Format Change
+
+#### Legacy Format (Still Supported)
+
+Collection settings are scattered across multiple top-level objects:
+
+```json
+{
+  "SCENE_TILER_PARAMS": {
+    "sentinel-2-l2a": { "assets": ["red", "green", "blue"] },
+    "landsat-c2-l2": { "assets": ["red", "green", "blue"] }
+  },
+  "MOSAIC_TILER_PARAMS": {
+    "sentinel-2-l2a": { "assets": ["visual"] },
+    "landsat-c2-l2": { "assets": ["red"] }
+  },
+  "SEARCH_MIN_ZOOM_LEVELS": {
+    "sentinel-2-l2a": { "high": 7 },
+    "landsat-c2-l2": { "high": 7 }
+  },
+  "POPUP_DISPLAY_FIELDS": {
+    "sentinel-2-l2a": ["datetime", "platform"],
+    "landsat-c2-l2": ["datetime", "platform"]
+  }
+}
+```
+
+**Problem**: Collection ID `sentinel-2-l2a` appears 4 times. Repetitive and error-prone.
+
+#### Modern Format (Recommended)
+
+All collection-specific settings grouped under `COLLECTIONS_CONFIG`:
+
+```json
+{
+  "COLLECTIONS_CONFIG": {
+    "sentinel-2-l2a": {
+      "sceneTilerParams": { "assets": ["red", "green", "blue"] },
+      "mosaicTilerParams": { "assets": ["visual"] },
+      "sceneMinZoom": 7,
+      "popupDisplayFields": ["datetime", "platform"]
+    },
+    "landsat-c2-l2": {
+      "sceneTilerParams": { "assets": ["red", "green", "blue"] },
+      "mosaicTilerParams": { "assets": ["red"] },
+      "sceneMinZoom": 7,
+      "popupDisplayFields": ["datetime", "platform"]
+    }
+  }
+}
+```
+
+**Benefit**: Collection ID appears once per collection. Much cleaner.
+
+### How to Migrate
+
+#### Option 1: Automatic Migration (Recommended)
+
+Use the provided migration script to automatically convert your config:
+
+```bash
+# Preview changes (dry-run mode - no files modified)
+python3 config_helper/migrate_config.py --input public/config/config.json --dry-run
+
+# Apply migration (creates output file)
+python3 config_helper/migrate_config.py \
+  --input public/config/config.json \
+  --output public/config/config.json.migrated
+
+# Verify the migrated config
+python3 config_helper/lint_config.py public/config/config.json.migrated
+
+# If satisfied, replace your original config
+mv public/config/config.json.migrated public/config/config.json
+```
+
+**Migration script features:**
+
+- **Preserves all data** - Nothing is lost in translation
+- **Validates input/output** - Ensures JSON is valid on both sides
+- **Dry-run mode** - Preview changes before writing files
+- **Clear reporting** - Shows exactly what was changed
+- **Handles edge cases** - Works with partial migrations and mixed formats
+
+See [config_helper/README.md](config_helper/README.md) for full script documentation.
+
+#### Option 2: Manual Migration
+
+If you prefer to migrate manually, use the parameter mapping below:
+
+| Old Parameter                     | New Location                                   | How to Convert                 |
+| --------------------------------- | ---------------------------------------------- | ------------------------------ |
+| `SCENE_TILER_PARAMS[id]`          | `COLLECTIONS_CONFIG[id].sceneTilerParams`      | Copy the object directly       |
+| `MOSAIC_TILER_PARAMS[id]`         | `COLLECTIONS_CONFIG[id].mosaicTilerParams`     | Copy the object directly       |
+| `SEARCH_MIN_ZOOM_LEVELS[id].high` | `COLLECTIONS_CONFIG[id].sceneMinZoom`          | Extract only the `.high` value |
+| `POPUP_DISPLAY_FIELDS[id]`        | `COLLECTIONS_CONFIG[id].popupDisplayFields`    | Copy the array directly        |
+| `TILE_LAYER_PARAMS[id]`           | `COLLECTIONS_CONFIG[id].tileLayerParams`       | Copy the object directly       |
+| `ENHANCED_DISPLAY_CONFIG[id]`     | `COLLECTIONS_CONFIG[id].enhancedDisplayConfig` | Copy the object directly       |
+| `DEFAULT_COLLECTION`              | `COLLECTIONS.default`                          | Copy the string value          |
+| `COLLECTIONS` (array)             | `COLLECTIONS.include`                          | Wrap array in object           |
+
+**Step-by-step example:**
+
+Starting with this legacy config:
+
+```json
+{
+  "SCENE_TILER_PARAMS": {
+    "sentinel-2-l2a": {
+      "assets": ["red", "green", "blue"],
+      "color_formula": "Gamma+RGB+3.2"
+    }
+  },
+  "SEARCH_MIN_ZOOM_LEVELS": {
+    "sentinel-2-l2a": {
+      "medium": 4,
+      "high": 7
+    }
+  },
+  "DEFAULT_COLLECTION": "sentinel-2-l2a",
+  "COLLECTIONS": ["sentinel-2-l2a", "landsat-c2-l2"]
+}
+```
+
+1. Create `COLLECTIONS_CONFIG` structure
+2. Move `SCENE_TILER_PARAMS` to `sceneTilerParams` ✓
+3. Extract `.high` from `SEARCH_MIN_ZOOM_LEVELS` to `sceneMinZoom` ✓
+4. Move `DEFAULT_COLLECTION` to `COLLECTIONS.default` ✓
+5. Move `COLLECTIONS` array to `COLLECTIONS.include` ✓
+
+Result:
+
+```json
+{
+  "COLLECTIONS_CONFIG": {
+    "sentinel-2-l2a": {
+      "sceneTilerParams": {
+        "assets": ["red", "green", "blue"],
+        "color_formula": "Gamma+RGB+3.2"
+      },
+      "sceneMinZoom": 7
+    }
+  },
+  "COLLECTIONS": {
+    "default": "sentinel-2-l2a",
+    "include": ["sentinel-2-l2a", "landsat-c2-l2"]
+  }
+}
+```
+
+### When Should You Migrate?
+
+**Migrate soon if:**
+
+- You're maintaining a config file you'll use long-term
+- You plan to add/remove collections frequently
+- You want to reduce configuration file size
+- You're encountering errors due to missing legacy parameters
+
+**It's safe to defer if:**
+
+- Your config works fine and rarely changes
+- You're in a quick proof-of-concept phase
+- You don't have time for testing
+- Your config is simple (1-2 collections)
+
+### Backward Compatibility Details
+
+**How it works:**
+
+- When the app loads, it detects your config format
+- If legacy format detected, automatically converts to modern format
+- Both formats produce identical runtime behavior
+- Console logs warnings if both formats present (helps detect accidental duplication)
+
+**Important:**
+
+- If you have both old and new format keys in the same config, `COLLECTIONS_CONFIG` takes precedence
+- This won't break anything, but indicates you may have partially migrated
+- The warning message helps identify this situation
+
+---
+
+## Advanced Configuration
+
+### Migration Details
 
 The FilmDrop UI configuration has been refactored to consolidate collection-specific
 parameters into a single `COLLECTIONS_CONFIG` object. This reduces repetition and makes
 configuration files easier to maintain.
-
-### What Changed
 
 #### Before (Legacy Format)
 
@@ -898,8 +1102,6 @@ If both formats are present in a config file, `COLLECTIONS_CONFIG` takes precede
   }
 }
 ```
-
-## Advanced Configuration
 
 ### Theme Configuration
 

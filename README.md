@@ -145,6 +145,11 @@ Some FilmDrop features require specific STAC API extensions:
 
 See [CONFIGURATION.md](CONFIGURATION.md) for detailed feature configuration.
 
+### 📦 Config Format Evolution
+
+FilmDrop UI evolved its configuration format to reduce repetition and improve maintainability. **Your old config files will continue to work** — the application automatically migrates them on load.
+If you want to upgrade to the modern format, see the [Configuration Migration Guide](CONFIGURATION.md#migration-guide) for step-by-step instructions and automated tools.
+
 ## 🎯 Configuration Examples
 
 ### Basic Setup
