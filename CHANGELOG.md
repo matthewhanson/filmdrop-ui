@@ -9,321 +9,67 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
-- Added direct URL routing to STAC items using TanStack Router, enabling users to share
-  links like `/item/sentinel-2-l2a/S2A_17SNB_20230617_0_L2A` that display items
-  immediately with full map visualization, browser navigation support, and authentication
-- Added STAC API client library (`src/services/stac-api/`) for programmatic interaction with STAC APIs:
-  - Core client functions: `getRootCatalog()`, `getCollections()`, `getCollection()`
-  - Conformance checking: `supportsConformance()`, `getConformance()`, `checkConformance()`
-  - Comprehensive conformance class constants for STAC API Core, Extensions, and Community extensions
-  - Support for custom headers and credentials for authenticated APIs
-  - Fully tested (38 tests) and ready for extraction as standalone npm package
-  - Complete documentation in `src/services/stac-api/README.md`
-- Added collections auto-configuration from STAC API:
-  - Collections are now automatically fetched from the STAC API instead of being hardcoded
-  - New `COLLECTIONS` config parameter with `default`, `include` and `exclude` options:
-    - `default`: Specify which collection should be selected by default (e.g., `"sentinel-2-l2a"`)
-    - `include`: Whitelist specific collections (e.g., `["sentinel-2-l2a", "landsat-8-c2-l2"]`)
-    - `exclude`: Blacklist specific collections (e.g., `["deprecated-collection"]`)
-    - If omitted, all collections from the API are available
-  - `COLLECTIONS_CONFIG` automatically filtered to only include active collections
-  - Added `autoConfigureCollections()` function in `src/utils/configHelper.js`
-  - Full collection objects stored in `_STAC_COLLECTIONS` for future use
-- Added rendering auto-configuration based on STAC Render Extension:
-  - Automatically configures visualization parameters for collections using the [STAC Render Extension](https://github.com/stac-extensions/render)
-  - Eliminates need to manually specify TiTiler visualization parameters for collections
-  - Only activates when both `STAC_API_URL` and `SCENE_TILER_URL` are configured
-  - Reads `renders` object from STAC Collections and stores all render definitions in `COLLECTIONS_CONFIG`:
-    - All render definitions stored in `visualizations` field (e.g., `"true-color"`, `"false-color"`, `"ndvi"`)
-    - First visualization is used as the default for rendering
-    - Each visualization includes: `title`, `assets`, `rescale`, `colormap_name`, `colormap`, `color_formula`, `nodata`, `expression`, `resampling`
-    - Rescale values flattened to comma-separated format for TiTiler
-  - Preserves all available visualization options for future UI enhancements (e.g., visualization selector)
-  - Respects user overrides - skips auto-configuration for collections manually configured
-  - Added `autoConfigureRendering()` function in `src/utils/configHelper.js`
-  - Comprehensive test coverage (10 new tests)
-  - Full documentation in `CONFIGURATION.md`
-- Added enhanced details component library (`src/components/EnhancedDetails/`) for React-based STAC item field and asset rendering:
-  - Core field rendering components: `FieldRenderer`, `FieldValue`, `FieldsGroup`, `FieldGroup`, `Field` for type-safe field display
-  - Specialized field type components: `GridCoordinateField`, `CoordinateField`, `ShapeField`, `BooleanField`, `PercentageField`, `TransformField`, `ProcessingField` for domain-specific rendering
-  - Item header component: `EnhancedDetailsHeader` for displaying STAC item ID and collection information
-  - Asset display components: `AssetsContainer`, `AssetCard`, `AssetGroup`, `DefaultAssetDisplay` with file type grouping and thumbnail exclusion
-  - Styling: `EnhancedDetails.css` with comprehensive styles for all enhanced details components
-  - Replaces unsafe HTML string rendering with component-based approach for improved security and maintainability
-- Added field type detection and discovery system (`src/utils/fieldDiscovery.js` enhanced):
-  - Automatic field type detection with caching for performance optimization
-  - Support for grid systems: MGRS (Military Grid Reference System), WRS (Worldwide Reference System), UTM (Universal Transverse Mercator), and generic grid codes
-  - Pattern matching for field names and values to identify coordinates, shapes, transforms, processing metadata, booleans, and percentages
-  - Grid type classification with intelligent component selection
-- Added field value extraction and formatting (`src/utils/fieldFormatting.js` enhanced):
-  - Component extraction for structured rendering of complex field types
-  - Grid system parsing with coordinate and component detection
-  - Bbox and coordinate extraction from arrays and objects
-  - Image dimension extraction from nested field structures
-  - HTML generation with sanitization for safe rendering of formatted values
-- Added security infrastructure (`src/utils/sanitizer.js`) for XSS prevention:
-  - DOMPurify integration with configurable strictness levels
-  - Safe field value rendering supporting strings, arrays, objects, booleans, and numbers
-  - Array and object-specific sanitization functions
-  - Strict mode (no HTML allowed) and regular mode (safe HTML tags only)
-- Added clipboard management hook (`src/hooks/useAssetClipboard.js`):
-  - React hook for managing copy-to-clipboard functionality for asset URLs
-  - Tracks which asset was most recently copied
-  - Handles clipboard write operations with error handling
-- Added comprehensive test coverage (14 new/enhanced test files):
-  - Security tests for sanitization and XSS prevention
-  - Field discovery tests for grid systems and field type detection
-  - Field formatting tests for component extraction and value parsing
-  - Field grouping tests for display configuration
-  - Asset grouping tests for file type classification and thumbnail detection
-- Asset cards now display file size when available in STAC data (`file:size` or `size` field)
-- Added STAC item links section with independent feature flags (`src/components/EnhancedDetails/LinkDisplay.jsx` and related components):
-  - Two independent feature flags control link display:
-    - `STAC_LINK_ENABLED`: Shows STAC API Item link (the item's canonical self-reference)
-    - `STAC_LINKS_SECTION_ENABLED`: Shows comprehensive Links section with all other links grouped by rel type
-  - Both flags default to `false` (opt-in feature for backwards compatibility)
-  - Links render under single "Links" header when at least one flag is enabled
-  - New `LinkDisplay` component handles orchestration of self-link and grouped links
-  - New `LinkItem` component for individual link cards with copy-to-clipboard, type icons, and open actions
-  - New `defaultLinkGrouping.js` utility with filtering, grouping, and formatting functions
-  - Smart href truncation showing meaningful URL parts (domain + important segments + filename)
-  - Links grouped by rel type (e.g., "STAC API Item", "License", "Canonical URL")
-  - Supports multiple links per rel type with count display (e.g., "License (3)")
-  - Copy-to-clipboard functionality for all links with tooltip feedback
-  - Type hint icons (JSON, HTML, Image, PDF) inferred from MIME type or URL extension
-  - Special handling for non-HTTP links (S3, etc.) with "Requires S3 access" tooltip
-  - Responsive grid layout respecting the column resize control (same as Assets section)
-  - Configurable link rel type exclusion via `STAC_LINKS_EXCLUDE_LIST` for power users
-  - Links exclude navigation/API plumbing by default: `parent`, `collection`, `root`, `items`, `aggregate`, `aggregations`, `conformance`, `service-desc`, `service-doc`, `data`, OGC queryables, `thumbnail`
-  - Comprehensive links section displays: `canonical`, `license`, `derived_from`, `about`, `alternate`, and custom links
-- Added `LayoutContext` for managing UI layout state (panel width, visibility)
-- Added `RIGHT_SIDEBAR_ENABLED` config flag to anchor the sidebar on the right
-- Added `EnhancedDetailsContext` for sharing STAC item and rendering data across component hierarchy
-- Added strict ISO 8601 datetime validation to field discovery system
-- Added `DatetimeFieldDisplay` component for formatted datetime rendering
-- Added Pagination functionality for viewing stac search results
-- Added collection-specific visualization dropdown to search filters panel for switching between scene renderings (e.g., true-color, false-color, NDVI)
-- Added visualization parameter to item route URLs (`/item/:collection/:item/:visualization`) so selected visualization persists on page refresh
-
 ### Changed
-
-- Replaced `sceneTilerParams` with `visualizations` field:
-  - Old configs with `SCENE_TILER_PARAMS` are automatically upgraded to `visualizations` dictionary
-  - Old `SCENE_TILER_PARAMS` converted to `visualizations: { "default": {...} }`
-  - Use the new `visualizations` field for defining multiple rendering options
-  - This change enables future UI enhancements like visualization selectors
-- Added sensible defaults and auto-population for configuration to reduce required parameters:
-  - Added `applyConfigDefaults()` function in `src/utils/configHelper.js` to centralize default value handling
-  - `BASEMAP` now defaults to OpenStreetMap if not provided in config
-  - `THEME_SWITCHING_ENABLED` now defaults to `true` (was `false`)
-  - `EXPORT_ENABLED` now defaults to `true` (was `false`)
-  - `SHOW_ITEM_AUTO_ZOOM` now defaults to `true` (was `false`)
-  - `SEARCH_BY_GEOM_ENABLED` now defaults to `true` (was `false`)
-  - `API_MAX_ITEMS` defaults to `200`
-  - `MOSAIC_MAX_ITEMS` defaults to `100`
-  - `MAP_CENTER` defaults to `[30, 0]`
-  - `MAP_ZOOM` defaults to `3`
-  - `MAP_ZOOM_MAX` defaults to `18`
-  - `CONFIG_COLORMAP` defaults to `"viridis"`
-  - Users can completely omit these configuration parameters for better out-of-box experience
-- Added unified View Mode selector with four buttons (Hex, Grid, Scene, Mosaic) for
-  user-selectable aggregation and viewing options
-- Added automatic view mode switching based on zoom level with manual override capability:
-  automatically switches between Hex (if available) and Scene views based on zoom
-- Added `sceneMinZoom` configuration parameter to specify minimum zoom level for
-  Scene and Mosaic views (replaces `searchMinZoomLevels.high`)
-- Added `COLLECTIONS_CONFIG` structure to consolidate collection-specific parameters
-  (sceneTilerParams, mosaicTilerParams, sceneMinZoom, popupDisplayFields,
-  tileLayerParams, enhancedDisplayConfig)
-- Added automatic configuration migration from legacy format to new format on load
-- Added `normalizeCollectionsConfig()` helper function in `src/utils/configHelper.js`
-  for backward compatibility
-- Added `getCollectionConfig()` helper function for unified access to collection settings
-- Added comprehensive `CONFIGURATION.md` documentation with parameter reference,
-  examples, and migration guide
-- Added `config-new-format-example.json` demonstrating new `COLLECTIONS_CONFIG` structure
-- Added comprehensive test coverage for `normalizeCollectionsConfig()` and
-  `getCollectionConfig()` functions (16 new tests covering backward compatibility,
-  migration, new format, and parameter mapping)
-- Added `.remarkrc.js` configuration file to customize markdown linting rules for technical
-  documentation (allows longer lines, relaxed table formatting, etc.)
-- Migrated from `pre-commit` package to Husky for git hooks management (developers should
-  run `npm install` to set up hooks automatically)
-- Added `.husky/` directory for git hooks
-- Git hooks now properly source nvm to ensure consistent Node.js version across all
-  environments (fixes Node version mismatch issues in VS Code/GitLens) due to moving
-  from pre-commit to husky
-- Added config `STAC_HEADER_COOKIES` to optionally inject STAC request header values from cookies. ([455](https://github.com/Element84/filmdrop-ui/pull/455))
-- STAC item field and asset rendering refactored to use React components instead of string-based HTML:
-  - `src/components/PopupResults/PopupResults.jsx` integrated with new enhanced details components
-  - New 3-step field processing pipeline: validation → type detection → component extraction → React rendering
-  - Error handling for field processing failures with graceful degradation
-  - Field rendering delegated to `FieldRenderer` component for type-safe display
-  - Asset rendering delegated to `AssetsContainer` component with file type grouping
-  - Item metadata displayed via `EnhancedDetailsHeader` component
-- Enhanced details rendering extracted to dedicated `EnhancedDetailsDisplay` component:
-  - Created new `src/components/EnhancedDetails/EnhancedDetailsDisplay.jsx` for improved maintainability
-  - Separates field grouping, asset rendering, and link display logic from popup navigation concerns
-  - Reduces `PopupResults.jsx` complexity from 350 to 180 lines (50% reduction)
-  - Enables independent testing of enhanced details rendering following React Testing Library principles
-  - Component accepts `currentPopupResult` and `enhancedColumns` props for clean interface
-- Enhanced CSS variable infrastructure for responsive layout:
-  - Added `--columns` CSS variable to both dark and light themes in `src/themes/theme.css`
-  - Ensures robust grid layout inheritance across `.field-grid`, `.asset-grid`, and `.link-grid` containers
-  - Improves browser compatibility and eliminates potential CSS variable inheritance edge cases
-- Code consistency improvements across Enhanced Details components:
-  - Renamed `copiedHref` state variable to `copiedUrl` in `LinkItem.jsx` for naming alignment with `AssetItem` component
-  - Fixed `enhancedColumns` initialization in Redux state to use correct panel width (320px) for semantic accuracy
-  - Restored JSDoc comment above `GridFieldDisplay.propTypes` for improved code documentation
-- Asset display now automatically groups by file type and excludes thumbnails from main asset view:
-  - `src/utils/defaultAssetGrouping.js` enhanced with file type detection and asset classification
-  - Thumbnails excluded from asset container (displayed separately if needed)
-  - Asset groups created by MIME type for organized presentation
-- Grid system recognition extended to support multiple coordinate system formats:
-  - MGRS (Military Grid Reference System) with component parsing
-  - WRS (Worldwide Reference System) for Landsat imagery
-  - UTM (Universal Transverse Mercator) with zone and band detection
-  - Generic grid codes with intelligent pattern matching
-  - Each grid type renders with specialized `GridCoordinateField` component
-- New `enhancedDisplayConfig` parameter within `COLLECTIONS_CONFIG[id]` for field and asset grouping:
-  - Allows configuration of which fields appear in popup and their display order
-  - Supports field grouping with collapsible sections
-  - Asset grouping configuration with custom group labels
-  - Optional configuration—if omitted, all fields and assets are displayed
-  - See `CONFIGURATION.md` for detailed parameter structure and examples
-- `src/utils/configHelper.js` enhanced with `createEnhancedDisplayFieldPredicate()` function:
-  - Factory function for creating field filtering predicates based on `enhancedDisplayConfig`
-  - Enables declarative field inclusion/exclusion logic
-  - Integrates with field grouping system
-- `src/utils/fieldGrouping.js` updated to make `appConfig` parameter optional in `createEnhancedDisplayFieldPredicate()`:
-  - When `appConfig` omitted, all fields included in grouping logic
-  - Reduces required parameters for utility function usage
-
-### Changed
-
-- Simplified zoom-based view switching: removed medium zoom level and grid-code auto-switching
-- Consolidated Redux state from separate `viewMode` and `aggregationViewMode` to single
-  `viewMode` state with values: 'hex', 'grid-code', 'scene', 'mosaic'
-- Changed initial `viewMode` state from 'hex' to 'scene' (universally supported)
-- Unified Mosaic and Scene zoom level requirements to both use `sceneMinZoom`
-- Updated Scene and Mosaic buttons to share same zoom-based enabling/disabling behavior
-- Updated `src/services/get-config-service.js` to normalize configuration on load
-- Updated `src/utils/searchHelper.js` to use `getCollectionConfig()` for accessing
-  scene min zoom level and removed unused `getTilerParams` import
-- Updated `src/utils/mapHelper.js` to use `getCollectionConfig()` for tile layer and
-  tiler parameters
-- Simplified `constructSceneTilerParams()` and `constructMosaicTilerParams()` to work
-  directly with collection config without unnecessary wrapping/unwrapping
-- Refactored `parameters` helper functions in `src/utils/mapHelper.js` to accept tiler
-  params directly instead of requiring collection lookup
-- Updated `constructSceneAssetsParam()` to work with params directly without collection
-  parameter
-- Updated `src/components/PopupResult/PopupResult.jsx` to use `getCollectionConfig()`
-  without passing redundant `_appConfig` parameter
-- Updated `src/components/EnhancedDetailsTab/EnhancedDetailsTab.jsx` to call
-  `createEnhancedDisplayFieldPredicate()` without passing redundant `appConfig` parameter
-- Updated `src/utils/fieldGrouping.js` to make `appConfig` parameter optional in
-  `createEnhancedDisplayFieldPredicate()`
-- Updated `src/utils/configHelper.js` JSDoc to clarify third parameter is for testing purposes
-- Updated `public/config/config.json` to use new `COLLECTIONS_CONFIG` structure
-- Overhauled `README.md` following best practices with improved structure, quick start guide, and developer section
-- Added `CONFIGURATION.md` with details on Config structure and including a migration guide
-- Consolidated duplicate sections in `README.md` for clearer documentation
-- Added backwards compatibility for stac-server aggregation names
-  - Now supports both new (stac-server >= 3.6.0) and old (deprecated) aggregation names
-  - Automatically detects and uses appropriate aggregation name based on STAC API capabilities
-  - New names: `centroid_geohex_grid_frequency`, `centroid_geohash_grid_frequency`, `centroid_geotile_grid_frequency`
-  - Old names: `grid_geohex_frequency`, `grid_geohash_frequency`, `grid_geotile_frequency`
-  - Ensures compatibility with Earth Search STAC API and other APIs using deprecated names
-- Asset grouping now prioritizes STAC roles (data, visual, metadata, thumbnail) with MIME type fallback for legacy items.
-- Asset cards display custom roles and file type abbreviations for improved clarity.
-- Processing software information now displays correctly in Enhanced Details (e.g., "sentinel2-to-stac (0.1.0)")
-- STAC API Item link moved from top of popup to bottom, after all asset groups
-- Refactored panel state management from Redux to React Context API:
-  - `leftPanelWidth`, `isLeftPanelVisible`, and `enhancedColumns` now managed by `LayoutContext`
-  - Reduces Redux store footprint and improves component isolation
-- Eliminated prop drilling through EnhancedDetails component hierarchy using Context API:
-  - Item data, enhanced columns, and app config now provided via `EnhancedDetailsContext`
-  - Simplifies component signatures and improves maintainability
-- DateTime field detection moved from regex fallback in `EnhancedFieldRenderer` to structured `fieldDiscovery` system
-  - Validates ISO 8601 format (YYYY-MM-DDTHH:MM:SS[.sss][Z|±HH:MM])
-  - Outputs formatted datetime as "YYYY-MM-DD HH:MM:SS"
-- Changed the fixed width of `disableSearchOverlay` to 100%, it now covers the search area (LeftContent)
-
-### Fixed
-
-- Fixed bug in `constructMosaicAssetVal()` that mutated Redux state by calling `.pop()` on
-  the assets array, causing crashes in development mode and silent failures on subsequent
-  mosaic searches in production (bug introduced in May 2023)
-- Fixed bug where Dashboard and Analyze buttons would appear even when `DASHBOARD_BTN_URL`
-  and `ANALYZE_BTN_URL` were set to empty strings or whitespace in configuration
-- Updated `src/components/Layout/PageHeader/PageHeader.jsx` to use `.trim()` when checking
-  button URL values to properly hide buttons when URLs are empty or whitespace-only
-- Added test cases for whitespace-only URL values in `PageHeader.test.jsx`
-- Fixed `TypeError: Invalid URL` warnings in test output by adding global fetch mock in
-  `src/setupTests.js`
-- Suppressed expected console.error messages in tests to reduce noise in test output
-- Fixed XSS (Cross-Site Scripting) vulnerabilities by replacing string-based HTML rendering with React components:
-  - STAC item field values no longer generated as HTML strings; instead rendered through type-safe `FieldRenderer` component
-  - All user-controlled content in field display sanitized before rendering
-  - DOMPurify integration provides additional HTML sanitization layer
-  - Eliminates unsafe `dangerouslySetInnerHTML` pattern previously used in field rendering
-- Fixed smart text truncation for long field values without spaces:
-  - Long values without spaces (e.g., URLs, coordinate strings) now truncated intelligently
-  - Full value displayed in tooltip on hover for accessibility
-  - Text overflow detection prevents UI layout issues
-- Fixed asset processing corrected for proper file type grouping and consistent thumbnail exclusion:
-  - Assets now reliably grouped by MIME type and file extension
-  - Thumbnails consistently excluded from main asset display across all collection types
-  - Asset metadata (roles, GSD, description) properly extracted and displayed
-- Fixed duplicate `rescale` parameter being added twice in TiTiler scene requests in `src/utils/mapHelper.js`
-  - Removed duplicate parameter push that caused malformed query strings
-- Fixed missing validation in `autoConfigureCollections()` function in `src/utils/configHelper.js`
-  - Added check for empty `collectionIds` array after filtering to prevent invalid configuration state
-  - Now returns early with warning when all collections have falsy IDs
-- Fixed incomplete error handling in visualization system in `src/utils/mapHelper.js`
-  - Added comprehensive validation to `constructSceneTilerParams()` with actionable warning messages
-  - Validates visualizations exist, are proper object type, and contain at least one definition
-  - Added specific error messaging in `addImageOverlay()` when visualizations are missing
-  - All failures now provide clear diagnostic information for developers
-- Fixed duplicate promise-based code in `src/services/get-collections-service.js`
-  - Removed dead code that was trying to use `.includes()` on COLLECTIONS object
-  - Consolidated to single async/await implementation that properly handles new COLLECTIONS object structure
-  - Prevents TypeError when collections are auto-configured from STAC API
-- Fixed empty "Processing" and "Software:" labels appearing when processing software data was present but not rendering
-- Fixed authentication session error persistence bug (#484):
-  - Error alerts now automatically clear when user successfully re-authenticates
-  - Closing error alerts no longer logs out user unless the error was authentication-related
-  - Added `isAuthErrorAlert` Redux state flag to distinguish auth errors from generic errors
-  - Added `clearApplicationAlert` action for atomic alert state reset on successful login
-  - Enhanced `showApplicationAlert()` helper with optional `isAuthError` parameter
-  - Removed immediate logout on 403 errors to allow re-authentication attempts
 
 ### Removed
 
-- Removed `DEFAULT_COLLECTION` configuration parameter - moved into `COLLECTIONS.default` for
-  better organization. For backward compatibility, code still supports the old `DEFAULT_COLLECTION`
-  parameter, but new configurations should use `COLLECTIONS.default` instead.
-- Removed `LAYER_LIST_ENABLED` configuration parameter - layer list widget is now automatically
-  enabled when `LAYER_LIST_SERVICES` array is populated (follows convention over configuration)
-- Removed `pre-commit` npm package (replaced by Husky) and configuration
-- Removed `MOSAIC_MIN_ZOOM_LEVEL` configuration parameter (mosaic views now use
-  per-collection `sceneMinZoom` parameter, same as scene views)
-- Removed unused `setShowZoomNotice` import from `src/utils/mapHelper.js` (functionality
-  moved to `searchHelper.js`)
-- Removed deprecated `setMosaicZoomMessage()` function from `src/utils/mapHelper.js`
-  (zoom notice handling now centralized in `searchHelper.js`)
+## 7.0.0 - 2026-01-09
 
-### Deprecated
+### 🚀 Major Features
 
-- Deprecated `SCENE_TILER_PARAMS` (use `COLLECTIONS_CONFIG[id].sceneTilerParams` instead, backward compatible)
-- Deprecated `MOSAIC_TILER_PARAMS` (use `COLLECTIONS_CONFIG[id].mosaicTilerParams` instead, backward compatible)
-- Deprecated `SEARCH_MIN_ZOOM_LEVELS` (use `COLLECTIONS_CONFIG[id].sceneMinZoom` instead, backward compatible - automatically converts `{ medium, high }` format to use "high" value)
-- Deprecated `searchMinZoomLevels` parameter (use `sceneMinZoom` instead)
-- Deprecated `POPUP_DISPLAY_FIELDS` (use `COLLECTIONS_CONFIG[id].popupDisplayFields` instead, backward compatible)
-- Deprecated `TILE_LAYER_PARAMS` (use `COLLECTIONS_CONFIG[id].tileLayerParams` instead, backward compatible)
-- Deprecated `ENHANCED_DISPLAY_CONFIG` (use `COLLECTIONS_CONFIG[id].enhancedDisplayConfig` instead, backward compatible)
-- Deprecated `getTilerParams()` in `src/utils/mapHelper.js` (no longer used internally, use `getCollectionConfig()` instead)
+- **Direct URL Routing:** Added TanStack Router integration. Users can now share deep links to specific items
+  (e.g., `/item/{collection}/{id}`), which persist state, visualization selection, and authentication.
+
+- **Zero-Config & Auto-Discovery:**
+  - **Collections:** Added `autoConfigureCollections()` to fetch collections directly from the STAC API.
+
+  - **Rendering:** Added `autoConfigureRendering()` to read the [STAC Render Extension](https://github.com/stac-extensions/render).
+    If `STAC_API_URL` and `SCENE_TILER_URL` are set, visualizations are automatically generated.
+
+  - **Defaults:** Major config parameters (Basemaps, Zoom levels, Export settings) now have sensible defaults, allowing for minimal configuration files.
+
+- **New Visualization Engine:** Replaced `sceneTilerParams` with a robust `visualizations` dictionary.
+  This supports multiple rendering presets (e.g., True Color, NDVI) and enables the new UI Visualization Selector.
+
+### ✨ UI & UX Enhancements
+
+- **Enhanced Details Panel:** Completely refactored the details pane using React components (replacing unsafe HTML strings) for better security and performance.
+
+- **Smart Asset Grouping:** Assets are now automatically grouped by MIME type/role (e.g., Data, Metadata). Thumbnails are excluded from the file list to reduce clutter.
+
+- **Grid & Field Discovery:** Added intelligent detection for MGRS, WRS, and UTM grid codes, plus strict ISO 8601 date formatting.
+
+- **STAC Links Section:** New dedicated section for STAC links (License, Canonical, derived_from) with "Copy to Clipboard" functionality and type icons.
+
+- **Unified View Mode:** Consolidated view switching into a single selector (Hex, Grid, Scene, Mosaic) with zoom-dependent auto-switching.
+
+### 🛠 Configuration & Developer Experience
+
+- **Config Consolidation:** Introduced `COLLECTIONS_CONFIG` to consolidate all collection-specific settings (`sceneTilerParams`, `mosaicTilerParams`, `popupDisplayFields`) into one structure.
+
+- **STAC API Client:** Added a new internal client library for standardized API interaction, conformance checking, and authentication management.
+
+- **Security:** Implemented `DOMPurify` for strict sanitization of field values to prevent XSS.
+
+- **Maintenance:** Migrated from `pre-commit` to `Husky` for git hooks.
+
+### 🐛 Bug Fixes
+
+- **Security:** Fixed XSS vulnerabilities by removing `dangerouslySetInnerHTML` usage in popup results.
+
+- **Mosaic Rendering:** Fixed a critical bug in `constructMosaicAssetVal()` that mutated Redux state and caused crashes during mosaic searches.
+
+- **Stability:** Fixed duplicate `rescale` parameters in TiTiler requests and handled whitespace-only URL configurations gracefully.
+
+- **Auth:** Fixed an issue where closing an error alert would inadvertently log the user out.
+
+### ⚠️ Deprecations & Breaking Changes
+
+- **Renamed:** `sceneTilerParams` is now `visualizations`.
+
+- **Deprecated:** Global params `SCENE_TILER_PARAMS`, `MOSAIC_TILER_PARAMS`, `POPUP_DISPLAY_FIELDS`, and `DEFAULT_COLLECTION` are deprecated in favor of the unified `COLLECTIONS_CONFIG`.
+
+- **Removed:** `LAYER_LIST_ENABLED` (now auto-detected based on service presence).
 
 ## 6.1.0 - 2025-09-25
 
