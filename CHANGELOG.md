@@ -248,6 +248,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - DateTime field detection moved from regex fallback in `EnhancedFieldRenderer` to structured `fieldDiscovery` system
   - Validates ISO 8601 format (YYYY-MM-DDTHH:MM:SS[.sss][Z|±HH:MM])
   - Outputs formatted datetime as "YYYY-MM-DD HH:MM:SS"
+- Changed the fixed width of `disableSearchOverlay` to 100%, it now covers the search area (LeftContent)
 
 ### Fixed
 
