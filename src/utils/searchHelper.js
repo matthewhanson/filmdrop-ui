@@ -30,6 +30,7 @@ import * as h3 from 'h3-js'
 import debounce from './debounce'
 import { AddMosaicService } from '../services/post-mosaic-service'
 import { router } from '../router'
+import { appendStacHeaderCookies } from '../utils/stacRequest'
 
 export function newSearch() {
   clearMapSelection()
@@ -468,11 +469,15 @@ function newMosaicSearch() {
     }
   }
 
+  const requestHeaders = new Headers()
+  appendStacHeaderCookies(requestHeaders)
+  requestHeaders.append(
+    'Content-Type',
+    'application/vnd.titiler.stac-api-query+json'
+  )
   const requestOptions = {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/vnd.titiler.stac-api-query+json'
-    },
+    headers: requestHeaders,
     body: JSON.stringify(createMosaicBody),
     credentials:
       store.getState().mainSlice.appConfig.FETCH_CREDENTIALS || 'same-origin'

@@ -1,8 +1,12 @@
 import { store } from '../redux/store'
+import { appendStacHeaderCookies } from '../utils/stacRequest'
 
 export function GetMosaicBoundsService(mosaicURL) {
   return new Promise(function (resolve, reject) {
+    const requestHeaders = new Headers()
+    appendStacHeaderCookies(requestHeaders)
     fetch(mosaicURL, {
+      headers: requestHeaders,
       credentials:
         store.getState().mainSlice.appConfig.FETCH_CREDENTIALS || 'same-origin'
     })
