@@ -217,6 +217,21 @@ By default, the comprehensive Links section excludes navigation and API plumbing
 | `SCENE_TILER_URL`  | String | TiTiler endpoint for scene tiling                                                                     |
 | `MOSAIC_TILER_URL` | String | TiTiler mosaic endpoint (requires [NASA IMPACT TiTiler fork](https://github.com/NASA-IMPACT/titiler)) |
 | `MOSAIC_MAX_ITEMS` | Number | Maximum items in mosaic (default: `100`)                                                              |
+| `TILER_SETTINGS`   | Object | TiTiler granular behavior settings. See [TILER_SETTINGS](#tiler_settings) |
+
+#### TILER_SETTINGS
+
+`URL_SUBST`
+
+Setting `TILER_SETTINGS.URL_SUBST` = true enables string substitution in requests to TiTiler. Set `URL_SUBST_FIND` to the part of the string used for search, and `URL_SUBST_REPLACE` with what you'd like to replace it with. One use case: if TiTiler requests to STAC Server should be made using a different URL than STAC items reference, e.g. if TiTiler should make it's request via private DNS rather than to your public STAC Server URL, you could use this feature to replace the public STAC Server URL with a private URL:
+
+```
+"TILER_SETTINGS": {
+    "URL_SUBST": true,
+    "URL_SUBST_FIND": "my-public-stac-api.com/catalog",
+    "URL_SUBST_REPLACE": "private-s2s-dns.com/catalog"
+} 
+```
 
 #### Layer Configuration
 
