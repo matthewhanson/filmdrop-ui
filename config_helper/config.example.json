@@ -155,7 +155,7 @@
     "url": "https://your-company.com",
     "title": "Visit Your Company",
     "alt": "Your Company Logo",
-    "image": "./your-brand-logo.png",
+    "image": "/your-brand-logo.png",
     "image_light": "/your-brand-logo-light-mode.png",
     "image_dark": "/your-brand-logo-dark-mode.png"
   },
