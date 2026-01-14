@@ -401,9 +401,7 @@ function addImageOverlay(item) {
 
   clearLayer('clickedSceneImageLayer')
 
-  const featureURL = item?.links
-    ?.find((x) => x?.rel === 'self')
-    ?.href?.toString()
+  let featureURL = item?.links?.find((x) => x?.rel === 'self')?.href?.toString()
   const tilerParams = constructSceneTilerParams(
     _selectedCollectionData.id,
     _selectedVisualization
@@ -432,6 +430,10 @@ function addImageOverlay(item) {
             ...collectionTileLayerParams,
             bounds: tileBounds
           }
+
+          // Find and replace within the titiler url, if configured
+          featureURL = findReplaceTitilerUrl(featureURL)
+
           const currentSelectionImageTileLayer = L.tileLayer(
             `${sceneTilerURL}/stac/tiles/{z}/{x}/{y}@${scale()}x.png?url=${featureURL}&${tilerParams}`,
             tileLayerParams
@@ -895,4 +897,41 @@ export function toggleReferenceLayerVisibility(combinedLayerNameToToggle) {
       }
     })
   }
+}
+
+// if TILER_SETTINGS.URL_SUBST = true, modify the get request url made to titiler by finding and replacing
+// strings defined by TILER_URL_SUBST_F and TILER_URL_SUBST_R
+function findReplaceTitilerUrl(featureURL) {
+  let ret = featureURL
+
+  const replaceTitilerURL =
+    store.getState().mainSlice.appConfig.TILER_SETTINGS?.URL_SUBST ?? false
+  if (replaceTitilerURL === true) {
+    const findStr =
+      store.getState().mainSlice.appConfig.TILER_SETTINGS.URL_SUBST_FIND
+    const replaceStr =
+      store.getState().mainSlice.appConfig.TILER_SETTINGS.URL_SUBST_REPLACE
+
+    if (findStr === undefined || replaceStr === undefined) {
+      console.warn(
+        '[TILER_SETTINGS.URL_SUBST] URL_SUBST = true but URL_SUBST_FIND or URL_SUBST_REPLACE is not set. Skipping substitution.'
+      )
+    } else if (typeof findStr !== 'string' || typeof replaceStr !== 'string') {
+      console.warn(
+        '[TILER_SETTINGS.URL_SUBST] URL_SUBST_FIND and URL_SUBST_REPLACE must be strings. Skipping substitution.'
+      )
+    } else {
+      // replace can fail
+      try {
+        ret = ret.replace(findStr, replaceStr)
+      } catch (err) {
+        console.error(
+          '[TILER_SETTINGS.URL_SUBST] Error performing substitution:',
+          err
+        )
+      }
+    }
+  }
+
+  return ret
 }

@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
+- Added `TILER_SETTINGS`, with properties `URL_SUBST`, `URL_SUBST_FIND`, `URL_SUBST_REPLACE`, to enable optional string substitution in TiTiler request URLs
+
 ### Changed
 
 ### Removed
