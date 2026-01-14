@@ -15,6 +15,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Removed
 
+## 7.0.1 - 2026-01-14
+
+### Changed
+
+- Vite build config - base path changed to absolute (`/`) instead of relative (`./`)
+
 ## 7.0.0 - 2026-01-09
 
 ### 🚀 Major Features
