@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useMemo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   Select,
@@ -36,24 +36,20 @@ const QueryableFilters = () => {
   // Store debounced functions for each field to avoid recreating on each render
   const debouncedFunctionsRef = useRef({})
 
-  // Initialize default values when queryables change
-  // This MUST come before any conditional returns (Rules of Hooks)
-  useEffect(() => {
-    // Clear debounced functions when collection changes
-    debouncedFunctionsRef.current = {}
-
-    // Skip if no queryables or invalid
+  // Memoize filtered renderable fields to avoid duplicating filter logic
+  const renderableFields = useMemo(() => {
+    // Return empty array if queryables are invalid
     if (
       !queryables ||
       typeof queryables !== 'object' ||
       Array.isArray(queryables) ||
       queryables.error === true
     ) {
-      return
+      return []
     }
 
     // Filter and process queryables
-    const renderableFields = Object.entries(queryables).filter(
+    return Object.entries(queryables).filter(
       ([fieldName, schema]) => {
         // Exclude fields based on config
         if (isFieldExcluded(fieldName, excludedQueryables)) {
@@ -82,6 +78,13 @@ const QueryableFilters = () => {
         return true
       }
     )
+  }, [queryables, excludedQueryables])
+
+  // Initialize default values when queryables change
+  // This MUST come before any conditional returns (Rules of Hooks)
+  useEffect(() => {
+    // Clear debounced functions when collection changes
+    debouncedFunctionsRef.current = {}
 
     if (renderableFields.length === 0) return
 
@@ -113,7 +116,7 @@ const QueryableFilters = () => {
     if (hasChanges) {
       dispatch(setQueryableFilters(newFilters))
     }
-  }, [selectedCollectionData?.id, queryables, queryableFilters])
+  }, [selectedCollectionData?.id, renderableFields, queryableFilters, dispatch])
 
   // Check if queryables has error (explicit check for error object from service)
   if (queryables?.error === true && queryables?.message) {
@@ -125,48 +128,6 @@ const QueryableFilters = () => {
       </div>
     )
   }
-
-  // Check if queryables exist and are a valid object
-  // queryables IS the properties object (service returns json.properties directly)
-  if (
-    !queryables ||
-    typeof queryables !== 'object' ||
-    Array.isArray(queryables) ||
-    Object.keys(queryables).length === 0
-  ) {
-    return null
-  }
-
-  // Filter and process queryables
-  const renderableFields = Object.entries(queryables).filter(
-    ([fieldName, schema]) => {
-      // Exclude fields based on config
-      if (isFieldExcluded(fieldName, excludedQueryables)) {
-        return false
-      }
-
-      // Exclude complex types (objects with properties, arrays of objects, etc.)
-      if (schema.type === 'object' && schema.properties) {
-        return false
-      }
-
-      if (schema.type === 'array' && schema.items?.type === 'object') {
-        return false
-      }
-
-      // Exclude union types (multiple types)
-      if (Array.isArray(schema.type)) {
-        return false
-      }
-
-      // Exclude if it has anyOf, oneOf, allOf
-      if (schema.anyOf || schema.oneOf || schema.allOf) {
-        return false
-      }
-
-      return true
-    }
-  )
 
   // If no renderable fields after filtering, hide component
   if (renderableFields.length === 0) {
