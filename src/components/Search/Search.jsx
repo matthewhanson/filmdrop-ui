@@ -10,8 +10,8 @@ import {
 } from '../../redux/slices/mainSlice'
 import 'react-tooltip/dist/react-tooltip.css'
 import DateTimeRangeSelector from '../DateTimeRangeSelector/DateTimeRangeSelector'
-import CloudSlider from '../CloudSlider/CloudSlider'
 import CollectionDropdown from '../CollectionDropdown/CollectionDropdown'
+import QueryableFilters from '../QueryableFilters/QueryableFilters'
 import ViewSelector from '../ViewSelector/ViewSelector'
 import { newSearch } from '../../utils/searchHelper'
 import { enableMapPolyDrawing, clearLayer } from '../../utils/mapHelper'
@@ -25,7 +25,6 @@ const Search = () => {
   const _searchDateRangeValue = useSelector(
     (state) => state.mainSlice.searchDateRangeValue
   )
-  const _cloudCover = useSelector((state) => state.mainSlice.cloudCover)
   const _viewMode = useSelector((state) => state.mainSlice.viewMode)
   const _showSearchByGeom = useSelector(
     (state) => state.mainSlice.showSearchByGeom
@@ -41,7 +40,7 @@ const Search = () => {
 
   useEffect(() => {
     dispatch(setshowSearchByGeom(false))
-  }, [_selectedCollectionData, _searchDateRangeValue, _cloudCover, _viewMode])
+  }, [_selectedCollectionData, _searchDateRangeValue, _viewMode])
 
   function processSearchBtn() {
     newSearch()
@@ -87,8 +86,8 @@ const Search = () => {
         <div className="searchContainer datePickerComponent">
           <DateTimeRangeSelector></DateTimeRangeSelector>
         </div>
-        <div className="searchContainer cloudSlider">
-          <CloudSlider></CloudSlider>
+        <div className="searchContainer queryableFilters">
+          <QueryableFilters></QueryableFilters>
         </div>
         {mosaicTilerURL && (
           <div className="searchContainer viewSelectorComponent">

@@ -9,7 +9,8 @@ import {
   setShowZoomNotice,
   setSearchLoading,
   sethasCollectionChanged,
-  setSelectedCollection
+  setSelectedCollection,
+  setQueryableFilters
 } from '../../redux/slices/mainSlice'
 import {
   zoomToCollectionExtent,
@@ -75,6 +76,8 @@ const Dropdown = () => {
     setCollectionId(e.target.value)
     clearMapSelection()
     clearAllLayers()
+    // Reset queryable filters when collection changes
+    dispatch(setQueryableFilters({}))
   }
 
   function formatDate(dateString) {

@@ -32,6 +32,48 @@ import { AddMosaicService } from '../services/post-mosaic-service'
 import { router } from '../router'
 import { appendStacHeaderCookies } from '../utils/stacRequest'
 
+/**
+ * Convert queryable filters from Redux state into STAC Query Extension format
+ * @param {Object} queryableFilters - Filter values from Redux (fieldName -> value)
+ * @returns {Object} Query object in STAC Query Extension format
+ */
+function buildQueryFromFilters(queryableFilters) {
+  const query = {}
+
+  Object.entries(queryableFilters).forEach(([fieldName, value]) => {
+    if (value === null || value === undefined) {
+      return
+    }
+
+    // Handle range values (object with min/max from RangeSlider)
+    if (
+      typeof value === 'object' &&
+      !Array.isArray(value) &&
+      'min' in value &&
+      'max' in value
+    ) {
+      query[fieldName] = {
+        gte: value.min,
+        lte: value.max
+      }
+      return
+    }
+
+    // Handle array values (multi-select, can be any type including numbers)
+    if (Array.isArray(value)) {
+      if (value.length > 0) {
+        query[fieldName] = { in: value }
+      }
+      return
+    }
+
+    // Handle boolean and single values
+    query[fieldName] = { eq: value }
+  })
+
+  return query
+}
+
 export function newSearch() {
   clearMapSelection()
   clearAllLayers()
@@ -150,16 +192,11 @@ function buildSearchScenesParams(gridCodeToSearchIn) {
     searchParams.set('bbox', bbox)
   }
 
-  const query = {}
-  if (_selectedCollection.queryables?.['eo:cloud_cover']) {
-    query['eo:cloud_cover'] = {
-      gte: 0,
-      lte: store.getState().mainSlice.cloudCover
-    }
-  }
-  if (_selectedCollection.queryables?.['sar:polarizations']) {
-    query['sar:polarizations'] = { in: ['VV', 'VH'] }
-  }
+  // Build query from queryable filters
+  const queryableFilters = store.getState().mainSlice.queryableFilters
+  const query = buildQueryFromFilters(queryableFilters)
+
+  // Add grid:code filter if provided
   if (gridCodeToSearchIn) {
     query['grid:code'] = { in: gridCodeToSearchIn }
   }
@@ -244,16 +281,9 @@ function buildSearchAggregateParams(gridType) {
     searchParams.set('bbox', bbox)
   }
 
-  const query = {}
-  if (_selectedCollection.queryables?.['eo:cloud_cover']) {
-    query['eo:cloud_cover'] = {
-      gte: 0,
-      lte: store.getState().mainSlice.cloudCover
-    }
-  }
-  if (_selectedCollection.queryables?.['sar:polarizations']) {
-    query['sar:polarizations'] = { in: ['VV', 'VH'] }
-  }
+  // Build query from queryable filters
+  const queryableFilters = store.getState().mainSlice.queryableFilters
+  const query = buildQueryFromFilters(queryableFilters)
 
   let aggregateParamsStr
   if (Object.keys(query).length > 0) {
@@ -460,13 +490,11 @@ function newMosaicSearch() {
     createMosaicBody.bbox = bboxFromMap
   }
 
-  if (store.getState().mainSlice.showCloudSlider) {
-    createMosaicBody.query = {
-      'eo:cloud_cover': {
-        gte: 0,
-        lte: store.getState().mainSlice.cloudCover
-      }
-    }
+  // Add queryable filters from Redux state
+  const queryableFilters = store.getState().mainSlice.queryableFilters
+  const query = buildQueryFromFilters(queryableFilters)
+  if (Object.keys(query).length > 0) {
+    createMosaicBody.query = query
   }
 
   const requestHeaders = new Headers()

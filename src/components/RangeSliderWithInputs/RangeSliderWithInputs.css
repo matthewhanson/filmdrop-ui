@@ -1,0 +1,57 @@
+.rangeSliderWithInputs {
+  width: 100%;
+}
+
+.rangeSliderLabel {
+  font-weight: bold;
+  color: var(--side-panel-heading-color);
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.rangeSliderControls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Material-UI Slider Component Overrides */
+
+.rangeSlider .MuiSlider-track {
+  color: var(--side-panel-slider-track);
+}
+
+.rangeSlider .MuiSlider-rail {
+  color: var(--side-panel-slider-rail);
+}
+
+.rangeSlider .MuiSlider-thumb {
+  color: var(--side-panel-slider-thumb);
+}
+
+.rangeSlider .MuiSlider-thumb:hover,
+.rangeSlider .MuiSlider-thumb.Mui-focusVisible {
+  box-shadow: 0px 0px 0px 8px rgba(200, 200, 200, 0.15);
+}
+
+.rangeSlider .MuiSlider-thumb:active {
+  box-shadow: 0px 0px 0px 14px rgba(200, 200, 200, 0.15);
+}
+
+/* Material-UI Input Component Overrides */
+
+.rangeSliderInput {
+  width: 42px;
+}
+
+.rangeSliderInput .MuiInput-root {
+  color: var(--side-panel-slider-input-color);
+}
+
+.rangeSliderInput .MuiInput-underline:before {
+  border-bottom-color: var(--side-panel-slider-input-underline);
+}
+
+.rangeSliderInput .MuiInput-underline:after {
+  border-bottom-color: var(--side-panel-slider-input-underline);
+}

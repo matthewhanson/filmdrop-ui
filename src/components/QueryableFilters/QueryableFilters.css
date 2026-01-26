@@ -1,0 +1,15 @@
+.queryableFilters {
+  width: 100%;
+}
+
+.queryableField {
+  margin-bottom: 16px;
+}
+
+.queryableField label {
+  color: var(--side-panel-heading-color);
+}
+
+.queryableFiltersError {
+  margin-bottom: 15px;
+}
