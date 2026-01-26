@@ -13,7 +13,8 @@ import {
   DEFAULT_MAP_CENTER,
   DEFAULT_MAP_ZOOM,
   DEFAULT_MAP_ZOOM_MAX,
-  DEFAULT_COLORMAP
+  DEFAULT_COLORMAP,
+  DEFAULT_EXCLUDED_QUERYABLES
 } from '../components/defaults'
 import { DEFAULT_REL_TYPE_EXCLUDE_LIST } from './defaultLinkGrouping.js'
 import { store } from '../redux/store'
@@ -619,7 +620,9 @@ export function applyConfigDefaults(config) {
     MAP_CENTER: config.MAP_CENTER ?? DEFAULT_MAP_CENTER,
     MAP_ZOOM: config.MAP_ZOOM ?? DEFAULT_MAP_ZOOM,
     MAP_ZOOM_MAX: config.MAP_ZOOM_MAX ?? DEFAULT_MAP_ZOOM_MAX,
-    CONFIG_COLORMAP: config.CONFIG_COLORMAP ?? DEFAULT_COLORMAP
+    CONFIG_COLORMAP: config.CONFIG_COLORMAP ?? DEFAULT_COLORMAP,
+    // Queryable filters configuration
+    EXCLUDED_QUERYABLES: config.EXCLUDED_QUERYABLES ?? DEFAULT_EXCLUDED_QUERYABLES
   }
 }
 

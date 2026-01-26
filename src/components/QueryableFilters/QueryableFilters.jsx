@@ -16,6 +16,7 @@ import {
 import RangeSliderWithInputs from '../RangeSliderWithInputs/RangeSliderWithInputs'
 import { setQueryableFilters } from '../../redux/slices/mainSlice'
 import { sanitizeFieldValue } from '../../utils/securityHelper'
+import { isFieldExcluded } from '../../utils/fieldMatchesPattern'
 import debounce from '../../utils/debounce'
 import './QueryableFilters.css'
 
@@ -27,24 +28,13 @@ const QueryableFilters = () => {
   const queryableFilters = useSelector(
     (state) => state.mainSlice.queryableFilters
   )
+  const appConfig = useSelector((state) => state.mainSlice.appConfig)
+  const excludedQueryables = appConfig?.EXCLUDED_QUERYABLES || []
 
   const queryables = selectedCollectionData?.queryables
 
   // Store debounced functions for each field to avoid recreating on each render
   const debouncedFunctionsRef = useRef({})
-
-  // Centralized function to determine if a field should be excluded
-  const isFieldExcluded = (fieldName) => {
-    // Exclude specific fields
-    if (['datetime', 'geometry', 'sci:doi'].includes(fieldName)) {
-      return true
-    }
-    // Exclude all proj: prefixed fields
-    if (fieldName.startsWith('proj:')) {
-      return true
-    }
-    return false
-  }
 
   // Initialize default values when queryables change
   // This MUST come before any conditional returns (Rules of Hooks)
@@ -65,8 +55,8 @@ const QueryableFilters = () => {
     // Filter and process queryables
     const renderableFields = Object.entries(queryables).filter(
       ([fieldName, schema]) => {
-        // Exclude specific fields
-        if (isFieldExcluded(fieldName)) {
+        // Exclude fields based on config
+        if (isFieldExcluded(fieldName, excludedQueryables)) {
           return false
         }
 
@@ -150,8 +140,8 @@ const QueryableFilters = () => {
   // Filter and process queryables
   const renderableFields = Object.entries(queryables).filter(
     ([fieldName, schema]) => {
-      // Exclude specific fields
-      if (isFieldExcluded(fieldName)) {
+      // Exclude fields based on config
+      if (isFieldExcluded(fieldName, excludedQueryables)) {
         return false
       }
 

@@ -27,3 +27,12 @@ export const DEFAULT_TILE_LAYER_PARAMS = {
   tileSize: 256,
   pane: 'imagery'
 }
+
+// Default queryable fields to exclude from queryable filters
+// Supports exact matches and prefix patterns (ending with '*')
+export const DEFAULT_EXCLUDED_QUERYABLES = [
+  'datetime',
+  'geometry',
+  'sci:doi',
+  'proj:*'
+]
