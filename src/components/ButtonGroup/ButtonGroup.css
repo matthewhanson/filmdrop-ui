@@ -1,0 +1,35 @@
+.ButtonGroup__buttons {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.ButtonGroup__button {
+  flex: 1;
+  height: 32px;
+  font-size: 12px;
+  font-weight: 400;
+  text-transform: capitalize;
+  background: #f6f8fa;
+  color: #0f1419;
+  border: 1px solid #e1e4e8;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+}
+
+.ButtonGroup__button:hover:not(:disabled) {
+  background: #e1e4e8;
+}
+
+.ButtonGroup__button--active {
+  background: #2da44e !important;
+  color: #ffffff !important;
+  border-color: #2da44e !important;
+}
+
+.ButtonGroup__button--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
