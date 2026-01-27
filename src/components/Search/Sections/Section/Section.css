@@ -8,7 +8,7 @@
   font-size: 15px;
   font-weight: bold;
   text-transform: uppercase;
-  color: #6E7781;
+  color: var(--blue-gray-8);
   letter-spacing: 0.5px;
 }
 

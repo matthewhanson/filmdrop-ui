@@ -6,7 +6,7 @@ import './Dropdown.css'
 
 const Dropdown = ({ label, value, onChange, options, className = '' }) => {
   return (
-    <Card height={80} label={label} className={`Dropdown ${className}`}>
+    <Card height={'auto'} label={label} className={`Dropdown ${className}`}>
       <NativeSelect
         className="Dropdown__select"
         value={value}

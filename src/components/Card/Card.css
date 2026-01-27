@@ -2,7 +2,7 @@
   background: #ffffff;
   border: 1px solid #e1e4e8;
   border-radius: 4px;
-  padding: 12px 28px;
+  padding: 8px 8px;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -10,14 +10,12 @@
 
 .Card__label {
   font-size: 14px;
-  font-weight: 400;
   color: #0f1419;
-  margin-bottom: 20px;
+  margin-bottom: 4px;
   display: block;
 }
 
 .Card__content {
   display: flex;
   flex-direction: column;
-  flex: 1;
 }
