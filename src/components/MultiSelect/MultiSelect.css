@@ -1,0 +1,53 @@
+/* Style the MUI Select */
+.MultiSelect__select {
+  width: 100%;
+  background: #f6f8fa;
+  font-size: 12px;
+  font-weight: 400;
+  color: #0f1419;
+}
+
+/* Style the outlined input */
+.MultiSelect__select .MuiOutlinedInput-notchedOutline {
+  border: 1px solid #e1e4e8;
+  border-radius: 4px;
+}
+
+.MultiSelect__select:hover .MuiOutlinedInput-notchedOutline {
+  border-color: #e1e4e8;
+}
+
+.MultiSelect__select.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #2da44e;
+  border-width: 1px;
+}
+
+/* Style the chips container */
+.MultiSelect__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Style individual chips */
+.MultiSelect__chip {
+  background: #e1e4e8 !important;
+  font-size: 12px !important;
+  height: 24px !important;
+  color: #0f1419 !important;
+}
+
+/* Style the chip delete icon */
+.MultiSelect__chip .MuiChip-deleteIcon {
+  color: #6e7781 !important;
+  font-size: 16px !important;
+}
+
+.MultiSelect__chip .MuiChip-deleteIcon:hover {
+  color: #0f1419 !important;
+}
+
+/* Style dropdown icon */
+.MultiSelect__select .MuiSelect-icon {
+  color: #6e7781;
+}
