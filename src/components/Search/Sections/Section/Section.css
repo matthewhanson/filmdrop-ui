@@ -1,0 +1,19 @@
+.Section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.Section__heading {
+  font-size: 15px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #6E7781;
+  letter-spacing: 0.5px;
+}
+
+.Section__content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
