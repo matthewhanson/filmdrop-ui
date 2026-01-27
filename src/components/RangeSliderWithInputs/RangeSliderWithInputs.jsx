@@ -1,147 +1,114 @@
-import React, { useState, useEffect } from 'react'
-import { Slider, Input, Stack, Grid } from '@mui/material'
+import React, { useState } from 'react'
+import { Slider } from '@mui/material'
 import PropTypes from 'prop-types'
+import Card from '../Card/Card'
 import './RangeSliderWithInputs.css'
 
-const RangeSliderWithInputs = ({
-  min,
-  max,
-  value,
-  onChange,
-  label,
-  step
-}) => {
-  // Convert object to array for MUI Slider (which expects [min, max])
-  const [sliderValue, setSliderValue] = useState([value.min, value.max])
+const RangeSliderWithInputs = ({ min, max, value, onChange, label, step = 1 }) => {
   const [minInput, setMinInput] = useState(value.min)
   const [maxInput, setMaxInput] = useState(value.max)
-
-  // Update local state when prop value changes (e.g., from Redux)
-  useEffect(() => {
-    setSliderValue([value.min, value.max])
-    setMinInput(value.min)
-    setMaxInput(value.max)
-  }, [value.min, value.max])
+  const [isEditingMin, setIsEditingMin] = useState(false)
+  const [isEditingMax, setIsEditingMax] = useState(false)
 
   const handleSliderChange = (event, newValue) => {
-    setSliderValue(newValue)
-    setMinInput(newValue[0])
-    setMaxInput(newValue[1])
     if (onChange) {
       onChange({ min: newValue[0], max: newValue[1] })
+      setMinInput(newValue[0])
+      setMaxInput(newValue[1])
     }
   }
 
-  const handleMinInputChange = (event) => {
-    const val = event.target.value
-    setMinInput(val === '' ? '' : Number(val))
+  const handleMinChange = (e) => {
+    setMinInput(e.target.value)
   }
 
-  const handleMaxInputChange = (event) => {
-    const val = event.target.value
-    setMaxInput(val === '' ? '' : Number(val))
+  const handleMaxChange = (e) => {
+    setMaxInput(e.target.value)
   }
 
-  const handleMinInputBlur = () => {
-    let newMin = Number(minInput) || min
-    const newMax = maxInput
+  const handleMinBlur = () => {
+    setIsEditingMin(false)
+    let newMin = Number(minInput)
 
-    // Clamp to bounds
-    if (newMin < min) newMin = min
+    // Validate and clamp
+    if (isNaN(newMin) || newMin < min) newMin = min
     if (newMin > max) newMin = max
-    // Ensure min <= max
-    if (newMin > newMax) newMin = newMax
+    if (newMin > value.max) newMin = value.max
 
-    setSliderValue([newMin, newMax])
     setMinInput(newMin)
-    if (onChange) {
-      onChange({ min: newMin, max: newMax })
+    if (onChange && newMin !== value.min) {
+      onChange({ min: newMin, max: value.max })
     }
   }
 
-  const handleMaxInputBlur = () => {
-    let newMax = Number(maxInput) || max
-    const newMin = minInput
+  const handleMaxBlur = () => {
+    setIsEditingMax(false)
+    let newMax = Number(maxInput)
 
-    // Clamp to bounds
-    if (newMax < min) newMax = min
+    // Validate and clamp
+    if (isNaN(newMax) || newMax < min) newMax = min
     if (newMax > max) newMax = max
-    // Ensure max >= min
-    if (newMax < newMin) newMax = newMin
+    if (newMax < value.min) newMax = value.min
 
-    setSliderValue([newMin, newMax])
     setMaxInput(newMax)
-    if (onChange) {
-      onChange({ min: newMin, max: newMax })
+    if (onChange && newMax !== value.max) {
+      onChange({ min: value.min, max: newMax })
     }
   }
 
   return (
-    <Stack className="rangeSliderWithInputs">
-      {label && <label className="rangeSliderLabel">{label}</label>}
-      <Grid
-        className="rangeSliderControls"
-        container
-        spacing={2}
-        alignItems="center"
-      >
-        <Grid size="auto">
-          <Input
-            value={minInput}
-            onChange={handleMinInputChange}
-            onBlur={handleMinInputBlur}
-            size="small"
-            className="rangeSliderInput"
-            inputProps={{
-              min,
-              max,
-              step,
-              type: 'number',
-              'aria-label': `${label} minimum`
-            }}
-          />
-        </Grid>
-        <Grid size="grow">
-          <Slider
-            value={sliderValue}
-            onChange={handleSliderChange}
-            min={min}
-            max={max}
-            step={step}
-            disableSwap
-            className="rangeSlider"
-          />
-        </Grid>
-        <Grid size="auto">
-          <Input
-            value={maxInput}
-            onChange={handleMaxInputChange}
-            onBlur={handleMaxInputBlur}
-            size="small"
-            className="rangeSliderInput"
-            inputProps={{
-              min,
-              max,
-              step,
-              type: 'number',
-              'aria-label': `${label} maximum`
-            }}
-          />
-        </Grid>
-      </Grid>
-    </Stack>
+    <Card height={88} label={label} className="rangeSliderWithInputs">
+      <div className="rangeSliderValuePills">
+        <input
+          type="number"
+          className="rangeSliderValuePill"
+          value={isEditingMin ? minInput : value.min}
+          onChange={handleMinChange}
+          onFocus={() => setIsEditingMin(true)}
+          onBlur={handleMinBlur}
+          min={min}
+          max={max}
+          step={step}
+          aria-label={`${label} minimum value`}
+        />
+        <span className="rangeSliderValueSeparator">—</span>
+        <input
+          type="number"
+          className="rangeSliderValuePill"
+          value={isEditingMax ? maxInput : value.max}
+          onChange={handleMaxChange}
+          onFocus={() => setIsEditingMax(true)}
+          onBlur={handleMaxBlur}
+          min={min}
+          max={max}
+          step={step}
+          aria-label={`${label} maximum value`}
+        />
+      </div>
+      <div className="rangeSliderTrackContainer">
+        <Slider
+          value={[value.min, value.max]}
+          onChange={handleSliderChange}
+          min={min}
+          max={max}
+          step={step}
+          disableSwap
+          className="rangeSlider"
+        />
+      </div>
+    </Card>
   )
 }
 
 RangeSliderWithInputs.propTypes = {
-  min: PropTypes.number,
-  max: PropTypes.number,
+  min: PropTypes.number.isRequired,
+  max: PropTypes.number.isRequired,
   value: PropTypes.shape({
     min: PropTypes.number.isRequired,
     max: PropTypes.number.isRequired
-  }),
-  onChange: PropTypes.func,
-  label: PropTypes.string,
+  }).isRequired,
+  onChange: PropTypes.func.isRequired,
+  label: PropTypes.string.isRequired,
   step: PropTypes.number
 }
 

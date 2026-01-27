@@ -1,57 +1,106 @@
 .rangeSliderWithInputs {
-  width: 100%;
+  position: relative;
 }
 
-.rangeSliderLabel {
-  font-weight: bold;
-  color: var(--side-panel-heading-color);
-  margin-bottom: 8px;
-  font-size: 16px;
+/* Value pills in top-right corner */
+.rangeSliderValuePills {
+  position: absolute;
+  top: 12px;
+  right: 28px;
+  display: flex;
+  gap: 4px;
 }
 
-.rangeSliderControls {
+.rangeSliderValuePill {
+  height: 28px;
+  width: 50px;
+  padding: 0 8px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  background: #f6f8fa;
+  border: 1px solid #e1e4e8;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #0f1419;
+  text-align: center;
+  box-sizing: border-box;
 }
 
-/* Material-UI Slider Component Overrides */
-
-.rangeSlider .MuiSlider-track {
-  color: var(--side-panel-slider-track);
+.rangeSliderValuePill:focus {
+  outline: none;
+  border-color: #2da44e;
+  background: #ffffff;
 }
 
+/* Hide number input spinners */
+.rangeSliderValuePill::-webkit-outer-spin-button,
+.rangeSliderValuePill::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.rangeSliderValuePill[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.rangeSliderValueSeparator {
+  font-size: 12px;
+  color: #6e7781;
+  margin: 0 4px;
+}
+
+/* Slider track container positioned at 60px from card top */
+.rangeSliderTrackContainer {
+  position: absolute;
+  top: 60px;
+  left: 36px;
+  right: 36px;
+}
+
+/* MUI Slider customization to match spec */
+.rangeSlider {
+  padding: 0 !important;
+  height: 6px !important;
+}
+
+/* Slider rail (inactive/background track) */
 .rangeSlider .MuiSlider-rail {
-  color: var(--side-panel-slider-rail);
+  height: 6px;
+  border-radius: 3px;
+  background-color: #e1e4e8;
+  opacity: 1;
 }
 
+/* Slider track (active/selected range) */
+.rangeSlider .MuiSlider-track {
+  height: 6px;
+  border-radius: 3px;
+  background-color: #2da44e;
+  border: none;
+}
+
+/* Slider thumb (handle) */
 .rangeSlider .MuiSlider-thumb {
-  color: var(--side-panel-slider-thumb);
+  width: 16px;
+  height: 16px;
+  background-color: #ffffff;
+  border: 2px solid #2da44e;
+  box-shadow: 0 0 0 9px rgba(225, 228, 232, 0.3);
 }
 
 .rangeSlider .MuiSlider-thumb:hover,
 .rangeSlider .MuiSlider-thumb.Mui-focusVisible {
-  box-shadow: 0px 0px 0px 8px rgba(200, 200, 200, 0.15);
+  box-shadow: 0 0 0 9px rgba(225, 228, 232, 0.5);
 }
 
 .rangeSlider .MuiSlider-thumb:active {
-  box-shadow: 0px 0px 0px 14px rgba(200, 200, 200, 0.15);
+  box-shadow: 0 0 0 9px rgba(225, 228, 232, 0.6);
 }
 
-/* Material-UI Input Component Overrides */
-
-.rangeSliderInput {
-  width: 42px;
-}
-
-.rangeSliderInput .MuiInput-root {
-  color: var(--side-panel-slider-input-color);
-}
-
-.rangeSliderInput .MuiInput-underline:before {
-  border-bottom-color: var(--side-panel-slider-input-underline);
-}
-
-.rangeSliderInput .MuiInput-underline:after {
-  border-bottom-color: var(--side-panel-slider-input-underline);
+/* Remove default MUI thumb ring on hover */
+.rangeSlider .MuiSlider-thumb::before {
+  display: none;
 }
