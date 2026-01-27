@@ -7,96 +7,73 @@ import {
   setsearchGeojsonBoundary,
   setshowUploadGeojsonModal
 } from '../../../../redux/slices/mainSlice'
-import { Stack } from '@mui/material'
 import DateTimeRangeSelector from '../../../DateTimeRangeSelector/DateTimeRangeSelector'
+import ButtonGroup from '../../../ButtonGroup/ButtonGroup'
 import Section from '../Section/Section'
-import { enableMapPolyDrawing, clearLayer } from '../../../../utils/mapHelper'
+import { enableMapPolyDrawing, clearLayer, zoomToCollectionExtent } from '../../../../utils/mapHelper'
 
 const SpaceTimeSection = () => {
   const dispatch = useDispatch()
-  const _showSearchByGeom = useSelector(
-    (state) => state.mainSlice.showSearchByGeom
-  )
-  const _searchGeojsonBoundary = useSelector(
+  const searchGeojsonBoundary = useSelector(
     (state) => state.mainSlice.searchGeojsonBoundary
   )
-  const _appConfig = useSelector((state) => state.mainSlice.appConfig)
+  const selectedCollectionData = useSelector(
+    (state) => state.mainSlice.selectedCollectionData
+  )
+  const appConfig = useSelector((state) => state.mainSlice.appConfig)
 
-  function onDrawBoundaryClicked() {
-    if (_searchGeojsonBoundary) {
-      return
-    }
-    dispatch(setshowSearchByGeom(!_showSearchByGeom))
+  const handleDraw = () => {
+    if (searchGeojsonBoundary) return
+    dispatch(setshowSearchByGeom(true))
     dispatch(setisDrawingEnabled(true))
     enableMapPolyDrawing()
   }
 
-  function onUploadGeojsonButtonClicked() {
-    if (_searchGeojsonBoundary) {
-      return
-    }
+  const handleUpload = () => {
+    if (searchGeojsonBoundary) return
     dispatch(setshowSearchByGeom(false))
     dispatch(setshowUploadGeojsonModal(true))
   }
 
-  function onClearButtonClicked() {
-    if (!_searchGeojsonBoundary) {
-      return
+  const handleExtents = () => {
+    if (selectedCollectionData) {
+      zoomToCollectionExtent(selectedCollectionData)
+      // Clear any drawn boundary when zooming to extents
+      dispatch(setsearchGeojsonBoundary(null))
+      dispatch(setshowSearchByGeom(false))
+      clearLayer('drawBoundsLayer')
     }
-    dispatch(setsearchGeojsonBoundary(null))
-    dispatch(setshowSearchByGeom(false))
-    clearLayer('drawBoundsLayer')
   }
+
+  const buttons = [
+    {
+      value: 'draw',
+      label: 'Draw',
+      onClick: handleDraw,
+      active: false,
+      disabled: !!searchGeojsonBoundary
+    },
+    {
+      value: 'upload',
+      label: 'Upload',
+      onClick: handleUpload,
+      active: false,
+      disabled: !!searchGeojsonBoundary
+    },
+    {
+      value: 'extents',
+      label: 'Extents',
+      onClick: handleExtents,
+      active: false,
+      disabled: false
+    }
+  ]
 
   return (
     <Section heading="Space & Time" className="SpaceTimeSection">
       <DateTimeRangeSelector />
-      {_appConfig.SEARCH_BY_GEOM_ENABLED && (
-        <div className="searchContainer searchBoundary">
-          <Stack className="searchFilterContainer">
-            <label
-              htmlFor="searchByGeomOptionsContainer"
-              className="searchByGeomOptionsText"
-            >
-              Area of Interest
-            </label>
-            <div className="searchByGeomOptionsButtons">
-              <button
-                className={
-                  !_searchGeojsonBoundary
-                    ? 'searchByGeomOptionsButton'
-                    : 'searchByGeomOptionsButton ' +
-                      'searchByGeomOptionsButtonDisabled'
-                }
-                onClick={onDrawBoundaryClicked}
-              >
-                Draw
-              </button>
-              <button
-                className={
-                  !_searchGeojsonBoundary
-                    ? 'searchByGeomOptionsButton'
-                    : 'searchByGeomOptionsButton ' +
-                      'searchByGeomOptionsButtonDisabled'
-                }
-                onClick={onUploadGeojsonButtonClicked}
-              >
-                Upload
-              </button>
-              <button
-                className={
-                  _searchGeojsonBoundary
-                    ? 'searchByGeomOptionsButton'
-                    : 'searchByGeomOptionsButton ' +
-                      'searchByGeomOptionsButtonDisabled'
-                }
-                onClick={onClearButtonClicked}
-              >
-                Clear
-              </button>
-            </div>
-          </Stack>
-        </div>
+      {appConfig.SEARCH_BY_GEOM_ENABLED && (
+        <ButtonGroup label="Area of Interest" buttons={buttons} />
       )}
     </Section>
   )
