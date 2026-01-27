@@ -3,11 +3,7 @@
 }
 
 .queryableField {
-  margin-bottom: 16px;
-}
-
-.queryableField label {
-  color: var(--side-panel-heading-color);
+  margin-bottom: 12px;
 }
 
 .queryableFiltersError {

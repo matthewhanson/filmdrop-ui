@@ -1,19 +1,10 @@
 import React, { useEffect, useRef, useMemo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import {
-  Select,
-  MenuItem,
-  TextField,
-  Checkbox,
-  FormControl,
-  InputLabel,
-  FormControlLabel,
-  Chip,
-  OutlinedInput,
-  Box,
-  Alert
-} from '@mui/material'
+import { TextField, FormControl, Alert } from '@mui/material'
 import RangeSliderWithInputs from '../RangeSliderWithInputs/RangeSliderWithInputs'
+import Dropdown from '../Dropdown/Dropdown'
+import MultiSelect from '../MultiSelect/MultiSelect'
+import Checkbox from '../Checkbox/Checkbox'
 import { setQueryableFilters } from '../../redux/slices/mainSlice'
 import { sanitizeFieldValue } from '../../utils/securityHelper'
 import { isFieldExcluded } from '../../utils/fieldMatchesPattern'
@@ -216,25 +207,22 @@ const QueryableFilters = () => {
 
     // String enum -> Select dropdown
     if (schema.type === 'string' && schema.enum) {
+      const options = [
+        { value: '', label: 'None' },
+        ...schema.enum.map((option) => ({
+          value: option,
+          label: sanitizeFieldValue(option, false)
+        }))
+      ]
+
       return (
         <div key={fieldName} className="queryableField">
-          <FormControl fullWidth size="small">
-            <InputLabel>{label}</InputLabel>
-            <Select
-              value={currentValue ?? defaultValue ?? ''}
-              onChange={(e) => handleFilterChange(fieldName, e.target.value)}
-              label={label}
-            >
-              <MenuItem value="">
-                <em>None</em>
-              </MenuItem>
-              {schema.enum.map((option) => (
-                <MenuItem key={option} value={option}>
-                  {sanitizeFieldValue(option, false)}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <Dropdown
+            label={label}
+            value={currentValue ?? defaultValue ?? ''}
+            onChange={(e) => handleFilterChange(fieldName, e.target.value)}
+            options={options}
+          />
         </div>
       )
     }
@@ -245,34 +233,19 @@ const QueryableFilters = () => {
       schema.items?.enum &&
       schema.items?.type === 'string'
     ) {
+      const options = schema.items.enum.map((option) => ({
+        value: option,
+        label: sanitizeFieldValue(option, false)
+      }))
+
       return (
         <div key={fieldName} className="queryableField">
-          <FormControl fullWidth size="small">
-            <InputLabel>{label}</InputLabel>
-            <Select
-              multiple
-              value={currentValue ?? defaultValue ?? []}
-              onChange={(e) => handleFilterChange(fieldName, e.target.value)}
-              input={<OutlinedInput label={label} />}
-              renderValue={(selected) => (
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                  {selected.map((value) => (
-                    <Chip
-                      key={value}
-                      label={sanitizeFieldValue(value, false)}
-                      size="small"
-                    />
-                  ))}
-                </Box>
-              )}
-            >
-              {schema.items.enum.map((option) => (
-                <MenuItem key={option} value={option}>
-                  {sanitizeFieldValue(option, false)}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <MultiSelect
+            label={label}
+            value={currentValue ?? defaultValue ?? []}
+            onChange={(newValue) => handleFilterChange(fieldName, newValue)}
+            options={options}
+          />
         </div>
       )
     }
@@ -281,16 +254,12 @@ const QueryableFilters = () => {
     if (schema.type === 'boolean') {
       return (
         <div key={fieldName} className="queryableField">
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={currentValue === true}
-                onChange={(e) =>
-                  handleFilterChange(fieldName, e.target.checked ? true : null)
-                }
-              />
-            }
+          <Checkbox
             label={label}
+            checked={currentValue === true}
+            onChange={(e) =>
+              handleFilterChange(fieldName, e.target.checked ? true : null)
+            }
           />
         </div>
       )
