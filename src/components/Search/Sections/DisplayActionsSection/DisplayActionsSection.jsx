@@ -2,7 +2,6 @@ import React from 'react'
 import './DisplayActionsSection.css'
 import { useSelector, useDispatch } from 'react-redux'
 import { setshowSearchByGeom, setautoCenterOnItemChanged } from '../../../../redux/slices/mainSlice'
-import Section from '../Section/Section'
 import ViewSelector from '../../../ViewSelector/ViewSelector'
 import Checkbox from '../../../Checkbox/Checkbox'
 import { newSearch } from '../../../../utils/searchHelper'
@@ -29,25 +28,27 @@ const DisplayActionsSection = () => {
   const showSectionHeading = hasViewMode || hasAutoZoom
 
   return (
-    <Section
-      heading={showSectionHeading ? "Display & Actions" : null}
-      className="DisplayActionsSection"
-    >
-      {mosaicTilerURL && <ViewSelector />}
-      {appConfig.SHOW_ITEM_AUTO_ZOOM && (
-        <Checkbox
-          label="Item Auto-Zoom"
-          checked={autoCenterOnItemChanged}
-          onChange={handleAutoZoomChange}
-        />
+    <div className="DisplayActionsSection">
+      {showSectionHeading && (
+        <div className="DisplayActionsSection__heading">Display & Actions</div>
       )}
-      <button
-        className="actionButton searchButton"
-        onClick={handleSearchClick}
-      >
-        Search
-      </button>
-    </Section>
+      <div className="DisplayActionsSection__content">
+        {mosaicTilerURL && <ViewSelector />}
+        {appConfig.SHOW_ITEM_AUTO_ZOOM && (
+          <Checkbox
+            label="Item Auto-Zoom"
+            checked={autoCenterOnItemChanged}
+            onChange={handleAutoZoomChange}
+          />
+        )}
+        <button
+          className="actionButton searchButton"
+          onClick={handleSearchClick}
+        >
+          Search
+        </button>
+      </div>
+    </div>
   )
 }
 

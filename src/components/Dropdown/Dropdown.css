@@ -21,11 +21,12 @@
 .Dropdown__select select:focus {
   outline: none;
   border-color: #2da44e;
+  border-radius: 4px;
 }
 
 /* Style the MUI icon wrapper */
 .Dropdown__select .MuiNativeSelect-icon {
   color: #6e7781;
   right: 12px;
-  font-size: 18px;
+  font-size: 24px;
 }

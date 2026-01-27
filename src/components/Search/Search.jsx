@@ -24,12 +24,10 @@ const Search = () => {
 
   return (
     <div className="Search" data-testid="Search">
-      <div className="searchFilters">
-        <CollectionSection />
-        <SpaceTimeSection />
-        <AttributesSection />
-        <DisplayActionsSection />
-      </div>
+      <CollectionSection />
+      <SpaceTimeSection />
+      <AttributesSection />
+      <DisplayActionsSection />
     </div>
   )
 }

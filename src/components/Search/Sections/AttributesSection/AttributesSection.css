@@ -1,3 +1,19 @@
 .AttributesSection {
-  /* Additional section-specific styles can go here if needed */
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.AttributesSection__heading {
+  font-size: 15px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: var(--blue-gray-8);
+  letter-spacing: 0.5px;
+}
+
+.AttributesSection__content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }

@@ -9,7 +9,6 @@ import {
 } from '../../../../redux/slices/mainSlice'
 import DateTimeRangeSelector from '../../../DateTimeRangeSelector/DateTimeRangeSelector'
 import ButtonGroup from '../../../ButtonGroup/ButtonGroup'
-import Section from '../Section/Section'
 import { enableMapPolyDrawing, clearLayer, zoomToCollectionExtent } from '../../../../utils/mapHelper'
 
 const SpaceTimeSection = () => {
@@ -70,12 +69,15 @@ const SpaceTimeSection = () => {
   ]
 
   return (
-    <Section heading="Space & Time" className="SpaceTimeSection">
-      <DateTimeRangeSelector />
-      {appConfig.SEARCH_BY_GEOM_ENABLED && (
-        <ButtonGroup label="Area of Interest" buttons={buttons} />
-      )}
-    </Section>
+    <div className="SpaceTimeSection">
+      <div className="SpaceTimeSection__heading">Space & Time</div>
+      <div className="SpaceTimeSection__content">
+        <DateTimeRangeSelector />
+        {appConfig.SEARCH_BY_GEOM_ENABLED && (
+          <ButtonGroup label="Area of Interest" buttons={buttons} />
+        )}
+      </div>
+    </div>
   )
 }
 

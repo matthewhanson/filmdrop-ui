@@ -1,5 +1,22 @@
 .DisplayActionsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   margin-top: auto;
+}
+
+.DisplayActionsSection__heading {
+  font-size: 15px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: var(--blue-gray-8);
+  letter-spacing: 0.5px;
+}
+
+.DisplayActionsSection__content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .searchButton {

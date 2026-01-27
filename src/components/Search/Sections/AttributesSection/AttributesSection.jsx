@@ -2,7 +2,6 @@ import React, { useMemo } from 'react'
 import './AttributesSection.css'
 import { useSelector } from 'react-redux'
 import QueryableFilters from '../../../QueryableFilters/QueryableFilters'
-import Section from '../Section/Section'
 import { isFieldExcluded } from '../../../../utils/fieldMatchesPattern'
 
 const AttributesSection = () => {
@@ -59,9 +58,12 @@ const AttributesSection = () => {
   }
 
   return (
-    <Section heading="Attributes" className="AttributesSection">
-      <QueryableFilters />
-    </Section>
+    <div className="AttributesSection">
+      <div className="AttributesSection__heading">Attributes</div>
+      <div className="AttributesSection__content">
+        <QueryableFilters />
+      </div>
+    </div>
   )
 }
 
