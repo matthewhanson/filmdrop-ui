@@ -1,0 +1,57 @@
+.Checkbox__label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Style the MUI Checkbox */
+.Checkbox__input {
+  padding: 0 !important;
+  width: 18px !important;
+  height: 18px !important;
+  margin-right: 12px !important;
+}
+
+/* Style the unchecked checkbox */
+.Checkbox__input .MuiSvgIcon-root {
+  width: 18px;
+  height: 18px;
+  border-radius: 2px;
+  background: #f6f8fa;
+  border: 1px solid #e1e4e8;
+  box-sizing: border-box;
+}
+
+/* Hide default checkbox icon */
+.Checkbox__input .MuiSvgIcon-root path {
+  display: none;
+}
+
+/* Style the checked state */
+.Checkbox__input.Mui-checked .MuiSvgIcon-root {
+  background: #f6f8fa;
+  border-color: #2da44e;
+  position: relative;
+}
+
+/* Create custom checkmark using pseudo-element */
+.Checkbox__input.Mui-checked .MuiSvgIcon-root::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 2px;
+  width: 4px;
+  height: 8px;
+  border: solid #2da44e;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  display: block;
+}
+
+/* Style the label text */
+.Checkbox__text {
+  font-size: 14px;
+  font-weight: 400;
+  color: #0f1419;
+}
