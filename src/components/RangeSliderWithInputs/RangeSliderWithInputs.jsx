@@ -57,33 +57,36 @@ const RangeSliderWithInputs = ({ min, max, value, onChange, label, step = 1 }) =
   }
 
   return (
-    <Card height={88} label={label} className="rangeSliderWithInputs">
-      <div className="rangeSliderValuePills">
-        <input
-          type="number"
-          className="rangeSliderValuePill"
-          value={isEditingMin ? minInput : value.min}
-          onChange={handleMinChange}
-          onFocus={() => setIsEditingMin(true)}
-          onBlur={handleMinBlur}
-          min={min}
-          max={max}
-          step={step}
-          aria-label={`${label} minimum value`}
-        />
-        <span className="rangeSliderValueSeparator">—</span>
-        <input
-          type="number"
-          className="rangeSliderValuePill"
-          value={isEditingMax ? maxInput : value.max}
-          onChange={handleMaxChange}
-          onFocus={() => setIsEditingMax(true)}
-          onBlur={handleMaxBlur}
-          min={min}
-          max={max}
-          step={step}
-          aria-label={`${label} maximum value`}
-        />
+    <Card height="auto" className="rangeSliderWithInputs">
+      <div className="rangeSliderHeader">
+        <label className="rangeSliderLabel">{label}</label>
+        <div className="rangeSliderValuePills">
+          <input
+            type="number"
+            className="rangeSliderValuePill"
+            value={isEditingMin ? minInput : value.min}
+            onChange={handleMinChange}
+            onFocus={() => setIsEditingMin(true)}
+            onBlur={handleMinBlur}
+            min={min}
+            max={max}
+            step={step}
+            aria-label={`${label} minimum value`}
+          />
+          <span className="rangeSliderValueSeparator">—</span>
+          <input
+            type="number"
+            className="rangeSliderValuePill"
+            value={isEditingMax ? maxInput : value.max}
+            onChange={handleMaxChange}
+            onFocus={() => setIsEditingMax(true)}
+            onBlur={handleMaxBlur}
+            min={min}
+            max={max}
+            step={step}
+            aria-label={`${label} maximum value`}
+          />
+        </div>
       </div>
       <div className="rangeSliderTrackContainer">
         <Slider

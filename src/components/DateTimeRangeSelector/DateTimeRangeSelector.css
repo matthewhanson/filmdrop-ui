@@ -36,8 +36,8 @@
 
 /* Override focused border color */
 .datePickerContainer .MuiPickersOutlinedInput-root.Mui-focused > .MuiPickersOutlinedInput-notchedOutline {
-  border-color: #2da44e !important;
-  border-width: 2px !important;
+  border-color: var(--brand-accent-primary) !important;
+  border-width: 1px !important;
 }
 
 /* Override calendar header font size */
@@ -51,11 +51,11 @@
 }
 
 .MuiYearCalendar-button.Mui-selected {
-  background-color: #2da44e !important;
+  background-color: var(--brand-accent-primary) !important;
 }
 
 .MuiYearCalendar-button.Mui-selected:hover {
-  background-color: #2da44e !important;
+  background-color: var(--brand-accent-primary) !important;
 }
 
 .MuiYearCalendar-button:hover {
@@ -64,15 +64,15 @@
 
 /* Override calendar day colors */
 .MuiPickersDay-root.MuiPickersDay-today {
-  border-color: #2da44e !important;
+  border-color: var(--brand-accent-primary) !important;
 }
 
 .MuiPickersDay-root.Mui-selected {
-  background-color: #2da44e !important;
+  background-color: var(--brand-accent-primary) !important;
 }
 
 .MuiPickersDay-root.Mui-selected:hover {
-  background-color: #2da44e !important;
+  background-color: var(--brand-accent-primary) !important;
 }
 
 .MuiPickersDay-root:hover {

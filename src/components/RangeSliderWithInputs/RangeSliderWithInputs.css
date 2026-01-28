@@ -1,37 +1,54 @@
-.rangeSliderWithInputs {
-  position: relative;
+/* Header row with label and pills */
+.rangeSliderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0px;
 }
 
-/* Value pills in top-right corner */
+.rangeSliderLabel {
+  font-size: 14px;
+  color: #0f1419;
+  font-family: Arial, sans-serif;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  margin-right: 8px;
+}
+
+/* Value pills on the right side of header - single container */
 .rangeSliderValuePills {
-  position: absolute;
-  top: 12px;
-  right: 28px;
   display: flex;
-  gap: 4px;
+  gap: 0;
+  align-items: center;
+  flex-shrink: 0;
+  background: #f6f8fa;
+  border: 1px solid #e1e4e8;
+  border-radius: 4px;
+  padding: 0 8px;
+  height: 28px;
+}
+
+.rangeSliderValuePills:focus-within {
+  border-color: var(--brand-accent-primary);
+  background: #ffffff;
 }
 
 .rangeSliderValuePill {
-  height: 28px;
-  width: 50px;
-  padding: 0 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f6f8fa;
-  border: 1px solid #e1e4e8;
-  border-radius: 6px;
+  width: 24px;
+  background: transparent;
+  border: none;
   font-size: 12px;
   font-weight: 400;
   color: #0f1419;
   text-align: center;
   box-sizing: border-box;
+  padding: 0;
 }
 
 .rangeSliderValuePill:focus {
   outline: none;
-  border-color: #2da44e;
-  background: #ffffff;
 }
 
 /* Hide number input spinners */
@@ -52,12 +69,9 @@
   margin: 0 4px;
 }
 
-/* Slider track container positioned at 60px from card top */
+/* Slider track container */
 .rangeSliderTrackContainer {
-  position: absolute;
-  top: 60px;
-  left: 36px;
-  right: 36px;
+  padding: 4px 8px;
 }
 
 /* MUI Slider customization to match spec */
@@ -78,7 +92,7 @@
 .rangeSlider .MuiSlider-track {
   height: 6px;
   border-radius: 3px;
-  background-color: #2da44e;
+  background-color: var(--brand-accent-primary);
   border: none;
 }
 
@@ -87,8 +101,8 @@
   width: 16px;
   height: 16px;
   background-color: #ffffff;
-  border: 2px solid #2da44e;
-  box-shadow: 0 0 0 9px rgba(225, 228, 232, 0.3);
+  border: 2px solid var(--brand-accent-primary);
+  box-shadow: none;
 }
 
 .rangeSlider .MuiSlider-thumb:hover,
