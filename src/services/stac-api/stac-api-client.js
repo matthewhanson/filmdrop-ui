@@ -72,6 +72,7 @@ export async function getCollections(apiUrl, options = {}) {
 
   const collectionsUrl = `${apiUrl.replace(/\/$/, '')}/collections`
 
+  console.log('options', options)
   const { headers = {}, credentials, ...otherOptions } = options
 
   const fetchOptions = {
@@ -86,6 +87,10 @@ export async function getCollections(apiUrl, options = {}) {
   if (credentials) {
     fetchOptions.credentials = credentials
   }
+
+  console.log('fetchOptions', fetchOptions)
+  console.log([...fetchOptions.headers.entries()])
+  console.log(Object.fromEntries(fetchOptions.headers.entries()))
 
   const response = await fetch(collectionsUrl, fetchOptions)
 
