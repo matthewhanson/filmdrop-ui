@@ -76,17 +76,17 @@ export async function getCollections(apiUrl, options = {}) {
   const { headers = {}, credentials, ...otherOptions } = options
 
   try {
-    console.log('headers', headers.entries())
+    console.log('headers', [...headers.entries()])
   } catch(e) {
     console.error(e)
   }
 
+  const headerSpread = headers?.entries ? [...headers.entries()] : Object.entries(headers)
+  console.log('headerSpread', headerSpread)
+
   const fetchOptions = {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      ...headers
-    },
+    headers: Object.fromEntries([['Content-Type', 'application/json'], ...headerSpread]),
     ...otherOptions
   }
 
@@ -97,7 +97,7 @@ export async function getCollections(apiUrl, options = {}) {
   console.log('fetchOptions', fetchOptions)
   try {
     console.log('...fetchOptions.headers.entries()')
-    console.log(...fetchOptions.headers.entries())
+    console.log([...fetchOptions.headers.entries()])
   } catch(e) {
     console.error(e)
   }
