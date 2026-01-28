@@ -75,6 +75,12 @@ export async function getCollections(apiUrl, options = {}) {
   console.log('options', options)
   const { headers = {}, credentials, ...otherOptions } = options
 
+  try {
+    console.log('headers', headers.entries())
+  } catch(e) {
+    console.error(e)
+  }
+
   const fetchOptions = {
     method: 'GET',
     headers: {
@@ -91,15 +97,15 @@ export async function getCollections(apiUrl, options = {}) {
   console.log('fetchOptions', fetchOptions)
   try {
     console.log('...fetchOptions.headers.entries()')
-    console.log([...fetchOptions.headers.entries()])
-  } catch {
-    console.log('error -- ...fetchOptions.headers.entries()');
+    console.log(...fetchOptions.headers.entries())
+  } catch(e) {
+    console.error(e)
   }
   try {
     console.log('Object.fromEntries(fetchOptions.headers.entries())')
     console.log(Object.fromEntries(fetchOptions.headers.entries()))
-  } catch {
-    console.log('error -- Object.fromEntries(fetchOptions.headers.entries())')
+  } catch(e) {
+    console.error(e)
   }
 
   const response = await fetch(collectionsUrl, fetchOptions)
