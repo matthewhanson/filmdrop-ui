@@ -59,6 +59,7 @@
   flex-direction: column;
   justify-content: space-between;
   height: calc(100% - 50px);
+  min-height: 0;
 }
 
 .LeftContentHolder {
