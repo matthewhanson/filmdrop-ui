@@ -81,12 +81,15 @@ export async function getCollections(apiUrl, options = {}) {
     console.error(e)
   }
 
-  const headerSpread = headers?.entries ? [...headers.entries()] : Object.entries(headers)
+  const headerSpread = headers?.entries ? Object.fromEntries(headers.entries()) : headers
   console.log('headerSpread', headerSpread)
 
   const fetchOptions = {
     method: 'GET',
-    headers: Object.fromEntries([['Content-Type', 'application/json'], ...headerSpread]),
+    headers: {
+      'Content-Type': 'application/json',
+      ...headerSpread
+    },
     ...otherOptions
   }
 
