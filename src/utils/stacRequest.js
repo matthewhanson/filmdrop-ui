@@ -9,7 +9,6 @@ export function appendStacHeaderCookies(requestHeaders) {
     store.getState().mainSlice.appConfig.STAC_HEADER_COOKIES ?? []
 
   if (headerArr.length > 0) {
-    console.log('Appending STAC header cookies to request', headerArr)
     const cooks = getStacCookies(headerArr)
     cooks.forEach((el) => {
       requestHeaders.append(
@@ -37,7 +36,6 @@ function getStacCookies(headerArr) {
           el.header_val_prefix === null ? '' : el.header_val_prefix,
         headerValMain: val
       }
-      console.log('found STAC header cookie:', x)
       ret.push(x)
     }
   })

@@ -9,7 +9,7 @@
  * Fetches the root catalog from a STAC API
  * @param {string} apiUrl - The base URL of the STAC API
  * @param {Object} options - Optional fetch options
- * @param {Object} options.headers - Custom headers to include (merged with defaults)
+ * @param {Headers} options.headers - Custom headers to include, must be of type Headers
  * @param {string} options.credentials - Credentials mode ('same-origin', 'include', etc.)
  * @returns {Promise<Object>} The root catalog object
  * @throws {Error} If the fetch fails or returns non-OK response
@@ -19,15 +19,13 @@ export async function getRootCatalog(apiUrl, options = {}) {
     throw new Error('STAC API URL is required')
   }
 
-  const { headers = {}, credentials, ...otherOptions } = options
+  const { headers = new Headers(), credentials, ...otherOptions } = options
+  headers.set('Content-Type', 'application/json')
 
   const fetchOptions = {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      ...headers
-    },
-    ...otherOptions
+    headers,
+    ...otherOptions,
   }
 
   if (credentials) {
@@ -60,7 +58,7 @@ export async function getRootCatalog(apiUrl, options = {}) {
  * Fetches all collections from a STAC API
  * @param {string} apiUrl - The base URL of the STAC API
  * @param {Object} options - Optional fetch options
- * @param {Object} options.headers - Custom headers to include (merged with defaults)
+ * @param {Headers} options.headers - Custom headers to include, must be of type Headers
  * @param {string} options.credentials - Credentials mode ('same-origin', 'include', etc.)
  * @returns {Promise<Object>} The collections response object with collections array
  * @throws {Error} If the fetch fails or returns non-OK response
@@ -72,43 +70,17 @@ export async function getCollections(apiUrl, options = {}) {
 
   const collectionsUrl = `${apiUrl.replace(/\/$/, '')}/collections`
 
-  console.log('options', options)
-  const { headers = {}, credentials, ...otherOptions } = options
-
-  try {
-    console.log('headers', [...headers.entries()])
-  } catch(e) {
-    console.error(e)
-  }
-
-  const headerSpread = headers?.entries ? Object.fromEntries(headers.entries()) : headers
-  console.log('headerSpread', headerSpread)
+  const { headers = new Headers(), credentials, ...otherOptions } = options
+  headers.set('Content-Type', 'application/json')
 
   const fetchOptions = {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      ...headerSpread
-    },
-    ...otherOptions
+    headers,
+    ...otherOptions,
   }
 
   if (credentials) {
     fetchOptions.credentials = credentials
-  }
-
-  console.log('fetchOptions', fetchOptions)
-  try {
-    console.log('...fetchOptions.headers.entries()')
-    console.log([...fetchOptions.headers.entries()])
-  } catch(e) {
-    console.error(e)
-  }
-  try {
-    console.log('Object.fromEntries(fetchOptions.headers.entries())')
-    console.log(Object.fromEntries(fetchOptions.headers.entries()))
-  } catch(e) {
-    console.error(e)
   }
 
   const response = await fetch(collectionsUrl, fetchOptions)
@@ -138,7 +110,7 @@ export async function getCollections(apiUrl, options = {}) {
  * @param {string} apiUrl - The base URL of the STAC API
  * @param {string} collectionId - The ID of the collection to fetch
  * @param {Object} options - Optional fetch options
- * @param {Object} options.headers - Custom headers to include (merged with defaults)
+ * @param {Headers} options.headers - Custom headers to include, must be of type Headers
  * @param {string} options.credentials - Credentials mode ('same-origin', 'include', etc.)
  * @returns {Promise<Object>} The collection object
  * @throws {Error} If the fetch fails or returns non-OK response
@@ -153,14 +125,12 @@ export async function getCollection(apiUrl, collectionId, options = {}) {
 
   const collectionUrl = `${apiUrl.replace(/\/$/, '')}/collections/${collectionId}`
 
-  const { headers = {}, credentials, ...otherOptions } = options
+  const { headers = new Headers(), credentials, ...otherOptions } = options
+  headers.set('Content-Type', 'application/json')
 
   const fetchOptions = {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      ...headers
-    },
+    headers,
     ...otherOptions
   }
 
