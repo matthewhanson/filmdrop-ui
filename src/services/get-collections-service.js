@@ -24,6 +24,7 @@ export async function GetCollectionsService(searchParams) {
   appendStacHeaderCookies(requestHeaders)
 
   try {
+    // Use stac-api client to fetch collections
     const json = await getCollections(appConfig.STAC_API_URL, {
       headers: requestHeaders,
       credentials: appConfig.FETCH_CREDENTIALS || 'same-origin'
