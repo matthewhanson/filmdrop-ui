@@ -6,11 +6,15 @@ import { store } from '../redux/store'
 // request headers
 export function appendStacHeaderCookies(requestHeaders) {
   try {
-  console.log('appendStacHeaderCookies headers:', Object.fromEntries(requestHeaders.entries()))
-  console.log('appendStacHeaderCookies mainSlice:', store.getState().mainSlice)
+    console.log(
+      'appendStacHeaderCookies headers:',
+      Object.fromEntries(Array.from(requestHeaders.entries()))
+    )
+    console.log('appendStacHeaderCookies mainSlice:', store.getState().mainSlice)
   } catch (e) {
     console.error(e)
   }
+
   const headerArr =
     store.getState().mainSlice.appConfig.STAC_HEADER_COOKIES ?? []
 
@@ -29,6 +33,7 @@ function getStacCookies(headerArr) {
   const ret = []
 
   headerArr.forEach((el) => {
+    console.log('headerArr element:', el)
     if (!el.header_name?.trim() || !el.cookie_name?.trim()) {
       console.warn('Invalid STAC_HEADER_COOKIES config:', el)
       return
@@ -42,6 +47,7 @@ function getStacCookies(headerArr) {
           el.header_val_prefix === null ? '' : el.header_val_prefix,
         headerValMain: val
       }
+      console.log('pushing x:', x)
       ret.push(x)
     }
   })
