@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useMemo } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { TextField, FormControl, Alert } from '@mui/material'
 import RangeSliderWithInputs from '../RangeSliderWithInputs/RangeSliderWithInputs'
@@ -7,8 +7,8 @@ import MultiSelect from '../MultiSelect/MultiSelect'
 import Checkbox from '../Checkbox/Checkbox'
 import { setQueryableFilters } from '../../redux/slices/mainSlice'
 import { sanitizeFieldValue } from '../../utils/securityHelper'
-import { isFieldExcluded } from '../../utils/fieldMatchesPattern'
 import debounce from '../../utils/debounce'
+import { useRenderableQueryables } from '../../hooks/useRenderableQueryables'
 import './QueryableFilters.css'
 
 const QueryableFilters = () => {
@@ -19,57 +19,12 @@ const QueryableFilters = () => {
   const queryableFilters = useSelector(
     (state) => state.mainSlice.queryableFilters
   )
-  const appConfig = useSelector((state) => state.mainSlice.appConfig)
-  const excludedQueryables = appConfig?.EXCLUDED_QUERYABLES || []
 
-  const queryables = selectedCollectionData?.queryables
+  // Use custom hook to get filtered and sorted queryable fields
+  const { fields: renderableFields, error } = useRenderableQueryables()
 
   // Store debounced functions for each field to avoid recreating on each render
   const debouncedFunctionsRef = useRef({})
-
-  // Memoize filtered renderable fields to avoid duplicating filter logic
-  const renderableFields = useMemo(() => {
-    // Return empty array if queryables are invalid
-    if (
-      !queryables ||
-      typeof queryables !== 'object' ||
-      Array.isArray(queryables) ||
-      queryables.error === true
-    ) {
-      return []
-    }
-
-    // Filter and process queryables
-    return Object.entries(queryables).filter(
-      ([fieldName, schema]) => {
-        // Exclude fields based on config
-        if (isFieldExcluded(fieldName, excludedQueryables)) {
-          return false
-        }
-
-        // Exclude complex types (objects with properties, arrays of objects, etc.)
-        if (schema.type === 'object' && schema.properties) {
-          return false
-        }
-
-        if (schema.type === 'array' && schema.items?.type === 'object') {
-          return false
-        }
-
-        // Exclude union types (multiple types)
-        if (Array.isArray(schema.type)) {
-          return false
-        }
-
-        // Exclude if it has anyOf, oneOf, allOf
-        if (schema.anyOf || schema.oneOf || schema.allOf) {
-          return false
-        }
-
-        return true
-      }
-    )
-  }, [queryables, excludedQueryables])
 
   // Initialize default values when queryables change
   // This MUST come before any conditional returns (Rules of Hooks)
@@ -109,12 +64,12 @@ const QueryableFilters = () => {
     }
   }, [selectedCollectionData?.id, renderableFields, queryableFilters, dispatch])
 
-  // Check if queryables has error (explicit check for error object from service)
-  if (queryables?.error === true && queryables?.message) {
+  // Check if queryables has error (from the hook)
+  if (error) {
     return (
       <div className="searchContainer queryableFiltersError">
         <Alert severity="error">
-          Unable to load filters: {queryables.message || 'Unknown error'}
+          Unable to load filters: {error.message || 'Unknown error'}
         </Alert>
       </div>
     )

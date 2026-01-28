@@ -7,7 +7,13 @@
 
 /* Style the MUI Checkbox */
 .Checkbox__input {
+  padding: 0 !important;
   margin-right: 12px !important;
+  color: #e1e4e8 !important;
+}
+
+.Checkbox__input.Mui-checked {
+  color: var(--brand-accent-primary) !important;
 }
 
 /* Style the label text */

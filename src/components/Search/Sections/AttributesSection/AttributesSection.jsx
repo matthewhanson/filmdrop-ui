@@ -1,65 +1,20 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import './AttributesSection.css'
-import { useSelector } from 'react-redux'
 import QueryableFilters from '../../../QueryableFilters/QueryableFilters'
-import { isFieldExcluded } from '../../../../utils/fieldMatchesPattern'
+import { useRenderableQueryables } from '../../../../hooks/useRenderableQueryables'
 
 const AttributesSection = () => {
-  const selectedCollectionData = useSelector(
-    (state) => state.mainSlice.selectedCollectionData
-  )
-  const appConfig = useSelector((state) => state.mainSlice.appConfig)
-  const excludedQueryables = appConfig?.EXCLUDED_QUERYABLES || []
-
-  const queryables = selectedCollectionData?.queryables
-
-  // Memoize whether there are any renderable queryable fields
-  const hasRenderableFields = useMemo(() => {
-    // Return false if queryables are invalid
-    if (
-      !queryables ||
-      typeof queryables !== 'object' ||
-      Array.isArray(queryables) ||
-      queryables.error === true
-    ) {
-      return false
-    }
-
-    const properties = queryables.properties || {}
-
-    // Filter out excluded fields and non-renderable types
-    const renderableKeys = Object.keys(properties).filter((key) => {
-      const field = properties[key]
-
-      // Exclude based on pattern matching
-      if (isFieldExcluded(key, excludedQueryables)) {
-        return false
-      }
-
-      // Exclude datetime fields
-      if (field.type === 'string' && field.format === 'date-time') {
-        return false
-      }
-
-      // Exclude geometry fields
-      if (field.type === 'object' || field.type === 'array') {
-        return false
-      }
-
-      return true
-    })
-
-    return renderableKeys.length > 0
-  }, [queryables, excludedQueryables])
+  // Use custom hook to check if there are any renderable fields
+  const { hasFields } = useRenderableQueryables()
 
   // Don't render the entire section if there are no renderable fields
-  if (!hasRenderableFields) {
+  if (!hasFields) {
     return null
   }
 
   return (
     <div className="AttributesSection">
-      <div className="AttributesSection__heading">Attributes</div>
+      <div className="AttributesSection__heading">Attribute Filters</div>
       <div className="AttributesSection__content">
         <QueryableFilters />
       </div>

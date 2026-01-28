@@ -73,7 +73,7 @@ const LeftContent = () => {
             }
             onClick={setFiltersTab}
           >
-            Filters
+            Search
           </button>
           <button
             className={

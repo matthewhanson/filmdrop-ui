@@ -101,7 +101,7 @@ const AreaOfInterestSelector = () => {
     },
     {
       value: 'mapview',
-      label: 'Map View',
+      label: 'Map Extent',
       onClick: handleMapView,
       active: selectedAOI === 'mapview',
       disabled: false

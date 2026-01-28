@@ -20,13 +20,15 @@
 }
 
 .ButtonGroup__button:hover:not(:disabled) {
-  background: #e1e4e8;
+  background: var(--brand-accent-primary-dark);
+  color: var(--white);
+  border-color: var(--brand-accent-primary-dark);
 }
 
 .ButtonGroup__button--active {
-  background: #2da44e !important;
-  color: #ffffff !important;
-  border-color: #2da44e !important;
+  background: var(--brand-accent-primary);
+  color: var(--white);
+  border-color: var(--brand-accent-primary);
 }
 
 .ButtonGroup__button--disabled {
