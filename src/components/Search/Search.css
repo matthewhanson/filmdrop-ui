@@ -6,6 +6,7 @@
   gap: 28px;
   overflow-y: auto;
   overflow-x: hidden;
+  padding-right: 8px;
 }
 
 .searchButtonContainer {

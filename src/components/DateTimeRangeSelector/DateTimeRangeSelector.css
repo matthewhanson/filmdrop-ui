@@ -24,14 +24,52 @@
   margin-top: 4px;
 }
 
-/* Override input font size */
+/* Override input font size, padding, and background */
 .datePickerContainer .MuiPickersOutlinedInput-root {
   font-size: 12px;
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+  background-color: #f6f8fa !important;
+}
+
+/* Make calendar icon button smaller and reduce spacing */
+.datePickerContainer .MuiInputAdornment-root {
+  margin-left: 0px !important;
+}
+
+.datePickerContainer .MuiInputAdornment-root .MuiIconButton-root {
+  padding-right: 12px !important;
+  padding-left: 4px !important;
+}
+
+/* Disable hover effect and ripple on calendar icon button */
+.datePickerContainer .MuiInputAdornment-root .MuiIconButton-root:hover {
+  background-color: transparent !important;
+}
+
+.datePickerContainer .MuiInputAdornment-root .MuiIconButton-root .MuiTouchRipple-root {
+  display: none !important;
+}
+
+.datePickerContainer .MuiInputAdornment-root .MuiSvgIcon-root {
+  font-size: 20px !important;
+  /* color: var(--card-secondary-text) !important; */
+  color: var(--blue-gray-8) !important;
 }
 
 .datePickerContainer .MuiPickersOutlinedInput-root input,
 .datePickerContainer .MuiPickersSectionList-sectionContent {
   font-size: 12px;
+}
+
+/* Override default border color */
+.datePickerContainer .MuiPickersOutlinedInput-root > .MuiPickersOutlinedInput-notchedOutline {
+  border-color: var(--side-panel-button-border) !important;
+}
+
+/* Override hover border - disable hover effect */
+.datePickerContainer .MuiPickersOutlinedInput-root:not(.Mui-focused):hover > .MuiPickersOutlinedInput-notchedOutline {
+  border-color: var(--side-panel-button-border) !important;
 }
 
 /* Override focused border color */
