@@ -89,8 +89,18 @@ export async function getCollections(apiUrl, options = {}) {
   }
 
   console.log('fetchOptions', fetchOptions)
-  console.log([...fetchOptions.headers.entries()])
-  console.log(Object.fromEntries(fetchOptions.headers.entries()))
+  try {
+    console.log('...fetchOptions.headers.entries()')
+    console.log([...fetchOptions.headers.entries()])
+  } catch {
+    console.log('error -- ...fetchOptions.headers.entries()');
+  }
+  try {
+    console.log('Object.fromEntries(fetchOptions.headers.entries())')
+    console.log(Object.fromEntries(fetchOptions.headers.entries()))
+  } catch {
+    console.log('error -- Object.fromEntries(fetchOptions.headers.entries())')
+  }
 
   const response = await fetch(collectionsUrl, fetchOptions)
 
