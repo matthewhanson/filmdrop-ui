@@ -24,9 +24,11 @@ const Search = () => {
 
   return (
     <div className="Search" data-testid="Search">
-      <CollectionSection />
-      <SpaceTimeSection />
-      <AttributesSection />
+      <div className="Search__scrollable">
+        <CollectionSection />
+        <SpaceTimeSection />
+        <AttributesSection />
+      </div>
       <DisplayActionsSection />
     </div>
   )

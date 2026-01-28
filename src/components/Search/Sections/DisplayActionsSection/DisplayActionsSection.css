@@ -2,7 +2,9 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-top: auto;
+  flex-shrink: 0;
+  padding-top: 15px;
+  border-top: 0px solid var(--side-panel-horizontal-divider-color);
 }
 
 .DisplayActionsSection__heading {

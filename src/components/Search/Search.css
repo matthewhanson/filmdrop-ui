@@ -3,11 +3,20 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 28px;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
   padding-right: 8px;
   padding-bottom: 8px;
+}
+
+.Search__scrollable {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding-bottom: 28px;
 }
 
 .searchButtonContainer {
