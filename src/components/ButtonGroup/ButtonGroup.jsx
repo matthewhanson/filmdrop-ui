@@ -5,7 +5,7 @@ import './ButtonGroup.css'
 
 const ButtonGroup = ({ label, buttons, className = '' }) => {
   return (
-    <Card height={80} label={label} className={`ButtonGroup ${className}`}>
+    <Card height='auto' label={label} className={`ButtonGroup ${className}`}>
       <div className="ButtonGroup__buttons">
         {buttons.map((button) => (
           <button

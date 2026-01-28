@@ -1,9 +1,5 @@
-.datePicker {
-  font-size: 14px;
-}
-
 .datePickerHelperText {
-  font-size: 11px;
+  font-size: 12px;
   color: #8b949e;
   margin-bottom: 8px;
 }
@@ -19,65 +15,67 @@
   display: flex;
   flex-direction: column;
   flex: 1;
+  min-width: 0;
 }
 
 .datePickerInputLabel {
-  font-size: 11px;
-  color: #8b949e;
-  margin-bottom: 4px;
-}
-
-.reactDatePicker {
-  width: 100%;
-  height: 36px;
-  background: #f6f8fa;
-  border: 1px solid #e1e4e8;
-  border-radius: 4px;
-  padding: 0 8px;
   font-size: 12px;
-  font-weight: 400;
-  color: #0f1419;
-  box-sizing: border-box;
+  color: #8b949e;
+  margin-top: 4px;
 }
 
-.reactDatePicker:focus {
-  outline: none;
-  border-color: #2da44e;
+/* Override input font size */
+.datePickerContainer .MuiPickersOutlinedInput-root {
+  font-size: 12px;
 }
 
-
-.datePicker .react-tooltip {
-  font-weight: normal;
-  line-height: 1.6;
+.datePickerContainer .MuiPickersOutlinedInput-root input,
+.datePickerContainer .MuiPickersSectionList-sectionContent {
+  font-size: 12px;
 }
 
-.dateToolTipIcon {
-  cursor: pointer;
+/* Override focused border color */
+.datePickerContainer .MuiPickersOutlinedInput-root.Mui-focused > .MuiPickersOutlinedInput-notchedOutline {
+  border-color: #2da44e !important;
+  border-width: 2px !important;
 }
 
-span.error-true {
-  color: #bc3131;
+/* Override calendar header font size */
+.MuiPickersCalendarHeader-label {
+  font-size: 16px !important;
 }
 
-.react-calendar {
-  width: 270px;
+/* Override year picker colors and font size */
+.MuiYearCalendar-button {
+  font-size: 16px !important;
 }
 
-#dateRange-tooltip {
-  opacity: 1;
-  z-index: 999;
+.MuiYearCalendar-button.Mui-selected {
+  background-color: #2da44e !important;
 }
 
-
-/* !important used here to override a MUI icon style to work in non-MUI datepicker */
-.datePicker-icon {
-  color: var(--side-panel-datepicker-icon-color);
-  height: 1rem !important;
-  width: 1rem !important;
-  cursor: pointer;
+.MuiYearCalendar-button.Mui-selected:hover {
+  background-color: #2da44e !important;
 }
 
-.react-datepicker__today-button:hover {
-  background-color: #d3d3d3;
+.MuiYearCalendar-button:hover {
+  background-color: rgba(45, 164, 78, 0.04) !important;
+}
+
+/* Override calendar day colors */
+.MuiPickersDay-root.MuiPickersDay-today {
+  border-color: #2da44e !important;
+}
+
+.MuiPickersDay-root.Mui-selected {
+  background-color: #2da44e !important;
+}
+
+.MuiPickersDay-root.Mui-selected:hover {
+  background-color: #2da44e !important;
+}
+
+.MuiPickersDay-root:hover {
+  background-color: rgba(45, 164, 78, 0.04) !important;
 }
 

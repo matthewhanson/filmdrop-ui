@@ -2,9 +2,9 @@ import React, { useEffect, useMemo } from 'react'
 import './DateTimeRangeSelector.css'
 import { useSelector, useDispatch } from 'react-redux'
 import { setSearchDateRangeValue } from '../../redux/slices/mainSlice'
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
-import DatePicker from 'react-datepicker'
-import 'react-datepicker/dist/react-datepicker.css'
+import { DatePicker } from '@mui/x-date-pickers/DatePicker'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import Card from '../Card/Card'
@@ -18,16 +18,6 @@ const DateTimeRangeSelector = () => {
   )
   const searchDateRangeValue = useSelector(
     (state) => state.mainSlice.searchDateRangeValue
-  )
-
-  // Parse dates from Redux (single source of truth)
-  const startDate = useMemo(
-    () => new Date(searchDateRangeValue[0]),
-    [searchDateRangeValue]
-  )
-  const endDate = useMemo(
-    () => new Date(searchDateRangeValue[1]),
-    [searchDateRangeValue]
   )
 
   // Memoized helper text for collection extent
@@ -86,91 +76,64 @@ const DateTimeRangeSelector = () => {
   }, [selectedCollectionData, dispatch]) // Intentionally NOT including searchDateRangeValue to avoid loops
 
   // Handle date changes - dispatch directly to Redux
+  // MUI DatePicker passes dayjs objects directly
   const handleStartDateChange = (date) => {
-    if (date) {
+    if (date && date.isValid()) {
       // Create new Date at start of day in UTC
-      const utcDate = dayjs(date).startOf('day').toISOString()
+      const utcDate = date.startOf('day').toISOString()
       dispatch(setSearchDateRangeValue([utcDate, searchDateRangeValue[1]]))
     }
   }
 
   const handleEndDateChange = (date) => {
-    if (date) {
+    if (date && date.isValid()) {
       // Create new Date at end of day in UTC
-      const utcDate = dayjs(date).endOf('day').toISOString()
+      const utcDate = date.endOf('day').toISOString()
       dispatch(setSearchDateRangeValue([searchDateRangeValue[0], utcDate]))
     }
   }
 
-  // Create display dates without mutation
-  const startDateForPicker = useMemo(() => {
-    const date = new Date(startDate)
-    date.setHours(0, 0, 0, 0)
-    return date
-  }, [startDate])
-
-  const endDateForPicker = useMemo(() => {
-    const date = new Date(endDate)
-    date.setHours(23, 59, 59, 999)
-    return date
-  }, [endDate])
-
   return (
-    <Card height={116} label="Date Range (UTC)" className="datePicker">
-      {collectionExtentText && (
-        <div className="datePickerHelperText">{collectionExtentText}</div>
-      )}
-      <div className="datePickerContainer">
-        <div className="datePickerInputWrapper">
-          <label htmlFor="startDatePicker" className="datePickerInputLabel">From</label>
-          <DatePicker
-            id="startDatePicker"
-            className="reactDatePicker"
-            selected={startDateForPicker}
-            maxDate={endDateForPicker}
-            showPopperArrow={false}
-            todayButton="Today"
-            showIcon
-            icon={
-              <CalendarTodayIcon className="datePicker-icon" />
-            }
-            toggleCalendarOnIconClick
-            closeOnScroll={true}
-            peekNextMonth
-            showMonthDropdown
-            showYearDropdown
-            dropdownMode="select"
-            dateFormat="yyyy-MM-dd"
-            popperPlacement="top-end"
-            onChange={handleStartDateChange}
-          />
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <Card label="Date Range (UTC)" className="datePicker">
+        {collectionExtentText && (
+          <div className="datePickerHelperText">{collectionExtentText}</div>
+        )}
+        <div className="datePickerContainer">
+          <div className="datePickerInputWrapper">
+            <DatePicker
+              value={dayjs(searchDateRangeValue[0])}
+              maxDate={dayjs(searchDateRangeValue[1])}
+              format="YYYY-MM-DD"
+              onChange={handleStartDateChange}
+              slotProps={{
+                textField: {
+                  id: 'startDatePicker',
+                  size: 'small'
+                }
+              }}
+            />
+            <label htmlFor="startDatePicker" className="datePickerInputLabel">From</label>
+          </div>
+          <div className="datePickerInputWrapper">
+            <DatePicker
+              value={dayjs(searchDateRangeValue[1])}
+              minDate={dayjs(searchDateRangeValue[0])}
+              maxDate={dayjs()}
+              format="YYYY-MM-DD"
+              onChange={handleEndDateChange}
+              slotProps={{
+                textField: {
+                  id: 'endDatePicker',
+                  size: 'small'
+                }
+              }}
+            />
+            <label htmlFor="endDatePicker" className="datePickerInputLabel">To</label>
+          </div>
         </div>
-        <div className="datePickerInputWrapper">
-          <label htmlFor="endDatePicker" className="datePickerInputLabel">To</label>
-          <DatePicker
-            id="endDatePicker"
-            className="reactDatePicker"
-            selected={endDateForPicker}
-            minDate={startDateForPicker}
-            maxDate={new Date()}
-            showPopperArrow={false}
-            todayButton="Today"
-            showIcon
-            icon={
-              <CalendarTodayIcon className="datePicker-icon" />
-            }
-            toggleCalendarOnIconClick
-            closeOnScroll={true}
-            showMonthDropdown
-            showYearDropdown
-            dropdownMode="select"
-            dateFormat="yyyy-MM-dd"
-            popperPlacement="top-end"
-            onChange={handleEndDateChange}
-          />
-        </div>
-      </div>
-    </Card>
+      </Card>
+    </LocalizationProvider>
   )
 }
 
