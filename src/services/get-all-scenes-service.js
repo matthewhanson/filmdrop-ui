@@ -10,6 +10,7 @@ import { appendStacHeaderCookies } from '../utils/stacRequest'
 
 async function fetchFeatures(url, abortSignal) {
   const requestHeaders = new Headers()
+  console.log('fetchFeatures')
   appendStacHeaderCookies(requestHeaders)
   const response = await fetch(url, {
     signal: abortSignal,

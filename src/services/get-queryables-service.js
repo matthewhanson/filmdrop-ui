@@ -10,6 +10,7 @@ export function GetCollectionQueryablesService(collectionId) {
     requestHeaders.append('Authorization', `Bearer ${JWT}`)
   }
   appendStacHeaderCookies(requestHeaders)
+  console.log('GetCollectionQueryablesService')
 
   return fetch(
     `${

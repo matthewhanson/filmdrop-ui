@@ -17,7 +17,7 @@ export async function AggregateSearchService(searchParams, gridType) {
     requestHeaders.append('Authorization', `Bearer ${JWT}`)
   }
   appendStacHeaderCookies(requestHeaders)
-
+  console.log('AggregateSearchService')
   await fetch(
     `${
       store.getState().mainSlice.appConfig.STAC_API_URL

@@ -409,6 +409,7 @@ function addImageOverlay(item) {
 
   const requestHeaders = new Headers()
   appendStacHeaderCookies(requestHeaders)
+  console.log('addImageOverlay')
   fetch(featureURL, {
     headers: requestHeaders,
     credentials:

@@ -5,6 +5,7 @@ export function GetMosaicBoundsService(mosaicURL) {
   return new Promise(function (resolve, reject) {
     const requestHeaders = new Headers()
     appendStacHeaderCookies(requestHeaders)
+    console.log('GetMosaicBoundsService')
     fetch(mosaicURL, {
       headers: requestHeaders,
       credentials:

@@ -471,6 +471,7 @@ function newMosaicSearch() {
 
   const requestHeaders = new Headers()
   appendStacHeaderCookies(requestHeaders)
+  console.log('newMosaicSearch')
   requestHeaders.append(
     'Content-Type',
     'application/vnd.titiler.stac-api-query+json'

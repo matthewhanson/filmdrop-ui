@@ -34,6 +34,7 @@ export async function FetchPageService(pageUrl, pageNumber) {
     requestHeaders.append('Authorization', `Bearer ${JWT}`)
   }
   appendStacHeaderCookies(requestHeaders)
+  console.log('FetchPageService')
 
   // Reset URL to root if currently on a STAC item route
   if (window.location.pathname.startsWith('/item/')) {
