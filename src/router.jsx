@@ -213,6 +213,7 @@ const itemRoute = createRoute({
       }
 
       // Fetch item from STAC API
+      console.log('itemId', itemId)
       const result = await GetItemService(collectionId, itemId)
 
       if (result.error) {

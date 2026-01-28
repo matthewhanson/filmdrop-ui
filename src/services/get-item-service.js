@@ -24,16 +24,14 @@ export async function GetItemService(collectionId, itemId) {
     requestHeaders.append('Authorization', `Bearer ${JWT}`)
   }
   appendStacHeaderCookies(requestHeaders)
-  console.log('GetItemService')
+  console.log('GetItemService', [...requestHeaders.entries()])
 
   try {
     const response = await fetch(
       `${store.getState().mainSlice.appConfig.STAC_API_URL}/collections/${collectionId}/items/${itemId}`,
       {
-        credentials:
-          store.getState().mainSlice.appConfig.FETCH_CREDENTIALS ||
-          'same-origin',
-        headers: requestHeaders
+        headers: requestHeaders,
+        credentials: 'same-origin'
       }
     )
 
