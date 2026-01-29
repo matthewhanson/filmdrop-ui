@@ -148,12 +148,6 @@
   line-height: 1.6;
 }
 
-/* Cloud Slider */
-
-.searchContainer.cloudSlider {
-  margin-bottom: 5px;
-}
-
 .searchContainer .MuiGrid-container {
   position: relative;
   top: 4px;

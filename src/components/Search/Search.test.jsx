@@ -6,7 +6,6 @@ import { Provider } from 'react-redux'
 import { store } from '../../redux/store'
 import {
   setappConfig,
-  setCloudCover,
   setsearchGeojsonBoundary,
   setshowSearchByGeom
 } from '../../redux/slices/mainSlice'
@@ -53,7 +52,7 @@ describe('Search', () => {
             setup()
           })
           await act(async () => {
-            store.dispatch(setCloudCover(5))
+            store.dispatch(setsearchGeojsonBoundary({ foo: 'bar' }))
           })
           expect(store.getState().mainSlice.showSearchByGeom).toBeFalsy()
         })
