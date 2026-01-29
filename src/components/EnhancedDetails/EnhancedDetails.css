@@ -7,7 +7,7 @@
 .item-id {
   margin: 0 0 8px 0;
   font-size: 18px;
-  font-weight: bold;
+  font-weight: 700;
   color: var(--enhanced-details-field-label-color);
   word-break: break-all;
 }
@@ -35,7 +35,7 @@
 .field-group-title {
   margin: 0 0 5px 0;
   font-size: 16px;
-  font-weight: bold;
+  font-weight: 700;
   color: var(--enhanced-details-field-label-color);
   text-transform: capitalize;
   display: flex;
@@ -153,7 +153,7 @@
 }
 
 .grid-system-name {
-  font-weight: bold;
+  font-weight: 700;
 }
 
 .grid-component {

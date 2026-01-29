@@ -61,7 +61,7 @@
   border: 0px;
   border-radius: 6px;
   font-size: 18px;
-  font-weight: bold;
+  font-weight: 700;
   height: 44px;
   padding-left: 15px;
   padding-right: 15px;
@@ -120,7 +120,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-weight: bold;
+  font-weight: 700;
 }
 
 .resultCount strong {
@@ -130,7 +130,7 @@
 .resultCountCartText {
   display: flex;
   flex-direction: column;
-  font-weight: bold;
+  font-weight: 700;
 }
 
 .resultCountButtons {
@@ -204,7 +204,7 @@
 }
 .drawGeomMessageTextTitle {
   color: var(--map-info-overlay-heading-color);
-  font-weight: bold;
+  font-weight: 700;
 }
 
 .drawGeomMessageCancelButton {

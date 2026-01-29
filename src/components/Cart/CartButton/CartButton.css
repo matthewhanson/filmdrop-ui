@@ -9,7 +9,7 @@
   border: 1px var(--cart-button-border-disabled) solid;
   padding: 10px;
   font-size: 16px;
-  font-weight: bold;
+  font-weight: 700;
   background: var(--cart-button-background-disabled);
   color: var(--cart-button-color-disabled);
   user-select: none;
@@ -34,7 +34,7 @@
   justify-content: center;
   margin-top: 3px;
   border-radius: 5px;
-  font-weight: normal;
+  font-weight: 400;
 }
 
 .cartCountContainerEnabled {

@@ -66,7 +66,7 @@
   border: 1px var(--page-header-button-border) solid;
   color: var(--page-header-button-color);
   padding: 5px 20px;
-  font-weight: bold;
+  font-weight: 700;
   display: flex;
   align-items: center;
   border-radius: 6px;

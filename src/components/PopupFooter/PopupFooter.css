@@ -24,7 +24,7 @@
   background-color: var(--side-panel-button-background);
   color: var(--side-panel-button-color);
   border: 0px;
-  font-weight: bold;
+  font-weight: 700;
   height: 30px;
   width: 30px;
   border: var(--side-panel-button-border) solid 1px;
