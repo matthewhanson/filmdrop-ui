@@ -1,0 +1,30 @@
+/* Style the MUI TextField */
+.TextField__input {
+  width: 100%;
+  background: #f6f8fa;
+  font-size: 12px;
+  font-weight: 400;
+  color: #0f1419;
+}
+
+/* Style the input field */
+.TextField__input .MuiInputBase-input {
+  padding: 8px !important;
+  font-size: 12px;
+  color: #0f1419;
+}
+
+/* Style the outlined input */
+.TextField__input .MuiOutlinedInput-notchedOutline {
+  border: 1px solid #e1e4e8;
+  border-radius: 4px;
+}
+
+.TextField__input:hover .MuiOutlinedInput-notchedOutline {
+  border-color: #e1e4e8 !important;
+}
+
+.TextField__input .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: var(--brand-accent-primary) !important;
+  border-width: 1px !important;
+}

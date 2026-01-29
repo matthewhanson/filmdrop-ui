@@ -1,12 +1,12 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { TextField, FormControl, Alert } from '@mui/material'
+import { Alert } from '@mui/material'
 import RangeSliderWithInputs from '../RangeSliderWithInputs/RangeSliderWithInputs'
 import MultiSelect from '../MultiSelect/MultiSelect'
 import Checkbox from '../Checkbox/Checkbox'
+import TextField from '../TextField/TextField'
 import { setQueryableFilters } from '../../redux/slices/mainSlice'
 import { sanitizeFieldValue } from '../../utils/securityHelper'
-import debounce from '../../utils/debounce'
 import { useRenderableQueryables } from '../../hooks/useRenderableQueryables'
 import './QueryableFilters.css'
 
@@ -22,15 +22,10 @@ const QueryableFilters = () => {
   // Use custom hook to get filtered and sorted queryable fields
   const { fields: renderableFields, error } = useRenderableQueryables()
 
-  // Store debounced functions for each field to avoid recreating on each render
-  const debouncedFunctionsRef = useRef({})
 
   // Initialize default values when queryables change
   // This MUST come before any conditional returns (Rules of Hooks)
   useEffect(() => {
-    // Clear debounced functions when collection changes
-    debouncedFunctionsRef.current = {}
-
     if (renderableFields.length === 0) return
 
     const newFilters = { ...queryableFilters }
@@ -129,32 +124,17 @@ const QueryableFilters = () => {
 
     // Numeric field without both min/max -> Text input
     if (schema.type === 'number' || schema.type === 'integer') {
-      // Get or create debounced function for this field
-      if (!debouncedFunctionsRef.current[fieldName]) {
-        debouncedFunctionsRef.current[fieldName] = debounce((value) => {
-          handleFilterChange(fieldName, value)
-        }, 400)
-      }
-      const debouncedChange = debouncedFunctionsRef.current[fieldName]
-
       return (
         <div key={fieldName} className="queryableField">
-          <FormControl fullWidth size="small">
-            <TextField
-              label={label}
-              type="number"
-              value={currentValue ?? defaultValue ?? ''}
-              onChange={(e) => {
-                const val =
-                  e.target.value === '' ? null : Number(e.target.value)
-                debouncedChange(val)
-              }}
-              size="small"
-              inputProps={{
-                step: schema.type === 'integer' ? 1 : 0.01
-              }}
-            />
-          </FormControl>
+          <TextField
+            label={label}
+            type="number"
+            value={currentValue ?? defaultValue ?? ''}
+            onChange={(e) => {
+              const val = e.target.value === '' ? null : Number(e.target.value)
+              handleFilterChange(fieldName, val)
+            }}
+          />
         </div>
       )
     }
@@ -185,28 +165,17 @@ const QueryableFilters = () => {
 
     // String field without enum -> Text input for string equivalence queries
     if (schema.type === 'string') {
-      // Get or create debounced function for this field
-      if (!debouncedFunctionsRef.current[fieldName]) {
-        debouncedFunctionsRef.current[fieldName] = debounce((value) => {
-          handleFilterChange(fieldName, value)
-        }, 400)
-      }
-      const debouncedChange = debouncedFunctionsRef.current[fieldName]
-
       return (
         <div key={fieldName} className="queryableField">
-          <FormControl fullWidth size="small">
-            <TextField
-              label={label}
-              type="text"
-              value={currentValue ?? defaultValue ?? ''}
-              onChange={(e) => {
-                const val = e.target.value === '' ? null : e.target.value
-                debouncedChange(val)
-              }}
-              size="small"
-            />
-          </FormControl>
+          <TextField
+            label={label}
+            type="text"
+            value={currentValue ?? defaultValue ?? ''}
+            onChange={(e) => {
+              const val = e.target.value === '' ? null : e.target.value
+              handleFilterChange(fieldName, val)
+            }}
+          />
         </div>
       )
     }

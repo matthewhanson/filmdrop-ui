@@ -9,7 +9,7 @@ const SpaceTimeSection = () => {
 
   return (
     <div className="SpaceTimeSection">
-      <div className="SpaceTimeSection__heading">Space & Time</div>
+      <h2 className="SpaceTimeSection__heading">Location & Date</h2>
       <div className="SpaceTimeSection__content">
         {appConfig.SEARCH_BY_GEOM_ENABLED && <AreaOfInterestSelector />}
         <DateTimeRangeSelector />

@@ -17,6 +17,31 @@
   flex-direction: column;
   gap: 28px;
   padding-bottom: 28px;
+  padding-right: 8px;
+}
+
+/* Custom scrollbar styling for Search */
+.Search__scrollable::-webkit-scrollbar {
+  width: 8px;
+}
+
+.Search__scrollable::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.Search__scrollable::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+.Search__scrollable::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+/* Firefox scrollbar */
+.Search__scrollable {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
 }
 
 .searchButtonContainer {

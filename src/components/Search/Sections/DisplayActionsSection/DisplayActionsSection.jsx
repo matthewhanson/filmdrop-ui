@@ -23,15 +23,9 @@ const DisplayActionsSection = () => {
     dispatch(setautoCenterOnItemChanged(e.target.checked))
   }
 
-  const hasViewMode = !!mosaicTilerURL
-  const hasAutoZoom = !!appConfig.SHOW_ITEM_AUTO_ZOOM
-  const showSectionHeading = hasViewMode || hasAutoZoom
-
   return (
     <div className="DisplayActionsSection">
-      {showSectionHeading && (
-        <div className="DisplayActionsSection__heading">Display & Actions</div>
-      )}
+      <h2 className="DisplayActionsSection__heading">View & Search</h2>
       <div className="DisplayActionsSection__content">
         {mosaicTilerURL && <ViewSelector />}
         {appConfig.SHOW_ITEM_AUTO_ZOOM && (
