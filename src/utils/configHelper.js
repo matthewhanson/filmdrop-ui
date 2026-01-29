@@ -347,7 +347,7 @@ export async function autoConfigureCollections(apiUrl, config) {
 
     // Fetch collections from STAC API
     const response = await getCollections(apiUrl, {
-      headers: requestHeaders,
+      headers: requestHeaders
     })
 
     if (!response.collections || !Array.isArray(response.collections)) {

@@ -10,7 +10,7 @@ export async function GetCollectionAggregationsService(collectionId) {
     requestHeaders.append('Authorization', `Bearer ${JWT}`)
   }
   appendStacHeaderCookies(requestHeaders)
-  console.log('GetCollectionAggregationsService')
+
   return fetch(
     `${
       store.getState().mainSlice.appConfig.STAC_API_URL

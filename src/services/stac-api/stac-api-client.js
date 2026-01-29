@@ -25,7 +25,7 @@ export async function getRootCatalog(apiUrl, options = {}) {
   const fetchOptions = {
     method: 'GET',
     headers,
-    ...otherOptions,
+    ...otherOptions
   }
 
   if (credentials) {
@@ -76,7 +76,7 @@ export async function getCollections(apiUrl, options = {}) {
   const fetchOptions = {
     method: 'GET',
     headers,
-    ...otherOptions,
+    ...otherOptions
   }
 
   if (credentials) {

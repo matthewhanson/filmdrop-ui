@@ -22,7 +22,6 @@ export async function GetCollectionsService(searchParams) {
     requestHeaders.append('Authorization', `Bearer ${JWT}`)
   }
   appendStacHeaderCookies(requestHeaders)
-  console.log('GetCollectionsService')
 
   try {
     // Use stac-api client to fetch collections

@@ -25,7 +25,6 @@ export async function SearchService(searchParams, typeOfSearch) {
     requestHeaders.append('Authorization', `Bearer ${JWT}`)
   }
   appendStacHeaderCookies(requestHeaders)
-  console.log('SearchService')
 
   await fetch(
     `${

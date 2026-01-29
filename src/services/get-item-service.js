@@ -24,7 +24,6 @@ export async function GetItemService(collectionId, itemId) {
     requestHeaders.append('Authorization', `Bearer ${JWT}`)
   }
   appendStacHeaderCookies(requestHeaders)
-  console.log('GetItemService', [...requestHeaders.entries()])
 
   try {
     const response = await fetch(
