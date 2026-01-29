@@ -343,7 +343,6 @@ export async function autoConfigureCollections(apiUrl, config) {
 
     const requestHeaders = new Headers()
     appendStacHeaderCookies(requestHeaders)
-    console.log('autoConfigureCollections')
 
     // Fetch collections from STAC API
     const response = await getCollections(apiUrl, {

@@ -29,8 +29,10 @@ export async function GetItemService(collectionId, itemId) {
     const response = await fetch(
       `${store.getState().mainSlice.appConfig.STAC_API_URL}/collections/${collectionId}/items/${itemId}`,
       {
-        headers: requestHeaders,
-        credentials: 'same-origin'
+        credentials:
+          store.getState().mainSlice.appConfig.FETCH_CREDENTIALS ||
+          'same-origin',
+        headers: requestHeaders
       }
     )
 
