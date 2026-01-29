@@ -8,6 +8,7 @@ import { setQueryableFilters } from '../../redux/slices/mainSlice'
 import { sanitizeFieldValue } from '../../utils/securityHelper'
 import { useRenderableQueryables } from '../../hooks/useRenderableQueryables'
 import { getFieldLabelPlainText } from '../../utils/fieldFormatting'
+import { calculateRangeStep } from '../../utils/rangeHelper'
 import './QueryableFilters.css'
 
 const QueryableFilters = () => {
@@ -111,7 +112,7 @@ const QueryableFilters = () => {
             value={rangeValue}
             onChange={(value) => handleFilterChange(fieldName, value)}
             label={label}
-            step={schema.type === 'integer' ? 1 : 0.1}
+            step={calculateRangeStep(schema.minimum, schema.maximum)}
           />
         </div>
       )
