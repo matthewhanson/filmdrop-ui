@@ -19,12 +19,13 @@ export async function getRootCatalog(apiUrl, options = {}) {
     throw new Error('STAC API URL is required')
   }
 
-  const { headers = new Headers(), credentials, ...otherOptions } = options
-  headers.set('Content-Type', 'application/json')
+  const { headers = {}, credentials, ...otherOptions } = options
+  const requestHeaders = normalizeHeaders(headers)
+  requestHeaders['Content-Type'] = 'application/json'
 
   const fetchOptions = {
     method: 'GET',
-    headers,
+    headers: requestHeaders,
     ...otherOptions
   }
 
@@ -70,12 +71,13 @@ export async function getCollections(apiUrl, options = {}) {
 
   const collectionsUrl = `${apiUrl.replace(/\/$/, '')}/collections`
 
-  const { headers = new Headers(), credentials, ...otherOptions } = options
-  headers.set('Content-Type', 'application/json')
+  const { headers = {}, credentials, ...otherOptions } = options
+  const requestHeaders = normalizeHeaders(headers)
+  requestHeaders['Content-Type'] = 'application/json'
 
   const fetchOptions = {
     method: 'GET',
-    headers,
+    headers: requestHeaders,
     ...otherOptions
   }
 
@@ -125,12 +127,13 @@ export async function getCollection(apiUrl, collectionId, options = {}) {
 
   const collectionUrl = `${apiUrl.replace(/\/$/, '')}/collections/${collectionId}`
 
-  const { headers = new Headers(), credentials, ...otherOptions } = options
-  headers.set('Content-Type', 'application/json')
+  const { headers = {}, credentials, ...otherOptions } = options
+  const requestHeaders = normalizeHeaders(headers)
+  requestHeaders['Content-Type'] = 'application/json'
 
   const fetchOptions = {
     method: 'GET',
-    headers,
+    headers: requestHeaders,
     ...otherOptions
   }
 
@@ -254,6 +257,22 @@ export async function checkConformance(apiUrl, conformanceUris) {
   }
 
   return result
+}
+
+function normalizeHeaders(headers) {
+  if (!headers) {
+    return {}
+  }
+
+  if (typeof Headers !== 'undefined' && headers instanceof Headers) {
+    const normalized = {}
+    headers.forEach((value, key) => {
+      normalized[key] = value
+    })
+    return normalized
+  }
+
+  return { ...headers }
 }
 
 // Re-export conformance constants for convenience

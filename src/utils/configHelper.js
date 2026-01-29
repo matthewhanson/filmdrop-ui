@@ -341,13 +341,18 @@ export async function autoConfigureCollections(apiUrl, config) {
     const { getCollections } = await import('../services/stac-api')
     const { appendStacHeaderCookies } = await import('../utils/stacRequest')
 
-    const requestHeaders = new Headers()
-    appendStacHeaderCookies(requestHeaders)
+    const headerCookies = config?.STAC_HEADER_COOKIES ?? []
 
     // Fetch collections from STAC API
-    const response = await getCollections(apiUrl, {
-      headers: requestHeaders
-    })
+    const response = headerCookies.length
+      ? await getCollections(apiUrl, {
+          headers: (() => {
+            const requestHeaders = new Headers()
+            appendStacHeaderCookies(requestHeaders, config)
+            return requestHeaders
+          })()
+        })
+      : await getCollections(apiUrl)
 
     if (!response.collections || !Array.isArray(response.collections)) {
       console.warn('No collections found in STAC API response')
