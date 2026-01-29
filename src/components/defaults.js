@@ -32,6 +32,8 @@ export const DEFAULT_TILE_LAYER_PARAMS = {
 // Supports exact matches and prefix patterns (ending with '*')
 export const DEFAULT_EXCLUDED_QUERYABLES = [
   'datetime',
+  'start_datetime',
+  'end_datetime',
   'geometry',
   'sci:doi',
   'proj:*'

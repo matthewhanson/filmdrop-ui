@@ -651,6 +651,14 @@ export function getFieldLabel(field, item = null) {
   }
 }
 
+export function getFieldLabelPlainText(field, item = null) {
+  const label = getFieldLabel(field, item)
+  // Strip HTML tags to get plain text
+  const div = document.createElement('div')
+  div.innerHTML = label
+  return div.textContent || div.innerText || label
+}
+
 export function getFieldUnit(field) {
   try {
     const spec = StacFields.Registry.getSpecification(field)

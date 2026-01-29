@@ -7,6 +7,7 @@ import TextField from '../TextField/TextField'
 import { setQueryableFilters } from '../../redux/slices/mainSlice'
 import { sanitizeFieldValue } from '../../utils/securityHelper'
 import { useRenderableQueryables } from '../../hooks/useRenderableQueryables'
+import { getFieldLabelPlainText } from '../../utils/fieldFormatting'
 import './QueryableFilters.css'
 
 const QueryableFilters = () => {
@@ -90,7 +91,8 @@ const QueryableFilters = () => {
   }
 
   const renderField = (fieldName, schema) => {
-    const label = schema.description || schema.title || fieldName
+    // Prefer the queryable's title, fall back to stac-fields label
+    const label = schema.title || getFieldLabelPlainText(fieldName)
     const currentValue = queryableFilters[fieldName]
     const defaultValue = schema.default
 
