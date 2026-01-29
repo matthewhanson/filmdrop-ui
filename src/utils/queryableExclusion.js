@@ -57,7 +57,7 @@ function matchesAnyExclusionPattern(fieldName, exclusionPatterns) {
  * Determine the render order for a queryable schema based on its component type.
  * Returns a numeric order for supported schemas, or null for unsupported schemas.
  *
- * Order: RangeSliderWithInputs (0), MultiSelect (1), Dropdown (2), TextField (3), Checkbox (4)
+ * Order: RangeSliderWithInputs (0), MultiSelect (1), TextField numeric (2), TextField string (3), Checkbox (4)
  *
  * @param {Object} schema - The JSON Schema for the queryable field
  * @returns {number | null} - Render order (0-4) for supported types, null for unsupported
@@ -72,16 +72,6 @@ export function getQueryableRenderOrder(schema) {
     return null
   }
 
-  // Exclude complex schema patterns (anyOf, oneOf, allOf)
-  if (schema.anyOf || schema.oneOf || schema.allOf) {
-    return null
-  }
-
-  // Exclude union types (multiple types like ["string", "null"])
-  if (Array.isArray(schema.type)) {
-    return null
-  }
-
   // RangeSliderWithInputs: numeric with both min and max
   if (
     (schema.type === 'number' || schema.type === 'integer') &&
@@ -91,21 +81,23 @@ export function getQueryableRenderOrder(schema) {
     return 0
   }
 
-  // MultiSelect: array of string enums
+  // MultiSelect: enum values for string, number, or integer types
+  // Supports multi-value filtering via STAC API query "in" operator
   if (
-    schema.type === 'array' &&
-    schema.items?.enum &&
-    schema.items?.type === 'string'
+    schema.enum &&
+    (schema.type === 'string' ||
+      schema.type === 'number' ||
+      schema.type === 'integer')
   ) {
     return 1
   }
-
-  // Dropdown: string enum
-  if (schema.type === 'string' && schema.enum) {
+  
+  // TextField: string without enum (for string equivalence queries)
+  if (schema.type === 'string') {
     return 2
   }
-
-  // TextField: numeric without both min/max
+  
+  // TextField: numeric without both min/max (for numeric equivalence queries)
   if (schema.type === 'number' || schema.type === 'integer') {
     return 3
   }

@@ -14,7 +14,7 @@ const AttributesSection = () => {
 
   return (
     <div className="AttributesSection">
-      <div className="AttributesSection__heading">Attribute Filters</div>
+      <div className="AttributesSection__heading">Attributes</div>
       <div className="AttributesSection__content">
         <QueryableFilters />
       </div>

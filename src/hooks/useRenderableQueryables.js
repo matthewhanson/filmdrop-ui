@@ -48,7 +48,7 @@ export const useRenderableQueryables = () => {
       isQueryableRenderable(fieldName, schema, excludedQueryables)
     )
 
-    // Sort by component type: RangeSliderWithInputs, MultiSelect, Dropdown, TextField, Checkbox
+    // Sort by component type: RangeSliderWithInputs, MultiSelect, TextField (string), TextField (numeric), Checkbox
     const sorted = filtered.sort((a, b) => {
       const orderA = getQueryableRenderOrder(a[1]) ?? Infinity
       const orderB = getQueryableRenderOrder(b[1]) ?? Infinity

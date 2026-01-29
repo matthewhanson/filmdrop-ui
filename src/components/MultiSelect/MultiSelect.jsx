@@ -22,6 +22,9 @@ const MultiSelect = ({ label, value, onChange, options, className = '' }) => {
         value={value}
         onChange={handleChange}
         input={<OutlinedInput />}
+        MenuProps={{
+          classes: { paper: 'MultiSelect__menu' }
+        }}
         renderValue={(selected) => (
           <Box className="MultiSelect__chips">
             {selected.map((val) => {

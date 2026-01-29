@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { TextField, FormControl, Alert } from '@mui/material'
 import RangeSliderWithInputs from '../RangeSliderWithInputs/RangeSliderWithInputs'
-import Dropdown from '../Dropdown/Dropdown'
 import MultiSelect from '../MultiSelect/MultiSelect'
 import Checkbox from '../Checkbox/Checkbox'
 import { setQueryableFilters } from '../../redux/slices/mainSlice'
@@ -160,37 +159,16 @@ const QueryableFilters = () => {
       )
     }
 
-    // String enum -> Select dropdown
-    if (schema.type === 'string' && schema.enum) {
-      const options = [
-        { value: '', label: 'None' },
-        ...schema.enum.map((option) => ({
-          value: option,
-          label: sanitizeFieldValue(option, false)
-        }))
-      ]
-
-      return (
-        <div key={fieldName} className="queryableField">
-          <Dropdown
-            label={label}
-            value={currentValue ?? defaultValue ?? ''}
-            onChange={(e) => handleFilterChange(fieldName, e.target.value)}
-            options={options}
-          />
-        </div>
-      )
-    }
-
-    // Array of string enums -> Multi-select with chips
+    // Enum values (string, number, or integer) -> MultiSelect
     if (
-      schema.type === 'array' &&
-      schema.items?.enum &&
-      schema.items?.type === 'string'
+      schema.enum &&
+      (schema.type === 'string' ||
+        schema.type === 'number' ||
+        schema.type === 'integer')
     ) {
-      const options = schema.items.enum.map((option) => ({
+      const options = schema.enum.map((option) => ({
         value: option,
-        label: sanitizeFieldValue(option, false)
+        label: sanitizeFieldValue(String(option), false)
       }))
 
       return (
@@ -201,6 +179,34 @@ const QueryableFilters = () => {
             onChange={(newValue) => handleFilterChange(fieldName, newValue)}
             options={options}
           />
+        </div>
+      )
+    }
+
+    // String field without enum -> Text input for string equivalence queries
+    if (schema.type === 'string') {
+      // Get or create debounced function for this field
+      if (!debouncedFunctionsRef.current[fieldName]) {
+        debouncedFunctionsRef.current[fieldName] = debounce((value) => {
+          handleFilterChange(fieldName, value)
+        }, 400)
+      }
+      const debouncedChange = debouncedFunctionsRef.current[fieldName]
+
+      return (
+        <div key={fieldName} className="queryableField">
+          <FormControl fullWidth size="small">
+            <TextField
+              label={label}
+              type="text"
+              value={currentValue ?? defaultValue ?? ''}
+              onChange={(e) => {
+                const val = e.target.value === '' ? null : e.target.value
+                debouncedChange(val)
+              }}
+              size="small"
+            />
+          </FormControl>
         </div>
       )
     }
@@ -220,8 +226,7 @@ const QueryableFilters = () => {
       )
     }
 
-    // String field without enum -> Not supported for now
-    // Could add text input if needed
+    // Unsupported schema type
     return null
   }
 
