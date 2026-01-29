@@ -93,9 +93,7 @@ export function deserializeQueryableFiltersFromURL(params, queryables) {
     if (!schema) return
 
     // Handle based on schema type
-    if (schema.type === 'boolean') {
-      filters[key] = value === 'true'
-    } else if (schema.type === 'number') {
+    if (schema.type === 'number') {
       filters[key] = parseFloat(value)
     } else if (schema.type === 'integer') {
       filters[key] = parseInt(value)

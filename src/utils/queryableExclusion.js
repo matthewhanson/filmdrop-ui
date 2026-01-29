@@ -57,14 +57,14 @@ function matchesAnyExclusionPattern(fieldName, exclusionPatterns) {
  * Determine the render order for a queryable schema based on its component type.
  * Returns a numeric order for supported schemas, or null for unsupported schemas.
  *
- * Order: RangeSliderWithInputs (0), MultiSelect (1), TextField numeric (2), TextField string (3), Checkbox (4)
+ * Order: RangeSliderWithInputs (0), MultiSelect (1), TextField numeric (2), TextField string (3)
  *
  * @param {Object} schema - The JSON Schema for the queryable field
- * @returns {number | null} - Render order (0-4) for supported types, null for unsupported
+ * @returns {number | null} - Render order (0-3) for supported types, null for unsupported
  *
  * @example
  * getQueryableRenderOrder({ type: 'number', minimum: 0, maximum: 100 }) // 0 (RangeSlider)
- * getQueryableRenderOrder({ type: 'boolean' }) // 4 (Checkbox)
+ * getQueryableRenderOrder({ type: 'string' }) // 2 (TextField)
  * getQueryableRenderOrder({ type: 'object' }) // null (unsupported)
  */
 export function getQueryableRenderOrder(schema) {
@@ -102,12 +102,7 @@ export function getQueryableRenderOrder(schema) {
     return 3
   }
 
-  // Checkbox: boolean
-  if (schema.type === 'boolean') {
-    return 4
-  }
-
-  // All other types are unsupported (objects, arrays of non-enums, etc.)
+  // All other types are unsupported (booleans, objects, arrays of non-enums, etc.)
   return null
 }
 

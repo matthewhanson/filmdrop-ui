@@ -3,7 +3,6 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Alert } from '@mui/material'
 import RangeSliderWithInputs from '../RangeSliderWithInputs/RangeSliderWithInputs'
 import MultiSelect from '../MultiSelect/MultiSelect'
-import Checkbox from '../Checkbox/Checkbox'
 import TextField from '../TextField/TextField'
 import { setQueryableFilters } from '../../redux/slices/mainSlice'
 import { sanitizeFieldValue } from '../../utils/securityHelper'
@@ -38,12 +37,6 @@ const QueryableFilters = () => {
         defaultValue !== undefined &&
         queryableFilters[fieldName] === undefined
       ) {
-        // For boolean fields, only set default if it's true
-        // (false means "no filter" which is the unchecked state)
-        if (schema.type === 'boolean' && defaultValue !== true) {
-          return
-        }
-
         const sanitizedValue =
           typeof defaultValue === 'string'
             ? sanitizeFieldValue(defaultValue, false)
@@ -175,21 +168,6 @@ const QueryableFilters = () => {
               const val = e.target.value === '' ? null : e.target.value
               handleFilterChange(fieldName, val)
             }}
-          />
-        </div>
-      )
-    }
-
-    // Boolean -> Checkbox
-    if (schema.type === 'boolean') {
-      return (
-        <div key={fieldName} className="queryableField">
-          <Checkbox
-            label={label}
-            checked={currentValue === true}
-            onChange={(e) =>
-              handleFilterChange(fieldName, e.target.checked ? true : null)
-            }
           />
         </div>
       )
