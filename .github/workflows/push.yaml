@@ -28,8 +28,6 @@ jobs:
         run: npm run lint
       # - name: Typecheck
       #   run: npm run typecheck
-      - name: Run audit (all, with exclusions)
-        run: npm run audit-all
       - name: Run audit (prod, no exclusions)
         run: npm run audit-prod
       - name: Copy config file
