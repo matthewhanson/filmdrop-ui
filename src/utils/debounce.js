@@ -2,7 +2,7 @@
 export default function debounce(func, wait, immediate) {
   let timeout
 
-  return function executedFunction() {
+  const executedFunction = function () {
     const context = this
     const args = arguments
 
@@ -19,4 +19,12 @@ export default function debounce(func, wait, immediate) {
 
     if (callNow) func.apply(context, args)
   }
+
+  // Add cancel method to allow cleanup of pending debounced calls
+  executedFunction.cancel = function () {
+    clearTimeout(timeout)
+    timeout = null
+  }
+
+  return executedFunction
 }

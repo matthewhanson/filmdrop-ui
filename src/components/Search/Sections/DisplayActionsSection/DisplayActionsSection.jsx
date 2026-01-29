@@ -15,6 +15,11 @@ const DisplayActionsSection = () => {
   const mosaicTilerURL = appConfig.MOSAIC_TILER_URL || ''
 
   const handleSearchClick = () => {
+    // Flush any pending text input changes by triggering blur
+    // This ensures debounced Redux updates complete before search executes
+    const textInputs = document.querySelectorAll('.TextField__input input')
+    textInputs.forEach((input) => input.blur())
+
     newSearch()
     dispatch(setshowSearchByGeom(false))
   }
