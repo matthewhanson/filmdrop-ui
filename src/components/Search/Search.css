@@ -185,6 +185,23 @@ input[class$='-MuiInputBase-input-MuiInput-input'] {
   background-color: rgba(200, 200, 200, 0.15);
 }
 
+/* Leaflet Map Control Border Overrides */
+
+.leaflet-touch .leaflet-bar,
+.leaflet-touch .leaflet-control-layers {
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.leaflet-touch .leaflet-bar a:first-child {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.leaflet-touch .leaflet-bar a:last-child {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+
 /* Leaflet Search Icon Overrides */
 
 .leaflet-control-geosearch a.leaflet-bar-part:before {
@@ -203,11 +220,11 @@ input[class$='-MuiInputBase-input-MuiInput-input'] {
 /* Leaflet Search Button and Form Overrides */
 
 .leaflet-control-geosearch .leaflet-bar-part {
-  border-radius: 2px; /* Fill gap between top corners of background and border */
+  border-radius: 3px; /* Match inner radius to outer 4px minus 1px border */
 }
 
 .leaflet-geosearch-button.active .leaflet-bar-part {
-  border-radius: 2px; /* Fill gap between top corners of background and border */
+  border-radius: 3px; /* Match inner radius to outer 4px minus 1px border */
 }
 
 .leaflet-control-geosearch form {
