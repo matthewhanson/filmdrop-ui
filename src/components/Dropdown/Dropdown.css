@@ -1,32 +1,48 @@
-/* Style the MUI NativeSelect to match spec */
+/* Style the MUI Select */
 .Dropdown__select {
   width: 100%;
-}
-
-/* Target the select element inside MUI NativeSelect */
-.Dropdown__select select {
-  width: 100%;
-  height: 36px;
   background: #f6f8fa;
-  border: 1px solid #e1e4e8;
-  border-radius: 4px;
-  padding: 0 32px 0 12px;
   font-size: 12px;
   font-weight: 400;
   color: #0f1419;
-  cursor: pointer;
-  box-sizing: border-box;
 }
 
-.Dropdown__select select:focus {
-  outline: none;
-  border-color: #2da44e;
+/* Reduce padding to match single-value height */
+.Dropdown__select .MuiSelect-select {
+  padding: 8px 12px !important;
+  font-size: 12px !important;
+}
+
+/* Style the outlined input */
+.Dropdown__select .MuiOutlinedInput-notchedOutline {
+  border: 1px solid #e1e4e8;
   border-radius: 4px;
 }
 
-/* Style the MUI icon wrapper */
-.Dropdown__select .MuiNativeSelect-icon {
+.Dropdown__select:hover .MuiOutlinedInput-notchedOutline {
+  border-color: #e1e4e8 !important;
+}
+
+.Dropdown__select.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: var(--brand-accent-primary) !important;
+  border-width: 1px !important;
+}
+
+/* Style dropdown icon */
+.Dropdown__select .MuiSelect-icon {
   color: #6e7781;
-  right: 12px;
-  font-size: 24px;
+}
+
+/* Style dropdown menu items */
+.Dropdown__menu .MuiMenuItem-root {
+  font-size: 12px !important;
+  padding: 6px 16px !important;
+}
+
+.Dropdown__menu .MuiMenuItem-root.Mui-selected {
+  background-color: #f0f0f0 !important;
+}
+
+.Dropdown__menu .MuiMenuItem-root.Mui-selected:hover {
+  background-color: #e8e8e8 !important;
 }

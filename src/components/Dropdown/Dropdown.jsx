@@ -1,24 +1,31 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { NativeSelect } from '@mui/material'
+import { Select, MenuItem, OutlinedInput } from '@mui/material'
 import Card from '../Card/Card'
 import './Dropdown.css'
 
 const Dropdown = ({ label, value, onChange, options, className = '' }) => {
+  const handleChange = (event) => {
+    onChange(event)
+  }
+
   return (
     <Card height={'auto'} label={label} className={`Dropdown ${className}`}>
-      <NativeSelect
+      <Select
         className="Dropdown__select"
         value={value}
-        onChange={onChange}
-        disableUnderline
+        onChange={handleChange}
+        input={<OutlinedInput />}
+        MenuProps={{
+          classes: { paper: 'Dropdown__menu' }
+        }}
       >
         {options.map((option) => (
-          <option key={option.value} value={option.value}>
+          <MenuItem key={option.value} value={option.value}>
             {option.label}
-          </option>
+          </MenuItem>
         ))}
-      </NativeSelect>
+      </Select>
     </Card>
   )
 }

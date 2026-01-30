@@ -23,7 +23,7 @@
 }
 
 .MultiSelect__select.Mui-focused .MuiOutlinedInput-notchedOutline {
-  border-color: #2da44e !important;
+  border-color: var(--brand-accent-primary) !important;
   border-width: 1px !important;
 }
 
@@ -62,4 +62,12 @@
 .MultiSelect__menu .MuiMenuItem-root {
   font-size: 12px !important;
   padding: 6px 16px !important;
+}
+
+.MultiSelect__menu .MuiMenuItem-root.Mui-selected {
+  background-color: #f0f0f0 !important;
+}
+
+.MultiSelect__menu .MuiMenuItem-root.Mui-selected:hover {
+  background-color: #e8e8e8 !important;
 }
