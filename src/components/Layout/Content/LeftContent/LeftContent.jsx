@@ -73,7 +73,7 @@ const LeftContent = () => {
             }
             onClick={setFiltersTab}
           >
-            Search
+            <span className="LeftContentTabLabel">Search</span>
           </button>
           <button
             className={
@@ -83,7 +83,7 @@ const LeftContent = () => {
             }
             onClick={setDetailsTab}
           >
-            Item Details
+            <span className="LeftContentTabLabel">Item Details</span>
           </button>
         </div>
         <div className="LeftContentSelectedTab">

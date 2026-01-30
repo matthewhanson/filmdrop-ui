@@ -9,6 +9,13 @@ body {
   font-family: 'Inter', Arial, Helvetica, sans-serif;
 }
 
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
 #root {
   height: 100%;
   width: 100%;
