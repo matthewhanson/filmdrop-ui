@@ -3,18 +3,18 @@
   flex-direction: column;
   gap: 12px;
   flex-shrink: 0;
-  padding-top: 20px;
+  padding-top: 15px;
   padding-left: 8px;
   padding-right: 8px;
   border-top: 1px solid var(--side-panel-horizontal-divider-color);
-  box-shadow: inset 0 8px 8px -8px rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0 8px 8px -8px var(--side-panel-input-border);
 }
 
 .ViewSearchSection__heading {
   font-size: 16px;
   font-weight: 600;
   text-transform: none;
-  color: var(--blue-gray-8);
+  color: var(--side-panel-heading-color);
   letter-spacing: 0;
   margin-bottom: 4px;
 }

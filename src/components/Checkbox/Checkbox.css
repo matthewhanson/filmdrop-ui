@@ -9,20 +9,15 @@
 .Checkbox__input {
   padding: 0 !important;
   margin-right: 8px !important;
-  color: #e1e4e8 !important;
+  color: var(--side-panel-checkbox-color-unchecked) !important;
 }
 
 .Checkbox__input.Mui-checked {
-  color: var(--brand-accent-primary) !important;
-}
-
-/* Style the checkbox border to be 1px wide */
-.Checkbox__input .MuiSvgIcon-root {
-  stroke-width: 1 !important;
+  color: var(--side-panel-checkbox-color-checked) !important;
 }
 
 /* Style the label text */
 .Checkbox__text {
   font-size: 14px;
-  color: #0f1419;
+  color: var(--side-panel-checkbox-label-color);
 }

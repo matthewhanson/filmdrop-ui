@@ -26,22 +26,22 @@
 }
 
 .Search__scrollable::-webkit-scrollbar-track {
-  background: transparent;
+  background: var(--side-panel-scrollbar-track);
 }
 
 .Search__scrollable::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.15);
+  background: var(--side-panel-scrollbar-thumb);
   border-radius: 4px;
 }
 
 .Search__scrollable::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.25);
+  background: var(--side-panel-scrollbar-thumb-hover);
 }
 
 /* Firefox scrollbar */
 .Search__scrollable {
   scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+  scrollbar-color: var(--side-panel-scrollbar-thumb) var(--side-panel-scrollbar-track);
 }
 
 .searchButtonContainer {
@@ -178,18 +178,18 @@ input[class$='-MuiInputBase-input-MuiInput-input'] {
 }
 
 .Search .MuiSwitch-switchBase:hover {
-  background-color: rgba(200, 200, 200, 0.15);
+  background-color: var(--side-panel-menu-item-background-hover);
 }
 
 .Search .MuiSwitch-switchBase.Mui-checked:hover {
-  background-color: rgba(200, 200, 200, 0.15);
+  background-color: var(--side-panel-menu-item-background-hover);
 }
 
 /* Leaflet Map Control Border Overrides */
 
 .leaflet-touch .leaflet-bar,
 .leaflet-touch .leaflet-control-layers {
-  border: 1px solid rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--side-panel-input-border);
 }
 
 .leaflet-touch .leaflet-bar a:first-child {

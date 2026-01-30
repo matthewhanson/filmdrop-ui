@@ -12,7 +12,6 @@ const Checkbox = ({ label, checked, onChange, className = '' }) => {
           checked={checked}
           onChange={onChange}
           className="Checkbox__input"
-          disableRipple
         />
         <span className="Checkbox__text">{label}</span>
       </label>

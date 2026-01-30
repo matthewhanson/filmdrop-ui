@@ -1,6 +1,6 @@
 .Card {
-  background: #ffffff;
-  border: 1px solid #e1e4e8;
+  background: var(--side-panel-card-background);
+  border: 1px solid var(--side-panel-card-border);
   border-radius: 4px;
   padding: 8px 8px;
   display: flex;
@@ -10,7 +10,7 @@
 
 .Card__label {
   font-size: 14px;
-  color: #0f1419;
+  color: var(--side-panel-card-label-color);
   margin-bottom: 4px;
   display: block;
 }

@@ -1,10 +1,10 @@
 /* Style the MUI Select — min-height on root allows growth when chips wrap */
 .MultiSelect__select {
   width: 100%;
-  background: #f6f8fa;
+  background: var(--side-panel-input-background);
   font-size: 12px;
   font-weight: 400;
-  color: #0f1419;
+  color: var(--side-panel-input-color);
   min-height: 36px !important;
   box-sizing: border-box !important;
 }
@@ -17,16 +17,16 @@
 
 /* Style the outlined input */
 .MultiSelect__select .MuiOutlinedInput-notchedOutline {
-  border: 1px solid #e1e4e8;
+  border: 1px solid var(--side-panel-input-border);
   border-radius: 4px;
 }
 
 .MultiSelect__select:hover .MuiOutlinedInput-notchedOutline {
-  border-color: #e1e4e8 !important;
+  border-color: var(--side-panel-input-border-hover) !important;
 }
 
 .MultiSelect__select.Mui-focused .MuiOutlinedInput-notchedOutline {
-  border-color: var(--brand-accent-primary) !important;
+  border-color: var(--side-panel-input-border-focused) !important;
   border-width: 1px !important;
 }
 
@@ -39,26 +39,26 @@
 
 /* Style individual chips */
 .MultiSelect__chip {
-  background: #e1e4e8 !important;
+  background: var(--side-panel-chip-background) !important;
   font-size: 12px !important;
   height: 24px !important;
-  color: #0f1419 !important;
+  color: var(--side-panel-chip-color) !important;
   border-radius: 4px !important;
 }
 
 /* Style the chip delete icon */
 .MultiSelect__chip .MuiChip-deleteIcon {
-  color: var(--brand-accent-primary) !important;
+  color: var(--side-panel-chip-delete-icon-color) !important;
   font-size: 16px !important;
 }
 
 .MultiSelect__chip .MuiChip-deleteIcon:hover {
-  color: var(--brand-accent-primary-dark) !important;
+  color: var(--side-panel-chip-delete-icon-color-hover) !important;
 }
 
 /* Style dropdown icon */
 .MultiSelect__select .MuiSelect-icon {
-  color: #6e7781;
+  color: var(--side-panel-input-icon-color);
 }
 
 /* Style dropdown menu items */
@@ -68,9 +68,9 @@
 }
 
 .MultiSelect__menu .MuiMenuItem-root.Mui-selected {
-  background-color: #f0f0f0 !important;
+  background-color: var(--side-panel-menu-item-background-selected) !important;
 }
 
 .MultiSelect__menu .MuiMenuItem-root.Mui-selected:hover {
-  background-color: #e8e8e8 !important;
+  background-color: var(--side-panel-menu-item-background-selected) !important;
 }
