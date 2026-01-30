@@ -1,23 +1,41 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import ToggleButton from '@mui/material/ToggleButton'
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Card from '../Card/Card'
 import './ButtonGroup.css'
 
 const ButtonGroup = ({ label, buttons, className = '' }) => {
+  const activeValue = buttons.find((b) => b.active)?.value ?? null
+
+  const handleChange = (_event, newValue) => {
+    if (newValue === null) return // prevent deselecting all
+    const button = buttons.find((b) => b.value === newValue)
+    if (button && !button.disabled) {
+      button.onClick()
+    }
+  }
+
   return (
     <Card height='auto' label={label} className={`ButtonGroup ${className}`}>
-      <div className="ButtonGroup__buttons">
+      <ToggleButtonGroup
+        value={activeValue}
+        exclusive
+        onChange={handleChange}
+        fullWidth
+        className="ButtonGroup__buttons"
+      >
         {buttons.map((button) => (
-          <button
+          <ToggleButton
             key={button.value}
-            className={`ButtonGroup__button ${button.active ? 'ButtonGroup__button--active' : ''} ${button.disabled ? 'ButtonGroup__button--disabled' : ''}`}
-            onClick={button.onClick}
+            value={button.value}
             disabled={button.disabled}
+            className="ButtonGroup__button"
           >
             {button.label}
-          </button>
+          </ToggleButton>
         ))}
-      </div>
+      </ToggleButtonGroup>
     </Card>
   )
 }

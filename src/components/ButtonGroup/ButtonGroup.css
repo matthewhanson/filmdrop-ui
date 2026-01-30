@@ -1,10 +1,11 @@
-.ButtonGroup__buttons {
-  display: flex;
-  gap: 8px;
+.ButtonGroup__buttons.MuiToggleButtonGroup-root {
   width: 100%;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  overflow: hidden;
 }
 
-.ButtonGroup__button {
+.ButtonGroup__buttons.MuiToggleButtonGroup-root .MuiToggleButtonGroup-grouped {
   flex: 1;
   height: 36px;
   font-size: 12px;
@@ -12,26 +13,33 @@
   text-transform: capitalize;
   background: #f6f8fa;
   color: #0f1419;
-  border: 1px solid #e1e4e8;
-  border-radius: 4px;
-  cursor: pointer;
+  border: none;
+  border-radius: 0;
+  margin: 0;
   transition: all 0.15s ease;
   box-sizing: border-box;
 }
 
-.ButtonGroup__button:hover:not(:disabled) {
+.ButtonGroup__buttons.MuiToggleButtonGroup-root .MuiToggleButtonGroup-grouped:not(:last-of-type) {
+  border-right: 1px solid #ced4da;
+}
+
+.ButtonGroup__buttons.MuiToggleButtonGroup-root .MuiToggleButtonGroup-grouped:hover {
   background: var(--brand-accent-primary-dark);
   color: var(--white);
-  border-color: var(--brand-accent-primary-dark);
 }
 
-.ButtonGroup__button--active {
+.ButtonGroup__buttons.MuiToggleButtonGroup-root .MuiToggleButtonGroup-grouped.Mui-selected {
   background: var(--brand-accent-primary);
   color: var(--white);
-  border-color: var(--brand-accent-primary);
 }
 
-.ButtonGroup__button--disabled {
+.ButtonGroup__buttons.MuiToggleButtonGroup-root .MuiToggleButtonGroup-grouped.Mui-selected:hover {
+  background: var(--brand-accent-primary-dark);
+  color: var(--white);
+}
+
+.ButtonGroup__buttons.MuiToggleButtonGroup-root .MuiToggleButtonGroup-grouped.Mui-disabled {
   opacity: 0.5;
-  cursor: not-allowed;
+  color: #0f1419;
 }
