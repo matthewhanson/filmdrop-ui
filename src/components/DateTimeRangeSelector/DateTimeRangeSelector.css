@@ -24,12 +24,14 @@
   margin-top: 4px;
 }
 
-/* Override input font size, padding, and background */
+/* Override input font size, padding, background, and height */
 .datePickerContainer .MuiPickersOutlinedInput-root {
   font-size: 12px;
   padding-left: 8px !important;
   padding-right: 8px !important;
   background-color: #f6f8fa !important;
+  height: 36px !important;
+  box-sizing: border-box !important;
 }
 
 /* Make calendar icon button smaller and reduce spacing */

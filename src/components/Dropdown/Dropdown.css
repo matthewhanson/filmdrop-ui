@@ -7,10 +7,12 @@
   color: #0f1419;
 }
 
-/* Reduce padding to match single-value height */
+/* Standardize control height */
 .Dropdown__select .MuiSelect-select {
   padding: 8px 12px !important;
   font-size: 12px !important;
+  height: 36px !important;
+  box-sizing: border-box !important;
 }
 
 /* Style the outlined input */

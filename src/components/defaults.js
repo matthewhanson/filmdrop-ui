@@ -35,6 +35,5 @@ export const DEFAULT_EXCLUDED_QUERYABLES = [
   'start_datetime',
   'end_datetime',
   'geometry',
-  'sci:doi',
-  'proj:*'
+  'sci:doi'
 ]

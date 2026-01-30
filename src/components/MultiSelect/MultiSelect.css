@@ -1,15 +1,18 @@
-/* Style the MUI Select */
+/* Style the MUI Select — min-height on root allows growth when chips wrap */
 .MultiSelect__select {
   width: 100%;
   background: #f6f8fa;
   font-size: 12px;
   font-weight: 400;
   color: #0f1419;
+  min-height: 36px !important;
+  box-sizing: border-box !important;
 }
 
-/* Reduce padding around chips */
+/* Reduce padding around chips and reset MUI default min-height */
 .MultiSelect__select .MuiSelect-select {
-  padding: 8px 8px !important;
+  padding: 6px 8px !important;
+  min-height: 0 !important;
 }
 
 /* Style the outlined input */
