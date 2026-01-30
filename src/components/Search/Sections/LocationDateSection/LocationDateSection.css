@@ -1,10 +1,10 @@
-.SpaceTimeSection {
+.LocationDateSection {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.SpaceTimeSection__heading {
+.LocationDateSection__heading {
   font-size: 16px;
   font-weight: 600;
   text-transform: none;
@@ -13,7 +13,7 @@
   margin-bottom: 4px;
 }
 
-.SpaceTimeSection__content {
+.LocationDateSection__content {
   display: flex;
   flex-direction: column;
   gap: 12px;

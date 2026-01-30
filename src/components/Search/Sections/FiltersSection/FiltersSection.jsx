@@ -1,9 +1,9 @@
 import React from 'react'
-import './AttributesSection.css'
+import './FiltersSection.css'
 import QueryableFilters from '../../../QueryableFilters/QueryableFilters'
 import { useRenderableQueryables } from '../../../../hooks/useRenderableQueryables'
 
-const AttributesSection = () => {
+const FiltersSection = () => {
   // Use custom hook to check if there are any renderable fields
   const { hasFields } = useRenderableQueryables()
 
@@ -13,13 +13,13 @@ const AttributesSection = () => {
   }
 
   return (
-    <div className="AttributesSection">
-      <h2 className="AttributesSection__heading">Filters</h2>
-      <div className="AttributesSection__content">
+    <div className="FiltersSection">
+      <h2 className="FiltersSection__heading">Filters</h2>
+      <div className="FiltersSection__content">
         <QueryableFilters />
       </div>
     </div>
   )
 }
 
-export default AttributesSection
+export default FiltersSection

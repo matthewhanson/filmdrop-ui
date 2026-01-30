@@ -1,4 +1,4 @@
-.DisplayActionsSection {
+.ViewSearchSection {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -10,7 +10,7 @@
   box-shadow: inset 0 8px 8px -8px rgba(0, 0, 0, 0.2);
 }
 
-.DisplayActionsSection__heading {
+.ViewSearchSection__heading {
   font-size: 16px;
   font-weight: 600;
   text-transform: none;
@@ -19,7 +19,7 @@
   margin-bottom: 4px;
 }
 
-.DisplayActionsSection__content {
+.ViewSearchSection__content {
   display: flex;
   flex-direction: column;
   gap: 12px;

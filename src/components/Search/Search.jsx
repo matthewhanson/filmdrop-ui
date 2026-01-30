@@ -4,9 +4,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setshowSearchByGeom } from '../../redux/slices/mainSlice'
 import 'react-tooltip/dist/react-tooltip.css'
 import CollectionSection from './Sections/CollectionSection/CollectionSection'
-import SpaceTimeSection from './Sections/SpaceTimeSection/SpaceTimeSection'
-import AttributesSection from './Sections/AttributesSection/AttributesSection'
-import DisplayActionsSection from './Sections/DisplayActionsSection/DisplayActionsSection'
+import LocationDateSection from './Sections/LocationDateSection/LocationDateSection'
+import FiltersSection from './Sections/FiltersSection/FiltersSection'
+import ViewSearchSection from './Sections/ViewSearchSection/ViewSearchSection'
 
 const Search = () => {
   const dispatch = useDispatch()
@@ -26,10 +26,10 @@ const Search = () => {
     <div className="Search" data-testid="Search">
       <div className="Search__scrollable">
         <CollectionSection />
-        <SpaceTimeSection />
-        <AttributesSection />
+        <LocationDateSection />
+        <FiltersSection />
       </div>
-      <DisplayActionsSection />
+      <ViewSearchSection />
     </div>
   )
 }

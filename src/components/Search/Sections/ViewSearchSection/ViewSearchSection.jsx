@@ -1,12 +1,12 @@
 import React from 'react'
-import './DisplayActionsSection.css'
+import './ViewSearchSection.css'
 import { useSelector, useDispatch } from 'react-redux'
 import { setshowSearchByGeom, setautoCenterOnItemChanged } from '../../../../redux/slices/mainSlice'
 import ViewSelector from '../../../ViewSelector/ViewSelector'
 import Checkbox from '../../../Checkbox/Checkbox'
 import { newSearch } from '../../../../utils/searchHelper'
 
-const DisplayActionsSection = () => {
+const ViewSearchSection = () => {
   const dispatch = useDispatch()
   const appConfig = useSelector((state) => state.mainSlice.appConfig)
   const autoCenterOnItemChanged = useSelector(
@@ -29,9 +29,9 @@ const DisplayActionsSection = () => {
   }
 
   return (
-    <div className="DisplayActionsSection">
-      <h2 className="DisplayActionsSection__heading">View & Search</h2>
-      <div className="DisplayActionsSection__content">
+    <div className="ViewSearchSection">
+      <h2 className="ViewSearchSection__heading">View & Search</h2>
+      <div className="ViewSearchSection__content">
         {mosaicTilerURL && <ViewSelector />}
         {appConfig.SHOW_ITEM_AUTO_ZOOM && (
           <Checkbox
@@ -51,4 +51,4 @@ const DisplayActionsSection = () => {
   )
 }
 
-export default DisplayActionsSection
+export default ViewSearchSection
