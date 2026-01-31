@@ -160,16 +160,16 @@
   --white: #ffffff;
   --black: #000000;
 
-  --blue-gray-1: #f8f9fa;
-  --blue-gray-2: #e9ecef;
-  --blue-gray-3: #dee2e6;
-  --blue-gray-4: #ced4da;
-  --blue-gray-5: #adb5bd;
-  --blue-gray-6: #6c757d;
-  --blue-gray-7: #495057;
+  --blue-gray-1: #f1f3f5;
+  --blue-gray-2: #e2e6ea;
+  --blue-gray-3: #d8dde1;
+  --blue-gray-4: #c8cfd6;
+  --blue-gray-5: #a8b1b9;
+  --blue-gray-6: #6a737b;
+  --blue-gray-7: #484f56;
   --blue-gray-8: #212529;
 
-  --blue-gray-alpha-60: rgba(108, 117, 125, 0.6);
+  --blue-gray-alpha-60: rgba(106, 115, 123, 0.6);
   --white-alpha-95: rgba(255, 255, 255, 0.95);
   --white-alpha-08: rgba(0, 0, 0, 0.08);
 
@@ -215,7 +215,7 @@
 
   --side-panel-tab-background: var(--blue-gray-1);
   --side-panel-tab-color: var(--blue-gray-8);
-  --side-panel-tab-color-inactive: var(--blue-gray-5);
+  --side-panel-tab-color-inactive: var(--blue-gray-6);
   --side-panel-tab-separator: var(--blue-gray-3);
   --side-panel-tab-bottom-selected: var(--brand-accent-primary);
 
@@ -228,7 +228,7 @@
   --side-panel-card-border: var(--blue-gray-3);
   --side-panel-card-label-color: var(--blue-gray-7);
 
-  --side-panel-input-background: var(--white);
+  --side-panel-input-background: var(--blue-gray-1);
   --side-panel-input-color: var(--blue-gray-8);
   --side-panel-input-border: var(--blue-gray-4);
   --side-panel-input-border-hover: var(--blue-gray-6);
@@ -241,7 +241,7 @@
   --side-panel-menu-item-background-hover: var(--blue-gray-2);
   --side-panel-menu-item-background-selected: var(--blue-gray-3);
 
-  --side-panel-toggle-button-background: var(--white);
+  --side-panel-toggle-button-background: var(--blue-gray-1);
   --side-panel-toggle-button-background-hover: var(--blue-gray-2);
   --side-panel-toggle-button-background-selected: var(--brand-accent-primary);
   --side-panel-toggle-button-color: var(--blue-gray-7);
@@ -253,7 +253,7 @@
   --side-panel-slider-thumb: var(--brand-accent-primary);
   --side-panel-slider-thumb-hover: var(--blue-gray-5);
   --side-panel-slider-thumb-border: var(--white);
-  --side-panel-slider-value-container-background: var(--white);
+  --side-panel-slider-value-container-background: var(--blue-gray-1);
   --side-panel-slider-value-container-border: var(--blue-gray-4);
   --side-panel-slider-value-container-border-focused: var(--brand-accent-primary);
   --side-panel-slider-value-color: var(--blue-gray-8);

@@ -56,7 +56,7 @@ const QueryableFilters = () => {
   // Check if queryables has error (from the hook)
   if (error) {
     return (
-      <div className="searchContainer queryableFiltersError">
+      <div className="queryableFiltersError">
         <Alert severity="error">
           Unable to load filters: {error.message || 'Unknown error'}
         </Alert>

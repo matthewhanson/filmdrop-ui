@@ -29,6 +29,10 @@
   height: 28px;
 }
 
+.rangeSliderValuePills:hover {
+  border-color: var(--side-panel-input-border-hover);
+}
+
 .rangeSliderValuePills:focus-within {
   border-color: var(--side-panel-slider-value-container-border-focused);
   background: var(--side-panel-slider-value-container-background);

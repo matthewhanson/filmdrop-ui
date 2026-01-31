@@ -41,7 +41,7 @@ const ViewSearchSection = () => {
           />
         )}
         <button
-          className="actionButton searchButton"
+          className="searchButton"
           onClick={handleSearchClick}
         >
           Search
