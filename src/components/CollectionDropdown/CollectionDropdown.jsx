@@ -28,20 +28,31 @@ const CollectionDropdown = () => {
 
   // Convert collections data to dropdown options
   const options = useMemo(() => {
+    const placeholder = { value: 'selectOne', label: 'Select Collection' }
+
     if (!collectionsData || collectionsData.length === 0) {
-      return [{ value: 'selectOne', label: 'Select Collection' }]
+      return [placeholder]
     }
 
-    return collectionsData.map(({ id, title }) => ({
+    const collectionOptions = collectionsData.map(({ id, title }) => ({
       value: id,
       label: title ?? id
     }))
-  }, [collectionsData])
+
+    // Include placeholder when no collection is selected yet to avoid
+    // MUI warning about out-of-range value during the render before
+    // the useEffect sets the default collection
+    if (!selectedCollection) {
+      return [placeholder, ...collectionOptions]
+    }
+
+    return collectionOptions
+  }, [collectionsData, selectedCollection])
 
   // Initialize default collection on mount
   useEffect(() => {
     if (collectionsData.length === 0) return
-    if (selectedCollection && selectedCollection !== 'Select Collection') return
+    if (selectedCollection) return
 
     // Get default from config
     const defaultCollection = appConfig.COLLECTIONS?.default
@@ -67,7 +78,7 @@ const CollectionDropdown = () => {
 
   // Update collection data when selection changes
   useEffect(() => {
-    if (!selectedCollection || selectedCollection === 'Select Collection') return
+    if (!selectedCollection) return
 
     const collection = collectionsData.find((c) => c.id === selectedCollection)
 

@@ -41,7 +41,7 @@ const initialState = {
   showLayerList: false,
   showVisualizationList: false,
   referenceLayers: [],
-  selectedCollection: 'Select Collection',
+  selectedCollection: '',
   selectedVisualization: null,
   tabSelected: 'filters',
   selectedPopupResultIndex: 0,
