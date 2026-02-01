@@ -155,7 +155,7 @@
 :root[data-theme='filmdrop-light'] {
   /* Light Color Palette */
   --brand-accent-primary: #6cc24a;
-  --brand-accent-primary-dark: #35731c;
+  --brand-accent-primary-dark: #5aaa3a;
   --transparent: transparent;
   --white: #ffffff;
   --black: #000000;
@@ -259,11 +259,10 @@
   --side-panel-slider-value-color: var(--blue-gray-8);
   --side-panel-slider-separator-color: var(--blue-gray-6);
 
-  --side-panel-checkbox-color-unchecked: var(--blue-gray-6);
+  --side-panel-checkbox-color-unchecked: var(--blue-gray-4);
   --side-panel-checkbox-color-checked: var(--brand-accent-primary);
-  --side-panel-checkbox-label-color: var(--blue-gray-8);
 
-  --side-panel-chip-background: var(--blue-gray-2);
+  --side-panel-chip-background: var(--blue-gray-3);
   --side-panel-chip-color: var(--blue-gray-8);
   --side-panel-chip-delete-icon-color: var(--brand-accent-primary);
   --side-panel-chip-delete-icon-color-hover: var(--brand-accent-primary-dark);
@@ -276,14 +275,27 @@
   --side-panel-alert-color: var(--blue-gray-8);
   --side-panel-alert-border: var(--blue-gray-4);
 
-  /* Map Overlays*/
+    /* Side Panel - Enhanced Details Content*/
+  --columns: 1;
+  --enhanced-details-field-label-color: var(--blue-gray-7);
+  --enhanced-details-field-value-color: var(--blue-gray-8);
+  --enhanced-details-primary-background: var(--white);
+  --enhanced-details-text-color: var(--blue-gray-8);
+  --enhanced-details-text-color-secondary: var(--blue-gray-6);
+  --enhanced-details-background-color: var(--white);
+  --enhanced-details-background-color-light: var(--blue-gray-1);
+  --enhanced-details-border-color: var(--blue-gray-4);
+
+  /* Map Overlay */
   --map-info-overlay-background: var(--white);
   --map-info-overlay-color: var(--blue-gray-8);
-  --map-info-overlay-button-background: var(--transparent);
+  --map-info-overlay-button-background: var(--blue-gray-1);
   --map-info-overlay-button-color: var(--blue-gray-7);
   --map-info-overlay-button-border: var(--blue-gray-4);
   --map-info-overlay-button-background-hover: var(--blue-gray-2);
   --map-info-overlay-button-color-hover: var(--blue-gray-8);
+  --map-info-overlay-button-border-secondary: var(--brand-accent-primary);
+  --map-info-overlay-button-border-secondary-focused: var(--brand-accent-primary-dark);
   --map-info-overlay-heading-color: var(--blue-gray-7);
   --map-info-overlay-heading-border: var(--blue-gray-3);
   --map-info-overlay-checkbox-background: var(--blue-gray-3);
@@ -297,13 +309,13 @@
   --map-attribution-overlay-color: var(--blue-gray-6);
   --map-attribution-overlay-tooltip-color: var(--blue-gray-7);
 
-  /* Aggregation */
+  /* Map Overlay - Aggregation */
   --hex-heatmap-legend: var(--blue-gray-8);
   --hex-label-color: var(--black);
   --hex-label-shadow: var(--white-alpha-95);
   --grid-cell-tooltip: var(--brand-accent-primary);
 
-  /* Action Button */
+  /* Map Overlay - Action Button */
   --action-button-background: var(--brand-accent-primary);
   --action-button-background-hover: var(--brand-accent-primary-dark);
   --action-button-color: var(--white);
@@ -314,16 +326,7 @@
   /* Resize Handle */
   --resize-handle-hover-background: var(--white-alpha-08);
 
-  /* Enhanced Details */
-  --columns: 1;
-  --enhanced-details-field-label-color: var(--blue-gray-7);
-  --enhanced-details-field-value-color: var(--blue-gray-8);
-  --enhanced-details-primary-background: var(--white);
-  --enhanced-details-text-color: var(--blue-gray-8);
-  --enhanced-details-text-color-secondary: var(--blue-gray-6);
-  --enhanced-details-background-color: var(--white);
-  --enhanced-details-background-color-light: var(--blue-gray-1);
-  --enhanced-details-border-color: var(--blue-gray-4);
+
 }
 
 /* Invert logo colors for light theme */
@@ -334,14 +337,4 @@
 /* No map tile styling for light theme */
 :root[data-theme='filmdrop-light'] .map-tiles {
   filter: none;
-}
-
-:root[data-theme='filmdrop-light'] .Search .MuiSwitch-switchBase:hover {
-  background-color: rgba(108, 194, 74, 0.15);
-}
-
-:root[data-theme='filmdrop-light']
-  .Search
-  .MuiSwitch-switchBase.Mui-checked:hover {
-  background-color: rgba(108, 194, 74, 0.15);
 }

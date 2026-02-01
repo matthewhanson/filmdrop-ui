@@ -8,52 +8,32 @@
 
 .paginationButton {
   padding: 6px 16px;
-  background-color: #ffffff;
-  border: 1px solid #d0d0d0;
+  background-color: var(--map-info-overlay-button-background);
+  border: 1px solid var(--map-info-overlay-button-border);
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  color: #333333;
+  color: var(--map-info-overlay-button-color);
   transition: all 0.2s ease;
   min-width: 80px;
 }
 
 .paginationButton:hover:not(.disabled) {
-  background-color: #f5f5f5;
-  border-color: #999999;
+  background-color: var(--map-info-overlay-button-background-hover);
+  color: var(--map-info-overlay-button-color-hover);
 }
 
 .paginationButton.disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  background-color: #f5f5f5;
+  background-color: var(--map-info-overlay-button-background);
 }
 
 .paginationInfo {
   font-size: 14px;
-  color: #666666;
-  font-weight: 500;
+  color: var(--map-info-overlay-color);
+  font-weight: 400;
   min-width: 100px;
   text-align: center;
-}
-
-/* Dark theme support */
-[data-theme='dark'] .paginationButton {
-  background-color: #2a2a2a;
-  border-color: #555555;
-  color: #e0e0e0;
-}
-
-[data-theme='dark'] .paginationButton:hover:not(.disabled) {
-  background-color: #3a3a3a;
-  border-color: #777777;
-}
-
-[data-theme='dark'] .paginationButton.disabled {
-  background-color: #1a1a1a;
-}
-
-[data-theme='dark'] .paginationInfo {
-  color: #b0b0b0;
 }

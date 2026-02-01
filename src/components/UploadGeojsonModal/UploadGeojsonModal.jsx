@@ -116,8 +116,9 @@ const UploadGeojsonModal = () => {
             Cancel
           </button>
           <button
-            className="uploadGeojsonModalActionButton"
+            className={`uploadGeojsonModalActionButton${!fileData ? ' uploadGeojsonModalActionButtonDisabled' : ''}`}
             onClick={onUploadGeojsonAddClicked}
+            disabled={!fileData}
           >
             Add
           </button>

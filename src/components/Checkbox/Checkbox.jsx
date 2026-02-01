@@ -11,6 +11,7 @@ const Checkbox = ({ label, checked, onChange, className = '' }) => {
         <MuiCheckbox
           checked={checked}
           onChange={onChange}
+          size="small"
           className="Checkbox__input"
         />
         <span className="Checkbox__text">{label}</span>

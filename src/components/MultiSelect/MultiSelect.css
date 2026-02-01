@@ -11,7 +11,7 @@
 
 /* Reduce padding around chips and reset MUI default min-height */
 .MultiSelect__select .MuiSelect-select {
-  padding: 6px 8px !important;
+  padding: 8px 8px !important;
   min-height: 0 !important;
 }
 
@@ -34,7 +34,7 @@
 .MultiSelect__chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
 }
 
 /* Style individual chips */

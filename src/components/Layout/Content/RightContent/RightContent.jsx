@@ -289,7 +289,7 @@ const RightContent = () => {
       <div className="actionButtons">
         {_appConfig.ACTION_BUTTON && (
           <button
-            className="actionButton actionButtonCTA"
+            className="actionButton"
             onClick={() => onActionClick()}
           >
             {_appConfig.ACTION_BUTTON.text}
@@ -308,8 +308,8 @@ const RightContent = () => {
                 : 'resultCountText'
             }
           >
-            Showing {_mappedScenes.length} of {_searchResults.numberMatched}{' '}
-            scenes
+            <strong>Showing {_mappedScenes.length} of {_searchResults.numberMatched}{' '}
+            Scenes</strong>
           </div>
           <div className="pagination">
             <Pagination />

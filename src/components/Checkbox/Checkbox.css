@@ -7,7 +7,7 @@
 
 /* Style the MUI Checkbox */
 .Checkbox__input {
-  padding: 0 !important;
+  padding: 4px !important;
   margin-right: 8px !important;
   color: var(--side-panel-checkbox-color-unchecked) !important;
 }
@@ -19,5 +19,5 @@
 /* Style the label text */
 .Checkbox__text {
   font-size: 14px;
-  color: var(--side-panel-checkbox-label-color);
+  color: var(--side-panel-card-label-color);
 }

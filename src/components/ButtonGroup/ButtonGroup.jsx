@@ -9,7 +9,14 @@ const ButtonGroup = ({ label, buttons, className = '' }) => {
   const activeValue = buttons.find((b) => b.active)?.value ?? null
 
   const handleChange = (_event, newValue) => {
-    if (newValue === null) return // prevent deselecting all
+    if (newValue === null) {
+      // Re-clicking the active button — still fire its handler
+      const active = buttons.find((b) => b.active)
+      if (active && !active.disabled) {
+        active.onClick()
+      }
+      return
+    }
     const button = buttons.find((b) => b.value === newValue)
     if (button && !button.disabled) {
       button.onClick()

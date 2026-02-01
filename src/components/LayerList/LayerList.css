@@ -1,36 +1,37 @@
 .LayerList {
   position: absolute;
-  top: 131px;
+  top: 125px;
   left: 54px;
   z-index: 1;
   background-color: var(--map-info-overlay-background);
   background-clip: padding-box;
-  border-radius: 4px;
+  border: 1px solid var(--map-info-overlay-button-border);
+  border-radius: 5px;
   min-width: 200px;
   max-width: 400px;
   max-height: 300px;
-  font-size: 16px;
+  font-size: 14px;
   display: flex;
   flex-direction: column;
   color: var(--map-info-overlay-color);
 }
 
 .LayerListTitle {
-  border-bottom: solid 2px var(--map-info-overlay-heading-border);
-  height: 35px;
-  margin-bottom: 8px;
+  border-bottom: solid 1px var(--map-info-overlay-heading-border);
+  padding: 6px 0;
   display: flex;
   align-items: center;
 }
 
 .LayerListTitleText {
   margin-left: 15px;
+  font-weight: 400;
+  color: var(--map-info-overlay-heading-color);
 }
 
 .LayerListLayers {
   overflow-y: auto;
-  margin-left: 14px;
-  margin-bottom: 5px;
+  margin-bottom: 2px;
 }
 
 .LayerListLayer {
@@ -39,62 +40,24 @@
 }
 
 .LayerListLayerContainer {
-  display: block;
-  position: relative;
-  padding-left: 25px;
-  margin-bottom: 12px;
-  margin-right: 15px;
+  display: flex;
+  align-items: center;
+  padding-left: 6px;
+  padding-right: 15px;
   cursor: pointer;
-  font-size: 14px;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
+  font-size: 12px;
   user-select: none;
 }
 
-.LayerListLayerContainer input {
-  position: absolute;
-  opacity: 0;
-  cursor: pointer;
-  height: 0;
-  width: 0;
+.LayerListCheckbox {
+  padding: 4px !important;
+  color: var(--map-info-overlay-checkbox-background) !important;
 }
 
-.LayerListCheckmark {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 16px;
-  width: 16px;
-  background-color: var(--map-info-overlay-checkbox-background);
+.LayerListCheckbox.Mui-checked {
+  color: var(--brand-accent-primary) !important;
 }
 
-.LayerListLayerContainer:hover input ~ .LayerListCheckmark {
-  background-color: var(--brand-accent-primary);
-}
-
-.LayerListLayerContainer input:checked ~ .LayerListCheckmark {
-  background-color: var(--brand-accent-primary);
-}
-
-.LayerListCheckmark:after {
-  content: '';
-  position: absolute;
-  display: none;
-}
-
-.LayerListLayerContainer input:checked ~ .LayerListCheckmark:after {
-  display: block;
-}
-
-.LayerListLayerContainer .LayerListCheckmark:after {
-  left: 5px;
-  top: 1px;
-  width: 4px;
-  height: 8px;
-  border: solid #fff;
-  border-width: 0 3px 3px 0;
-  -webkit-transform: rotate(45deg);
-  -ms-transform: rotate(45deg);
-  transform: rotate(45deg);
+.LayerListLayerText {
+  color: var(--map-info-overlay-color);
 }
