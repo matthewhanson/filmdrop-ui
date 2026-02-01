@@ -16,7 +16,7 @@
   width: 95%;
   min-height: 300px;
   min-width: 500px;
-  background-color: var(--map-alert-overlay-secondary-background);
+  background-color: var(--map-info-overlay-secondary-background);
   border-radius: 5px;
 }
 
@@ -26,8 +26,8 @@
   height: 50px;
   width: 100%;
   align-items: center;
-  background-color: var(--map-alert-overlay-primary-background);
-  color: var(--map-alert-overlay-primary-color);
+  background-color: var(--map-info-overlay-background);
+  color: var(--map-info-overlay-color);
   display: flex;
   flex-direction: row;
   font-size: 18px;
@@ -43,7 +43,7 @@
 
 .closeCartModal {
   background-color: transparent;
-  color: var(--map-alert-overlay-primary-color);
+  color: var(--map-info-overlay-color);
   border: 0px;
   font-size: 24px;
   cursor: pointer;

@@ -11,11 +11,12 @@
 .ZoomNotice {
   position: absolute;
   bottom: 10px;
-  left: 12px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 6;
-  background: var(--map-alert-overlay-primary-background);
+  background: var(--map-info-overlay-background);
   padding: 6px 15px;
-  border-radius: 2px;
+  border-radius: 5px;
   font-size: 0.75em;
   animation: fadeIn 0.45s ease-in-out 0.4s forwards;
   opacity: 0;
@@ -25,16 +26,15 @@
 
 .zoomInText {
   all: unset;
-  color: var(--map-alert-overlay-accent-color);
+  color: var(--brand-accent-primary);
   cursor: pointer;
-  transition: border-color 0.33s ease-in-out;
-  border-bottom: 1px solid transparent;
+  transition: color 0.33s ease-in-out;
   display: inline-block;
   margin-left: 10px;
 }
 
 .zoomInText:hover {
-  border-color: var(--map-alert-overlay-accent-color);
+  color: var(--brand-accent-primary-dark);
 }
 
 @keyframes fadeIn {
@@ -257,7 +257,7 @@
 }
 
 .mapAttribution span {
-  color: var(--map-attribution-overlay-color);
+  color: var(--map-info-overlay-button-color);
 }
 
 .mapAttribution a:hover {
@@ -269,7 +269,7 @@ div[data-tooltip-id='attribution-tooltip'] {
   bottom: 4px;
   right: 10px;
   z-index: 1;
-  color: var(--map-attribution-overlay-tooltip-color);
+  color: var(--map-info-overlay-button-color);
 }
 
 div#attribution-tooltip {

@@ -29,18 +29,18 @@ const FieldInfoIcon = ({ field, tooltipPlacement = 'left' }) => {
       componentsProps={{
         tooltip: {
           sx: {
-            backgroundColor: 'var(--map-alert-overlay-primary-background)',
-            color: 'var(--map-alert-overlay-primary-color)',
-            border: '1px solid var(--map-alert-overlay-accent-color)',
+            backgroundColor: 'var(--map-info-overlay-background)',
+            color: 'var(--map-info-overlay-color)',
+            border: '1px solid var(--brand-accent-primary)',
             borderRadius: '6px',
             padding: '8px 12px',
             fontSize: '12px',
             maxWidth: 300,
             zIndex: 1000,
             '& .MuiTooltip-arrow': {
-              color: 'var(--map-alert-overlay-primary-background)',
+              color: 'var(--map-info-overlay-background)',
               '&::before': {
-                border: '1px solid var(--map-alert-overlay-accent-color)'
+                border: '1px solid var(--brand-accent-primary)'
               }
             }
           }

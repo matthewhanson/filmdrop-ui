@@ -15,8 +15,8 @@
   width: 600px;
   max-width: 80%;
   min-height: 280px;
-  background: var(--map-alert-overlay-primary-background);
-  color: var(--map-alert-overlay-primary-color);
+  background: var(--map-info-overlay-background);
+  color: var(--map-info-overlay-color);
   padding: 20px;
   position: relative;
   display: flex;
