@@ -11,6 +11,17 @@ import Card from '../Card/Card'
 
 dayjs.extend(utc)
 
+const calendarSlotProps = {
+  desktopPaper: {
+    sx: {
+      backgroundColor: 'var(--side-panel-background)',
+      color: 'var(--side-panel-heading-color)',
+      border: '1px solid var(--side-panel-input-border)',
+      backgroundImage: 'none'
+    }
+  }
+}
+
 const DateTimeRangeSelector = () => {
   const dispatch = useDispatch()
   const selectedCollectionData = useSelector(
@@ -107,6 +118,7 @@ const DateTimeRangeSelector = () => {
               format="YYYY-MM-DD"
               onChange={handleStartDateChange}
               slotProps={{
+                ...calendarSlotProps,
                 textField: {
                   id: 'startDatePicker',
                   size: 'small'
@@ -123,6 +135,7 @@ const DateTimeRangeSelector = () => {
               format="YYYY-MM-DD"
               onChange={handleEndDateChange}
               slotProps={{
+                ...calendarSlotProps,
                 textField: {
                   id: 'endDatePicker',
                   size: 'small'

@@ -51,11 +51,15 @@
 
 .LayerListCheckbox {
   padding: 4px !important;
-  color: var(--map-info-overlay-checkbox-background) !important;
+  color: var(--map-info-overlay-checkbox-color-unchecked) !important;
 }
 
 .LayerListCheckbox.Mui-checked {
-  color: var(--brand-accent-primary) !important;
+  color: var(--map-info-overlay-checkbox-color-checked) !important;
+}
+
+.LayerListCheckbox:hover {
+  background-color: var(--map-info-overlay-checkbox-hover) !important;
 }
 
 .LayerListLayerText {

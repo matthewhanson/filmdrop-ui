@@ -24,12 +24,13 @@
   margin-top: 4px;
 }
 
-/* Override input font size, padding, background, and height */
+/* Override input font size, padding, background, height, and text color */
 .datePickerContainer .MuiPickersOutlinedInput-root {
   font-size: 12px;
   padding-left: 8px !important;
   padding-right: 8px !important;
   background-color: var(--side-panel-input-background) !important;
+  color: var(--side-panel-input-color) !important;
   height: 36px !important;
   box-sizing: border-box !important;
 }
@@ -59,8 +60,10 @@
 }
 
 .datePickerContainer .MuiPickersOutlinedInput-root input,
-.datePickerContainer .MuiPickersSectionList-sectionContent {
+.datePickerContainer .MuiPickersSectionList-sectionContent,
+.datePickerContainer .MuiPickersSectionList-sectionSeparator {
   font-size: 12px;
+  color: var(--side-panel-input-color);
 }
 
 /* Override default border color */
@@ -79,18 +82,63 @@
   border-width: 1px !important;
 }
 
-/* Override calendar header font size */
+/* Calendar popup - text colors (background set via slotProps in component) */
+
+/* Calendar header (month/year label + navigation arrows) */
 .MuiPickersCalendarHeader-label {
   font-size: 16px !important;
+  color: var(--side-panel-heading-color) !important;
 }
 
-/* Override year picker colors and font size */
+.MuiPickersCalendarHeader-switchViewButton,
+.MuiPickersArrowSwitcher-button {
+  color: var(--side-panel-heading-color) !important;
+}
+
+/* Day-of-week column headers (S, M, T, ...) */
+.MuiDayCalendar-weekDayLabel {
+  color: var(--page-content-color) !important;
+}
+
+/* Day buttons - default state */
+.MuiPickersDay-root {
+  color: var(--side-panel-heading-color) !important;
+}
+
+.MuiPickersDay-root:hover {
+  background-color: var(--side-panel-menu-item-background-hover) !important;
+}
+
+/* Day buttons - today */
+.MuiPickersDay-root.MuiPickersDay-today {
+  border-color: var(--side-panel-toggle-button-background-selected) !important;
+}
+
+/* Day buttons - selected */
+.MuiPickersDay-root.Mui-selected {
+  background-color: var(--side-panel-toggle-button-background-selected) !important;
+  color: var(--white) !important;
+}
+
+.MuiPickersDay-root.Mui-selected:hover {
+  background-color: var(--side-panel-toggle-button-background-selected) !important;
+}
+
+/* Day buttons - disabled / outside current month */
+.MuiPickersDay-root.Mui-disabled {
+  color: var(--page-content-color) !important;
+  opacity: 0.4;
+}
+
+/* Year picker */
 .MuiYearCalendar-button {
   font-size: 16px !important;
+  color: var(--side-panel-heading-color) !important;
 }
 
 .MuiYearCalendar-button.Mui-selected {
   background-color: var(--side-panel-toggle-button-background-selected) !important;
+  color: var(--white) !important;
 }
 
 .MuiYearCalendar-button.Mui-selected:hover {
@@ -98,23 +146,6 @@
 }
 
 .MuiYearCalendar-button:hover {
-  background-color: var(--side-panel-menu-item-background-hover) !important;
-}
-
-/* Override calendar day colors */
-.MuiPickersDay-root.MuiPickersDay-today {
-  border-color: var(--side-panel-toggle-button-background-selected) !important;
-}
-
-.MuiPickersDay-root.Mui-selected {
-  background-color: var(--side-panel-toggle-button-background-selected) !important;
-}
-
-.MuiPickersDay-root.Mui-selected:hover {
-  background-color: var(--side-panel-toggle-button-background-selected) !important;
-}
-
-.MuiPickersDay-root:hover {
   background-color: var(--side-panel-menu-item-background-hover) !important;
 }
 

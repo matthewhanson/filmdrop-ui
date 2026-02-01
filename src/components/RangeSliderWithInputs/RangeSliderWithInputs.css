@@ -110,7 +110,7 @@
 
 .rangeSlider .MuiSlider-thumb:hover,
 .rangeSlider .MuiSlider-thumb.Mui-focusVisible {
-  box-shadow: 0 0 0 9px color-mix(in srgb, var(--side-panel-slider-thumb-hover) 14%, transparent);
+  box-shadow: 0 0 0 9px var(--side-panel-icon-hover);
 }
 
 .rangeSlider .MuiSlider-thumb:active {

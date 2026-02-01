@@ -50,10 +50,16 @@
 .leaflet-touch .leaflet-control-layers {
   border: 1px solid var(--map-info-overlay-button-border);
   border-radius: 5px;
+  background-color: var(--map-info-overlay-background);
 }
 
 .leaflet-touch .leaflet-bar a {
+  background-color: var(--map-info-overlay-background);
   color: var(--map-info-overlay-color);
+}
+
+.leaflet-touch .leaflet-bar a:hover {
+  background-color: var(--map-info-overlay-button-background-hover);
 }
 
 .leaflet-touch .leaflet-bar a:first-child {
@@ -180,6 +186,7 @@
 .tooltip_style {
   font-weight: 600;
   background-color: var(--grid-cell-tooltip);
+  color: var(--white);
   border: 0 none;
   text-align: center;
   line-height: 15px;

@@ -61,10 +61,21 @@
   color: var(--side-panel-input-icon-color);
 }
 
+/* Style dropdown menu paper */
+.MultiSelect__menu {
+  background-color: var(--side-panel-menu-background) !important;
+  color: var(--side-panel-input-color) !important;
+}
+
 /* Style dropdown menu items */
 .MultiSelect__menu .MuiMenuItem-root {
   font-size: 12px !important;
   padding: 6px 16px !important;
+  color: var(--side-panel-input-color) !important;
+}
+
+.MultiSelect__menu .MuiMenuItem-root:hover {
+  background-color: var(--side-panel-menu-item-background-hover) !important;
 }
 
 .MultiSelect__menu .MuiMenuItem-root.Mui-selected {

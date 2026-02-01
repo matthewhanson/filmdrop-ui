@@ -16,6 +16,10 @@
   color: var(--side-panel-checkbox-color-checked) !important;
 }
 
+.Checkbox__input:hover {
+  background-color: var(--side-panel-checkbox-hover) !important;
+}
+
 /* Style the label text */
 .Checkbox__text {
   font-size: 14px;
