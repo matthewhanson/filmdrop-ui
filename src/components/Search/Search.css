@@ -56,6 +56,7 @@
 .leaflet-touch .leaflet-bar a {
   background-color: var(--map-info-overlay-background);
   color: var(--map-info-overlay-color);
+  border-bottom-color: var(--map-info-overlay-button-border);
 }
 
 .leaflet-touch .leaflet-bar a:hover {
