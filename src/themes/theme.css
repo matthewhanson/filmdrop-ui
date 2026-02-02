@@ -37,6 +37,7 @@
 
   /* Header */
   --page-header-background: var(--blue-gray-1);
+  --page-header-border-bottom: var(--blue-gray-4);
   --page-header-button-background: var(--transparent);
   --page-header-button-background-hover: var(--brand-accent-primary);
   --page-header-button-color: var(--blue-gray-7);
@@ -63,13 +64,13 @@
   --side-panel-background: var(--blue-gray-1);
   --side-panel-background-disabled: var(--blue-gray-1);
   --side-panel-heading-color: var(--blue-gray-8);
-  --side-panel-horizontal-divider-color: var(--blue-gray-3);
+  --side-panel-horizontal-divider-color: var(--blue-gray-4);
   --side-panel-link-color: var(--blue-gray-7);
   --side-panel-link-color-hover: var(--blue-gray-8);
   --side-panel-tab-background: var(--blue-gray-1);
   --side-panel-tab-color: var(--blue-gray-8);
   --side-panel-tab-color-inactive: var(--blue-gray-6);
-  --side-panel-tab-separator: var(--blue-gray-3);
+  --side-panel-tab-separator: var(--blue-gray-4);
   --side-panel-tab-bottom-selected: var(--brand-accent-primary);
 
   /* Side Panel - Search Content */
@@ -216,6 +217,7 @@
 
   /* Header */
   --page-header-background: var(--white);
+  --page-header-border-bottom: var(--transparent);
   --page-header-button-background: var(--transparent);
   --page-header-button-background-hover: var(--brand-accent-primary);
   --page-header-button-color: var(--blue-gray-7);

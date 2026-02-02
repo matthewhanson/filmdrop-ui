@@ -2,10 +2,12 @@
   width: 100%;
   height: 64px;
   background-color: var(--page-header-background);
+  /* border-bottom is applied via Content's border-top to avoid z-index conflicts with the map */
   display: flex;
   align-items: stretch;
   justify-content: space-between;
   position: absolute;
+  z-index: 1;
   -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none; /* Safari */
   -khtml-user-select: none; /* Konqueror HTML */
