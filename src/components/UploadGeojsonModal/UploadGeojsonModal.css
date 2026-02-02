@@ -16,6 +16,7 @@
   max-width: 80%;
   min-height: 280px;
   background: var(--map-info-overlay-background);
+  border: 1px solid var(--map-info-overlay-border);
   color: var(--map-info-overlay-color);
   padding: 20px;
   position: relative;

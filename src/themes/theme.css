@@ -321,7 +321,7 @@
   --map-info-overlay-background-hover: var(--blue-gray-2);
   --map-info-overlay-secondary-background: var(--blue-gray-2);
   --map-info-overlay-color: var(--blue-gray-8);
-  --map-info-overlay-border: var(--blue-gray-4);
+  --map-info-overlay-border: var(--transparent);
   --map-info-overlay-button-background: var(--blue-gray-1);
   --map-info-overlay-button-color: var(--blue-gray-7);
   --map-info-overlay-button-border: var(--blue-gray-4);
