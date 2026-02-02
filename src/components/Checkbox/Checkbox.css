@@ -17,7 +17,7 @@
 }
 
 .Checkbox__input:hover {
-  background-color: var(--side-panel-checkbox-hover) !important;
+  background-color: var(--mui-hover) !important;
 }
 
 /* Style the label text */

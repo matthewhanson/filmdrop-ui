@@ -110,14 +110,11 @@
 
 .rangeSlider .MuiSlider-thumb:hover,
 .rangeSlider .MuiSlider-thumb.Mui-focusVisible {
-  box-shadow: 0 0 0 9px var(--side-panel-icon-hover);
+  box-shadow: 0 0 0 9px var(--mui-hover);
 }
 
-.rangeSlider .MuiSlider-thumb:active {
-  box-shadow: 0 0 0 9px color-mix(in srgb, var(--side-panel-slider-thumb-hover) 28%, transparent);
+.rangeSlider .MuiSlider-thumb:active,
+.rangeSlider .MuiSlider-thumb.Mui-active {
+  box-shadow: 0 0 0 12px var(--mui-hover);
 }
 
-/* Remove default MUI thumb ring on hover */
-/* .rangeSlider .MuiSlider-thumb::before {
-  display: none;
-} */

@@ -14,9 +14,9 @@ dayjs.extend(utc)
 const calendarSlotProps = {
   desktopPaper: {
     sx: {
-      backgroundColor: 'var(--side-panel-background)',
-      color: 'var(--side-panel-heading-color)',
-      border: '1px solid var(--side-panel-input-border)',
+      backgroundColor: 'var(--side-panel-datepicker-popup-background)',
+      color: 'var(--side-panel-datepicker-popup-color)',
+      border: '1px solid var(--side-panel-datepicker-popup-border)',
       backgroundImage: 'none'
     }
   }

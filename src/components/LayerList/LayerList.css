@@ -59,7 +59,7 @@
 }
 
 .LayerListCheckbox:hover {
-  background-color: var(--map-info-overlay-checkbox-hover) !important;
+  background-color: var(--mui-hover) !important;
 }
 
 .LayerListLayerText {

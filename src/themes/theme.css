@@ -23,6 +23,8 @@
   --white-alpha-95: rgba(0, 0, 0, 0.85);
   --white-alpha-08: rgba(255, 255, 255, 0.08);
 
+  --mui-hover: color-mix(in srgb, var(--blue-gray-5) 14%, transparent);
+
   /* App */
   --app-background-disabled: var(--blue-gray-alpha-60);
   --app-background-loading: var(--blue-gray-2);
@@ -64,8 +66,6 @@
   --side-panel-horizontal-divider-color: var(--blue-gray-3);
   --side-panel-link-color: var(--blue-gray-7);
   --side-panel-link-color-hover: var(--blue-gray-8);
-  --side-panel-icon-hover: color-mix(in srgb, var(--blue-gray-5) 14%, transparent);
-
   --side-panel-tab-background: var(--blue-gray-1);
   --side-panel-tab-color: var(--blue-gray-8);
   --side-panel-tab-color-inactive: var(--blue-gray-6);
@@ -103,7 +103,6 @@
   --side-panel-slider-rail: var(--blue-gray-4);
   --side-panel-slider-track: var(--brand-accent-primary);
   --side-panel-slider-thumb: var(--brand-accent-primary);
-  --side-panel-slider-thumb-hover: var(--blue-gray-5);
   --side-panel-slider-thumb-border: var(--blue-gray-1);
   --side-panel-slider-value-container-background: var(--blue-gray-1);
   --side-panel-slider-value-container-border: var(--blue-gray-4);
@@ -113,7 +112,12 @@
 
   --side-panel-checkbox-color-unchecked: var(--blue-gray-5);
   --side-panel-checkbox-color-checked: var(--brand-accent-primary);
-  --side-panel-checkbox-hover: var(--side-panel-icon-hover);
+
+  --side-panel-datepicker-popup-background: var(--blue-gray-1);
+  --side-panel-datepicker-popup-color: var(--blue-gray-8);
+  --side-panel-datepicker-popup-border: var(--blue-gray-4);
+  --side-panel-datepicker-selected-background: var(--brand-accent-primary);
+  --side-panel-datepicker-today-border: var(--brand-accent-primary);
 
   --side-panel-chip-background: var(--blue-gray-3);
   --side-panel-chip-color: var(--blue-gray-8);
@@ -152,8 +156,6 @@
   --map-info-overlay-heading-border: var(--blue-gray-3);
   --map-info-overlay-checkbox-color-unchecked: var(--blue-gray-5);
   --map-info-overlay-checkbox-color-checked: var(--brand-accent-primary);
-  --map-info-overlay-icon-hover: color-mix(in srgb, var(--blue-gray-5) 14%, transparent);
-  --map-info-overlay-checkbox-hover: var(--map-info-overlay-icon-hover);
 
   /* Map Overlay - Aggregation */
   --hex-heatmap-legend: var(--blue-gray-8);
@@ -236,13 +238,13 @@
   /* Content */
   --page-content-color: var(--blue-gray-7);
 
-  /* Side Panel - Tab Bar */
+  /* Side Panel */
   --side-panel-background: var(--blue-gray-1);
   --side-panel-background-disabled: var(--blue-gray-1);
   --side-panel-heading-color: var(--blue-gray-8);
   --side-panel-horizontal-divider-color: var(--blue-gray-4);
-  --side-panel-icon-hover: color-mix(in srgb, var(--blue-gray-5) 14%, transparent);
 
+  /* Side Panel - Tab Bar */
   --side-panel-tab-background: var(--blue-gray-1);
   --side-panel-tab-color: var(--blue-gray-8);
   --side-panel-tab-color-inactive: var(--blue-gray-6);
@@ -280,7 +282,6 @@
   --side-panel-slider-rail: var(--blue-gray-4);
   --side-panel-slider-track: var(--brand-accent-primary);
   --side-panel-slider-thumb: var(--brand-accent-primary);
-  --side-panel-slider-thumb-hover: var(--blue-gray-5);
   --side-panel-slider-thumb-border: var(--white);
   --side-panel-slider-value-container-background: var(--blue-gray-1);
   --side-panel-slider-value-container-border: var(--blue-gray-4);
@@ -290,7 +291,12 @@
 
   --side-panel-checkbox-color-unchecked: var(--blue-gray-4);
   --side-panel-checkbox-color-checked: var(--brand-accent-primary);
-  --side-panel-checkbox-hover: var(--side-panel-icon-hover);
+
+  --side-panel-datepicker-popup-background: var(--white);
+  --side-panel-datepicker-popup-color: var(--blue-gray-8);
+  --side-panel-datepicker-popup-border: var(--blue-gray-4);
+  --side-panel-datepicker-selected-background: var(--brand-accent-primary);
+  --side-panel-datepicker-today-border: var(--brand-accent-primary);
 
   --side-panel-chip-background: var(--blue-gray-3);
   --side-panel-chip-color: var(--blue-gray-8);
@@ -324,8 +330,6 @@
   --map-info-overlay-heading-border: var(--blue-gray-3);
   --map-info-overlay-checkbox-color-unchecked: var(--blue-gray-4);
   --map-info-overlay-checkbox-color-checked: var(--brand-accent-primary);
-  --map-info-overlay-icon-hover: color-mix(in srgb, var(--blue-gray-5) 14%, transparent);
-  --map-info-overlay-checkbox-hover: var(--map-info-overlay-icon-hover);
 
   /* Map Overlay - Aggregation */
   --hex-heatmap-legend: var(--blue-gray-8);

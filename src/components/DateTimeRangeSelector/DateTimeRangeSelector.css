@@ -27,8 +27,8 @@
 /* Override input font size, padding, background, height, and text color */
 .datePickerContainer .MuiPickersOutlinedInput-root {
   font-size: 12px;
-  padding-left: 8px !important;
-  padding-right: 8px !important;
+  padding-left: 10px !important;
+  padding-right: 0px !important;
   background-color: var(--side-panel-input-background) !important;
   color: var(--side-panel-input-color) !important;
   height: 36px !important;
@@ -41,17 +41,12 @@
 }
 
 .datePickerContainer .MuiInputAdornment-root .MuiIconButton-root {
-  padding-right: 12px !important;
-  padding-left: 4px !important;
+  padding: 4px !important;
+  margin-right: 4px !important;
 }
 
-/* Disable hover effect and ripple on calendar icon button */
 .datePickerContainer .MuiInputAdornment-root .MuiIconButton-root:hover {
-  background-color: transparent !important;
-}
-
-.datePickerContainer .MuiInputAdornment-root .MuiIconButton-root .MuiTouchRipple-root {
-  display: none !important;
+  background-color: var(--mui-hover) !important;
 }
 
 .datePickerContainer .MuiInputAdornment-root .MuiSvgIcon-root {
@@ -87,12 +82,12 @@
 /* Calendar header (month/year label + navigation arrows) */
 .MuiPickersCalendarHeader-label {
   font-size: 16px !important;
-  color: var(--side-panel-heading-color) !important;
+  color: var(--side-panel-datepicker-popup-color) !important;
 }
 
 .MuiPickersCalendarHeader-switchViewButton,
 .MuiPickersArrowSwitcher-button {
-  color: var(--side-panel-heading-color) !important;
+  color: var(--side-panel-datepicker-popup-color) !important;
 }
 
 /* Day-of-week column headers (S, M, T, ...) */
@@ -102,26 +97,22 @@
 
 /* Day buttons - default state */
 .MuiPickersDay-root {
-  color: var(--side-panel-heading-color) !important;
+  color: var(--side-panel-datepicker-popup-color) !important;
 }
 
 .MuiPickersDay-root:hover {
-  background-color: var(--side-panel-menu-item-background-hover) !important;
+  background-color: var(--mui-hover) !important;
 }
 
 /* Day buttons - today */
 .MuiPickersDay-root.MuiPickersDay-today {
-  border-color: var(--side-panel-toggle-button-background-selected) !important;
+  border-color: var(--side-panel-datepicker-today-border) !important;
 }
 
 /* Day buttons - selected */
 .MuiPickersDay-root.Mui-selected {
-  background-color: var(--side-panel-toggle-button-background-selected) !important;
+  background-color: var(--side-panel-datepicker-selected-background) !important;
   color: var(--white) !important;
-}
-
-.MuiPickersDay-root.Mui-selected:hover {
-  background-color: var(--side-panel-toggle-button-background-selected) !important;
 }
 
 /* Day buttons - disabled / outside current month */
@@ -133,19 +124,16 @@
 /* Year picker */
 .MuiYearCalendar-button {
   font-size: 16px !important;
-  color: var(--side-panel-heading-color) !important;
-}
-
-.MuiYearCalendar-button.Mui-selected {
-  background-color: var(--side-panel-toggle-button-background-selected) !important;
-  color: var(--white) !important;
-}
-
-.MuiYearCalendar-button.Mui-selected:hover {
-  background-color: var(--side-panel-toggle-button-background-selected) !important;
+  color: var(--side-panel-datepicker-popup-color) !important;
 }
 
 .MuiYearCalendar-button:hover {
-  background-color: var(--side-panel-menu-item-background-hover) !important;
+  background-color: var(--mui-hover) !important;
 }
+
+.MuiYearCalendar-button.Mui-selected {
+  background-color: var(--side-panel-datepicker-selected-background) !important;
+  color: var(--white) !important;
+}
+
 
