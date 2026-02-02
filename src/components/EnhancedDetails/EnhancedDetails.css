@@ -1,42 +1,37 @@
 .item-header {
-  margin-bottom: 10px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--brand-accent-primary);
+  margin-bottom: 0;
+  padding-bottom: 8px;
 }
 
 .item-id {
-  margin: 0 0 8px 0;
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--enhanced-details-field-label-color);
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--side-panel-text-color);
   word-break: break-all;
 }
 
 .item-collection {
   margin: 0;
   font-size: 14px;
-  color: var(--enhanced-details-field-value-color);
-  font-style: italic;
+  font-weight: 400;
+  color: var(--side-panel-text-color-secondary);
 }
 
 .fields-container {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 12px;
 }
 
-.group-divider {
-  height: 1px;
-  background-color: var(--brand-accent-primary);
-  margin: 8px 0;
-  width: 100%;
-}
+/* group-divider removed — gap-based spacing handles section separation */
 
 .field-group-title {
-  margin: 0 0 5px 0;
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--enhanced-details-field-label-color);
+  margin: 0;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--side-panel-heading-color);
   text-transform: capitalize;
   display: flex;
   align-items: center;
@@ -62,7 +57,7 @@
 }
 
 .collapse-icon {
-  color: var(--enhanced-details-field-label-color);
+  color: var(--side-panel-card-label-color);
   opacity: 0.8;
 }
 
@@ -72,7 +67,11 @@
 
 .field-group,
 .link-group {
-  margin-top: 10px;
+  margin-top: 0;
+  border: 1px solid var(--side-panel-card-border);
+  border-radius: 6px;
+  background-color: var(--side-panel-card-background);
+  overflow: hidden;
 }
 
 .field-grid,
@@ -81,25 +80,38 @@
   display: grid;
   grid-template-columns: repeat(var(--columns, 1), 1fr);
   gap: 10px;
+  padding: 8px 12px 12px 12px;
+  border-top: 1px solid var(--side-panel-card-border);
 }
 
 .field-grid {
-  gap: 5px;
+  gap: 0;
+  grid-template-columns: auto 1fr;
+  padding-top: 8px;
 }
 
 .field-grid-item {
-  display: flex;
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: 1 / -1;
   align-items: baseline;
-  gap: 4px;
+  gap: 0 6px;
   word-break: break-word;
   min-width: 0;
+  padding: 4px 0;
 }
 
 .field-label-inline {
-  font-weight: 500;
-  color: var(--enhanced-details-field-label-color);
+  font-weight: 400;
+  color: var(--side-panel-text-color-secondary);
   font-size: 14px;
   flex-shrink: 0;
+}
+
+.field-label-has-tooltip {
+  text-decoration: underline dotted var(--side-panel-card-label-color);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
 }
 
 .asset-card .field-label-inline {
@@ -108,12 +120,12 @@
 }
 
 .field-value-inline {
-  color: var(--enhanced-details-field-value-color);
+  color: var(--side-panel-text-color);
   flex: 1;
   display: flex;
   align-items: center;
   word-break: break-word;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .asset-list .field-value-inline {
@@ -138,13 +150,13 @@
 
 .asset-description {
   font-size: 0.9em;
-  color: var(--enhanced-details-field-value-color);
+  color: var(--side-panel-text-color);
   font-style: italic;
 }
 
 .asset-details {
   font-size: 0.85em;
-  color: var(--enhanced-details-field-value-color);
+  color: var(--side-panel-text-color);
 }
 
 .asset-actions {
@@ -160,37 +172,41 @@
   display: inline;
 }
 
-.asset-.asset-list,
+.asset-list,
 .link-display {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 12px;
 }
 
-.data-files-section {
-  padding: 8px 0;
+/* Section wrapper and heading (matches Search tab pattern) */
+.EnhancedDetails__section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.data-files-title {
+.EnhancedDetails__heading {
   font-size: 16px;
   font-weight: 600;
-  color: var(--enhanced-details-text-color);
-  margin: 0 0 8px 0;
-  padding: 0;
+  color: var(--side-panel-heading-color);
+  letter-spacing: 0;
+  margin-bottom: 4px;
 }
 
-/* Asset card styling */
+/* Asset item styling (plain rows, no card borders) */
 .asset-card {
-  border: 1px solid var(--brand-accent-primary);
-  background-color: var(--action-button-color);
-  color: var(--enhanced-details-text-color);
-  padding: 10px 12px;
-  border-radius: 6px;
+  color: var(--side-panel-text-color);
+  padding: 10px 0;
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 8px;
   align-items: start;
   overflow: hidden;
+}
+
+.asset-card + .asset-card {
+  border-top: 1px solid var(--side-panel-horizontal-divider-color);
 }
 
 .asset-content {
@@ -209,9 +225,9 @@
 }
 
 .tooltip-enhancedDetails {
-  background-color: var(--enhanced-details-primary-background) !important;
-  color: var(--enhanced-details-field-label-color) !important;
-  border: 1px solid var(--brand-accent-primary) !important;
+  background-color: var(--side-panel-card-background) !important;
+  color: var(--side-panel-card-label-color) !important;
+  border: 1px solid var(--side-panel-card-border) !important;
   border-radius: 6px !important;
   padding: 8px 12px !important;
   font-size: 12px !important;
@@ -220,11 +236,21 @@
 }
 
 .tooltip-enhancedDetails .MuiTooltip-arrow {
-  color: var(--enhanced-details-primary-background) !important;
+  color: var(--side-panel-card-background) !important;
 }
 
 .tooltip-enhancedDetails .MuiTooltip-arrow::before {
-  border: 1px solid var(--brand-accent-primary) !important;
+  border: 1px solid var(--side-panel-card-border) !important;
+}
+
+.tooltip-field-label {
+  background-color: var(--side-panel-card-background) !important;
+  color: var(--side-panel-text-color) !important;
+  border-radius: 4px !important;
+  padding: 6px 10px !important;
+  font-size: 12px !important;
+  max-width: 260px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
 }
 
 .icon-info,
@@ -283,17 +309,18 @@
   min-width: 0;
 }
 
-/* Link card styling */
+/* Link item styling (plain rows, no card borders) */
 .link-card {
-  border: 1px solid var(--brand-accent-primary);
-  background-color: var(--action-button-color);
-  color: var(--enhanced-details-text-color);
-  padding: 10px 12px;
-  border-radius: 6px;
+  color: var(--side-panel-text-color);
+  padding: 10px 0;
   display: flex;
   flex-direction: column;
   gap: 4px;
   overflow: hidden;
+}
+
+.link-card + .link-card {
+  border-top: 1px solid var(--side-panel-horizontal-divider-color);
 }
 
 .link-content {
@@ -305,12 +332,12 @@
 
 .link-title {
   font-weight: 500;
-  color: var(--enhanced-details-field-label-color);
+  color: var(--side-panel-card-label-color);
   font-size: 14px;
 }
 
 .link-href-display {
-  color: var(--enhanced-details-field-value-color);
+  color: var(--side-panel-text-color);
   font-size: 12px;
   font-family: monospace;
   word-break: break-all;

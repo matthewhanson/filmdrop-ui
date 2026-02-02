@@ -21,15 +21,6 @@ const TruncatedFieldValue = ({ field, value }) => {
 
       const text = containerRef.current.textContent || ''
 
-      // Check if text has no spaces
-      const hasNoSpaces = !/\s/.test(text)
-
-      if (!hasNoSpaces) {
-        setShouldTruncate(false)
-        return
-      }
-
-      // For text without spaces, check if it would overflow with nowrap
       // Get the parent container width (field-value-inline)
       const parent = containerRef.current.parentElement
       if (!parent) {

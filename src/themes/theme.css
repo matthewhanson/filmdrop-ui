@@ -73,7 +73,7 @@
   --side-panel-tab-separator: var(--blue-gray-4);
   --side-panel-tab-bottom-selected: var(--brand-accent-primary);
 
-  /* Side Panel - Search Content */
+  /* Side Panel */
   --side-panel-scrollbar-track: var(--blue-gray-2);
   --side-panel-scrollbar-thumb: var(--blue-gray-5);
   --side-panel-scrollbar-thumb-hover: var(--blue-gray-6);
@@ -130,16 +130,8 @@
   --side-panel-button-background-hover: var(--blue-gray-4);
   --side-panel-button-border: var(--blue-gray-5);
 
-  /* Side Panel - Enhanced Details Content */
-  --columns: 1;
-  --enhanced-details-field-label-color: var(--blue-gray-7);
-  --enhanced-details-field-value-color: var(--blue-gray-8);
-  --enhanced-details-primary-background: var(--blue-gray-2);
-  --enhanced-details-text-color: var(--blue-gray-8);
-  --enhanced-details-text-color-secondary: var(--blue-gray-6);
-  --enhanced-details-background-color: var(--blue-gray-2);
-  --enhanced-details-background-color-light: var(--blue-gray-1);
-  --enhanced-details-border-color: var(--blue-gray-4);
+  --side-panel-text-color: var(--blue-gray-8);
+  --side-panel-text-color-secondary: var(--blue-gray-6);
 
   /* Map Overlay */
   --map-info-overlay-background: var(--blue-gray-1);
@@ -253,7 +245,7 @@
   --side-panel-tab-separator: var(--blue-gray-3);
   --side-panel-tab-bottom-selected: var(--brand-accent-primary);
 
-  /* Side Panel - Search Content */
+  /* Side Panel */
   --side-panel-scrollbar-track: var(--blue-gray-2);
   --side-panel-scrollbar-thumb: var(--blue-gray-5);
   --side-panel-scrollbar-thumb-hover: var(--blue-gray-6);
@@ -305,16 +297,13 @@
   --side-panel-chip-delete-icon-color: var(--brand-accent-primary);
   --side-panel-chip-delete-icon-color-hover: var(--brand-accent-primary-dark);
 
-    /* Side Panel - Enhanced Details Content*/
-  --columns: 1;
-  --enhanced-details-field-label-color: var(--blue-gray-7);
-  --enhanced-details-field-value-color: var(--blue-gray-8);
-  --enhanced-details-primary-background: var(--white);
-  --enhanced-details-text-color: var(--blue-gray-8);
-  --enhanced-details-text-color-secondary: var(--blue-gray-6);
-  --enhanced-details-background-color: var(--white);
-  --enhanced-details-background-color-light: var(--blue-gray-1);
-  --enhanced-details-border-color: var(--blue-gray-4);
+  --side-panel-button-color: var(--blue-gray-8);
+  --side-panel-button-background: var(--white);
+  --side-panel-button-background-hover: var(--blue-gray-2);
+  --side-panel-button-border: var(--blue-gray-4);
+
+  --side-panel-text-color: var(--blue-gray-8);
+  --side-panel-text-color-secondary: var(--blue-gray-6);
 
   /* Map Overlay */
   --map-info-overlay-background: var(--white);

@@ -119,54 +119,47 @@ const EnhancedDetailsDisplay = () => {
         collection={currentPopupResult.collection}
       />
 
-      <div className="fields-container">
-        {hasEnhancedConfig
-          ? Object.entries(groupedFields).map(
-              ([groupName, fields], index, array) => {
-                const normalized = normalizeGroupName(groupName)
-                const isCore =
-                  normalized === 'group-core-fields' ||
-                  normalized === 'core-fields'
-                return (
-                  <React.Fragment key={groupName}>
+      <div className="EnhancedDetails__section">
+        <div className="fields-container">
+          {hasEnhancedConfig
+            ? Object.entries(groupedFields).map(
+                ([groupName, fields]) => {
+                  const normalized = normalizeGroupName(groupName)
+                  const isCore =
+                    normalized === 'group-core-fields' ||
+                    normalized === 'core-fields'
+                  return (
                     <FieldGroup
+                      key={groupName}
                       group={[groupName, fields]}
                       sortFields={sortFields}
                       isConfigured={true}
                       defaultExpanded={isCore}
                     />
-                    {index < array.length - 1 && (
-                      <div className="group-divider" />
-                    )}
-                  </React.Fragment>
-                )
-              }
-            )
-          : groupedFields.map((group, index, array) => (
-              <React.Fragment key={group.name}>
+                  )
+                }
+              )
+            : groupedFields.map((group, index) => (
                 <FieldGroup
+                  key={group.name}
                   group={group}
                   isConfigured={false}
                   defaultExpanded={index === 0}
                 />
-                {index < array.length - 1 && <div className="group-divider" />}
-              </React.Fragment>
-            ))}
+              ))}
+        </div>
       </div>
-      <div className="group-divider" />
 
       {currentPopupResult.assets &&
         Object.keys(currentPopupResult.assets).length > 0 && (
-          <>
-            <div className="data-files-section">
-              <h3 className="data-files-title">Assets</h3>
-              {hasEnhancedConfig ? (
-                <AssetDisplay assets={currentPopupResult.assets} />
-              ) : (
-                <DefaultAssetDisplay assets={currentPopupResult.assets} />
-              )}
-            </div>
-          </>
+          <div className="EnhancedDetails__section">
+            <h2 className="EnhancedDetails__heading">Assets</h2>
+            {hasEnhancedConfig ? (
+              <AssetDisplay assets={currentPopupResult.assets} />
+            ) : (
+              <DefaultAssetDisplay assets={currentPopupResult.assets} />
+            )}
+          </div>
         )}
 
       {(() => {
@@ -185,13 +178,10 @@ const EnhancedDetailsDisplay = () => {
         }
 
         return (
-          <>
-            <div className="group-divider" />
-            <div className="data-files-section">
-              <h3 className="data-files-title">Links</h3>
-              <LinkDisplay selfLink={selfLink} otherLinks={otherLinks} />
-            </div>
-          </>
+          <div className="EnhancedDetails__section">
+            <h2 className="EnhancedDetails__heading">Links</h2>
+            <LinkDisplay selfLink={selfLink} otherLinks={otherLinks} />
+          </div>
         )
       })()}
     </div>
