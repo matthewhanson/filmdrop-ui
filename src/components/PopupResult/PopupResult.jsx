@@ -22,14 +22,17 @@ const PopupResult = (props) => {
         ({ rel }) => rel === 'thumbnail'
       )?.href
 
+      setthumbnailURL(null)
+
+      if (!thumbnailURLForSelection) {
+        return
+      }
+
       const image = new Image()
       image.onload = function () {
         if (this.width > 0) {
           setthumbnailURL(thumbnailURLForSelection)
         }
-      }
-      image.onerror = function () {
-        setthumbnailURL('/ThumbnailNotAvailable.png')
       }
       image.src = thumbnailURLForSelection
     }
@@ -47,8 +50,8 @@ const PopupResult = (props) => {
     >
       {props.result ? (
         <div className="popupResultHero">
-          <div className="popupResultThumbnailContainer">
-            {thumbnailURL ? (
+          {thumbnailURL && (
+            <div className="popupResultThumbnailContainer">
               <picture>
                 <img
                   src={thumbnailURL}
@@ -56,12 +59,12 @@ const PopupResult = (props) => {
                   className="popupResultThumbnail"
                   onError={({ currentTarget }) => {
                     currentTarget.onerror = null // prevents looping
-                    currentTarget.parentElement.remove()
+                    currentTarget.parentElement.parentElement.remove()
                   }}
                 ></img>
               </picture>
-            ) : null}
-          </div>
+            </div>
+          )}
           <ItemHeader
             id={props.result.id}
             collection={props.result.collection}

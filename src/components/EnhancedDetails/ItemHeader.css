@@ -1,0 +1,35 @@
+.item-header {
+  margin-bottom: 28px;
+}
+
+.item-header-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.item-header-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.item-header-label {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--side-panel-text-color-secondary);
+}
+
+.item-header-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--side-panel-text-color);
+  line-height: 1.4;
+}
+
+.item-header-value--truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

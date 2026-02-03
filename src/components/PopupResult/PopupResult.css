@@ -6,12 +6,10 @@
 .popupResultHero {
   display: flex;
   flex-direction: column;
-  align-items: center;
 }
 
 .popupResultHero .item-header {
   width: 100%;
-  max-width: 304px;
 }
 
 .popupResultThumbnailContainer {
@@ -20,13 +18,13 @@
   align-items: center;
   justify-content: center;
   margin-top: 8px;
-  margin-bottom: 6px;
-  min-height: 230px;
+  margin-bottom: 10px;
 }
 
 .popupResultThumbnail {
   width: 100%;
   max-width: 304px;
+  border-radius: 4px;
 }
 
 .popupResultDetails {
