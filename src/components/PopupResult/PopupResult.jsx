@@ -22,12 +22,13 @@ const PopupResult = (props) => {
         ({ rel }) => rel === 'thumbnail'
       )?.href
 
-      setthumbnailURL(null)
-
+      // If no thumbnail available, clear immediately
       if (!thumbnailURLForSelection) {
+        setthumbnailURL(null)
         return
       }
 
+      // Preload the new image, keeping the previous one visible until ready
       const image = new Image()
       image.onload = function () {
         if (this.width > 0) {
