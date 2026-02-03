@@ -7,7 +7,7 @@
   background-color: var(--side-panel-background);
   border: 1px solid var(--side-panel-background);
   border-left: none;
-  border-radius: 0 4px 4px 0;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   padding: 8px 0px;
   cursor: pointer;
   display: flex;
@@ -23,7 +23,7 @@
 .PanelToggle.rightSidebar {
   border-left: 1px solid var(--side-panel-background);
   border-right: none;
-  border-radius: 4px 0 0 4px;
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
   box-shadow: -2px 0 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -48,21 +48,21 @@
 .PanelToggle:before {
   top: -7px;
   border-bottom: 3px solid var(--side-panel-background);
-  border-radius: 0px 0px 0px 6px;
+  border-radius: 0px 0px 0px var(--radius-md);
 }
 
 .PanelToggle.rightSidebar:before {
-  border-radius: 0px 0px 6px 0px;
+  border-radius: 0px 0px var(--radius-md) 0px;
 }
 
 .PanelToggle:after {
   bottom: -7px;
   border-top: 3px solid var(--side-panel-background);
-  border-radius: 6px 0px 0px 0px;
+  border-radius: var(--radius-md) 0px 0px 0px;
 }
 
 .PanelToggle.rightSidebar:after {
-  border-radius: 0px 6px 0px 0px;
+  border-radius: 0px var(--radius-md) 0px 0px;
 }
 
 .PanelToggle:hover svg {

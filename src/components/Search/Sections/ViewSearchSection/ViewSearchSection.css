@@ -30,7 +30,7 @@
   background: var(--brand-accent-primary);
   color: var(--white);
   border: none;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   font-size: 18px;
   font-weight: 600;
   cursor: pointer;

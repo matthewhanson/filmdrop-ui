@@ -1,7 +1,7 @@
 .ButtonGroup__buttons.MuiToggleButtonGroup-root {
   width: 100%;
   border: 1px solid var(--side-panel-toggle-button-border);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   overflow: hidden;
 }
 

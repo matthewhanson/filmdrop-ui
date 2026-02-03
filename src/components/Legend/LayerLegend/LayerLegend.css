@@ -7,7 +7,7 @@
   background-color: var(--map-info-overlay-background);
   border: 1px solid var(--map-info-overlay-border);
   color: var(--map-info-overlay-color);
-  border-radius: 5px;
+  border-radius: var(--radius-md);
   display: flex;
   flex-direction: column;
   justify-content: center;

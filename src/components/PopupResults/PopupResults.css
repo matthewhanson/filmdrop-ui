@@ -32,7 +32,7 @@
 
 .popupResultsContent::-webkit-scrollbar-thumb {
   background: var(--side-panel-scrollbar-thumb);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 .popupResultsContent::-webkit-scrollbar-thumb:hover {

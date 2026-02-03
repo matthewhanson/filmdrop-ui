@@ -10,7 +10,7 @@
   padding: 6px 16px;
   background-color: var(--map-info-overlay-button-background);
   border: 1px solid var(--map-info-overlay-button-border);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;

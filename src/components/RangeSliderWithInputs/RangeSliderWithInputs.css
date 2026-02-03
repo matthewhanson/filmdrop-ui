@@ -24,7 +24,7 @@
   flex-shrink: 0;
   background: var(--side-panel-slider-value-container-background);
   border: 1px solid var(--side-panel-slider-value-container-border);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   padding: 0 8px;
   height: 28px;
 }
@@ -86,7 +86,7 @@
 /* Slider rail (inactive/background track) */
 .rangeSlider .MuiSlider-rail {
   height: 6px;
-  border-radius: 3px;
+  border-radius: var(--radius-xs);
   background-color: var(--side-panel-slider-rail);
   opacity: 1;
 }
@@ -94,7 +94,7 @@
 /* Slider track (active/selected range) */
 .rangeSlider .MuiSlider-track {
   height: 6px;
-  border-radius: 3px;
+  border-radius: var(--radius-xs);
   background-color: var(--side-panel-slider-track);
   border: none;
 }

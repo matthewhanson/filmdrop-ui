@@ -34,7 +34,7 @@
   height: 30px;
   width: 30px;
   border: 1px solid var(--side-panel-button-border);
-  border-radius: 5px;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -64,7 +64,7 @@
   height: 30px;
   width: 30px;
   border: 1px solid var(--side-panel-button-border);
-  border-radius: 5px;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;

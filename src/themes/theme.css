@@ -1,3 +1,12 @@
+/* ------------------- SHARED DESIGN TOKENS ------------------- */
+:root {
+  /* Border Radius Scale */
+  --radius-xs: 3px;      /* slider tracks, small internal elements */
+  --radius-sm: 4px;      /* inputs, chips, buttons, small interactive elements */
+  --radius-md: 6px;      /* cards, containers, panels */
+  --radius-pill: 9999px; /* badges, pills, fully rounded elements */
+}
+
 /* ------------------- DARK THEME ------------------- */
 :root[data-theme='filmdrop-dark'] {
   /* Dark Color Palette

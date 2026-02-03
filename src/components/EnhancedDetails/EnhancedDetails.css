@@ -3,7 +3,7 @@
   flex-direction: column;
   gap: 0;
   border: 1px solid var(--side-panel-card-border);
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   background-color: var(--side-panel-card-background);
   overflow: hidden;
 }
@@ -61,7 +61,7 @@
   color: var(--brand-accent-primary);
   background: var(--brand-accent-primary-light);
   padding: 2px 8px;
-  border-radius: 10px;
+  border-radius: var(--radius-pill);
   line-height: 1.2;
 }
 
@@ -202,7 +202,7 @@
   flex-direction: column;
   gap: 0;
   border: 1px solid var(--side-panel-card-border);
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   background-color: var(--side-panel-card-background);
   overflow: hidden;
 }
@@ -264,7 +264,7 @@
 .tooltip-field-label {
   background-color: var(--side-panel-card-background) !important;
   color: var(--side-panel-text-color) !important;
-  border-radius: 4px !important;
+  border-radius: var(--radius-sm) !important;
   padding: 6px 10px !important;
   font-size: 12px !important;
   max-width: 260px !important;

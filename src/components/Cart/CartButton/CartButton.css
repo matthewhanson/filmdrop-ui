@@ -5,7 +5,7 @@
   justify-content: center;
   height: 30px;
   width: 35px;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   border: 1px var(--cart-button-border-disabled) solid;
   padding: 10px;
   font-size: 16px;
@@ -33,7 +33,7 @@
   align-items: center;
   justify-content: center;
   margin-top: 3px;
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   font-weight: 400;
 }
 

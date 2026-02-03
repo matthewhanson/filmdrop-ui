@@ -17,7 +17,7 @@
   background: var(--map-info-overlay-background);
   border: 1px solid var(--map-info-overlay-border);
   padding: 6px 15px;
-  border-radius: 5px;
+  border-radius: var(--radius-md);
   font-size: 0.75em;
   animation: fadeIn 0.45s ease-in-out 0.4s forwards;
   opacity: 0;
@@ -60,7 +60,7 @@
   background-color: var(--action-button-background);
   color: var(--action-button-color);
   border: 0px;
-  border-radius: 5px;
+  border-radius: var(--radius-md);
   font-size: 16px;
   font-weight: 700;
   height: 35px;
@@ -104,7 +104,7 @@
   background-color: var(--map-info-overlay-background);
   border: 1px solid var(--map-info-overlay-border);
   padding: 8px 10px;
-  border-radius: 5px;
+  border-radius: var(--radius-md);
   color: var(--map-info-overlay-color);
   align-items: center;
   font-size: 14px;
@@ -136,7 +136,7 @@
   background-color: var(--map-info-overlay-button-background);
   color: var(--map-info-overlay-button-color);
   border: 1px solid var(--map-info-overlay-button-border);
-  border-radius: 5px;
+  border-radius: var(--radius-md);
   height: 28px;
   font-size: 14px;
   display: flex;
@@ -182,7 +182,7 @@
   background-color: var(--map-info-overlay-background);
   border: 1px solid var(--map-info-overlay-border);
   padding: 10px 20px;
-  border-radius: 5px;
+  border-radius: var(--radius-md);
   color: var(--map-info-overlay-color);
   align-items: center;
   justify-content: center;
@@ -212,7 +212,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 5px;
+  border-radius: var(--radius-md);
   margin-left: 30px;
 }
 
@@ -293,7 +293,7 @@ div#attribution-tooltip {
   height: 30px;
   width: 30px;
   cursor: pointer;
-  border-radius: 5px;
+  border-radius: var(--radius-md);
   border: solid 1px var(--map-info-overlay-border);
   display: flex;
   align-items: center;
@@ -318,7 +318,7 @@ div#attribution-tooltip {
   height: 30px;
   width: 30px;
   cursor: pointer;
-  border-radius: 5px;
+  border-radius: var(--radius-md);
   border: solid 2px rgba(0, 0, 0, 0.2);
   display: flex;
   align-items: center;
@@ -388,7 +388,7 @@ div#attribution-tooltip {
   background-color: var(--map-info-overlay-background);
   border: 1px solid var(--map-info-overlay-border);
   padding: 8px 10px;
-  border-radius: 5px;
+  border-radius: var(--radius-md);
   color: var(--map-info-overlay-color);
   align-items: center;
   justify-content: center;

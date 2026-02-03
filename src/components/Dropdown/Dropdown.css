@@ -19,7 +19,7 @@
 /* Style the outlined input */
 .Dropdown__select .MuiOutlinedInput-notchedOutline {
   border: 1px solid var(--side-panel-input-border);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 .Dropdown__select:hover .MuiOutlinedInput-notchedOutline {
