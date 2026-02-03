@@ -78,11 +78,6 @@
   padding-bottom: 8px;
 }
 
-.enhancedDetailsSection .fields-container {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
 
 .stac-link-section {
   padding: 12px 0;

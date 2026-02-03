@@ -79,6 +79,7 @@
   --side-panel-scrollbar-thumb-hover: var(--blue-gray-6);
 
   --side-panel-card-background: var(--blue-gray-2);
+  --side-panel-card-content-background: var(--blue-gray-1);
   --side-panel-card-border: var(--blue-gray-3);
   --side-panel-card-label-color: var(--blue-gray-7);
 
@@ -251,6 +252,7 @@
   --side-panel-scrollbar-thumb-hover: var(--blue-gray-6);
 
   --side-panel-card-background: var(--white);
+  --side-panel-card-content-background: var(--blue-gray-1);
   --side-panel-card-border: var(--blue-gray-3);
   --side-panel-card-label-color: var(--blue-gray-7);
 

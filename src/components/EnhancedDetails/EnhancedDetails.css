@@ -21,7 +21,11 @@
 .fields-container {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 0;
+  border: 1px solid var(--side-panel-card-border);
+  border-radius: 6px;
+  background-color: var(--side-panel-card-background);
+  overflow: hidden;
 }
 
 /* group-divider removed — gap-based spacing handles section separation */
@@ -68,10 +72,22 @@
 .field-group,
 .link-group {
   margin-top: 0;
-  border: 1px solid var(--side-panel-card-border);
-  border-radius: 6px;
-  background-color: var(--side-panel-card-background);
-  overflow: hidden;
+}
+
+.field-group + .field-group,
+.link-group + .link-group {
+  position: relative;
+}
+
+.field-group + .field-group::before,
+.link-group + .link-group::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 12px;
+  right: 12px;
+  height: 1px;
+  background-color: var(--side-panel-card-border);
 }
 
 .field-grid,
@@ -80,8 +96,8 @@
   display: grid;
   grid-template-columns: repeat(var(--columns, 1), 1fr);
   gap: 0;
-  padding: 4px 12px 8px 12px;
-  border-top: 1px solid var(--side-panel-card-border);
+  padding: 0 12px 8px 12px;
+  margin-left: 12px;
 }
 
 .asset-grid {
@@ -91,7 +107,6 @@
 .field-grid {
   gap: 0;
   grid-template-columns: auto 1fr;
-  padding-top: 8px;
 }
 
 .field-grid-item {
@@ -175,7 +190,11 @@
 .link-display {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 0;
+  border: 1px solid var(--side-panel-card-border);
+  border-radius: 6px;
+  background-color: var(--side-panel-card-background);
+  overflow: hidden;
 }
 
 /* Section wrapper and heading (matches Search tab pattern) */
@@ -202,6 +221,10 @@
 
 .asset-card {
   border-bottom: 1px solid var(--side-panel-horizontal-divider-color);
+}
+
+.asset-card:last-child {
+  border-bottom: none;
 }
 
 

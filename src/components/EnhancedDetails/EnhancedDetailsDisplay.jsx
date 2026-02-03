@@ -114,6 +114,7 @@ const EnhancedDetailsDisplay = () => {
       style={{ '--columns': enhancedColumns }}
     >
       <div className="EnhancedDetails__section">
+        <h2 className="EnhancedDetails__heading">Properties</h2>
         <div className="fields-container">
           {hasEnhancedConfig
             ? Object.entries(groupedFields).map(
