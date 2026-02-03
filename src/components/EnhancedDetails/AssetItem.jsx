@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
-import InfoIcon from '@mui/icons-material/Info'
 import Tooltip from '@mui/material/Tooltip'
 import { sanitizeFieldValue } from '../../utils/securityHelper.js'
 import {
@@ -35,124 +34,79 @@ function formatFileSize(bytes) {
 const AssetItem = React.memo(({ asset, copiedUrl, onCopyToClipboard }) => {
   const assetLabel = getAssetLabel(asset.key, asset)
 
-  // Build the details string with custom roles and file type abbreviation
-  const detailsParts = []
+  // Build metadata lines as separate entries
+  const metadataLines = []
 
-  // Show custom roles (non-standard roles like 'reflectance', 'temperature', etc.)
   const customRoles = getCustomRoles(asset)
   if (customRoles.length > 0) {
-    detailsParts.push(`Roles: ${customRoles.join(', ')}`)
+    metadataLines.push(`Roles: ${customRoles.join(', ')}`)
   }
 
-  // Show file type abbreviation (e.g., COG, JP2, JSON)
   const fileType = getFileType(asset.type || asset.href)
   if (fileType) {
     const abbreviation = getFileTypeAbbreviation(fileType)
-    detailsParts.push(`Type: ${abbreviation}`)
+    metadataLines.push(`Type: ${abbreviation}`)
   }
 
-  // Show GSD if available
   if (asset.gsd) {
-    detailsParts.push(`GSD: ${asset.gsd}`)
+    metadataLines.push(`GSD: ${asset.gsd}`)
   }
 
-  // Show file size if available
   if (asset['file:size'] || asset.size) {
     const sizeBytes = asset['file:size'] || asset.size
     const sizeFormatted = formatFileSize(sizeBytes)
-    detailsParts.push(`Size: ${sizeFormatted}`)
+    metadataLines.push(`Size: ${sizeFormatted}`)
   }
-
-  // Show title if different from label
-  if (asset.title && asset.title !== assetLabel) {
-    detailsParts.push(asset.title)
-  }
-
-  const detailsString = detailsParts.join(' | ')
 
   return (
     <div role="listitem" className="asset-card">
       <div className="asset-content">
         <div className="asset-title-row">
-          <Tooltip
-            title={copiedUrl === asset.key ? 'Copied!' : 'Click to copy link'}
-            placement="top-start"
-            arrow
-            slotProps={{
-              tooltip: {
-                className: 'tooltip-enhancedDetails'
-              }
-            }}
-          >
-            <span
-              className="field-label-inline copy-target"
-              role="button"
-              tabIndex={0}
-              onClick={() => onCopyToClipboard(asset.href, asset.key)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  onCopyToClipboard(asset.href, asset.key)
-                }
-              }}
-            >
-              {sanitizeFieldValue(assetLabel)}
-            </span>
-          </Tooltip>
-          {asset.description && (
-            <Tooltip
-              title={sanitizeFieldValue(asset.description)}
-              placement="top-start"
-              arrow
-              slotProps={{
-                tooltip: {
-                  className: 'tooltip-enhancedDetails'
-                }
-              }}
-            >
-              <span
-                aria-label={`Information about ${assetLabel}`}
-                style={{ display: 'inline-flex' }}
-              >
-                <InfoIcon className="icon-info" />
-              </span>
-            </Tooltip>
-          )}
+          <span className="field-label-inline">
+            {sanitizeFieldValue(assetLabel)}
+          </span>
         </div>
-        {(asset.description || detailsString) && (
+        {(asset.description || metadataLines.length > 0) && (
           <div className="asset-details-row">
             {asset.description && (
               <div className="asset-description">
                 {sanitizeFieldValue(asset.description)}
               </div>
             )}
-            {detailsString && (
-              <div className="asset-details">
-                {sanitizeFieldValue(detailsString)}
+            {metadataLines.map((line) => (
+              <div key={line} className="asset-meta-line">
+                {sanitizeFieldValue(line)}
               </div>
-            )}
+            ))}
           </div>
         )}
-      </div>
-      <div className="asset-actions">
-        <Tooltip
-          title={copiedUrl === asset.key ? 'Copied!' : 'Click to copy link'}
-          placement="top-end"
-          arrow
-          slotProps={{
-            tooltip: {
-              className: 'tooltip-enhancedDetails'
-            }
-          }}
-        >
-          <button
-            className="asset-copy-button"
-            onClick={() => onCopyToClipboard(asset.href, asset.key)}
-            type="button"
-            aria-label="Copy Link to Clipboard"
+        <div className="asset-actions">
+          <Tooltip
+            title={copiedUrl === asset.key ? 'Copied!' : 'Copy link'}
+            placement="top-start"
+            slotProps={{
+              tooltip: {
+                className: 'tooltip-field-label'
+              }
+            }}
           >
-            <ContentCopyIcon className="icon-copy" />
-          </button>
-        </Tooltip>
+            <span
+              role="button"
+              tabIndex={0}
+              onClick={() => onCopyToClipboard(asset.href, asset.key)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  onCopyToClipboard(asset.href, asset.key)
+                }
+              }}
+              style={{ display: 'inline-flex', cursor: 'pointer' }}
+              aria-label="Copy link to clipboard"
+            >
+              <ContentCopyIcon fontSize="small" />
+            </span>
+          </Tooltip>
+        </div>
       </div>
     </div>
   )

@@ -64,7 +64,7 @@ const TruncatedFieldValue = ({ field, value }) => {
       disableHoverListener={!shouldTruncate}
       componentsProps={{
         tooltip: {
-          className: 'tooltip-enhancedDetails'
+          className: 'tooltip-field-label'
         }
       }}
     >

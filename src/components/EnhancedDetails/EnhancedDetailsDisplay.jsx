@@ -10,7 +10,6 @@ import { groupPropertiesByExtension } from '../../utils/defaultFieldGrouping.js'
 import { getCollectionFieldPriorities } from '../../utils/fieldPriorities.js'
 import { getCollectionConfig } from '../../utils/configHelper.js'
 import FieldGroup from './FieldGroup.jsx'
-import ItemHeader from './ItemHeader.jsx'
 import AssetDisplay from './AssetDisplay.jsx'
 import DefaultAssetDisplay from './DefaultAssetDisplay.jsx'
 import LinkDisplay from './LinkDisplay.jsx'
@@ -114,11 +113,6 @@ const EnhancedDetailsDisplay = () => {
       className="enhancedDetailsSection"
       style={{ '--columns': enhancedColumns }}
     >
-      <ItemHeader
-        id={currentPopupResult.id}
-        collection={currentPopupResult.collection}
-      />
-
       <div className="EnhancedDetails__section">
         <div className="fields-container">
           {hasEnhancedConfig

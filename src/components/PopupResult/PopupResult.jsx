@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import './PopupResult.css'
 import { useSelector } from 'react-redux'
 import { debounceTitilerOverlay, zoomToItemExtent } from '../../utils/mapHelper'
+import ItemHeader from '../EnhancedDetails/ItemHeader.jsx'
 
 const PopupResult = (props) => {
   const _appConfig = useSelector((state) => state.mainSlice.appConfig)
@@ -45,7 +46,7 @@ const PopupResult = (props) => {
       }
     >
       {props.result ? (
-        <div>
+        <div className="popupResultHero">
           <div className="popupResultThumbnailContainer">
             {thumbnailURL ? (
               <picture>
@@ -61,6 +62,10 @@ const PopupResult = (props) => {
               </picture>
             ) : null}
           </div>
+          <ItemHeader
+            id={props.result.id}
+            collection={props.result.collection}
+          />
         </div>
       ) : null}
     </div>

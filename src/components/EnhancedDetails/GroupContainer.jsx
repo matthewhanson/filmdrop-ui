@@ -13,6 +13,7 @@ const GroupContainer = React.memo(
     groupName,
     children,
     className = 'field-group',
+    gridClassName = 'field-grid',
     role = 'group',
     defaultExpanded = false,
     renderChildrenInGrid = true
@@ -50,7 +51,7 @@ const GroupContainer = React.memo(
         <Collapse in={open} timeout="auto">
           {renderChildrenInGrid ? (
             <div
-              className="field-grid"
+              className={gridClassName}
               role="list"
               id={`group-content-${normalizedGroupName}`}
             >
@@ -69,6 +70,7 @@ GroupContainer.propTypes = {
   groupName: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
+  gridClassName: PropTypes.string,
   role: PropTypes.string,
   defaultExpanded: PropTypes.bool,
   renderChildrenInGrid: PropTypes.bool

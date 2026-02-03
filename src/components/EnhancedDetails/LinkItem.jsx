@@ -72,7 +72,7 @@ const LinkItem = React.memo(({ link }) => {
             arrow
             slotProps={{
               tooltip: {
-                className: 'tooltip-enhancedDetails'
+                className: 'tooltip-field-label'
               }
             }}
           >
@@ -99,7 +99,7 @@ const LinkItem = React.memo(({ link }) => {
             arrow
             slotProps={{
               tooltip: {
-                className: 'tooltip-enhancedDetails'
+                className: 'tooltip-field-label'
               }
             }}
           >
@@ -118,7 +118,7 @@ const LinkItem = React.memo(({ link }) => {
             arrow
             slotProps={{
               tooltip: {
-                className: 'tooltip-enhancedDetails'
+                className: 'tooltip-field-label'
               }
             }}
           >
