@@ -113,9 +113,9 @@
   --side-panel-toggle-button-border: var(--blue-gray-3);
 
   --side-panel-slider-rail: var(--blue-gray-4);
-  --side-panel-slider-track: var(--brand-accent-primary);
-  --side-panel-slider-thumb: var(--brand-accent-primary);
-  --side-panel-slider-thumb-border: var(--blue-gray-2);
+  --side-panel-slider-track: var(--blue-gray-5);
+  --side-panel-slider-thumb-fill: var(--blue-gray-2);
+  --side-panel-slider-thumb-border: var(--brand-accent-primary);
   --side-panel-slider-value-container-background: var(--blue-gray-2);
   --side-panel-slider-value-container-border: var(--blue-gray-3);
   --side-panel-slider-value-container-border-focused: var(--brand-accent-primary);
@@ -287,9 +287,9 @@
   --side-panel-toggle-button-border: var(--blue-gray-4);
 
   --side-panel-slider-rail: var(--blue-gray-4);
-  --side-panel-slider-track: var(--brand-accent-primary);
-  --side-panel-slider-thumb: var(--brand-accent-primary);
-  --side-panel-slider-thumb-border: var(--white);
+  --side-panel-slider-track: var(--blue-gray-5);
+  --side-panel-slider-thumb-fill: var(--white);
+  --side-panel-slider-thumb-border: var(--brand-accent-primary);
   --side-panel-slider-value-container-background: var(--blue-gray-1);
   --side-panel-slider-value-container-border: var(--blue-gray-4);
   --side-panel-slider-value-container-border-focused: var(--brand-accent-primary);

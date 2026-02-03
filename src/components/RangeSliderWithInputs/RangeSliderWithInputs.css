@@ -103,18 +103,18 @@
 .rangeSlider .MuiSlider-thumb {
   width: 16px;
   height: 16px;
-  background-color: var(--side-panel-slider-thumb-border);
-  border: 2px solid var(--side-panel-slider-thumb);
+  background-color: var(--side-panel-slider-thumb-fill);
+  border: 2px solid var(--side-panel-slider-thumb-border);
   box-shadow: none;
 }
 
 .rangeSlider .MuiSlider-thumb:hover,
 .rangeSlider .MuiSlider-thumb.Mui-focusVisible {
-  box-shadow: 0 0 0 9px var(--mui-hover);
+  box-shadow: 0 0 0 5px var(--mui-hover);
 }
 
 .rangeSlider .MuiSlider-thumb:active,
 .rangeSlider .MuiSlider-thumb.Mui-active {
-  box-shadow: 0 0 0 12px var(--mui-hover);
+  box-shadow: 0 0 0 7px var(--mui-hover);
 }
 
