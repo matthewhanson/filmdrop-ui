@@ -12,9 +12,9 @@ export const useLayout = () => {
 }
 
 export const LayoutProvider = ({ children }) => {
-  const [leftPanelWidth, setLeftPanelWidth] = useState(320)
+  const [leftPanelWidth, setLeftPanelWidth] = useState(340)
   const [isLeftPanelVisible, setIsLeftPanelVisible] = useState(true)
-  const [enhancedColumns, setEnhancedColumns] = useState(Math.floor(320 / 250))
+  const [enhancedColumns, setEnhancedColumns] = useState(Math.floor(340 / 250))
 
   const toggleLeftPanel = useCallback(() => {
     setIsLeftPanelVisible((prev) => !prev)
