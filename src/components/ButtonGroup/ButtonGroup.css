@@ -40,6 +40,6 @@
 }
 
 .ButtonGroup__buttons.MuiToggleButtonGroup-root .MuiToggleButtonGroup-grouped.Mui-disabled {
-  opacity: 0.5;
+  opacity: var(--opacity-disabled);
   color: var(--side-panel-toggle-button-color);
 }

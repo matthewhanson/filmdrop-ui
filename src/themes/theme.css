@@ -5,6 +5,11 @@
   --radius-sm: 4px;      /* inputs, chips, buttons, small interactive elements */
   --radius-md: 6px;      /* cards, containers, panels */
   --radius-pill: 9999px; /* badges, pills, fully rounded elements */
+
+  /* Opacity Scale */
+  --opacity-muted: 0.4;      /* heavily disabled, unavailable (e.g., dates outside range) */
+  --opacity-disabled: 0.5;   /* disabled controls */
+  --opacity-secondary: 0.7;  /* supporting elements, interactive icons */
 }
 
 /* ------------------- DARK THEME ------------------- */

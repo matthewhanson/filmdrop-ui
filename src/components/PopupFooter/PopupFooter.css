@@ -50,7 +50,7 @@
 }
 
 .popupFooterButton:disabled {
-  opacity: 0.35;
+  opacity: var(--opacity-muted);
   cursor: default;
 }
 

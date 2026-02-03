@@ -160,7 +160,7 @@
 
 .disabledCountButton {
   cursor: default;
-  opacity: 0.35;
+  opacity: var(--opacity-muted);
 }
 .disabledCountButton:hover {
   color: var(--map-info-overlay-button-color);
@@ -242,7 +242,7 @@
   background: var(--app-background-loading);
   color: var(--app-color-loading);
   z-index: 499;
-  opacity: 0.75;
+  opacity: var(--opacity-secondary);
 }
 
 .mapAttribution {

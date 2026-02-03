@@ -41,8 +41,8 @@
 }
 
 .collapse-icon {
-  color: var(--side-panel-card-label-color);
-  opacity: 0.8;
+  color: var(--side-panel-text-color);
+  opacity: var(--opacity-secondary);
 }
 
 .field-group-title-button:hover .collapse-icon {
@@ -274,7 +274,7 @@
 .icon-info,
 .icon-copy {
   margin-left: 4px;
-  opacity: 0.7;
+  opacity: var(--opacity-secondary);
   transition: opacity 0.2s ease;
   font-size: inherit;
 }

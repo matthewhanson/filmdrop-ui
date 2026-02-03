@@ -51,7 +51,13 @@
 
 .datePickerContainer .MuiInputAdornment-root .MuiSvgIcon-root {
   font-size: 20px !important;
-  color: var(--side-panel-input-icon-color) !important;
+  color: var(--side-panel-text-color) !important;
+  opacity: var(--opacity-secondary);
+  transition: opacity 0.2s ease;
+}
+
+.datePickerContainer .MuiInputAdornment-root .MuiIconButton-root:hover .MuiSvgIcon-root {
+  opacity: 1;
 }
 
 .datePickerContainer .MuiPickersOutlinedInput-root input,
@@ -118,7 +124,7 @@
 /* Day buttons - disabled / outside current month */
 .MuiPickersDay-root.Mui-disabled {
   color: var(--page-content-color) !important;
-  opacity: 0.4;
+  opacity: var(--opacity-muted);
 }
 
 /* Year picker */

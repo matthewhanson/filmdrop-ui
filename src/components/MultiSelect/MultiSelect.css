@@ -58,7 +58,13 @@
 
 /* Style dropdown icon */
 .MultiSelect__select .MuiSelect-icon {
-  color: var(--side-panel-input-icon-color);
+  color: var(--side-panel-text-color);
+  opacity: var(--opacity-secondary);
+  transition: opacity 0.2s ease;
+}
+
+.MultiSelect__select:hover .MuiSelect-icon {
+  opacity: 1;
 }
 
 /* Style dropdown menu paper */
