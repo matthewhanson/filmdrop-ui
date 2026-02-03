@@ -2,34 +2,20 @@ import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import LaunchIcon from '@mui/icons-material/Launch'
-import DescriptionIcon from '@mui/icons-material/Description'
-import LanguageIcon from '@mui/icons-material/Language'
-import ImageIcon from '@mui/icons-material/Image'
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf'
+import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
 import { sanitizeFieldValue } from '../../utils/securityHelper.js'
-import {
-  isHttpLink,
-  getRelTypeTitle,
-  getLinkTypeFromMimeOrUrl,
-  truncateHref
-} from '../../utils/defaultLinkGrouping.js'
+import { isHttpLink, getLinkTypeFromMimeOrUrl } from '../../utils/defaultLinkGrouping.js'
 
 /**
- * Get Material-UI icon component for link type
+ * Extract domain from URL
  */
-function getLinkTypeIcon(linkType) {
-  switch (linkType) {
-    case 'JSON':
-      return DescriptionIcon
-    case 'HTML':
-      return LanguageIcon
-    case 'Image':
-      return ImageIcon
-    case 'PDF':
-      return PictureAsPdfIcon
-    default:
-      return DescriptionIcon
+function getDomain(url) {
+  try {
+    const parsed = new URL(url)
+    return parsed.hostname
+  } catch {
+    return null
   }
 }
 
@@ -39,12 +25,10 @@ function getLinkTypeIcon(linkType) {
 const LinkItem = React.memo(({ link }) => {
   const [copiedUrl, setCopiedUrl] = useState(null)
 
-  const linkTitle = link.title || getRelTypeTitle(link.rel)
+  const linkTitle = link.title
   const linkType = getLinkTypeFromMimeOrUrl(link.type, link.href)
+  const linkDomain = getDomain(link.href)
   const isHttp = isHttpLink(link.href)
-  const truncated = truncateHref(link.href, 80)
-
-  const TypeIcon = getLinkTypeIcon(linkType)
 
   const handleCopyToClipboard = () => {
     if (link.href) {
@@ -63,8 +47,15 @@ const LinkItem = React.memo(({ link }) => {
   return (
     <div role="listitem" className="link-card">
       <div className="link-content">
-        <div className="link-title">{sanitizeFieldValue(linkTitle)}</div>
-        <div className="link-href-display">{sanitizeFieldValue(truncated)}</div>
+        {linkTitle && (
+          <div className="link-title">{sanitizeFieldValue(linkTitle)}</div>
+        )}
+        {linkDomain && (
+          <div className="link-meta-line">Host: {sanitizeFieldValue(linkDomain)}</div>
+        )}
+        {linkType && linkType !== 'Unknown' && (
+          <div className="link-meta-line">Type: {sanitizeFieldValue(linkType)}</div>
+        )}
         <div className="link-actions">
           <Tooltip
             title={copiedUrl === link.href ? 'Copied!' : 'Copy link'}
@@ -76,40 +67,19 @@ const LinkItem = React.memo(({ link }) => {
               }
             }}
           >
-            <span
-              role="button"
-              tabIndex={0}
+            <IconButton
+              size="small"
               onClick={handleCopyToClipboard}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault()
-                  handleCopyToClipboard()
+              aria-label="Copy link to clipboard"
+              sx={{
+                color: 'var(--brand-accent-primary)',
+                '&:hover': {
+                  backgroundColor: 'var(--mui-hover)'
                 }
               }}
-              style={{ display: 'inline-flex', cursor: 'pointer' }}
-              aria-label="Copy link to clipboard"
             >
               <ContentCopyIcon fontSize="small" />
-            </span>
-          </Tooltip>
-
-          <Tooltip
-            title={link.type || linkType}
-            placement="top"
-            arrow
-            slotProps={{
-              tooltip: {
-                className: 'tooltip-field-label'
-              }
-            }}
-          >
-            <span
-              className="link-type-hint"
-              style={{ display: 'inline-flex' }}
-              aria-label={`Link type: ${linkType}`}
-            >
-              <TypeIcon fontSize="small" />
-            </span>
+            </IconButton>
           </Tooltip>
 
           <Tooltip
@@ -122,33 +92,29 @@ const LinkItem = React.memo(({ link }) => {
               }
             }}
           >
-            <span
-              role="button"
-              tabIndex={isHttp ? 0 : -1}
-              onClick={isHttp ? handleOpen : undefined}
-              onKeyDown={
-                isHttp
-                  ? (e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault()
-                        handleOpen()
-                      }
-                    }
-                  : undefined
-              }
-              className={isHttp ? '' : 'link-action-disabled'}
-              style={{
-                display: 'inline-flex',
-                cursor: isHttp ? 'pointer' : 'not-allowed'
-              }}
-              aria-label={
-                isHttp
-                  ? 'Open link in new tab'
-                  : 'Link not accessible (non-HTTP)'
-              }
-              aria-disabled={!isHttp}
-            >
-              <LaunchIcon fontSize="small" />
+            <span>
+              <IconButton
+                size="small"
+                onClick={handleOpen}
+                disabled={!isHttp}
+                aria-label={
+                  isHttp
+                    ? 'Open link in new tab'
+                    : 'Link not accessible (non-HTTP)'
+                }
+                sx={{
+                  color: 'var(--brand-accent-primary)',
+                  '&:hover': {
+                    backgroundColor: 'var(--mui-hover)'
+                  },
+                  '&.Mui-disabled': {
+                    color: 'var(--side-panel-text-color-secondary)',
+                    opacity: 0.4
+                  }
+                }}
+              >
+                <LaunchIcon fontSize="small" />
+              </IconButton>
             </span>
           </Tooltip>
         </div>

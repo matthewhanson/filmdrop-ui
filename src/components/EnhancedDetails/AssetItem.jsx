@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
+import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
 import { sanitizeFieldValue } from '../../utils/securityHelper.js'
 import {
@@ -90,21 +91,19 @@ const AssetItem = React.memo(({ asset, copiedUrl, onCopyToClipboard }) => {
               }
             }}
           >
-            <span
-              role="button"
-              tabIndex={0}
+            <IconButton
+              size="small"
               onClick={() => onCopyToClipboard(asset.href, asset.key)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault()
-                  onCopyToClipboard(asset.href, asset.key)
+              aria-label="Copy link to clipboard"
+              sx={{
+                color: 'var(--brand-accent-primary)',
+                '&:hover': {
+                  backgroundColor: 'var(--mui-hover)'
                 }
               }}
-              style={{ display: 'inline-flex', cursor: 'pointer' }}
-              aria-label="Copy link to clipboard"
             >
               <ContentCopyIcon fontSize="small" />
-            </span>
+            </IconButton>
           </Tooltip>
         </div>
       </div>

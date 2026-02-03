@@ -16,7 +16,8 @@ const GroupContainer = React.memo(
     gridClassName = 'field-grid',
     role = 'group',
     defaultExpanded = false,
-    renderChildrenInGrid = true
+    renderChildrenInGrid = true,
+    count
   }) => {
     const normalizedGroupName = useMemo(
       () => normalizeGroupName(groupName),
@@ -41,11 +42,16 @@ const GroupContainer = React.memo(
             onClick={onToggle}
           >
             <span className="field-group-title-text">{groupName}</span>
-            {open ? (
-              <KeyboardArrowUpIcon className="collapse-icon" />
-            ) : (
-              <KeyboardArrowDownIcon className="collapse-icon" />
-            )}
+            <span className="field-group-title-end">
+              {count !== undefined && !open && (
+                <span className="field-group-count-badge">{count}</span>
+              )}
+              {open ? (
+                <KeyboardArrowUpIcon className="collapse-icon" />
+              ) : (
+                <KeyboardArrowDownIcon className="collapse-icon" />
+              )}
+            </span>
           </button>
         </h3>
         <Collapse in={open} timeout="auto">
@@ -73,7 +79,8 @@ GroupContainer.propTypes = {
   gridClassName: PropTypes.string,
   role: PropTypes.string,
   defaultExpanded: PropTypes.bool,
-  renderChildrenInGrid: PropTypes.bool
+  renderChildrenInGrid: PropTypes.bool,
+  count: PropTypes.number
 }
 
 GroupContainer.displayName = 'GroupContainer'

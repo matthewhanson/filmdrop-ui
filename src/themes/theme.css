@@ -6,6 +6,7 @@
      use the same palette references with inverted visual results. */
   --brand-accent-primary: #6cc24a;
   --brand-accent-primary-dark: #5aaa3a;
+  --brand-accent-background-subtle: color-mix(in srgb, var(--brand-accent-primary) 15%, transparent);
   --transparent: transparent;
   --white: #ffffff;
   --black: #000000;
@@ -179,6 +180,7 @@
   /* Light Color Palette */
   --brand-accent-primary: #6cc24a;
   --brand-accent-primary-dark: #5aaa3a;
+  --brand-accent-background-subtle: color-mix(in srgb, var(--brand-accent-primary) 12%, transparent);
   --transparent: transparent;
   --white: #ffffff;
   --black: #000000;
