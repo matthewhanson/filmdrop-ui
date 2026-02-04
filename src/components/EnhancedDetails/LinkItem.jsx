@@ -44,17 +44,34 @@ const LinkItem = React.memo(({ link }) => {
     }
   }
 
+  // Build metadata as label/value pairs
+  const metadataItems = []
+
+  if (linkDomain) {
+    metadataItems.push({ label: 'Host:', value: linkDomain })
+  }
+
+  if (linkType && linkType !== 'Unknown') {
+    metadataItems.push({ label: 'Type:', value: linkType })
+  }
+
   return (
     <div role="listitem" className="link-card">
       <div className="link-content">
         {linkTitle && (
           <div className="link-title">{sanitizeFieldValue(linkTitle)}</div>
         )}
-        {linkDomain && (
-          <div className="link-meta-line">Host: {sanitizeFieldValue(linkDomain)}</div>
-        )}
-        {linkType && linkType !== 'Unknown' && (
-          <div className="link-meta-line">Type: {sanitizeFieldValue(linkType)}</div>
+        {metadataItems.length > 0 && (
+          <div className="link-details-row">
+            {metadataItems.map((item) => (
+              <div key={item.label} className="link-meta-line link-meta-pair">
+                <span className="link-meta-label">{item.label}</span>
+                <span className="link-meta-value">
+                  {sanitizeFieldValue(item.value)}
+                </span>
+              </div>
+            ))}
+          </div>
         )}
         <div className="link-actions">
           <Tooltip

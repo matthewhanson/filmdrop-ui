@@ -35,28 +35,28 @@ function formatFileSize(bytes) {
 const AssetItem = React.memo(({ asset, copiedUrl, onCopyToClipboard }) => {
   const assetLabel = getAssetLabel(asset.key, asset)
 
-  // Build metadata lines as separate entries
-  const metadataLines = []
+  // Build metadata as label/value pairs
+  const metadataItems = []
 
   const customRoles = getCustomRoles(asset)
   if (customRoles.length > 0) {
-    metadataLines.push(`Roles: ${customRoles.join(', ')}`)
+    metadataItems.push({ label: 'Roles:', value: customRoles.join(', ') })
   }
 
   const fileType = getFileType(asset.type || asset.href)
   if (fileType) {
     const abbreviation = getFileTypeAbbreviation(fileType)
-    metadataLines.push(`Type: ${abbreviation}`)
+    metadataItems.push({ label: 'Type:', value: abbreviation })
   }
 
   if (asset.gsd) {
-    metadataLines.push(`GSD: ${asset.gsd}`)
+    metadataItems.push({ label: 'GSD:', value: asset.gsd })
   }
 
   if (asset['file:size'] || asset.size) {
     const sizeBytes = asset['file:size'] || asset.size
     const sizeFormatted = formatFileSize(sizeBytes)
-    metadataLines.push(`Size: ${sizeFormatted}`)
+    metadataItems.push({ label: 'Size:', value: sizeFormatted })
   }
 
   return (
@@ -67,16 +67,19 @@ const AssetItem = React.memo(({ asset, copiedUrl, onCopyToClipboard }) => {
             {sanitizeFieldValue(assetLabel)}
           </span>
         </div>
-        {(asset.description || metadataLines.length > 0) && (
+        {asset.description && (
+          <div className="asset-description">
+            {sanitizeFieldValue(asset.description)}
+          </div>
+        )}
+        {metadataItems.length > 0 && (
           <div className="asset-details-row">
-            {asset.description && (
-              <div className="asset-description">
-                {sanitizeFieldValue(asset.description)}
-              </div>
-            )}
-            {metadataLines.map((line) => (
-              <div key={line} className="asset-meta-line">
-                {sanitizeFieldValue(line)}
+            {metadataItems.map((item) => (
+              <div key={item.label} className="asset-meta-line asset-meta-pair">
+                <span className="asset-meta-label">{item.label}</span>
+                <span className="asset-meta-value">
+                  {sanitizeFieldValue(item.value)}
+                </span>
               </div>
             ))}
           </div>
