@@ -19,7 +19,7 @@
      This mirrors the light theme's numbering so semantic variables can
      use the same palette references with inverted visual results. */
   --brand-accent-primary: #6cc24a;
-  --brand-accent-primary-dark: #5aaa3a;
+  --brand-accent-primary-dark: color-mix(in srgb, var(--brand-accent-primary) 80%, black);
   --brand-accent-primary-light: color-mix(in srgb, var(--brand-accent-primary) 15%, transparent);
   --transparent: transparent;
   --white: #ffffff;
@@ -194,7 +194,7 @@
 :root[data-theme='filmdrop-light'] {
   /* Light Color Palette */
   --brand-accent-primary: #6cc24a;
-  --brand-accent-primary-dark: #5aaa3a;
+  --brand-accent-primary-dark: color-mix(in srgb, var(--brand-accent-primary) 80%, black);
   --brand-accent-primary-light: color-mix(in srgb, var(--brand-accent-primary) 12%, transparent);
   --transparent: transparent;
   --white: #ffffff;
