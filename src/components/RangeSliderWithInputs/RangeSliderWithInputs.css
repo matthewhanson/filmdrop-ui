@@ -85,7 +85,7 @@
 
 /* Slider rail (inactive/background track) */
 .rangeSlider .MuiSlider-rail {
-  height: 6px;
+  height: 5px;
   border-radius: var(--radius-xs);
   background-color: var(--side-panel-slider-rail);
   opacity: 1;
