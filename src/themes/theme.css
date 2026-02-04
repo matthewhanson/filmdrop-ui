@@ -136,10 +136,11 @@
   --side-panel-datepicker-selected-background: var(--brand-accent-primary);
   --side-panel-datepicker-today-border: var(--brand-accent-primary);
 
-  --side-panel-chip-background: var(--blue-gray-3);
-  --side-panel-chip-color: var(--blue-gray-8);
-  --side-panel-chip-delete-icon-color: var(--brand-accent-primary);
-  --side-panel-chip-delete-icon-color-hover: var(--brand-accent-primary-dark);
+  --side-panel-chip-background: var(--brand-accent-primary);
+  --side-panel-chip-border: var(--transparent);
+  --side-panel-chip-color: var(--white);
+  --side-panel-chip-delete-icon-color: var(--white);
+  --side-panel-chip-delete-icon-color-hover: var(--blue-gray-3);
 
   --side-panel-button-color: var(--blue-gray-8);
   --side-panel-button-background: var(--blue-gray-3);
@@ -272,7 +273,7 @@
   --side-panel-card-border: var(--blue-gray-3);
   --side-panel-card-label-color: var(--blue-gray-7);
 
-  --side-panel-input-background: var(--blue-gray-1);
+  --side-panel-input-background: var(--white);
   --side-panel-input-color: var(--blue-gray-8);
   --side-panel-input-border: var(--blue-gray-4);
   --side-panel-input-border-hover: var(--blue-gray-6);
@@ -284,7 +285,7 @@
   --side-panel-menu-item-background-hover: var(--blue-gray-2);
   --side-panel-menu-item-background-selected: var(--blue-gray-3);
 
-  --side-panel-toggle-button-background: var(--blue-gray-1);
+  --side-panel-toggle-button-background: var(--white);
   --side-panel-toggle-button-background-hover: var(--blue-gray-2);
   --side-panel-toggle-button-background-selected: var(--brand-accent-primary);
   --side-panel-toggle-button-color: var(--blue-gray-7);
@@ -295,7 +296,7 @@
   --side-panel-slider-track: var(--blue-gray-5);
   --side-panel-slider-thumb-fill: var(--white);
   --side-panel-slider-thumb-border: var(--brand-accent-primary);
-  --side-panel-slider-value-container-background: var(--blue-gray-1);
+  --side-panel-slider-value-container-background: var(--white);
   --side-panel-slider-value-container-border: var(--blue-gray-4);
   --side-panel-slider-value-container-border-focused: var(--brand-accent-primary);
   --side-panel-slider-value-color: var(--blue-gray-8);
@@ -310,10 +311,11 @@
   --side-panel-datepicker-selected-background: var(--brand-accent-primary);
   --side-panel-datepicker-today-border: var(--brand-accent-primary);
 
-  --side-panel-chip-background: var(--blue-gray-3);
-  --side-panel-chip-color: var(--blue-gray-8);
-  --side-panel-chip-delete-icon-color: var(--brand-accent-primary);
-  --side-panel-chip-delete-icon-color-hover: var(--brand-accent-primary-dark);
+  --side-panel-chip-background: var(--brand-accent-primary);
+  --side-panel-chip-border: var(--transparent);
+  --side-panel-chip-color: var(--white);
+  --side-panel-chip-delete-icon-color: var(--white);
+  --side-panel-chip-delete-icon-color-hover: var(--blue-gray-3);
 
   --side-panel-button-color: var(--blue-gray-8);
   --side-panel-button-background: var(--white);
