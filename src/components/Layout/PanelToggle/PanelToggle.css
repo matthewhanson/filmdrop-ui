@@ -17,14 +17,14 @@
     left 0.3s ease-in-out,
     right 0.3s ease-in-out,
     background-color 0.2s ease;
-  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 2px 0 4px var(--panel-toggle-shadow);
 }
 
 .PanelToggle.rightSidebar {
   border-left: 1px solid var(--side-panel-background);
   border-right: none;
   border-radius: var(--radius-sm) 0 0 var(--radius-sm);
-  box-shadow: -2px 0 4px rgba(0, 0, 0, 0.1);
+  box-shadow: -2px 0 4px var(--panel-toggle-shadow);
 }
 
 .PanelToggle:before,
@@ -66,10 +66,10 @@
 }
 
 .PanelToggle:hover svg {
-  color: var(--brand-accent-primary);
+  color: var(--panel-toggle-icon-color-hover);
 }
 
 .PanelToggle svg {
   font-size: 20px;
-  color: var(--brand-accent-primary-dark);
+  color: var(--panel-toggle-icon-color);
 }

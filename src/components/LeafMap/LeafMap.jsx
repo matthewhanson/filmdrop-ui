@@ -19,7 +19,7 @@ import {
   DEFAULT_MAP_ZOOM,
   DEFAULT_MAP_ZOOM_MAX
 } from '../defaults'
-import { getBasemapConfig } from '../../utils/themeHelper'
+import { getBasemapConfig, getMapGeometryColors } from '../../utils/themeHelper'
 
 const LeafMap = () => {
   const dispatch = useDispatch()
@@ -139,8 +139,9 @@ const LeafMap = () => {
         }
       })
 
+      const mapColors = getMapGeometryColors()
       const drawPolygonHandler = new L.Draw.Polygon(map, {
-        shapeOptions: { color: '#00C07B' }
+        shapeOptions: { color: mapColors.aoiBoundary }
       })
 
       dispatch(setmapDrawPolygonHandler(drawPolygonHandler))

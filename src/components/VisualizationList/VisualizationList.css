@@ -76,8 +76,8 @@
 }
 
 .VisualizationListItemContainer input:checked ~ .VisualizationListRadio {
-  background-color: var(--brand-accent-primary);
-  border-color: var(--brand-accent-primary);
+  background-color: var(--map-info-overlay-checkbox-color-checked);
+  border-color: var(--map-info-overlay-checkbox-color-checked);
 }
 
 .VisualizationListRadio:after {
@@ -96,5 +96,5 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: white;
+  background: var(--map-info-overlay-radio-selected-dot);
 }

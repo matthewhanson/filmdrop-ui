@@ -180,3 +180,34 @@ export function initializeTheme(appConfig) {
     switchingEnabled: true
   }
 }
+
+/**
+ * Gets the computed value of a CSS custom property from the document root.
+ * @param {string} variableName - The CSS variable name (e.g., '--map-geometry-search-result')
+ * @returns {string} The computed value of the CSS variable
+ */
+export function getCSSVariable(variableName) {
+  if (typeof document === 'undefined') {
+    return ''
+  }
+  return getComputedStyle(document.documentElement)
+    .getPropertyValue(variableName)
+    .trim()
+}
+
+/**
+ * Gets map geometry colors from CSS variables.
+ * Call this when rendering map layers to get theme-aware colors.
+ * @returns {Object} Object containing all map geometry color values
+ */
+export function getMapGeometryColors() {
+  return {
+    searchResult: getCSSVariable('--map-geometry-search-result') || '#3183f5',
+    searchResultFill:
+      getCSSVariable('--map-geometry-search-result-fill') || '#3183f52e',
+    aoiBoundary: getCSSVariable('--map-geometry-aoi-boundary') || '#00c07b',
+    highlighted: getCSSVariable('--map-geometry-highlighted') || '#bea835',
+    cartItem: getCSSVariable('--map-geometry-cart-item') || '#ad5c11',
+    cartItemFill: getCSSVariable('--map-geometry-cart-item-fill') || '#ad5c1129'
+  }
+}

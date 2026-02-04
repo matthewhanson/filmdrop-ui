@@ -85,7 +85,7 @@
 }
 
 .stac-link-section a {
-  color: var(--brand-accent-primary);
+  color: var(--side-panel-link-color);
   text-decoration: underline;
   font-size: 14px;
 }

@@ -187,7 +187,7 @@
 .tooltip_style {
   font-weight: 600;
   background-color: var(--grid-cell-tooltip);
-  color: var(--white);
+  color: var(--grid-cell-tooltip-color);
   border: 0 none;
   text-align: center;
   line-height: 15px;

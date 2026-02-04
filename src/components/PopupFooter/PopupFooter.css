@@ -77,5 +77,5 @@
 }
 
 .popupFooterCartButton--add {
-  color: var(--brand-accent-primary);
+  color: var(--side-panel-button-icon-accent);
 }

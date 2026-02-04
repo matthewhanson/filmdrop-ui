@@ -255,7 +255,7 @@
 }
 
 .mapAttribution a {
-  color: #19a1d7;
+  color: var(--map-info-overlay-attribution-link-color);
   text-decoration: none;
 }
 
@@ -319,7 +319,7 @@ div#attribution-tooltip {
   width: 30px;
   cursor: pointer;
   border-radius: var(--radius-md);
-  border: solid 2px rgba(0, 0, 0, 0.2);
+  border: solid 2px var(--shadow-subtle);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -355,12 +355,12 @@ div#attribution-tooltip {
 @keyframes visualizationPulse {
   0%,
   100% {
-    border-color: rgba(0, 0, 0, 0.2);
+    border-color: var(--shadow-subtle);
     box-shadow: 0 0 0 0 var(--brand-accent-primary);
   }
   50% {
     border-color: var(--brand-accent-primary);
-    box-shadow: 0 0 8px 2px rgba(108, 194, 74, 0.3);
+    box-shadow: 0 0 8px 2px var(--brand-accent-primary-light);
   }
 }
 

@@ -94,17 +94,17 @@
 }
 
 .logoutButton {
-  background-color: #4f5768;
-  color: white;
+  background-color: var(--logout-button-background);
+  color: var(--logout-button-color);
   padding: 10px;
   font-size: 16px;
   cursor: pointer;
-  border: 1px solid #a9b0c1;
+  border: 1px solid var(--logout-button-border);
   border-radius: var(--radius-md);
 }
 
 .logoutButton:hover {
-  background-color: #353d4f;
+  background-color: var(--logout-button-background-hover);
 }
 
 @media screen and (max-width: 950px) {

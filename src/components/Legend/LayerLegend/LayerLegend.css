@@ -42,7 +42,7 @@
 }
 
 .searchAreaLegendSymbol {
-  border-color: #00c07b;
+  border-color: var(--map-geometry-aoi-boundary);
   border-style: dashed;
 }
 
@@ -53,14 +53,14 @@
 }
 
 .sceneLegendSymbol {
-  border-color: #3183f5;
-  background-color: #3183f52e;
+  border-color: var(--map-geometry-search-result);
+  background-color: var(--map-geometry-search-result-fill);
   border-style: solid;
 }
 
 .sceneInCartLegendSymbol {
-  border-color: #ad5c11;
-  background-color: #ad5c1129;
+  border-color: var(--map-geometry-cart-item);
+  background-color: var(--map-geometry-cart-item-fill);
   border-style: solid;
 }
 

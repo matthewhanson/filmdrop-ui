@@ -10,6 +10,10 @@
   --opacity-muted: 0.4;      /* heavily disabled, unavailable (e.g., dates outside range) */
   --opacity-disabled: 0.5;   /* disabled controls */
   --opacity-secondary: 0.7;  /* supporting elements, interactive icons */
+
+  /* Shadows */
+  --shadow-tooltip: rgba(0, 0, 0, 0.15);
+  --shadow-subtle: rgba(0, 0, 0, 0.2);
 }
 
 /* ------------------- DARK THEME ------------------- */
@@ -71,6 +75,11 @@
   --cart-button-count-background: var(--brand-accent-primary-dark);
   --cart-button-count-color-disabled: var(--white);
   --cart-button-count-background-disabled: var(--blue-gray-5);
+
+  --logout-button-background: var(--blue-gray-5);
+  --logout-button-background-hover: var(--blue-gray-4);
+  --logout-button-color: var(--white);
+  --logout-button-border: var(--blue-gray-6);
 
   /* Content */
   --page-content-color: var(--blue-gray-7);
@@ -134,6 +143,7 @@
   --side-panel-datepicker-popup-color: var(--blue-gray-8);
   --side-panel-datepicker-popup-border: var(--blue-gray-3);
   --side-panel-datepicker-selected-background: var(--brand-accent-primary);
+  --side-panel-datepicker-selected-color: var(--white);
   --side-panel-datepicker-today-border: var(--brand-accent-primary);
 
   --side-panel-chip-background: var(--brand-accent-primary);
@@ -146,6 +156,7 @@
   --side-panel-button-background: var(--blue-gray-3);
   --side-panel-button-background-hover: var(--blue-gray-4);
   --side-panel-button-border: var(--blue-gray-5);
+  --side-panel-button-icon-accent: var(--brand-accent-primary);
 
   --side-panel-text-color: var(--blue-gray-8);
   --side-panel-text-color-secondary: var(--blue-gray-6);
@@ -166,12 +177,15 @@
   --map-info-overlay-heading-border: var(--blue-gray-3);
   --map-info-overlay-checkbox-color-unchecked: var(--blue-gray-5);
   --map-info-overlay-checkbox-color-checked: var(--brand-accent-primary);
+  --map-info-overlay-radio-selected-dot: var(--white);
+  --map-info-overlay-attribution-link-color: #19a1d7;
 
   /* Map Overlay - Aggregation */
   --hex-heatmap-legend: var(--blue-gray-8);
   --hex-label-color: var(--white);
   --hex-label-shadow: var(--white-alpha-95);
   --grid-cell-tooltip: var(--brand-accent-primary);
+  --grid-cell-tooltip-color: var(--white);
 
   /* Map Overlay - Action Button */
   --action-button-background: var(--brand-accent-primary);
@@ -183,6 +197,24 @@
 
   /* Resize Handle */
   --resize-handle-hover-background: var(--white-alpha-08);
+  --resize-handle-icon-color: var(--brand-accent-primary-dark);
+  --resize-handle-icon-color-hover: var(--brand-accent-primary);
+
+  /* Panel Toggle */
+  --panel-toggle-shadow: rgba(0, 0, 0, 0.1);
+  --panel-toggle-icon-color: var(--brand-accent-primary-dark);
+  --panel-toggle-icon-color-hover: var(--brand-accent-primary);
+
+  /* Validation States */
+  --validation-error-border: #ff1744;
+
+  /* Map Geometry - Layer Colors */
+  --map-geometry-search-result: #3183f5;
+  --map-geometry-search-result-fill: #3183f52e;
+  --map-geometry-aoi-boundary: var(--brand-accent-primary);
+  --map-geometry-highlighted: #bea835;
+  --map-geometry-cart-item: #ad5c11;
+  --map-geometry-cart-item-fill: #ad5c1129;
 }
 
 /* Make map tiles dark for dark theme */
@@ -247,6 +279,11 @@
   --cart-button-count-color-disabled: var(--white);
   --cart-button-count-background-disabled: var(--blue-gray-7);
 
+  --logout-button-background: var(--blue-gray-5);
+  --logout-button-background-hover: var(--blue-gray-4);
+  --logout-button-color: var(--white);
+  --logout-button-border: var(--blue-gray-6);
+
   /* Content */
   --page-content-color: var(--blue-gray-7);
 
@@ -309,6 +346,7 @@
   --side-panel-datepicker-popup-color: var(--blue-gray-8);
   --side-panel-datepicker-popup-border: var(--blue-gray-4);
   --side-panel-datepicker-selected-background: var(--brand-accent-primary);
+  --side-panel-datepicker-selected-color: var(--white);
   --side-panel-datepicker-today-border: var(--brand-accent-primary);
 
   --side-panel-chip-background: var(--brand-accent-primary);
@@ -321,6 +359,7 @@
   --side-panel-button-background: var(--white);
   --side-panel-button-background-hover: var(--blue-gray-2);
   --side-panel-button-border: var(--blue-gray-4);
+  --side-panel-button-icon-accent: var(--brand-accent-primary);
 
   --side-panel-text-color: var(--blue-gray-8);
   --side-panel-text-color-secondary: var(--blue-gray-6);
@@ -341,12 +380,15 @@
   --map-info-overlay-heading-border: var(--blue-gray-3);
   --map-info-overlay-checkbox-color-unchecked: var(--blue-gray-4);
   --map-info-overlay-checkbox-color-checked: var(--brand-accent-primary);
+  --map-info-overlay-radio-selected-dot: var(--white);
+  --map-info-overlay-attribution-link-color: #19a1d7;
 
   /* Map Overlay - Aggregation */
   --hex-heatmap-legend: var(--blue-gray-8);
   --hex-label-color: var(--black);
   --hex-label-shadow: var(--white-alpha-95);
   --grid-cell-tooltip: var(--brand-accent-primary);
+  --grid-cell-tooltip-color: var(--white);
 
   /* Map Overlay - Action Button */
   --action-button-background: var(--brand-accent-primary);
@@ -358,6 +400,25 @@
 
   /* Resize Handle */
   --resize-handle-hover-background: var(--white-alpha-08);
+  --resize-handle-icon-color: var(--brand-accent-primary-dark);
+  --resize-handle-icon-color-hover: var(--brand-accent-primary);
+
+  /* Panel Toggle */
+  --panel-toggle-shadow: rgba(0, 0, 0, 0.1);
+  --panel-toggle-icon-color: var(--brand-accent-primary-dark);
+  --panel-toggle-icon-color-hover: var(--brand-accent-primary);
+
+  /* Validation States */
+  --validation-error-border: #ff1744;
+
+  /* Map Geometry - Layer Colors */
+  --map-geometry-search-result: #3183f5;
+  --map-geometry-search-result-fill: #3183f52e;
+  --map-geometry-aoi-boundary: #00c07b;
+  --map-geometry-aoi-boundary: var(--brand-accent-primary);
+  --map-geometry-highlighted: #bea835;
+  --map-geometry-cart-item: #ad5c11;
+  --map-geometry-cart-item-fill: #ad5c1129;
 }
 
 /* Invert logo colors for light theme */

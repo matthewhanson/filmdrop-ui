@@ -141,11 +141,11 @@
 }
 
 .resize-handle:hover .resize-handle-icon {
-  color: var(--brand-accent-primary);
+  color: var(--resize-handle-icon-color-hover);
 }
 
 .resize-handle-icon {
-  color: var(--brand-accent-primary-dark);
+  color: var(--resize-handle-icon-color);
   transform: rotate(90deg);
   font-size: 20px;
   pointer-events: none;

@@ -118,7 +118,7 @@
 /* Day buttons - selected */
 .MuiPickersDay-root.Mui-selected {
   background-color: var(--side-panel-datepicker-selected-background) !important;
-  color: var(--white) !important;
+  color: var(--side-panel-datepicker-selected-color) !important;
 }
 
 /* Day buttons - disabled / outside current month */
@@ -139,7 +139,7 @@
 
 .MuiYearCalendar-button.Mui-selected {
   background-color: var(--side-panel-datepicker-selected-background) !important;
-  color: var(--white) !important;
+  color: var(--side-panel-datepicker-selected-color) !important;
 }
 
 
