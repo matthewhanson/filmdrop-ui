@@ -104,7 +104,7 @@
   width: 16px;
   height: 16px;
   background-color: var(--side-panel-slider-thumb-fill);
-  border: 2px solid var(--side-panel-slider-thumb-border);
+  border: 1.5px solid var(--side-panel-slider-thumb-border);
   box-shadow: none;
 }
 
