@@ -72,7 +72,7 @@ export function GetCollectionQueryablesService(collection) {
   appendStacHeaderCookies(requestHeaders)
 
   // Check if collection has queryables link in its links array
-  const queryablesLink = collection.links.find(
+  const queryablesLink = collection?.links?.find(
     (link) => link.rel === 'http://www.opengis.net/def/rel/ogc/1.0/queryables'
   )
 

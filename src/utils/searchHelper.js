@@ -201,26 +201,16 @@ function buildSearchScenesParams(gridCodeToSearchIn) {
     query['grid:code'] = { in: gridCodeToSearchIn }
   }
 
-  let searchParamsStr
   if (Object.keys(query).length > 0) {
     searchParams.set('query', encodeURIComponent(JSON.stringify(query)))
-
-    searchParamsStr = [...searchParams]
-      .reduce((obj, x) => {
-        obj.push(x.join('='))
-        return obj
-      }, [])
-      .join('&')
-  } else {
-    searchParamsStr = [...searchParams]
-      .reduce((obj, x) => {
-        obj.push(x.join('='))
-        return obj
-      }, [])
-      .join('&')
   }
 
-  return searchParamsStr
+  return [...searchParams]
+    .reduce((obj, x) => {
+      obj.push(x.join('='))
+      return obj
+    }, [])
+    .join('&')
 }
 
 function buildSearchAggregateParams(gridType) {
@@ -285,25 +275,16 @@ function buildSearchAggregateParams(gridType) {
   const queryableFilters = store.getState().mainSlice.queryableFilters
   const query = buildQueryFromFilters(queryableFilters)
 
-  let aggregateParamsStr
   if (Object.keys(query).length > 0) {
     searchParams.set('query', encodeURIComponent(JSON.stringify(query)))
-
-    aggregateParamsStr = [...searchParams]
-      .reduce((obj, x) => {
-        obj.push(x.join('='))
-        return obj
-      }, [])
-      .join('&')
-  } else {
-    aggregateParamsStr = [...searchParams]
-      .reduce((obj, x) => {
-        obj.push(x.join('='))
-        return obj
-      }, [])
-      .join('&')
   }
-  return aggregateParamsStr
+
+  return [...searchParams]
+    .reduce((obj, x) => {
+      obj.push(x.join('='))
+      return obj
+    }, [])
+    .join('&')
 }
 
 function buildUrlParamFromBBOX() {
