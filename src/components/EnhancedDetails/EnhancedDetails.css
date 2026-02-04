@@ -12,7 +12,7 @@
 
 .field-group-title {
   margin: 0;
-  padding: 10px 12px;
+  padding: 10px 12px 6px 12px;
   font-size: 14px;
   font-weight: 500;
   color: var(--side-panel-heading-color);
