@@ -128,9 +128,9 @@ const QueryableFilters = () => {
             label={label}
             type="number"
             value={currentValue ?? defaultValue ?? ''}
-            onChange={(e) => {
-              const val = e.target.value === '' ? null : Number(e.target.value)
-              handleFilterChange(fieldName, val)
+            onChange={(val) => {
+              const numVal = val === '' ? null : Number(val)
+              handleFilterChange(fieldName, numVal)
             }}
           />
         </div>
@@ -169,9 +169,8 @@ const QueryableFilters = () => {
             label={label}
             type="text"
             value={currentValue ?? defaultValue ?? ''}
-            onChange={(e) => {
-              const val = e.target.value === '' ? null : e.target.value
-              handleFilterChange(fieldName, val)
+            onChange={(val) => {
+              handleFilterChange(fieldName, val === '' ? null : val)
             }}
           />
         </div>

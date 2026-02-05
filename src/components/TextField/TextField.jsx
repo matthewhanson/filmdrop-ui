@@ -19,10 +19,14 @@ const TextField = ({
   // Ref to store debounced function
   const debouncedOnChange = useRef(null)
 
+  // Ref to store latest onChange (avoids recreating debounce on every render)
+  const onChangeRef = useRef(onChange)
+  onChangeRef.current = onChange
+
   // Create debounced onChange function
   useEffect(() => {
     debouncedOnChange.current = debounce((val) => {
-      onChange({ target: { value: val } })
+      onChangeRef.current(val)
     }, debounceDelay)
 
     // Cleanup on unmount or when dependencies change
@@ -31,11 +35,13 @@ const TextField = ({
         debouncedOnChange.current.cancel()
       }
     }
-  }, [onChange, debounceDelay])
+  }, [debounceDelay])
 
   // Sync local state when external value changes
   useEffect(() => {
-    setLocalValue(value)
+    if (value !== localValue) {
+      setLocalValue(value)
+    }
   }, [value])
 
   // Handle local input changes
@@ -62,7 +68,7 @@ const TextField = ({
 }
 
 TextField.propTypes = {
-  label: PropTypes.string,
+  label: PropTypes.string.isRequired,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   onChange: PropTypes.func.isRequired,
   type: PropTypes.oneOf(['text', 'number']),
