@@ -74,8 +74,8 @@ After building with `npm run build`, place your config at `build/config/config.j
 | `CART_ENABLED`               | Boolean | `false`  | Enable shopping cart features for scene selection       |
 | `EXPORT_ENABLED`             | Boolean | `true`   | Enable GeoJSON export of search results                 |
 | `RIGHT_SIDEBAR_ENABLED`      | Boolean | `false`  | Anchor the sidebar panel on the right                   |
-| `STAC_LINK_ENABLED`          | Boolean | `false`  | Show STAC API Item link in Links section                |
-| `STAC_LINKS_SECTION_ENABLED` | Boolean | `false`  | Show comprehensive Links section (grouped by rel type)  |
+| `STAC_LINK_ENABLED`          | Boolean | `true`   | Show STAC API Item link in Links section                |
+| `STAC_LINKS_SECTION_ENABLED` | Boolean | `true`   | Show comprehensive Links section (grouped by rel type)  |
 | `STAC_LINKS_EXCLUDE_LIST`    | Array   | See note | Link rel types to hide from Links section (power-users) |
 | `SHOW_ITEM_AUTO_ZOOM`        | Boolean | `true`   | Show toggle to auto-center map on selected item         |
 | `THEME_SWITCHING_ENABLED`    | Boolean | `true`   | Enable light/dark theme switching                       |
@@ -84,8 +84,8 @@ After building with `npm run build`, place your config at `build/config/config.j
 
 The Links section displays STAC item links through two independent feature flags:
 
-- **`STAC_LINK_ENABLED`** (`false` by default): Shows the STAC API Item link (the item's canonical link to itself)
-- **`STAC_LINKS_SECTION_ENABLED`** (`false` by default): Shows a comprehensive Links section with all other item links grouped by relationship type
+- **`STAC_LINK_ENABLED`** (`true` by default): Shows the STAC API Item link (the item's canonical link to itself)
+- **`STAC_LINKS_SECTION_ENABLED`** (`true` by default): Shows a comprehensive Links section with all other item links grouped by relationship type
 
 Both flags can be enabled independently. Links are displayed under a single "Links" header when at least one flag is enabled.
 
@@ -146,7 +146,7 @@ Both flags can be enabled independently. Links are displayed under a single "Lin
 }
 ```
 
-**Hide all links (default):**
+**Hide all links:**
 
 ```json
 {
