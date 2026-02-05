@@ -13,7 +13,9 @@ const ItemHeader = ({ id, collection }) => {
       <div className="item-header-fields">
         <div className="item-header-field">
           <span className="item-header-label">Item ID</span>
-          <span className="item-header-value item-header-value--truncate">{id}</span>
+          <span className="item-header-value item-header-value--truncate">
+            {id}
+          </span>
         </div>
         <div className="item-header-field">
           <span className="item-header-label">Collection</span>

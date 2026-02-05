@@ -92,7 +92,11 @@ export const useRenderableQueryables = () => {
 
     // Compute render order once per entry, filter unsupported schemas and apply optional allowlist
     const withOrder = Object.entries(queryables)
-      .map(([fieldName, schema]) => [fieldName, schema, getQueryableRenderOrder(schema)])
+      .map(([fieldName, schema]) => [
+        fieldName,
+        schema,
+        getQueryableRenderOrder(schema)
+      ])
       .filter(
         ([fieldName, , order]) =>
           order !== null &&

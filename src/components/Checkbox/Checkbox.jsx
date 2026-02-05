@@ -6,7 +6,7 @@ import './Checkbox.css'
 
 const Checkbox = ({ label, checked, onChange, className = '' }) => {
   return (
-    <Card height='auto' className={`Checkbox ${className}`}>
+    <Card height="auto" className={`Checkbox ${className}`}>
       <label className="Checkbox__label">
         <MuiCheckbox
           checked={checked}

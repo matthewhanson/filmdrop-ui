@@ -29,7 +29,7 @@ export async function SearchService(searchParams, typeOfSearch) {
   const stacApiUrl = `${
     store.getState().mainSlice.appConfig.STAC_API_URL
   }/search?${searchParams}`
-  
+
   console.log('STAC API Search Request:', stacApiUrl)
   console.log('Search Parameters:', searchParams)
 

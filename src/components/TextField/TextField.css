@@ -26,7 +26,9 @@
   border-color: var(--side-panel-input-border-hover) !important;
 }
 
-.TextField__input .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+.TextField__input
+  .MuiOutlinedInput-root.Mui-focused
+  .MuiOutlinedInput-notchedOutline {
   border-color: var(--side-panel-input-border-focused) !important;
   border-width: 1px !important;
 }

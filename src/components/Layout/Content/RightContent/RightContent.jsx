@@ -288,10 +288,7 @@ const RightContent = () => {
       {_showVisualizationList && <VisualizationList></VisualizationList>}
       <div className="actionButtons">
         {_appConfig.ACTION_BUTTON && (
-          <button
-            className="actionButton"
-            onClick={() => onActionClick()}
-          >
+          <button className="actionButton" onClick={() => onActionClick()}>
             {_appConfig.ACTION_BUTTON.text}
           </button>
         )}
@@ -308,8 +305,10 @@ const RightContent = () => {
                 : 'resultCountText'
             }
           >
-            <strong>Showing {_mappedScenes.length} of {_searchResults.numberMatched}{' '}
-            Scenes</strong>
+            <strong>
+              Showing {_mappedScenes.length} of {_searchResults.numberMatched}{' '}
+              Scenes
+            </strong>
           </div>
           <div className="pagination">
             <Pagination />

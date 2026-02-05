@@ -251,7 +251,6 @@
   border-bottom: none;
 }
 
-
 .asset-content {
   display: flex;
   flex-direction: column;
@@ -301,7 +300,6 @@
 .icon-copy {
   cursor: pointer;
 }
-
 
 /* Field value truncation for text without spaces */
 .field-value-truncated {
@@ -383,4 +381,3 @@
   margin-top: 6px;
   align-items: center;
 }
-

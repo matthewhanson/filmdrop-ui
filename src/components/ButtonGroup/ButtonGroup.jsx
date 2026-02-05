@@ -24,7 +24,7 @@ const ButtonGroup = ({ label, buttons, className = '' }) => {
   }
 
   return (
-    <Card height='auto' label={label} className={`ButtonGroup ${className}`}>
+    <Card height="auto" label={label} className={`ButtonGroup ${className}`}>
       <ToggleButtonGroup
         value={activeValue}
         exclusive

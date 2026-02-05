@@ -1,15 +1,15 @@
 /* ------------------- SHARED DESIGN TOKENS ------------------- */
 :root {
   /* Border Radius Scale */
-  --radius-xs: 3px;      /* slider tracks, small internal elements */
-  --radius-sm: 4px;      /* inputs, chips, buttons, small interactive elements */
-  --radius-md: 6px;      /* cards, containers, panels */
+  --radius-xs: 3px; /* slider tracks, small internal elements */
+  --radius-sm: 4px; /* inputs, chips, buttons, small interactive elements */
+  --radius-md: 6px; /* cards, containers, panels */
   --radius-pill: 9999px; /* badges, pills, fully rounded elements */
 
   /* Opacity Scale */
-  --opacity-muted: 0.4;      /* heavily disabled, unavailable (e.g., dates outside range) */
-  --opacity-disabled: 0.5;   /* disabled controls */
-  --opacity-secondary: 0.7;  /* supporting elements, interactive icons */
+  --opacity-muted: 0.4; /* heavily disabled, unavailable (e.g., dates outside range) */
+  --opacity-disabled: 0.5; /* disabled controls */
+  --opacity-secondary: 0.7; /* supporting elements, interactive icons */
 
   /* Shadows */
   --shadow-tooltip: rgba(0, 0, 0, 0.15);
@@ -23,8 +23,16 @@
      This mirrors the light theme's numbering so semantic variables can
      use the same palette references with inverted visual results. */
   --brand-accent-primary: #6cc24a;
-  --brand-accent-primary-dark: color-mix(in srgb, var(--brand-accent-primary) 80%, black);
-  --brand-accent-primary-light: color-mix(in srgb, var(--brand-accent-primary) 15%, transparent);
+  --brand-accent-primary-dark: color-mix(
+    in srgb,
+    var(--brand-accent-primary) 80%,
+    black
+  );
+  --brand-accent-primary-light: color-mix(
+    in srgb,
+    var(--brand-accent-primary) 15%,
+    transparent
+  );
   --transparent: transparent;
   --white: #ffffff;
   --black: #000000;
@@ -132,7 +140,9 @@
   --side-panel-slider-thumb-border: var(--brand-accent-primary);
   --side-panel-slider-value-container-background: var(--blue-gray-2);
   --side-panel-slider-value-container-border: var(--blue-gray-3);
-  --side-panel-slider-value-container-border-focused: var(--brand-accent-primary);
+  --side-panel-slider-value-container-border-focused: var(
+    --brand-accent-primary
+  );
   --side-panel-slider-value-color: var(--blue-gray-8);
   --side-panel-slider-separator-color: var(--blue-gray-6);
 
@@ -226,8 +236,16 @@
 :root[data-theme='filmdrop-light'] {
   /* Light Color Palette */
   --brand-accent-primary: #6cc24a;
-  --brand-accent-primary-dark: color-mix(in srgb, var(--brand-accent-primary) 80%, black);
-  --brand-accent-primary-light: color-mix(in srgb, var(--brand-accent-primary) 12%, transparent);
+  --brand-accent-primary-dark: color-mix(
+    in srgb,
+    var(--brand-accent-primary) 80%,
+    black
+  );
+  --brand-accent-primary-light: color-mix(
+    in srgb,
+    var(--brand-accent-primary) 12%,
+    transparent
+  );
   --transparent: transparent;
   --white: #ffffff;
   --black: #000000;
@@ -335,7 +353,9 @@
   --side-panel-slider-thumb-border: var(--brand-accent-primary);
   --side-panel-slider-value-container-background: var(--white);
   --side-panel-slider-value-container-border: var(--blue-gray-4);
-  --side-panel-slider-value-container-border-focused: var(--brand-accent-primary);
+  --side-panel-slider-value-container-border-focused: var(
+    --brand-accent-primary
+  );
   --side-panel-slider-value-color: var(--blue-gray-8);
   --side-panel-slider-separator-color: var(--blue-gray-6);
 

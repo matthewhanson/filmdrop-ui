@@ -54,7 +54,8 @@ const DateTimeRangeSelector = () => {
       return
     }
 
-    const collectionStart = selectedCollectionData.extent.temporal.interval[0][0]
+    const collectionStart =
+      selectedCollectionData.extent.temporal.interval[0][0]
     const collectionEnd = selectedCollectionData.extent.temporal.interval[0][1]
 
     if (!collectionStart) {
@@ -62,9 +63,7 @@ const DateTimeRangeSelector = () => {
     }
 
     const collectionStartDate = dayjs(collectionStart)
-    const collectionEndDate = collectionEnd
-      ? dayjs(collectionEnd)
-      : dayjs() // Use current date if collection is ongoing
+    const collectionEndDate = collectionEnd ? dayjs(collectionEnd) : dayjs() // Use current date if collection is ongoing
 
     const currentStartDate = dayjs(searchDateRangeValue[0])
     const currentEndDate = dayjs(searchDateRangeValue[1])
@@ -125,7 +124,9 @@ const DateTimeRangeSelector = () => {
                 }
               }}
             />
-            <label htmlFor="startDatePicker" className="datePickerInputLabel">From</label>
+            <label htmlFor="startDatePicker" className="datePickerInputLabel">
+              From
+            </label>
           </div>
           <div className="datePickerInputWrapper">
             <DatePicker
@@ -142,7 +143,9 @@ const DateTimeRangeSelector = () => {
                 }
               }}
             />
-            <label htmlFor="endDatePicker" className="datePickerInputLabel">To</label>
+            <label htmlFor="endDatePicker" className="datePickerInputLabel">
+              To
+            </label>
           </div>
         </div>
       </Card>

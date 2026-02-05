@@ -56,7 +56,10 @@
   transition: opacity 0.2s ease;
 }
 
-.datePickerContainer .MuiInputAdornment-root .MuiIconButton-root:hover .MuiSvgIcon-root {
+.datePickerContainer
+  .MuiInputAdornment-root
+  .MuiIconButton-root:hover
+  .MuiSvgIcon-root {
   opacity: 1;
 }
 
@@ -68,17 +71,23 @@
 }
 
 /* Override default border color */
-.datePickerContainer .MuiPickersOutlinedInput-root > .MuiPickersOutlinedInput-notchedOutline {
+.datePickerContainer
+  .MuiPickersOutlinedInput-root
+  > .MuiPickersOutlinedInput-notchedOutline {
   border-color: var(--side-panel-input-border) !important;
 }
 
 /* Override hover border - disable hover effect */
-.datePickerContainer .MuiPickersOutlinedInput-root:not(.Mui-focused):hover > .MuiPickersOutlinedInput-notchedOutline {
+.datePickerContainer
+  .MuiPickersOutlinedInput-root:not(.Mui-focused):hover
+  > .MuiPickersOutlinedInput-notchedOutline {
   border-color: var(--side-panel-input-border-hover) !important;
 }
 
 /* Override focused border color */
-.datePickerContainer .MuiPickersOutlinedInput-root.Mui-focused > .MuiPickersOutlinedInput-notchedOutline {
+.datePickerContainer
+  .MuiPickersOutlinedInput-root.Mui-focused
+  > .MuiPickersOutlinedInput-notchedOutline {
   border-color: var(--side-panel-input-border-focused) !important;
   border-width: 1px !important;
 }
@@ -141,5 +150,3 @@
   background-color: var(--side-panel-datepicker-selected-background) !important;
   color: var(--side-panel-datepicker-selected-color) !important;
 }
-
-

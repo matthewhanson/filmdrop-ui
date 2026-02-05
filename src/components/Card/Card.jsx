@@ -14,10 +14,7 @@ const Card = ({ height = 'auto', label, children, className = '' }) => {
 }
 
 Card.propTypes = {
-  height: PropTypes.oneOfType([
-    PropTypes.number,
-    PropTypes.oneOf(['auto'])
-  ]),
+  height: PropTypes.oneOfType([PropTypes.number, PropTypes.oneOf(['auto'])]),
   label: PropTypes.string,
   children: PropTypes.node.isRequired,
   className: PropTypes.string

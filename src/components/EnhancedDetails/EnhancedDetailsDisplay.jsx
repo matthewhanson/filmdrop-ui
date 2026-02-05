@@ -117,23 +117,21 @@ const EnhancedDetailsDisplay = () => {
         <h2 className="EnhancedDetails__heading">Properties</h2>
         <div className="fields-container">
           {hasEnhancedConfig
-            ? Object.entries(groupedFields).map(
-                ([groupName, fields]) => {
-                  const normalized = normalizeGroupName(groupName)
-                  const isCore =
-                    normalized === 'group-core-fields' ||
-                    normalized === 'core-fields'
-                  return (
-                    <FieldGroup
-                      key={groupName}
-                      group={[groupName, fields]}
-                      sortFields={sortFields}
-                      isConfigured={true}
-                      defaultExpanded={isCore}
-                    />
-                  )
-                }
-              )
+            ? Object.entries(groupedFields).map(([groupName, fields]) => {
+                const normalized = normalizeGroupName(groupName)
+                const isCore =
+                  normalized === 'group-core-fields' ||
+                  normalized === 'core-fields'
+                return (
+                  <FieldGroup
+                    key={groupName}
+                    group={[groupName, fields]}
+                    sortFields={sortFields}
+                    isConfigured={true}
+                    defaultExpanded={isCore}
+                  />
+                )
+              })
             : groupedFields.map((group, index) => (
                 <FieldGroup
                   key={group.name}

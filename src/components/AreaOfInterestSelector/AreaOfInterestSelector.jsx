@@ -7,7 +7,11 @@ import {
   setshowUploadGeojsonModal
 } from '../../redux/slices/mainSlice'
 import ButtonGroup from '../ButtonGroup/ButtonGroup'
-import { enableMapPolyDrawing, clearLayer, zoomToCollectionExtent } from '../../utils/mapHelper'
+import {
+  enableMapPolyDrawing,
+  clearLayer,
+  zoomToCollectionExtent
+} from '../../utils/mapHelper'
 import './AreaOfInterestSelector.css'
 
 const AreaOfInterestSelector = () => {
@@ -38,15 +42,30 @@ const AreaOfInterestSelector = () => {
       return
     }
     // If upload was cancelled (Upload button selected but modal closed and no boundary)
-    if (selectedAOI === 'upload' && !showUploadGeojsonModal && !searchGeojsonBoundary) {
+    if (
+      selectedAOI === 'upload' &&
+      !showUploadGeojsonModal &&
+      !searchGeojsonBoundary
+    ) {
       setSelectedAOI('mapview')
       return
     }
     // If boundary is cleared externally while not in active draw/upload mode
-    if (!searchGeojsonBoundary && !showSearchByGeom && !showUploadGeojsonModal && selectedAOI !== 'mapview') {
+    if (
+      !searchGeojsonBoundary &&
+      !showSearchByGeom &&
+      !showUploadGeojsonModal &&
+      selectedAOI !== 'mapview'
+    ) {
       setSelectedAOI('mapview')
     }
-  }, [searchGeojsonBoundary, showSearchByGeom, isDrawingEnabled, showUploadGeojsonModal, selectedAOI])
+  }, [
+    searchGeojsonBoundary,
+    showSearchByGeom,
+    isDrawingEnabled,
+    showUploadGeojsonModal,
+    selectedAOI
+  ])
 
   const handleDraw = () => {
     // Clear any existing boundary to allow redrawing

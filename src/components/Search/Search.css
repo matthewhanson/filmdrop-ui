@@ -41,7 +41,8 @@
 /* Firefox scrollbar */
 .Search__scrollable {
   scrollbar-width: thin;
-  scrollbar-color: var(--side-panel-scrollbar-thumb) var(--side-panel-scrollbar-track);
+  scrollbar-color: var(--side-panel-scrollbar-thumb)
+    var(--side-panel-scrollbar-track);
 }
 
 /* Leaflet Map Control Border Overrides */

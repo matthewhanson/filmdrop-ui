@@ -20,26 +20,31 @@
   box-sizing: border-box;
 }
 
-.ButtonGroup__buttons.MuiToggleButtonGroup-root .MuiToggleButtonGroup-grouped:not(:last-of-type) {
+.ButtonGroup__buttons.MuiToggleButtonGroup-root
+  .MuiToggleButtonGroup-grouped:not(:last-of-type) {
   border-right: 1px solid var(--side-panel-toggle-button-border);
 }
 
-.ButtonGroup__buttons.MuiToggleButtonGroup-root .MuiToggleButtonGroup-grouped:hover {
+.ButtonGroup__buttons.MuiToggleButtonGroup-root
+  .MuiToggleButtonGroup-grouped:hover {
   background: var(--side-panel-toggle-button-background-hover);
   color: var(--side-panel-toggle-button-color);
 }
 
-.ButtonGroup__buttons.MuiToggleButtonGroup-root .MuiToggleButtonGroup-grouped.Mui-selected {
+.ButtonGroup__buttons.MuiToggleButtonGroup-root
+  .MuiToggleButtonGroup-grouped.Mui-selected {
   background: var(--side-panel-toggle-button-background-selected);
   color: var(--side-panel-toggle-button-color-selected);
 }
 
-.ButtonGroup__buttons.MuiToggleButtonGroup-root .MuiToggleButtonGroup-grouped.Mui-selected:hover {
+.ButtonGroup__buttons.MuiToggleButtonGroup-root
+  .MuiToggleButtonGroup-grouped.Mui-selected:hover {
   background: var(--side-panel-toggle-button-background-selected);
   color: var(--side-panel-toggle-button-color-selected);
 }
 
-.ButtonGroup__buttons.MuiToggleButtonGroup-root .MuiToggleButtonGroup-grouped.Mui-disabled {
+.ButtonGroup__buttons.MuiToggleButtonGroup-root
+  .MuiToggleButtonGroup-grouped.Mui-disabled {
   opacity: var(--opacity-disabled);
   color: var(--side-panel-toggle-button-color);
 }

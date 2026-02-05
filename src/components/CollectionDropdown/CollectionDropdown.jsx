@@ -23,7 +23,9 @@ const CollectionDropdown = () => {
   const selectedCollectionData = useSelector(
     (state) => state.mainSlice.selectedCollectionData
   )
-  const collectionsData = useSelector((state) => state.mainSlice.collectionsData)
+  const collectionsData = useSelector(
+    (state) => state.mainSlice.collectionsData
+  )
   const appConfig = useSelector((state) => state.mainSlice.appConfig)
 
   // Convert collections data to dropdown options
@@ -93,7 +95,12 @@ const CollectionDropdown = () => {
         zoomToCollectionExtent(collection)
       }
     }
-  }, [selectedCollection, collectionsData, selectedCollectionData?.id, dispatch])
+  }, [
+    selectedCollection,
+    collectionsData,
+    selectedCollectionData?.id,
+    dispatch
+  ])
 
   const handleCollectionChange = (e) => {
     const newCollectionId = e.target.value

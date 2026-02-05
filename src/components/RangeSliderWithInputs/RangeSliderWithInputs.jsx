@@ -4,7 +4,14 @@ import PropTypes from 'prop-types'
 import Card from '../Card/Card'
 import './RangeSliderWithInputs.css'
 
-const RangeSliderWithInputs = ({ min, max, value, onChange, label, step = 1 }) => {
+const RangeSliderWithInputs = ({
+  min,
+  max,
+  value,
+  onChange,
+  label,
+  step = 1
+}) => {
   const [minInput, setMinInput] = useState(value.min)
   const [maxInput, setMaxInput] = useState(value.max)
   const [isEditingMin, setIsEditingMin] = useState(false)

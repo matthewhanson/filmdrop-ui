@@ -5,7 +5,10 @@ import LaunchIcon from '@mui/icons-material/Launch'
 import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
 import { sanitizeFieldValue } from '../../utils/securityHelper.js'
-import { isHttpLink, getLinkTypeFromMimeOrUrl } from '../../utils/defaultLinkGrouping.js'
+import {
+  isHttpLink,
+  getLinkTypeFromMimeOrUrl
+} from '../../utils/defaultLinkGrouping.js'
 
 /**
  * Extract domain from URL

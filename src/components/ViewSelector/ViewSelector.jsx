@@ -51,7 +51,11 @@ const ViewSelector = () => {
     if (!selectedCollectionData) return
 
     // Default to hex if available, otherwise grid, otherwise scene
-    const defaultView = supportsHex ? 'hex' : supportsGrid ? 'grid-code' : 'scene'
+    const defaultView = supportsHex
+      ? 'hex'
+      : supportsGrid
+        ? 'grid-code'
+        : 'scene'
     dispatch(setViewMode(defaultView))
     setIsManualSelection(false)
   }, [selectedCollectionData?.id, supportsHex, supportsGrid, dispatch])
@@ -90,7 +94,14 @@ const ViewSelector = () => {
         dispatch(setViewMode('hex'))
       }
     }
-  }, [currentZoom, sceneMinZoom, supportsHex, viewMode, isManualSelection, dispatch])
+  }, [
+    currentZoom,
+    sceneMinZoom,
+    supportsHex,
+    viewMode,
+    isManualSelection,
+    dispatch
+  ])
 
   const handleViewChange = (view) => {
     dispatch(setViewMode(view))

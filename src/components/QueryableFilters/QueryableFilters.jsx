@@ -23,7 +23,6 @@ const QueryableFilters = () => {
   // Use custom hook to get filtered and sorted queryable fields
   const { fields: renderableFields, error } = useRenderableQueryables()
 
-
   // Initialize default values when queryables change
   // This MUST come before any conditional returns (Rules of Hooks)
   useEffect(() => {
@@ -103,7 +102,10 @@ const QueryableFilters = () => {
       schema.minimum !== undefined &&
       schema.maximum !== undefined
     ) {
-      const rangeValue = currentValue || { min: schema.minimum, max: schema.maximum }
+      const rangeValue = currentValue || {
+        min: schema.minimum,
+        max: schema.maximum
+      }
       return (
         <div key={fieldName} className="queryableField">
           <RangeSliderWithInputs

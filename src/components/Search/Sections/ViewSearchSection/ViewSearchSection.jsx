@@ -1,7 +1,10 @@
 import React from 'react'
 import './ViewSearchSection.css'
 import { useSelector, useDispatch } from 'react-redux'
-import { setshowSearchByGeom, setautoCenterOnItemChanged } from '../../../../redux/slices/mainSlice'
+import {
+  setshowSearchByGeom,
+  setautoCenterOnItemChanged
+} from '../../../../redux/slices/mainSlice'
 import ViewSelector from '../../../ViewSelector/ViewSelector'
 import Checkbox from '../../../Checkbox/Checkbox'
 import { newSearch } from '../../../../utils/searchHelper'
@@ -40,10 +43,7 @@ const ViewSearchSection = () => {
             onChange={handleAutoZoomChange}
           />
         )}
-        <button
-          className="searchButton"
-          onClick={handleSearchClick}
-        >
+        <button className="searchButton" onClick={handleSearchClick}>
           Search
         </button>
       </div>
