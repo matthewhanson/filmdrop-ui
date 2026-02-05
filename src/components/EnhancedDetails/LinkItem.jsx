@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import LaunchIcon from '@mui/icons-material/Launch'
@@ -27,6 +27,16 @@ function getDomain(url) {
  */
 const LinkItem = React.memo(({ link }) => {
   const [copiedUrl, setCopiedUrl] = useState(null)
+  const timeoutRef = useRef(null)
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+    }
+  }, [])
 
   const linkTitle = link.title
   const linkType = getLinkTypeFromMimeOrUrl(link.type, link.href)
@@ -37,7 +47,10 @@ const LinkItem = React.memo(({ link }) => {
     if (link.href) {
       navigator.clipboard.writeText(link.href)
       setCopiedUrl(link.href)
-      setTimeout(() => setCopiedUrl(null), 2000)
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+      timeoutRef.current = setTimeout(() => setCopiedUrl(null), 2000)
     }
   }
 

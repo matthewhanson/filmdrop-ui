@@ -184,6 +184,15 @@ const RightContent = () => {
     }
   }, [_appConfig, _currentTheme])
 
+  // Cleanup attribution tooltip timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (attributionTimeout.current) {
+        clearTimeout(attributionTimeout.current)
+      }
+    }
+  }, [])
+
   function sanitizeAttribution(dirty) {
     const clean = {
       __html: DOMPurify.sanitize(dirty, {

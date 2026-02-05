@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { TextField as MuiTextField } from '@mui/material'
 import Card from '../Card/Card'
-import debounce from '../../utils/debounce'
+import { useDebouncedCallback } from '../../hooks/useDebouncedCallback'
 import './TextField.css'
 
 const TextField = ({
@@ -16,26 +16,8 @@ const TextField = ({
   // Local state for immediate UI updates (prevents stuttering)
   const [localValue, setLocalValue] = useState(value)
 
-  // Ref to store debounced function
-  const debouncedOnChange = useRef(null)
-
-  // Ref to store latest onChange (avoids recreating debounce on every render)
-  const onChangeRef = useRef(onChange)
-  onChangeRef.current = onChange
-
-  // Create debounced onChange function
-  useEffect(() => {
-    debouncedOnChange.current = debounce((val) => {
-      onChangeRef.current(val)
-    }, debounceDelay)
-
-    // Cleanup on unmount or when dependencies change
-    return () => {
-      if (debouncedOnChange.current?.cancel) {
-        debouncedOnChange.current.cancel()
-      }
-    }
-  }, [debounceDelay])
+  // Debounced onChange callback
+  const debouncedOnChange = useDebouncedCallback(onChange, debounceDelay)
 
   // Sync local state when external value changes
   useEffect(() => {
@@ -48,9 +30,7 @@ const TextField = ({
   const handleLocalChange = (e) => {
     const newValue = e.target.value
     setLocalValue(newValue) // Immediate UI update
-    if (debouncedOnChange.current) {
-      debouncedOnChange.current(newValue) // Debounced Redux dispatch
-    }
+    debouncedOnChange(newValue) // Debounced parent callback
   }
 
   return (

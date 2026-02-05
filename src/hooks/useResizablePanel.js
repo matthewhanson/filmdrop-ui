@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react'
 import { useLayout } from '../contexts/LayoutContext'
 import { useSelector } from 'react-redux'
+import { useDebouncedCallback } from './useDebouncedCallback'
 
 // Minimum card width for column calculation (design token)
 const CARD_MIN_WIDTH = 250
@@ -29,20 +30,10 @@ export const useResizablePanel = (panelRef) => {
   }, [])
 
   // Debounced column update
-  const updateColumnsDebounced = useRef(null)
-
-  const updateColumns = useCallback(
-    (width) => {
-      if (updateColumnsDebounced.current) {
-        clearTimeout(updateColumnsDebounced.current)
-      }
-      updateColumnsDebounced.current = setTimeout(() => {
-        const columns = calculateColumns(width)
-        updateEnhancedColumns(columns)
-      }, 100)
-    },
-    [calculateColumns, updateEnhancedColumns]
-  )
+  const updateColumns = useDebouncedCallback((width) => {
+    const columns = calculateColumns(width)
+    updateEnhancedColumns(columns)
+  }, 100)
 
   // ResizeObserver to track panel size changes
   useEffect(() => {
@@ -66,9 +57,6 @@ export const useResizablePanel = (panelRef) => {
 
     return () => {
       resizeObserver.disconnect()
-      if (updateColumnsDebounced.current) {
-        clearTimeout(updateColumnsDebounced.current)
-      }
     }
   }, [panelRef, updateColumns])
 
