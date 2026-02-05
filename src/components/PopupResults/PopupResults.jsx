@@ -51,7 +51,7 @@ const PopupResults = (props) => {
     return () => {
       dispatch(setimageOverlayLoading(false))
     }
-  }, [props.results, _selectedPopupResultIndex])
+  }, [props.results, _selectedPopupResultIndex, _selectedVisualization])
 
   useEffect(() => {
     if (props.results.length > 0) {

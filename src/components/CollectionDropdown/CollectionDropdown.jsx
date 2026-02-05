@@ -6,7 +6,8 @@ import {
   setSearchLoading,
   sethasCollectionChanged,
   setSelectedCollection,
-  setQueryableFilters
+  setQueryableFilters,
+  setSelectedVisualization
 } from '../../redux/slices/mainSlice'
 import {
   zoomToCollectionExtent,
@@ -115,6 +116,9 @@ const CollectionDropdown = () => {
     clearMapSelection()
     clearAllLayers()
     dispatch(setQueryableFilters({}))
+
+    // Reset visualization so new collection's default is selected
+    dispatch(setSelectedVisualization(null))
   }
 
   return (

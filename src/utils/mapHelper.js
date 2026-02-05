@@ -659,7 +659,7 @@ const parameters = {
   },
   expression: (tilerParams) => {
     const value = tilerParams?.expression
-    return value && `expression=${value}`
+    return value && `expression=${encodeURIComponent(value)}`
   },
   rescale: (tilerParams) => {
     const value = tilerParams?.rescale

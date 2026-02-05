@@ -3,6 +3,7 @@ import './Search.css'
 import { useDispatch, useSelector } from 'react-redux'
 import { setautoCenterOnItemChanged } from '../../redux/slices/mainSlice'
 import CollectionDropdown from '../CollectionDropdown/CollectionDropdown'
+import VisualizationDropdown from '../VisualizationDropdown/VisualizationDropdown'
 import DateTimeRangeSelector from '../DateTimeRangeSelector/DateTimeRangeSelector'
 import AreaOfInterestSelector from '../AreaOfInterestSelector/AreaOfInterestSelector'
 import QueryableFilters from '../QueryableFilters/QueryableFilters'
@@ -38,6 +39,7 @@ const Search = () => {
         {/* Collection Section */}
         <div className="Search__section">
           <CollectionDropdown />
+          <VisualizationDropdown />
         </div>
 
         {/* Location & Date Section */}
