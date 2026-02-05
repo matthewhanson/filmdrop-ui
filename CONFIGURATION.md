@@ -521,6 +521,7 @@ improves maintainability.
 | `mosaicTilerParams`     | Object | TiTiler mosaic parameters (same structure as sceneTilerParams)                                                                |
 | `sceneMinZoom`          | Number | Minimum zoom level required for Scene and Mosaic views (default: 7)                                                           |
 | `popupDisplayFields`    | Array  | STAC property names to display in popup (e.g., `["datetime", "platform"]`)                                                    |
+| `queryableFilters`      | Array  | Allowlist of queryable fields to show as filters. See [Dynamic Property Filtering](#dynamic-property-filtering).              |
 | `tileLayerParams`       | Object | Leaflet tile layer options (e.g., `minZoom`, `maxZoom`, `opacity`)                                                            |
 | `enhancedDisplayConfig` | Object | Enhanced details configuration with `property_groups` and `asset_groups`                                                      |
 
@@ -550,6 +551,7 @@ improves maintainability.
           "rescale": ["-1,1"]
         }
       },
+      "queryableFilters": ["eo:cloud_cover"],
       "mosaicTilerParams": {
         "assets": ["visual"]
       },
@@ -566,6 +568,50 @@ improves maintainability.
 
 **Note:** The `visualizations` field is automatically populated when auto-configuration is enabled. All render definitions from
 the STAC Collection are stored here. The first visualization is used as the default for rendering.
+
+#### Dynamic Property Filtering
+
+FilmDrop UI automatically discovers filterable properties from each STAC collection's
+[OGC Queryables](https://docs.ogc.org/is/17-069r4/17-069r4.html#_queryables) endpoint.
+The application renders appropriate filter controls based on the queryable schema:
+
+| Schema Type                      | UI Control            | Example Property      |
+| -------------------------------- | --------------------- | --------------------- |
+| Numeric with `minimum`/`maximum` | Range slider          | `eo:cloud_cover`      |
+| String/Number/Integer with enum  | Multi-select dropdown | `sar:polarizations`   |
+| String (plain)                   | Text input            | `platform`            |
+| Number/Integer (without min/max) | Numeric input         | Custom numeric fields |
+
+##### Controlling Which Filters Appear
+
+By default, all supported queryables from a collection are displayed as filters. Use the
+`queryableFilters` property to limit filters to specific fields:
+
+```json
+{
+  "COLLECTIONS_CONFIG": {
+    "sentinel-2-l2a": {
+      "queryableFilters": ["eo:cloud_cover"]
+    },
+    "sentinel-1-grd": {
+      "queryableFilters": ["sar:polarizations", "sar:instrument_mode"]
+    },
+    "landsat-c2-l2": {
+      "queryableFilters": []
+    }
+  }
+}
+```
+
+Behavior:
+
+- **Array provided**: Only listed queryables appear as filters (allowlist)
+- **Empty array `[]`**: No queryable filters shown for that collection
+- **Property omitted**: All supported queryables are shown
+
+> **Note:** Collections must expose a queryables endpoint (link with
+> `rel="http://www.opengis.net/def/rel/ogc/1.0/queryables"`). If no queryables link
+> is found, no property filters are displayed for that collection.
 
 #### Legacy Format (Deprecated)
 
@@ -1026,6 +1072,14 @@ See `config_helper/config-new-format-example.json` for a comprehensive example w
 - Verify CSS theme selectors match configuration
 - Check `THEME_SWITCHING_ENABLED` matches CSS structure
 - See [CSS Theme Configuration](#theme-configuration)
+
+### Filters not appearing
+
+- Verify the collection has a queryables endpoint (check collection links for
+  `rel="http://www.opengis.net/def/rel/ogc/1.0/queryables"`)
+- Check browser console for queryables fetch errors
+- Ensure queryable schemas have supported types (number with min/max, enum values, string, or number)
+- If using `queryableFilters` allowlist, verify field names match exactly
 
 ## Additional Resources
 

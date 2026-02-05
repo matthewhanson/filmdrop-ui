@@ -37,7 +37,7 @@ Check out
 
 - **🔍 Search**
   - Date/time range filtering
-  - Cloud cover filtering
+  - Dynamic property filtering (based on collection queryables)
   - Draw or upload GeoJSON search bounds
   - Interactive map with Leaflet
   - Light/dark theme support
@@ -133,7 +133,10 @@ Some FilmDrop features require specific STAC API extensions:
 - **Grid Code Aggregation** - Custom `grid:code` property
   - Items must include grid identifier (e.g., MGRS, WRS2)
 
-- **Cloud Cover Filtering** - [EO Extension](https://github.com/stac-extensions/eo)
+- **Dynamic Property Filtering** - Requires a [OGC API Queryables](https://docs.ogc.org/is/19-079r2/19-079r2.html#queryables) endpoint
+  - FilmDrop auto-discovers filterable properties from each collection's queryables schema
+  - Supported filter types: range sliders (numeric), multi-select (enums), text and numeric inputs
+  - Use `queryableFilters` in `COLLECTIONS_CONFIG` to limit which properties appear as filters
 
 - **Automatic Rendering** -
   [Render Extension](https://github.com/stac-extensions/render) (Optional)
