@@ -22,7 +22,6 @@ const initialState = {
   searchDateRangeValue: DEFAULT_DATE_RANGE,
   localGridData: {},
   hasCollectionChanged: false,
-  showSearchByGeom: false,
   isDrawingEnabled: false,
   mapDrawPolygonHandler: null,
   searchGeojsonBoundary: null,
@@ -122,9 +121,6 @@ export const mainSlice = createSlice({
     },
     sethasCollectionChanged: (state, action) => {
       state.hasCollectionChanged = action.payload
-    },
-    setshowSearchByGeom: (state, action) => {
-      state.showSearchByGeom = action.payload
     },
     setisDrawingEnabled: (state, action) => {
       state.isDrawingEnabled = action.payload
@@ -250,7 +246,6 @@ export const { setSelectedCollectionData } = mainSlice.actions
 export const { setSearchDateRangeValue } = mainSlice.actions
 export const { setLocalGridData } = mainSlice.actions
 export const { sethasCollectionChanged } = mainSlice.actions
-export const { setshowSearchByGeom } = mainSlice.actions
 export const { setisDrawingEnabled } = mainSlice.actions
 export const { setmapDrawPolygonHandler } = mainSlice.actions
 export const { setsearchGeojsonBoundary } = mainSlice.actions

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
-  setshowSearchByGeom,
   setisDrawingEnabled,
   setsearchGeojsonBoundary,
   setshowUploadGeojsonModal
@@ -20,9 +19,6 @@ const AreaOfInterestSelector = () => {
 
   const searchGeojsonBoundary = useSelector(
     (state) => state.mainSlice.searchGeojsonBoundary
-  )
-  const showSearchByGeom = useSelector(
-    (state) => state.mainSlice.showSearchByGeom
   )
   const isDrawingEnabled = useSelector(
     (state) => state.mainSlice.isDrawingEnabled
@@ -48,20 +44,9 @@ const AreaOfInterestSelector = () => {
       !searchGeojsonBoundary
     ) {
       setSelectedAOI('mapview')
-      return
-    }
-    // If boundary is cleared externally while not in active draw/upload mode
-    if (
-      !searchGeojsonBoundary &&
-      !showSearchByGeom &&
-      !showUploadGeojsonModal &&
-      selectedAOI !== 'mapview'
-    ) {
-      setSelectedAOI('mapview')
     }
   }, [
     searchGeojsonBoundary,
-    showSearchByGeom,
     isDrawingEnabled,
     showUploadGeojsonModal,
     selectedAOI
@@ -74,7 +59,6 @@ const AreaOfInterestSelector = () => {
       clearLayer('drawBoundsLayer')
     }
     setSelectedAOI('draw')
-    dispatch(setshowSearchByGeom(true))
     dispatch(setisDrawingEnabled(true))
     enableMapPolyDrawing()
   }
@@ -86,7 +70,6 @@ const AreaOfInterestSelector = () => {
       clearLayer('drawBoundsLayer')
     }
     setSelectedAOI('upload')
-    dispatch(setshowSearchByGeom(false))
     dispatch(setshowUploadGeojsonModal(true))
   }
 
@@ -94,7 +77,6 @@ const AreaOfInterestSelector = () => {
     setSelectedAOI('mapview')
     // Clear any drawn boundary when switching to map view
     dispatch(setsearchGeojsonBoundary(null))
-    dispatch(setshowSearchByGeom(false))
     clearLayer('drawBoundsLayer')
 
     // Optionally zoom to collection extents if available

@@ -3581,7 +3581,6 @@ export const mockAppConfig = {
     attribution:
       '&copy; <a href="https://www.tile-provider.example.com/copyright">TileProvider</a>'
   },
-  SEARCH_BY_GEOM_ENABLED: false,
   CART_ENABLED: false,
   BRAND_LOGO: {
     url: 'https://element84.com/filmdrop',

@@ -33,7 +33,7 @@ const LayerLegend = () => {
           <span>Scene Aggregation</span>
         </div>
       )}
-      {_appConfig.SEARCH_BY_GEOM_ENABLED && _searchGeojsonBoundary && (
+      {_searchGeojsonBoundary && (
         <div className="legendRow">
           <div className="legendSymbol searchAreaLegendSymbol"></div>
           <img

@@ -7,7 +7,6 @@ import { store } from '../../redux/store'
 import {
   setappConfig,
   setsearchGeojsonBoundary,
-  setshowSearchByGeom,
   setisDrawingEnabled,
   setshowUploadGeojsonModal
 } from '../../redux/slices/mainSlice'
@@ -28,7 +27,6 @@ describe('AreaOfInterestSelector', () => {
     vi.mock('../../utils/mapHelper')
     store.dispatch(setappConfig(mockAppConfig))
     store.dispatch(setsearchGeojsonBoundary(null))
-    store.dispatch(setshowSearchByGeom(false))
     store.dispatch(setisDrawingEnabled(false))
     store.dispatch(setshowUploadGeojsonModal(false))
   })
@@ -61,7 +59,6 @@ describe('AreaOfInterestSelector', () => {
       await user.click(drawButton)
       expect(spyEnableMapPolyDrawing).toHaveBeenCalled()
       expect(store.getState().mainSlice.isDrawingEnabled).toBeTruthy()
-      expect(store.getState().mainSlice.showSearchByGeom).toBeTruthy()
     })
 
     it('should clear existing boundary and enable drawing when geom exists', async () => {
@@ -119,13 +116,11 @@ describe('AreaOfInterestSelector', () => {
           coordinates: [[]]
         })
       )
-      store.dispatch(setshowSearchByGeom(true))
       setup()
       const mapViewButton = screen.getByRole('button', { name: /map view/i })
       await user.click(mapViewButton)
       expect(spyClearLayer).toHaveBeenCalledWith('drawBoundsLayer')
       expect(store.getState().mainSlice.searchGeojsonBoundary).toBeNull()
-      expect(store.getState().mainSlice.showSearchByGeom).toBeFalsy()
     })
   })
 })

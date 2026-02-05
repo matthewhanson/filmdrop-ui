@@ -16,7 +16,6 @@ export const DEFAULT_BASEMAP = {
 export const DEFAULT_THEME_SWITCHING_ENABLED = true
 export const DEFAULT_EXPORT_ENABLED = true
 export const DEFAULT_SHOW_ITEM_AUTO_ZOOM = true
-export const DEFAULT_SEARCH_BY_GEOM_ENABLED = true
 export const DEFAULT_STAC_LINK_ENABLED = true
 export const DEFAULT_STAC_LINKS_SECTION_ENABLED = true
 export const DEFAULT_RIGHT_SIDEBAR_ENABLED = false
