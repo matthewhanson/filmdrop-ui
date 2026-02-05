@@ -5,7 +5,7 @@ import { useDebouncedCallback } from './useDebouncedCallback'
 
 // Minimum card width for column calculation (design token)
 const CARD_MIN_WIDTH = 250
-const MIN_PANEL_WIDTH = 200
+const MIN_PANEL_WIDTH = 280
 const MAX_PANEL_WIDTH = 1200
 
 /**

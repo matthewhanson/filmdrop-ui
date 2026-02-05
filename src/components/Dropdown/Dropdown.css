@@ -9,7 +9,7 @@
 
 /* Standardize control height */
 .Dropdown__select .MuiSelect-select {
-  padding: 8px 12px !important;
+  padding: 8px 32px 8px 12px !important;
   font-size: 12px !important;
   height: 36px !important;
   box-sizing: border-box !important;

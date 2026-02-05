@@ -18,6 +18,9 @@
   margin: 0;
   transition: all 0.15s ease;
   box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ButtonGroup__buttons.MuiToggleButtonGroup-root
