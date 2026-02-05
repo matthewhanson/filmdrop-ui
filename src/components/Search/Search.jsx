@@ -18,7 +18,6 @@ const Search = () => {
     (state) => state.mainSlice.autoCenterOnItemChanged
   )
   const { hasFields } = useRenderableQueryables()
-  const mosaicTilerURL = appConfig.MOSAIC_TILER_URL || ''
 
   const handleSearchClick = () => {
     // Flush any pending text input changes by triggering blur
@@ -65,7 +64,7 @@ const Search = () => {
       <div className="Search__section Search__section--footer">
         <h2 className="Search__section-heading">View & Search</h2>
         <div className="Search__section-content">
-          {mosaicTilerURL && <ViewSelector />}
+          <ViewSelector />
           {appConfig.SHOW_ITEM_AUTO_ZOOM && (
             <Checkbox
               label="Item Auto-Zoom"

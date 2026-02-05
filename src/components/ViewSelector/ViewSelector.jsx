@@ -15,6 +15,7 @@ const ViewSelector = () => {
     (state) => state.mainSlice.selectedCollectionData
   )
   const map = useSelector((state) => state.mainSlice.map)
+  const appConfig = useSelector((state) => state.mainSlice.appConfig)
 
   const [currentZoom, setCurrentZoom] = useState(0)
   const [isManualSelection, setIsManualSelection] = useState(false)
@@ -129,14 +130,14 @@ const ViewSelector = () => {
       label: 'Scene',
       onClick: () => handleViewChange('scene'),
       active: viewMode === 'scene',
-      disabled: !canUseScene
+      disabled: !canUseScene || !appConfig?.SCENE_TILER_URL
     },
     {
       value: 'mosaic',
       label: 'Mosaic',
       onClick: () => handleViewChange('mosaic'),
       active: viewMode === 'mosaic',
-      disabled: !canUseScene
+      disabled: !canUseScene || !appConfig?.MOSAIC_TILER_URL
     }
   ]
 
