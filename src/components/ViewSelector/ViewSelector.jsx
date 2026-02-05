@@ -18,6 +18,10 @@ const ViewSelector = () => {
   const appConfig = useSelector((state) => state.mainSlice.appConfig)
 
   const [currentZoom, setCurrentZoom] = useState(0)
+  // Track whether user has manually selected a view mode.
+  // Once true, auto-switching based on zoom level is disabled until
+  // the collection changes. This preserves the user's explicit choice
+  // while still resetting on collection change.
   const [isManualSelection, setIsManualSelection] = useState(false)
 
   // Check if collection supports hex and grid aggregations
@@ -82,9 +86,7 @@ const ViewSelector = () => {
     if (isManualSelection) return
     if (viewMode === 'mosaic') return // Don't auto-switch in mosaic mode
 
-    const canUseScene = currentZoom >= sceneMinZoom
-
-    if (canUseScene) {
+    if (canUseScene && appConfig?.SCENE_TILER_URL) {
       // High zoom: switch to scene if not already there
       if (viewMode !== 'scene') {
         dispatch(setViewMode('scene'))
@@ -96,8 +98,8 @@ const ViewSelector = () => {
       }
     }
   }, [
-    currentZoom,
-    sceneMinZoom,
+    canUseScene,
+    appConfig?.SCENE_TILER_URL,
     supportsHex,
     viewMode,
     isManualSelection,
