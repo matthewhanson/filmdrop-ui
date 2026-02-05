@@ -1,0 +1,131 @@
+import { vi } from 'vitest'
+import React from 'react'
+import { render, screen } from '@testing-library/react'
+import AreaOfInterestSelector from './AreaOfInterestSelector'
+import { Provider } from 'react-redux'
+import { store } from '../../redux/store'
+import {
+  setappConfig,
+  setsearchGeojsonBoundary,
+  setshowSearchByGeom,
+  setisDrawingEnabled,
+  setshowUploadGeojsonModal
+} from '../../redux/slices/mainSlice'
+import { mockAppConfig } from '../../testing/shared-mocks'
+import userEvent from '@testing-library/user-event'
+import * as mapHelper from '../../utils/mapHelper'
+
+describe('AreaOfInterestSelector', () => {
+  const user = userEvent.setup()
+  const setup = () =>
+    render(
+      <Provider store={store}>
+        <AreaOfInterestSelector />
+      </Provider>
+    )
+
+  beforeEach(() => {
+    vi.mock('../../utils/mapHelper')
+    store.dispatch(setappConfig(mockAppConfig))
+    store.dispatch(setsearchGeojsonBoundary(null))
+    store.dispatch(setshowSearchByGeom(false))
+    store.dispatch(setisDrawingEnabled(false))
+    store.dispatch(setshowUploadGeojsonModal(false))
+  })
+
+  afterEach(() => {
+    vi.resetAllMocks()
+  })
+
+  describe('on render', () => {
+    it('should render Draw, Upload, and Map View buttons', () => {
+      setup()
+      expect(screen.getByRole('button', { name: /draw/i })).toBeInTheDocument()
+      expect(
+        screen.getByRole('button', { name: /upload/i })
+      ).toBeInTheDocument()
+      expect(
+        screen.getByRole('button', { name: /map view/i })
+      ).toBeInTheDocument()
+    })
+  })
+
+  describe('when Draw button clicked', () => {
+    it('should enable drawing mode', async () => {
+      const spyEnableMapPolyDrawing = vi.spyOn(
+        mapHelper,
+        'enableMapPolyDrawing'
+      )
+      setup()
+      const drawButton = screen.getByRole('button', { name: /draw/i })
+      await user.click(drawButton)
+      expect(spyEnableMapPolyDrawing).toHaveBeenCalled()
+      expect(store.getState().mainSlice.isDrawingEnabled).toBeTruthy()
+      expect(store.getState().mainSlice.showSearchByGeom).toBeTruthy()
+    })
+
+    it('should clear existing boundary and enable drawing when geom exists', async () => {
+      const spyEnableMapPolyDrawing = vi.spyOn(
+        mapHelper,
+        'enableMapPolyDrawing'
+      )
+      const spyClearLayer = vi.spyOn(mapHelper, 'clearLayer')
+      store.dispatch(
+        setsearchGeojsonBoundary({
+          type: 'Polygon',
+          coordinates: [[]]
+        })
+      )
+      setup()
+      const drawButton = screen.getByRole('button', { name: /draw/i })
+      await user.click(drawButton)
+      expect(spyClearLayer).toHaveBeenCalledWith('drawBoundsLayer')
+      expect(spyEnableMapPolyDrawing).toHaveBeenCalled()
+      expect(store.getState().mainSlice.searchGeojsonBoundary).toBeNull()
+    })
+  })
+
+  describe('when Upload button clicked', () => {
+    it('should show upload modal', async () => {
+      setup()
+      const uploadButton = screen.getByRole('button', { name: /upload/i })
+      await user.click(uploadButton)
+      expect(store.getState().mainSlice.showUploadGeojsonModal).toBeTruthy()
+    })
+
+    it('should clear existing boundary and show upload modal when geom exists', async () => {
+      const spyClearLayer = vi.spyOn(mapHelper, 'clearLayer')
+      store.dispatch(
+        setsearchGeojsonBoundary({
+          type: 'Polygon',
+          coordinates: [[]]
+        })
+      )
+      setup()
+      const uploadButton = screen.getByRole('button', { name: /upload/i })
+      await user.click(uploadButton)
+      expect(spyClearLayer).toHaveBeenCalledWith('drawBoundsLayer')
+      expect(store.getState().mainSlice.searchGeojsonBoundary).toBeNull()
+      expect(store.getState().mainSlice.showUploadGeojsonModal).toBeTruthy()
+    })
+  })
+
+  describe('when Map View button clicked', () => {
+    it('should clear boundary and reset state', async () => {
+      const spyClearLayer = vi.spyOn(mapHelper, 'clearLayer')
+      store.dispatch(
+        setsearchGeojsonBoundary({
+          type: 'Polygon',
+          coordinates: [[]]
+        })
+      )
+      store.dispatch(setshowSearchByGeom(true))
+      setup()
+      const mapViewButton = screen.getByRole('button', { name: /map view/i })
+      await user.click(mapViewButton)
+      expect(spyClearLayer).toHaveBeenCalledWith('drawBoundsLayer')
+      expect(store.getState().mainSlice.searchGeojsonBoundary).toBeNull()
+      expect(store.getState().mainSlice.showSearchByGeom).toBeFalsy()
+    })
+  })
+})

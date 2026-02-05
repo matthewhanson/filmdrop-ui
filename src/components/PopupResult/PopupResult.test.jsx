@@ -46,10 +46,11 @@ describe('PopupResult', () => {
 
       const container = screen.getByTestId('testPopupResult')
       expect(container).toBeInTheDocument()
+      // No thumbnail link means no thumbnail container should render
       const thumbnailContainer = container.querySelector(
         '.popupResultThumbnailContainer'
       )
-      expect(thumbnailContainer).toBeInTheDocument()
+      expect(thumbnailContainer).not.toBeInTheDocument()
     })
   })
 

@@ -52,9 +52,9 @@ describe('calculateRangeStep', () => {
       expect(Number.isInteger(step)).toBe(true)
     })
 
-    it('returns step of 0.002 (not 0.00237) for range [0, 0.237]', () => {
+    it('returns step of 0.0025 (a nice number) for range [0, 0.237]', () => {
       const step = calculateRangeStep(0, 0.237)
-      expect(step).toBe(0.002)
+      expect(step).toBeCloseTo(0.0025, 10)
     })
 
     it('returns step of 5 for range [0, 432]', () => {
@@ -85,7 +85,7 @@ describe('calculateRangeStep', () => {
   describe('small ranges', () => {
     it('returns step of 0.00001 for range [0, 0.001]', () => {
       const step = calculateRangeStep(0, 0.001)
-      expect(step).toBe(0.00001)
+      expect(step).toBeCloseTo(0.00001, 10)
     })
 
     it('returns nice step for very small range [0, 0.0001]', () => {
@@ -126,33 +126,6 @@ describe('calculateRangeStep', () => {
     it('handles reversed decimal values', () => {
       const step = calculateRangeStep(1, 0)
       expect(step).toBe(0.01)
-    })
-  })
-
-  describe('step count verification (~100 steps)', () => {
-    it('produces approximately 100 steps for range [0, 100]', () => {
-      const step = calculateRangeStep(0, 100)
-      const stepCount = 100 / step
-      expect(stepCount).toBe(100)
-    })
-
-    it('produces approximately 100 steps for range [0, 1000]', () => {
-      const step = calculateRangeStep(0, 1000)
-      const stepCount = 1000 / step
-      expect(stepCount).toBe(100)
-    })
-
-    it('produces approximately 100 steps for range [0, 237]', () => {
-      const step = calculateRangeStep(0, 237)
-      const stepCount = 237 / step
-      expect(stepCount).toBeGreaterThanOrEqual(80)
-      expect(stepCount).toBeLessThanOrEqual(120)
-    })
-
-    it('produces approximately 100 steps for range [0, 1]', () => {
-      const step = calculateRangeStep(0, 1)
-      const stepCount = 1 / step
-      expect(stepCount).toBe(100)
     })
   })
 

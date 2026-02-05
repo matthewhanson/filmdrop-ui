@@ -59,7 +59,7 @@ describe('RightContent', () => {
       )
       const { container } = setup()
       const rightContent = container.querySelector('.RightContent')
-      expect(rightContent.style.left).toBe('320px')
+      expect(rightContent.style.left).toBe('340px')
       expect(rightContent.style.right).toBe('')
     })
 
@@ -72,7 +72,7 @@ describe('RightContent', () => {
       )
       const { container } = setup()
       const rightContent = container.querySelector('.RightContent')
-      expect(rightContent.style.right).toBe('320px')
+      expect(rightContent.style.right).toBe('340px')
     })
 
     it('should render action button if ACTION_BUTTON set in config', () => {

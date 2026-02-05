@@ -11,7 +11,6 @@ import {
 } from '../../redux/slices/mainSlice'
 import { mockAppConfig } from '../../testing/shared-mocks'
 import userEvent from '@testing-library/user-event'
-import * as mapHelper from '../../utils/mapHelper'
 
 describe('Search', () => {
   const user = userEvent.setup()
@@ -78,94 +77,8 @@ describe('Search', () => {
           expect(store.getState().mainSlice.isDrawingEnabled).toBeTruthy()
         })
       })
-      describe('when draw boundary button clicked', () => {
-        it('should not call functions if geom already exists', async () => {
-          const spyEnableMapPolyDrawing = vi.spyOn(
-            mapHelper,
-            'enableMapPolyDrawing'
-          )
-          store.dispatch(
-            setsearchGeojsonBoundary({
-              type: 'Polygon',
-              coordinates: [[]]
-            })
-          )
-          setup()
-          const drawBoundaryButton = screen.getByRole('button', {
-            name: /draw/i
-          })
-          await user.click(drawBoundaryButton)
-          expect(spyEnableMapPolyDrawing).not.toHaveBeenCalled()
-        })
-        it('should enter drawing state if geom does not exists', async () => {
-          const spyEnableMapPolyDrawing = vi.spyOn(
-            mapHelper,
-            'enableMapPolyDrawing'
-          )
-          store.dispatch(setshowSearchByGeom(true))
-          setup()
-          const drawBoundaryButton = screen.getByRole('button', {
-            name: /draw/i
-          })
-          await user.click(drawBoundaryButton)
-          expect(spyEnableMapPolyDrawing).toHaveBeenCalled()
-          expect(store.getState().mainSlice.isDrawingEnabled).toBeTruthy()
-        })
-      })
-      describe('when clear button clicked', () => {
-        it('should not call functions if geom does not exists', async () => {
-          const spyClearLayer = vi.spyOn(mapHelper, 'clearLayer')
-          setup()
-          const clearButton = screen.getByRole('button', {
-            name: /clear/i
-          })
-          await user.click(clearButton)
-          expect(spyClearLayer).not.toHaveBeenCalled()
-        })
-        it('should clear layer and close options if geom exists', async () => {
-          const spyClearLayer = vi.spyOn(mapHelper, 'clearLayer')
-          store.dispatch(
-            setsearchGeojsonBoundary({
-              type: 'Polygon',
-              coordinates: [[]]
-            })
-          )
-          setup()
-          const clearButton = screen.getByRole('button', {
-            name: /clear/i
-          })
-          await user.click(clearButton)
-          expect(spyClearLayer).toHaveBeenCalled()
-          expect(store.getState().mainSlice.searchGeojsonBoundary).toBeNull()
-          expect(store.getState().mainSlice.showSearchByGeom).toBeFalsy()
-        })
-      })
-      describe('when upload geojson button clicked', () => {
-        it('should not call dispatch functions if geom already exists', async () => {
-          store.dispatch(
-            setsearchGeojsonBoundary({
-              type: 'Polygon',
-              coordinates: [[]]
-            })
-          )
-          setup()
-          const uploadGeojsonButton = screen.getByRole('button', {
-            name: /upload/i
-          })
-          await user.click(uploadGeojsonButton)
-          expect(store.getState().mainSlice.showUploadGeojsonModal).toBeFalsy()
-        })
-        it('should call dispatch functions if geom does not exists', async () => {
-          store.dispatch(setshowSearchByGeom(true))
-          setup()
-          const uploadGeojsonButton = screen.getByRole('button', {
-            name: /upload/i
-          })
-          await user.click(uploadGeojsonButton)
-          expect(store.getState().mainSlice.showSearchByGeom).toBeFalsy()
-          expect(store.getState().mainSlice.showUploadGeojsonModal).toBeTruthy()
-        })
-      })
+      // Note: Draw, Upload, and Clear button tests moved to AreaOfInterestSelector.test.jsx
+      // The behavior has changed - buttons now always allow action (clearing existing boundary first)
     })
   })
 })

@@ -19,6 +19,11 @@
   justify-content: center;
   margin-top: 8px;
   margin-bottom: 10px;
+  width: 100%;
+  max-width: 304px;
+  min-height: 304px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .popupResultThumbnail {

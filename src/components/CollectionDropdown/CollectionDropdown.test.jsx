@@ -4,7 +4,11 @@ import { render, screen, within } from '@testing-library/react'
 import CollectionDropdown from './CollectionDropdown'
 import { Provider } from 'react-redux'
 import { store } from '../../redux/store'
-import { setCollectionsData, setappConfig } from '../../redux/slices/mainSlice'
+import {
+  setCollectionsData,
+  setappConfig,
+  setSelectedCollection
+} from '../../redux/slices/mainSlice'
 import { mockCollectionsData, mockAppConfig } from '../../testing/shared-mocks'
 import * as mapHelper from '../../utils/mapHelper'
 import userEvent from '@testing-library/user-event'
@@ -21,6 +25,7 @@ describe('CollectionDropdown', () => {
     vi.mock('../../utils/mapHelper')
     store.dispatch(setappConfig(mockAppConfig))
     store.dispatch(setCollectionsData(mockCollectionsData))
+    store.dispatch(setSelectedCollection(null))
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -43,8 +48,9 @@ describe('CollectionDropdown', () => {
       expect(store.getState().mainSlice.hasCollectionChanged).toBeFalsy()
       const select = screen.getByRole('combobox')
       await userEvent.click(select)
+      // Click a different collection than the auto-selected first one
       const option = screen.getByRole('option', {
-        name: /copernicus dem glo-30/i
+        name: /sentinel-2 level 2a/i
       })
       await userEvent.click(option)
       expect(store.getState().mainSlice.hasCollectionChanged).toBeTruthy()
@@ -59,8 +65,9 @@ describe('CollectionDropdown', () => {
       setup()
       const select = screen.getByRole('combobox')
       await userEvent.click(select)
+      // Click a different collection than the auto-selected first one
       const option = screen.getByRole('option', {
-        name: /copernicus dem glo-30/i
+        name: /sentinel-2 level 2a/i
       })
       await userEvent.click(option)
       expect(store.getState().mainSlice.showZoomNotice).toBeFalsy()

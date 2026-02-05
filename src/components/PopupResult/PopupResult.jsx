@@ -12,6 +12,11 @@ const PopupResult = (props) => {
   )
   const [thumbnailURL, setthumbnailURL] = useState(null)
 
+  // Derive from props so container renders on first paint (no layout shift)
+  const hasThumbnailLink = Boolean(
+    props.result?.links?.find(({ rel }) => rel === 'thumbnail')?.href
+  )
+
   useEffect(() => {
     if (props.result) {
       if (_autoCenterOnItemChanged) {
@@ -51,19 +56,21 @@ const PopupResult = (props) => {
     >
       {props.result ? (
         <div className="popupResultHero">
-          {thumbnailURL && (
+          {hasThumbnailLink && (
             <div className="popupResultThumbnailContainer">
-              <picture>
-                <img
-                  src={thumbnailURL}
-                  alt="thumbnail"
-                  className="popupResultThumbnail"
-                  onError={({ currentTarget }) => {
-                    currentTarget.onerror = null // prevents looping
-                    currentTarget.parentElement.parentElement.remove()
-                  }}
-                ></img>
-              </picture>
+              {thumbnailURL && (
+                <picture>
+                  <img
+                    src={thumbnailURL}
+                    alt="thumbnail"
+                    className="popupResultThumbnail"
+                    onError={({ currentTarget }) => {
+                      currentTarget.onerror = null // prevents looping
+                      currentTarget.parentElement.parentElement.remove()
+                    }}
+                  />
+                </picture>
+              )}
             </div>
           )}
           <ItemHeader

@@ -63,16 +63,16 @@ describe('LeftContent', () => {
         expect(screen.queryByTestId('testPopupResults')).toBeInTheDocument()
       })
     })
-    describe('on filters tab clicked', () => {
+    describe('on Search tab clicked', () => {
       it('should render search results', async () => {
         store.dispatch(settabSelected('item details'))
         setup()
         expect(screen.queryByTestId('Search')).not.toBeInTheDocument()
         expect(screen.queryByTestId('testPopupResults')).toBeInTheDocument()
-        const filtersButton = screen.getByRole('button', {
-          name: /filters/i
+        const searchButton = screen.getByRole('button', {
+          name: /search/i
         })
-        await user.click(filtersButton)
+        await user.click(searchButton)
         expect(screen.queryByTestId('Search')).toBeInTheDocument()
         expect(screen.queryByTestId('testPopupResults')).not.toBeInTheDocument()
       })
