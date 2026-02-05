@@ -1,1 +1,27 @@
-/* ViewSelector now uses the ButtonGroup component, no custom styles needed */
+.ViewSelector__checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  margin-top: 12px;
+  margin-left: -4px; /* Align checkbox edge with button edge */
+}
+
+.ViewSelector__checkbox .MuiCheckbox-root {
+  padding: 4px !important;
+  margin-right: 4px !important;
+  color: var(--side-panel-checkbox-color-unchecked) !important;
+}
+
+.ViewSelector__checkbox .MuiCheckbox-root.Mui-checked {
+  color: var(--side-panel-checkbox-color-checked) !important;
+}
+
+.ViewSelector__checkbox .MuiCheckbox-root:hover {
+  background-color: var(--mui-hover) !important;
+}
+
+.ViewSelector__checkbox span {
+  font-size: 12px;
+  color: var(--side-panel-text-color-secondary);
+}

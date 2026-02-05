@@ -1,23 +1,15 @@
 import React from 'react'
 import './Search.css'
-import { useDispatch, useSelector } from 'react-redux'
-import { setautoCenterOnItemChanged } from '../../redux/slices/mainSlice'
 import CollectionDropdown from '../CollectionDropdown/CollectionDropdown'
 import VisualizationDropdown from '../VisualizationDropdown/VisualizationDropdown'
 import DateTimeRangeSelector from '../DateTimeRangeSelector/DateTimeRangeSelector'
 import AreaOfInterestSelector from '../AreaOfInterestSelector/AreaOfInterestSelector'
 import QueryableFilters from '../QueryableFilters/QueryableFilters'
 import ViewSelector from '../ViewSelector/ViewSelector'
-import Checkbox from '../Checkbox/Checkbox'
 import { useRenderableQueryables } from '../../hooks/useRenderableQueryables'
 import { newSearch } from '../../utils/searchHelper'
 
 const Search = () => {
-  const dispatch = useDispatch()
-  const appConfig = useSelector((state) => state.mainSlice.appConfig)
-  const autoCenterOnItemChanged = useSelector(
-    (state) => state.mainSlice.autoCenterOnItemChanged
-  )
   const { hasFields } = useRenderableQueryables()
 
   const handleSearchClick = () => {
@@ -27,10 +19,6 @@ const Search = () => {
     textInputs.forEach((input) => input.blur())
 
     newSearch()
-  }
-
-  const handleAutoZoomChange = (e) => {
-    dispatch(setautoCenterOnItemChanged(e.target.checked))
   }
 
   return (
@@ -67,13 +55,6 @@ const Search = () => {
         <h2 className="Search__section-heading">View & Search</h2>
         <div className="Search__section-content">
           <ViewSelector />
-          {appConfig.SHOW_ITEM_AUTO_ZOOM && (
-            <Checkbox
-              label="Item Auto-Zoom"
-              checked={autoCenterOnItemChanged}
-              onChange={handleAutoZoomChange}
-            />
-          )}
           <button className="Search__button" onClick={handleSearchClick}>
             Search
           </button>

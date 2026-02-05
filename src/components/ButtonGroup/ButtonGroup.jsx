@@ -5,7 +5,7 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Card from '../Card/Card'
 import './ButtonGroup.css'
 
-const ButtonGroup = ({ label, buttons, className = '' }) => {
+const ButtonGroup = ({ label, buttons, className = '', children }) => {
   const activeValue = buttons.find((b) => b.active)?.value ?? null
 
   const handleChange = (_event, newValue) => {
@@ -43,6 +43,7 @@ const ButtonGroup = ({ label, buttons, className = '' }) => {
           </ToggleButton>
         ))}
       </ToggleButtonGroup>
+      {children}
     </Card>
   )
 }
@@ -58,7 +59,8 @@ ButtonGroup.propTypes = {
       disabled: PropTypes.bool
     })
   ).isRequired,
-  className: PropTypes.string
+  className: PropTypes.string,
+  children: PropTypes.node
 }
 
 export default ButtonGroup

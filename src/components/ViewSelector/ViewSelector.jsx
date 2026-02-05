@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { setViewMode } from '../../redux/slices/mainSlice'
+import {
+  setViewMode,
+  setautoCenterOnItemChanged
+} from '../../redux/slices/mainSlice'
+import { Checkbox as MuiCheckbox } from '@mui/material'
 import './ViewSelector.css'
 import ButtonGroup from '../ButtonGroup/ButtonGroup'
 import { getCurrentMapZoomLevel } from '../../utils/mapHelper'
@@ -16,6 +20,9 @@ const ViewSelector = () => {
   )
   const map = useSelector((state) => state.mainSlice.map)
   const appConfig = useSelector((state) => state.mainSlice.appConfig)
+  const autoCenterOnItemChanged = useSelector(
+    (state) => state.mainSlice.autoCenterOnItemChanged
+  )
 
   const [currentZoom, setCurrentZoom] = useState(0)
   // Track whether user has manually selected a view mode.
@@ -111,6 +118,10 @@ const ViewSelector = () => {
     setIsManualSelection(true)
   }
 
+  const handleAutoZoomChange = (e) => {
+    dispatch(setautoCenterOnItemChanged(e.target.checked))
+  }
+
   // Build buttons array for ButtonGroup
   const buttons = [
     {
@@ -143,7 +154,20 @@ const ViewSelector = () => {
     }
   ]
 
-  return <ButtonGroup label="View Mode" buttons={buttons} />
+  return (
+    <ButtonGroup label="View Mode" buttons={buttons}>
+      {appConfig?.SHOW_ITEM_AUTO_ZOOM && (
+        <label className="ViewSelector__checkbox">
+          <MuiCheckbox
+            checked={autoCenterOnItemChanged}
+            onChange={handleAutoZoomChange}
+            size="small"
+          />
+          <span>Item Auto-Zoom</span>
+        </label>
+      )}
+    </ButtonGroup>
+  )
 }
 
 export default ViewSelector

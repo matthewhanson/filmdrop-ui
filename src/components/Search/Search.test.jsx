@@ -100,30 +100,5 @@ describe('Search', () => {
         expect(screen.getByText('View Mode')).toBeInTheDocument()
       })
     })
-
-    describe('Auto-Zoom checkbox', () => {
-      it('should not render Auto-Zoom checkbox when SHOW_ITEM_AUTO_ZOOM is false', () => {
-        setup({ SHOW_ITEM_AUTO_ZOOM: false })
-        expect(
-          screen.queryByLabelText('Item Auto-Zoom')
-        ).not.toBeInTheDocument()
-      })
-
-      it('should render Auto-Zoom checkbox when SHOW_ITEM_AUTO_ZOOM is true', () => {
-        setup({ SHOW_ITEM_AUTO_ZOOM: true })
-        expect(screen.getByLabelText('Item Auto-Zoom')).toBeInTheDocument()
-      })
-    })
-  })
-
-  describe('Auto-Zoom checkbox interaction', () => {
-    it('should dispatch setautoCenterOnItemChanged when checkbox is toggled', () => {
-      setup({ SHOW_ITEM_AUTO_ZOOM: true })
-      const checkbox = screen.getByLabelText('Item Auto-Zoom')
-      fireEvent.click(checkbox)
-      // Verify the Redux state was updated
-      const state = store.getState()
-      expect(state.mainSlice.autoCenterOnItemChanged).toBe(true)
-    })
   })
 })

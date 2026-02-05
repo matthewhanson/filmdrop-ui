@@ -8,7 +8,8 @@ import {
   setappConfig,
   setSelectedCollectionData,
   setViewMode,
-  setMap
+  setMap,
+  setautoCenterOnItemChanged
 } from '../../redux/slices/mainSlice'
 import { mockAppConfig } from '../../testing/shared-mocks'
 import * as mapHelper from '../../utils/mapHelper'
@@ -202,6 +203,29 @@ describe('ViewSelector', () => {
 
       const state = store.getState()
       expect(state.mainSlice.viewMode).toBe('mosaic')
+    })
+  })
+
+  describe('Auto-Zoom checkbox', () => {
+    it('should not render Auto-Zoom checkbox when SHOW_ITEM_AUTO_ZOOM is false', () => {
+      setup({ SHOW_ITEM_AUTO_ZOOM: false })
+      expect(screen.queryByText('Item Auto-Zoom')).not.toBeInTheDocument()
+    })
+
+    it('should render Auto-Zoom checkbox when SHOW_ITEM_AUTO_ZOOM is true', () => {
+      setup({ SHOW_ITEM_AUTO_ZOOM: true })
+      expect(screen.getByText('Item Auto-Zoom')).toBeInTheDocument()
+    })
+
+    it('should dispatch setautoCenterOnItemChanged when checkbox is toggled', () => {
+      store.dispatch(setautoCenterOnItemChanged(false))
+      setup({ SHOW_ITEM_AUTO_ZOOM: true })
+
+      const checkbox = screen.getByRole('checkbox')
+      fireEvent.click(checkbox)
+
+      const state = store.getState()
+      expect(state.mainSlice.autoCenterOnItemChanged).toBe(true)
     })
   })
 })
