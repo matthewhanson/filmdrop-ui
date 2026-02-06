@@ -663,7 +663,12 @@ const parameters = {
   },
   rescale: (tilerParams) => {
     const value = tilerParams?.rescale
-    return value && `rescale=${value}`
+    if (!value) return null
+    // Handle array of rescale values (one per band) - TiTiler expects separate rescale params
+    if (Array.isArray(value)) {
+      return value.map((v) => `rescale=${v}`).join('&')
+    }
+    return `rescale=${value}`
   },
   colormapName: (tilerParams) => {
     const value = tilerParams?.colormap_name

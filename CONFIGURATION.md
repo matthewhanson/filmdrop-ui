@@ -441,7 +441,7 @@ configuration when needed.
 }
 // Result:
 // sceneTilerParams.assets = ["red", "green", "blue"]
-// sceneTilerParams.rescale = ["0,10000,0,10000,0,10000"]
+// sceneTilerParams.rescale = ["0,10000", "0,10000", "0,10000"]
 ```
 
 **Scenario 2: NDVI with colormap**

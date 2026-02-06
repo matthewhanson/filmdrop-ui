@@ -522,9 +522,11 @@ export function autoConfigureRendering(config) {
 
       // Optional: rescale
       if (renderDef.rescale && Array.isArray(renderDef.rescale)) {
-        // Convert [[0,10000],[0,10000],[0,10000]] to "0,10000,0,10000,0,10000"
-        const rescaleFlat = renderDef.rescale.flat().join(',')
-        processedRender.rescale = [rescaleFlat]
+        // Convert [[0,10000],[0,10000],[0,10000]] to ["0,10000", "0,10000", "0,10000"]
+        // Each inner array becomes a "min,max" string - one per band
+        processedRender.rescale = renderDef.rescale.map((band) =>
+          Array.isArray(band) ? band.join(',') : String(band)
+        )
       }
 
       // Optional: colormap_name
