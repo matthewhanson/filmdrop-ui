@@ -1,12 +1,10 @@
 import React, { useEffect, useMemo } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { setSelectedVisualization } from '../../redux/slices/mainSlice'
+import { useSelector } from 'react-redux'
 import { getCollectionVisualizations } from '../../utils/configHelper'
 import { useUrlNavigate } from '../../hooks/useUrlNavigate'
 import Dropdown from '../Dropdown/Dropdown'
 
 const VisualizationDropdown = () => {
-  const dispatch = useDispatch()
   const { setViz } = useUrlNavigate()
   const selectedCollection = useSelector(
     (state) => state.mainSlice.selectedCollection
@@ -37,14 +35,13 @@ const VisualizationDropdown = () => {
   // Auto-select first visualization when collection changes and has visualizations
   useEffect(() => {
     if (hasVisualizations && !selectedVisualization) {
-      dispatch(setSelectedVisualization(visualizationKeys[0]))
+      setViz(visualizationKeys[0])
     }
   }, [
     selectedCollection,
     hasVisualizations,
     selectedVisualization,
-    visualizationKeys,
-    dispatch
+    visualizationKeys
   ])
 
   const handleVisualizationChange = (e) => {

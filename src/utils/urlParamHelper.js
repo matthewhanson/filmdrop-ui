@@ -1,56 +1,7 @@
 /**
  * Utility functions for serializing/deserializing queryable filters to/from URL search params.
- *
- * These functions are used by the URL state sync system (useUrlStateSync hook)
- * and by newSearch() to commit search state to the URL.
+ * Used by the URL state sync system (useUrlStateSync hook) and newSearch().
  */
-
-/**
- * Serialize queryable filters to URL search params (URLSearchParams format).
- * @param {Object} filters - The queryableFilters object from Redux
- * @returns {URLSearchParams} URLSearchParams object
- */
-export function serializeQueryableFiltersToURL(filters) {
-  const params = new URLSearchParams()
-
-  Object.entries(filters).forEach(([fieldName, value]) => {
-    if (value === null || value === undefined) {
-      return
-    }
-
-    // Handle range values (objects with min/max from RangeSlider)
-    if (
-      value &&
-      typeof value === 'object' &&
-      !Array.isArray(value) &&
-      'min' in value &&
-      'max' in value
-    ) {
-      params.set(`${fieldName}_min`, String(value.min))
-      params.set(`${fieldName}_max`, String(value.max))
-      return
-    }
-
-    // Handle array values (multi-select)
-    if (Array.isArray(value)) {
-      if (value.length > 0) {
-        params.set(fieldName, value.join(','))
-      }
-      return
-    }
-
-    // Handle boolean values
-    if (typeof value === 'boolean') {
-      params.set(fieldName, String(value))
-      return
-    }
-
-    // Handle number and string values
-    params.set(fieldName, String(value))
-  })
-
-  return params
-}
 
 /**
  * Serialize queryable filters to a plain object for use with TanStack Router's
@@ -170,18 +121,4 @@ export function deserializeQueryableFiltersFromURL(params, queryables) {
   }
 
   return filters
-}
-
-/**
- * Security: sanitize decoded URL params to prevent XSS
- * Strips HTML tags as defense in depth (React also escapes on render)
- * @param {string} value - Value to sanitize
- * @returns {string} Sanitized value
- */
-export function sanitizeParam(value) {
-  if (typeof value === 'string') {
-    // Strip HTML tags
-    return value.replace(/<[^>]*>/g, '')
-  }
-  return value
 }
