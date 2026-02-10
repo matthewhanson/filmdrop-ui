@@ -37,22 +37,24 @@ export const RESERVED_PARAMS = new Set([
 
 /**
  * Extract queryable filter params from the raw search object.
- * These are any params not in the RESERVED_PARAMS set and not
- * _min/_max suffixes of reserved params.
+ * Returns any params not in the RESERVED_PARAMS set.
  */
 export function extractQueryableParams(search) {
   const result = {}
   for (const [key, value] of Object.entries(search)) {
-    const baseKey = key.replace(/_min$|_max$/, '')
-    if (!RESERVED_PARAMS.has(key) && !RESERVED_PARAMS.has(baseKey)) {
+    if (!RESERVED_PARAMS.has(key)) {
       result[key] = value
     }
   }
   return result
 }
 
-const rootRoute = createRootRoute({
-  validateSearch: (search) => ({
+/**
+ * Normalize and validate URL search params.
+ * Exported for direct unit testing.
+ */
+export function normalizeSearch(search) {
+  return {
     // Search-committed params (updated on Search click)
     col: String(search.col ?? ''),
     dt: String(search.dt ?? ''),
@@ -67,7 +69,11 @@ const rootRoute = createRootRoute({
     c: String(search.c ?? ''),
     // Dynamic queryable filter params (pass through non-reserved keys)
     ...extractQueryableParams(search)
-  }),
+  }
+}
+
+const rootRoute = createRootRoute({
+  validateSearch: normalizeSearch,
   component: App
 })
 
