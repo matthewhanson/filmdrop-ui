@@ -77,6 +77,17 @@ function buildQueryFromFilters(queryableFilters) {
 
 export function newSearch(options = {}) {
   const { viewMode: overrideViewMode, preserveItem = false } = options
+
+  // Snapshot all needed Redux state upfront, before any dispatches or URL writes.
+  const _state = store.getState().mainSlice
+  const _selectedCollection = _state.selectedCollectionData
+  const viewMode = overrideViewMode || _state.viewMode
+  const dateRange = _state.searchDateRangeValue
+  const dt =
+    dateRange && dateRange[0] && dateRange[1]
+      ? `${dateRange[0]}/${dateRange[1]}`
+      : ''
+
   clearMapSelection()
   clearAllLayers()
   store.dispatch(setSearchResults(null))
@@ -91,12 +102,6 @@ export function newSearch(options = {}) {
   store.dispatch(setpaginationHistory([]))
 
   // Commit current search state to URL (replace — no history entry)
-  const _state = store.getState().mainSlice
-  const dateRange = _state.searchDateRangeValue
-  const dt =
-    dateRange && dateRange[0] && dateRange[1]
-      ? `${dateRange[0]}/${dateRange[1]}`
-      : ''
   router.navigate({
     search: (prev) => ({
       // Only preserve immediate/map params — don't spread all of prev,
@@ -104,17 +109,15 @@ export function newSearch(options = {}) {
       tab: prev.tab,
       z: prev.z,
       c: prev.c,
-      col: _state.selectedCollectionData?.id || '',
+      col: _selectedCollection?.id || '',
       dt,
-      view: overrideViewMode || _state.viewMode || 'scene',
+      view: viewMode || 'scene',
       viz: _state.selectedVisualization || '',
       item: preserveItem ? prev.item : '',
       ...serializeQueryableFiltersForUrl(_state.queryableFilters)
     }),
     replace: true
   })
-
-  const _selectedCollection = store.getState().mainSlice.selectedCollectionData
 
   // Get minimum zoom level for scene/mosaic views
   const sceneMinZoom =
@@ -132,8 +135,6 @@ export function newSearch(options = {}) {
   const includesGridCode = _selectedCollection.aggregations?.some(
     (el) => el.name === 'grid_code_frequency'
   )
-
-  const viewMode = overrideViewMode || store.getState().mainSlice.viewMode
 
   // Handle mosaic mode
   if (viewMode === 'mosaic') {
