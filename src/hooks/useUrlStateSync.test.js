@@ -25,8 +25,17 @@ vi.mock('@tanstack/react-router', () => ({
 
 // Mock Redux
 const mockDispatch = vi.fn()
+const mockCollectionData = {
+  queryables: {
+    'eo:cloud_cover': { type: 'number', minimum: 0, maximum: 100 }
+  }
+}
 vi.mock('react-redux', () => ({
-  useDispatch: () => mockDispatch
+  useDispatch: () => mockDispatch,
+  useSelector: (selector) =>
+    selector({
+      mainSlice: { selectedCollectionData: mockCollectionData }
+    })
 }))
 
 // Mock useUrlInitialize to control initialization refs
@@ -42,21 +51,6 @@ vi.mock('./useUrlInitialize', () => ({
     fetchAndDisplayItem: mockFetchAndDisplayItem,
     clearItemSelection: mockClearItemSelection
   })
-}))
-
-// Mock store for queryable filter sync
-vi.mock('../redux/store', () => ({
-  store: {
-    getState: () => ({
-      mainSlice: {
-        selectedCollectionData: {
-          queryables: {
-            'eo:cloud_cover': { type: 'number', minimum: 0, maximum: 100 }
-          }
-        }
-      }
-    })
-  }
 }))
 
 vi.mock('../utils/urlParamHelper', () => ({

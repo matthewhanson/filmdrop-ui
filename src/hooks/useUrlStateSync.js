@@ -12,7 +12,7 @@
  */
 import { useEffect } from 'react'
 import { useSearch } from '@tanstack/react-router'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   setSelectedCollection,
   setSelectedVisualization,
@@ -23,7 +23,6 @@ import {
 } from '../redux/slices/mainSlice'
 import { extractQueryableParams } from '../router'
 import { deserializeQueryableFiltersFromURL } from '../utils/urlParamHelper'
-import { store } from '../redux/store'
 import { useUrlInitialize } from './useUrlInitialize'
 
 /**
@@ -55,6 +54,10 @@ const SIMPLE_PARAM_HANDLERS = [
 export function useUrlStateSync() {
   const search = useSearch({ from: '__root__' })
   const dispatch = useDispatch()
+
+  const selectedCollectionData = useSelector(
+    (state) => state.mainSlice.selectedCollectionData
+  )
 
   const { isInitialized, prevSearch, fetchAndDisplayItem, clearItemSelection } =
     useUrlInitialize(search, dispatch)
@@ -97,8 +100,7 @@ export function useUrlStateSync() {
     const prevFilters = extractQueryableParams(prev)
     const currFilters = extractQueryableParams(search)
     if (JSON.stringify(prevFilters) !== JSON.stringify(currFilters)) {
-      const collData = store.getState().mainSlice.selectedCollectionData
-      const queryables = collData?.queryables
+      const queryables = selectedCollectionData?.queryables
       if (queryables && typeof queryables === 'object' && !queryables.error) {
         const filters = deserializeQueryableFiltersFromURL(currFilters, {
           properties: queryables
@@ -116,5 +118,11 @@ export function useUrlStateSync() {
         clearItemSelection()
       }
     }
-  }, [search, dispatch, fetchAndDisplayItem, clearItemSelection])
+  }, [
+    search,
+    selectedCollectionData,
+    dispatch,
+    fetchAndDisplayItem,
+    clearItemSelection
+  ])
 }
