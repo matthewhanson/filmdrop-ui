@@ -239,9 +239,7 @@ export function useUrlInitialize(search, dispatch) {
           }
         } else if (urlSearch.item && urlSearch.col) {
           // Item without full search params — try to display it
-          const collection = collectionsData.find(
-            (c) => c.id === urlSearch.col
-          )
+          const collection = collectionsData.find((c) => c.id === urlSearch.col)
           if (collection) {
             dispatch(setSelectedCollection(urlSearch.col))
             dispatch(setSelectedCollectionData(collection))
