@@ -17,9 +17,7 @@ vi.mock('../../hooks/useUrlNavigate', () => ({
   useUrlNavigate: () => ({
     setTab: vi.fn(),
     setViz: vi.fn(),
-    setItem: vi.fn(),
-    clearItem: vi.fn(),
-    setMapView: vi.fn()
+    setItem: vi.fn()
   })
 }))
 

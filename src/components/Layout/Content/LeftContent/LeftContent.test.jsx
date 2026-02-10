@@ -21,9 +21,7 @@ vi.mock('../../../../hooks/useUrlNavigate', async () => {
     useUrlNavigate: () => ({
       setTab: (tab) => store.dispatch(settabSelected(tab)),
       setViz: vi.fn(),
-      setItem: vi.fn(),
-      clearItem: vi.fn(),
-      setMapView: vi.fn()
+      setItem: vi.fn()
     })
   }
 })
