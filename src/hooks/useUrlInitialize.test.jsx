@@ -6,7 +6,8 @@ import { store } from '../redux/store'
 import {
   setappConfig,
   setCollectionsData,
-  setMap
+  setMap,
+  setSearchResults
 } from '../redux/slices/mainSlice'
 import { useUrlInitialize } from './useUrlInitialize'
 
@@ -347,6 +348,62 @@ describe('useUrlInitialize', () => {
         'error',
         expect.stringContaining('unexpected')
       )
+    })
+
+    it('uses cached item from searchResults instead of calling API', async () => {
+      const cachedFeature = {
+        id: 'cached-item',
+        collection: 'sentinel-2',
+        properties: {}
+      }
+      store.dispatch(
+        setSearchResults({
+          type: 'FeatureCollection',
+          features: [cachedFeature],
+          searchType: 'scene'
+        })
+      )
+
+      const { result } = renderHook(
+        () => useUrlInitialize(mockSearch, mockDispatch),
+        { wrapper }
+      )
+
+      await act(async () => {
+        await result.current.fetchAndDisplayItem('sentinel-2', 'cached-item')
+      })
+
+      expect(GetItemService).not.toHaveBeenCalled()
+      // Should still dispatch selection state (3 dispatches: clickResults, index, currentResult)
+      expect(mockDispatch).toHaveBeenCalledTimes(3)
+
+      // Clean up
+      store.dispatch(setSearchResults(null))
+    })
+
+    it('falls through to API when item is not in searchResults', async () => {
+      store.dispatch(
+        setSearchResults({
+          type: 'FeatureCollection',
+          features: [{ id: 'other-item', properties: {} }],
+          searchType: 'scene'
+        })
+      )
+      GetItemService.mockResolvedValue({ error: true, status: 404 })
+
+      const { result } = renderHook(
+        () => useUrlInitialize(mockSearch, mockDispatch),
+        { wrapper }
+      )
+
+      await act(async () => {
+        await result.current.fetchAndDisplayItem('sentinel-2', 'not-cached')
+      })
+
+      expect(GetItemService).toHaveBeenCalledWith('sentinel-2', 'not-cached')
+
+      // Clean up
+      store.dispatch(setSearchResults(null))
     })
   })
 
