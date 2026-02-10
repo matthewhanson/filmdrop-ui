@@ -49,6 +49,7 @@ export function useUrlInitialize(search, dispatch) {
   const isInitialized = useRef(false)
   const isInitializing = useRef(false)
   const prevSearch = useRef(null)
+  const latestItemRequest = useRef(null)
 
   // Redux state we need to watch for initialization readiness
   const appConfig = useSelector((state) => state.mainSlice.appConfig)
@@ -64,6 +65,8 @@ export function useUrlInitialize(search, dispatch) {
   const fetchAndDisplayItem = useCallback(
     async (collectionId, itemId) => {
       if (!collectionId || !itemId) return
+
+      latestItemRequest.current = itemId
 
       // If the item is already in search results (e.g. from a map click),
       // use it directly instead of making a redundant API call.
@@ -83,6 +86,9 @@ export function useUrlInitialize(search, dispatch) {
       try {
         const result = await GetItemService(collectionId, itemId)
 
+        // Discard result if a newer item request was initiated during the fetch
+        if (latestItemRequest.current !== itemId) return
+
         if (result.error) {
           if (result.status === 404) {
             showApplicationAlert(
@@ -100,10 +106,13 @@ export function useUrlInitialize(search, dispatch) {
           return
         }
 
+        // Re-read from store — searchResults may have changed during the await
+        const currentSearchResults = store.getState().mainSlice.searchResults
+
         // Add item to search results layer on map if not already there
         if (
-          !searchResults?.features ||
-          searchResults?.searchType === 'direct-item'
+          !currentSearchResults?.features ||
+          currentSearchResults?.searchType === 'direct-item'
         ) {
           const searchResultsObject = {
             type: 'FeatureCollection',
