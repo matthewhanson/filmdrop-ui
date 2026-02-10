@@ -15,6 +15,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added `$ref` resolution in queryables service for dereferencing external JSON schemas
 - Added reusable UI components: `ButtonGroup`, `Card`, `Dropdown`, `MultiSelect`, `TextField`, `RangeSliderWithInputs`
 - Added `useDebouncedCallback` and `useRenderableQueryables` hooks
+- Added URL state management: all search/UI state is now persisted in URL search params for shareable links
+- Added `useUrlNavigate` hook for components to update URL params
+- Added `useUrlInitialize` hook for restoring full app state (collection, dates, filters, visualization, selected item) from URL on load
+- Added `useUrlStateSync` hook for ongoing bidirectional sync between URL params and Redux
+- Added `urlParamHelper` utilities for serializing/deserializing queryable filters to/from URL params
+- Added unit tests for URL routing utilities, `useUrlInitialize`, and `useUrlStateSync`
 
 ### Changed
 
@@ -22,12 +28,22 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Unified control heights, border radii, padding, and font styling across components
 - Refactored `Search` component with extracted `AreaOfInterestSelector` and `QueryableFilters`
 - Replaced `react-datepicker` with `@mui/x-date-pickers`
+- Refactored `router.jsx` to use `validateSearch` for URL param parsing instead of path-based routing
+- Visualization selection now routed through URL params instead of direct Redux dispatch
+- Consolidated store reads in `newSearch` to a single upfront snapshot to prevent stale-state bugs
+- Replaced `JSON.stringify` with `shallowEqual` for queryable filter comparison
+- Fixed stale state and race condition in `fetchAndDisplayItem`
+- Fixed falsy value handling (`0`, `false`) in URL param sync default logic
+- Skipped redundant API call when selected item is already in search results
 
 ### Removed
 
 - Removed `CloudSlider` component (replaced by queryable-based filters)
 - Removed `VisualizationList` component (replaced by `VisualizationDropdown`)
 - Removed `FieldInfoIcon` component
+- Removed `routerHelper.js` (replaced by `urlParamHelper.js`)
+- Removed unused `clearItem` and `setMapView` from `useUrlNavigate`
+- Removed dead `hasLeftPanelTabChanged` state and dual dispatch in `mapHelper`
 - Removed `SEARCH_BY_GEOM_ENABLED` config option (now always enabled)
 
 ## 7.0.1 - 2026-01-14
