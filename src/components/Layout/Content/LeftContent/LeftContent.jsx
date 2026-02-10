@@ -2,17 +2,15 @@ import { React, useEffect, useCallback, useRef } from 'react'
 import './LeftContent.css'
 import Search from '../../../Search/Search'
 import PopupResults from '../../../PopupResults/PopupResults'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { debounceNewSearch } from '../../../../utils/searchHelper'
 import { debounceTitilerOverlay } from '../../../../utils/mapHelper'
-import { sethasLeftPanelTabChanged } from '../../../../redux/slices/mainSlice'
 import { useResizablePanel } from '../../../../hooks/useResizablePanel'
 import { useLayout } from '../../../../contexts/LayoutContext'
 import { useUrlNavigate } from '../../../../hooks/useUrlNavigate'
 import DragHandleIcon from '@mui/icons-material/DragHandle'
 
 const LeftContent = () => {
-  const dispatch = useDispatch()
   const panelRef = useRef(null)
   const { isLeftPanelVisible } = useLayout()
 
@@ -61,8 +59,7 @@ const LeftContent = () => {
 
   const setDetailsTab = useCallback(() => {
     setTab('details')
-    dispatch(sethasLeftPanelTabChanged(true))
-  }, [setTab, dispatch])
+  }, [setTab])
 
   return (
     <div
