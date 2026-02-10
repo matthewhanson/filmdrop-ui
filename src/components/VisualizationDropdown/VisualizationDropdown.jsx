@@ -2,10 +2,12 @@ import React, { useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { setSelectedVisualization } from '../../redux/slices/mainSlice'
 import { getCollectionVisualizations } from '../../utils/configHelper'
+import { useUrlNavigate } from '../../hooks/useUrlNavigate'
 import Dropdown from '../Dropdown/Dropdown'
 
 const VisualizationDropdown = () => {
   const dispatch = useDispatch()
+  const { setViz } = useUrlNavigate()
   const selectedCollection = useSelector(
     (state) => state.mainSlice.selectedCollection
   )
@@ -46,7 +48,7 @@ const VisualizationDropdown = () => {
   ])
 
   const handleVisualizationChange = (e) => {
-    dispatch(setSelectedVisualization(e.target.value))
+    setViz(e.target.value)
   }
 
   // Only render if collection has multiple visualizations

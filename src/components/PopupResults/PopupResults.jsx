@@ -10,21 +10,19 @@ import {
   setimageOverlayLoading,
   setselectedPopupResultIndex
 } from '../../redux/slices/mainSlice'
-import {
-  getCollectionConfig,
-  getCollectionVisualizations
-} from '../../utils/configHelper'
+import { getCollectionConfig } from '../../utils/configHelper'
 import PopupFooter from '../PopupFooter/PopupFooter.jsx'
 import { isSceneInCart } from '../../utils/dataHelper'
 import { debounceTitilerOverlay } from '../../utils/mapHelper'
 import { useLayout } from '../../contexts/LayoutContext'
 import { EnhancedDetailsProvider } from '../../contexts/EnhancedDetailsContext'
 import EnhancedDetailsDisplay from '../EnhancedDetails/EnhancedDetailsDisplay.jsx'
-import { router } from '../../router'
+import { useUrlNavigate } from '../../hooks/useUrlNavigate'
 
 const PopupResults = (props) => {
   const dispatch = useDispatch()
   const { enhancedColumns: _enhancedColumns } = useLayout()
+  const { setItem } = useUrlNavigate()
   const _cartItems = useSelector((state) => state.mainSlice.cartItems)
   const _appConfig = useSelector((state) => state.mainSlice.appConfig)
   const _currentPopupResult = useSelector(
@@ -59,27 +57,11 @@ const PopupResults = (props) => {
 
       // Update URL when navigating between items
       const currentItem = props.results[_selectedPopupResultIndex]
-      if (currentItem && currentItem.collection && currentItem.id) {
-        const collectionId = currentItem.collection
-        const { hasVisualizations } = getCollectionVisualizations(collectionId)
-
-        const navigateParams = {
-          collectionId,
-          itemId: currentItem.id
-        }
-
-        // Only include visualization if collection has >= 1 visualization
-        if (hasVisualizations && _selectedVisualization) {
-          navigateParams.visualizationId = _selectedVisualization
-        }
-
-        router.navigate({
-          to: '/item/$collectionId/$itemId/{-$visualizationId}',
-          params: navigateParams
-        })
+      if (currentItem && currentItem.id) {
+        setItem(currentItem.id)
       }
     }
-  }, [_selectedPopupResultIndex, props.results, _selectedVisualization])
+  }, [_selectedPopupResultIndex, props.results])
 
   const onNextClick = useCallback(() => {
     if (_selectedPopupResultIndex < props.results.length - 1) {

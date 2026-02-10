@@ -63,6 +63,12 @@ const RangeSliderWithInputs = ({
     }
   }
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.target.blur()
+    }
+  }
+
   return (
     <Card height="auto" className="rangeSliderWithInputs">
       <div className="rangeSliderHeader">
@@ -75,6 +81,7 @@ const RangeSliderWithInputs = ({
             onChange={handleMinChange}
             onFocus={() => setIsEditingMin(true)}
             onBlur={handleMinBlur}
+            onKeyDown={handleKeyDown}
             min={min}
             max={max}
             step={step}
@@ -88,6 +95,7 @@ const RangeSliderWithInputs = ({
             onChange={handleMaxChange}
             onFocus={() => setIsEditingMax(true)}
             onBlur={handleMaxBlur}
+            onKeyDown={handleKeyDown}
             min={min}
             max={max}
             step={step}

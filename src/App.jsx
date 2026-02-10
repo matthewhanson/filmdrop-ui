@@ -21,8 +21,10 @@ import {
   zoomToItemExtent
 } from './utils/mapHelper'
 import { LayoutProvider } from './contexts/LayoutContext'
+import { useUrlStateSync } from './hooks/useUrlStateSync'
 
 function App() {
+  useUrlStateSync()
   const dispatch = useDispatch()
   const _showUploadGeojsonModal = useSelector(
     (state) => state.mainSlice.showUploadGeojsonModal

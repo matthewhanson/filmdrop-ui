@@ -31,6 +31,7 @@ import debounce from './debounce'
 import { AddMosaicService } from '../services/post-mosaic-service'
 import { router } from '../router'
 import { appendStacHeaderCookies } from '../utils/stacRequest'
+import { serializeQueryableFiltersForUrl } from './urlParamHelper'
 
 /**
  * Convert queryable filters from Redux state into STAC Query Extension format
@@ -74,17 +75,13 @@ function buildQueryFromFilters(queryableFilters) {
   return query
 }
 
-export function newSearch() {
+export function newSearch(options = {}) {
+  const { viewMode: overrideViewMode, preserveItem = false } = options
   clearMapSelection()
   clearAllLayers()
   store.dispatch(setSearchResults(null))
   store.dispatch(setShowZoomNotice(false))
   store.dispatch(setSearchLoading(false))
-
-  // Reset URL to root if currently on a STAC item route
-  if (window.location.pathname.startsWith('/item/')) {
-    router.navigate({ to: '/' })
-  }
 
   // Reset pagination state for new search
   store.dispatch(setpaginationNextLink(null))
@@ -92,6 +89,30 @@ export function newSearch() {
   store.dispatch(setcurrentPage(1))
   store.dispatch(settotalPages(null))
   store.dispatch(setpaginationHistory([]))
+
+  // Commit current search state to URL (replace — no history entry)
+  const _state = store.getState().mainSlice
+  const dateRange = _state.searchDateRangeValue
+  const dt =
+    dateRange && dateRange[0] && dateRange[1]
+      ? `${dateRange[0]}/${dateRange[1]}`
+      : ''
+  router.navigate({
+    search: (prev) => ({
+      // Only preserve immediate/map params — don't spread all of prev,
+      // which would carry stale queryable filters from a previous collection.
+      tab: prev.tab,
+      z: prev.z,
+      c: prev.c,
+      col: _state.selectedCollectionData?.id || '',
+      dt,
+      view: overrideViewMode || _state.viewMode || 'scene',
+      viz: _state.selectedVisualization || '',
+      item: preserveItem ? prev.item : '',
+      ...serializeQueryableFiltersForUrl(_state.queryableFilters)
+    }),
+    replace: true
+  })
 
   const _selectedCollection = store.getState().mainSlice.selectedCollectionData
 
@@ -112,7 +133,7 @@ export function newSearch() {
     (el) => el.name === 'grid_code_frequency'
   )
 
-  const viewMode = store.getState().mainSlice.viewMode
+  const viewMode = overrideViewMode || store.getState().mainSlice.viewMode
 
   // Handle mosaic mode
   if (viewMode === 'mosaic') {

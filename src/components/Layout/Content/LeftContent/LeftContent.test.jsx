@@ -13,6 +13,21 @@ import {
 import { mockAppConfig } from '../../../../testing/shared-mocks'
 import userEvent from '@testing-library/user-event'
 
+// Mock useUrlNavigate so setTab dispatches to Redux (simulating URL→Redux sync)
+vi.mock('../../../../hooks/useUrlNavigate', async () => {
+  const { store } = await import('../../../../redux/store')
+  const { settabSelected } = await import('../../../../redux/slices/mainSlice')
+  return {
+    useUrlNavigate: () => ({
+      setTab: (tab) => store.dispatch(settabSelected(tab)),
+      setViz: vi.fn(),
+      setItem: vi.fn(),
+      clearItem: vi.fn(),
+      setMapView: vi.fn()
+    })
+  }
+})
+
 describe('LeftContent', () => {
   const user = userEvent.setup()
   const setup = () =>
