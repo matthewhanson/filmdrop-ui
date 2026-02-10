@@ -65,6 +65,21 @@ export function useUrlInitialize(search, dispatch) {
     async (collectionId, itemId) => {
       if (!collectionId || !itemId) return
 
+      // If the item is already in search results (e.g. from a map click),
+      // use it directly instead of making a redundant API call.
+      const searchResults = store.getState().mainSlice.searchResults
+      const cachedItem = searchResults?.features?.find((f) => f.id === itemId)
+      if (cachedItem) {
+        const existingClickResults = store.getState().mainSlice.clickResults
+        const { clickResults, selectedIndex, currentResult } =
+          syncSelectionWithFetchedItem(existingClickResults, cachedItem)
+
+        dispatch(setClickResults(clickResults))
+        dispatch(setselectedPopupResultIndex(selectedIndex))
+        dispatch(setCurrentPopupResult(currentResult))
+        return
+      }
+
       try {
         const result = await GetItemService(collectionId, itemId)
 
@@ -86,7 +101,6 @@ export function useUrlInitialize(search, dispatch) {
         }
 
         // Add item to search results layer on map if not already there
-        const searchResults = store.getState().mainSlice.searchResults
         if (
           !searchResults?.features ||
           searchResults?.searchType === 'direct-item'
