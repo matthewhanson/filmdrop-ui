@@ -94,8 +94,8 @@ export function useUrlStateSync() {
       if (search[param] !== prev[param]) {
         if (requireTruthy && !search[param]) continue
         const raw =
-          defaultValue !== undefined
-            ? search[param] || defaultValue
+          defaultValue !== undefined && !search[param]
+            ? defaultValue
             : search[param]
         if (transform) {
           const value = transform(raw)
