@@ -146,6 +146,24 @@ export function useUrlInitialize(search, dispatch) {
 
     isInitializing.current = true
 
+    function restoreVisualization(col, viz) {
+      if (!viz) return
+      const { visualizationKeys, hasVisualizations } =
+        getCollectionVisualizations(col)
+      if (hasVisualizations && visualizationKeys.includes(viz)) {
+        dispatch(setSelectedVisualization(viz))
+      }
+    }
+
+    async function restoreItem(col, item, tab) {
+      if (!item) return
+      await fetchAndDisplayItem(col, item)
+      // Default to details tab for item view, but respect URL tab if set
+      if (!tab) {
+        dispatch(settabSelected('details'))
+      }
+    }
+
     async function initialize() {
       try {
         const urlSearch = search
@@ -203,17 +221,7 @@ export function useUrlInitialize(search, dispatch) {
               }
             }
 
-            // Set visualization from URL
-            if (urlSearch.viz) {
-              const { visualizationKeys, hasVisualizations } =
-                getCollectionVisualizations(urlSearch.col)
-              if (
-                hasVisualizations &&
-                visualizationKeys.includes(urlSearch.viz)
-              ) {
-                dispatch(setSelectedVisualization(urlSearch.viz))
-              }
-            }
+            restoreVisualization(urlSearch.col, urlSearch.viz)
 
             // Auto-execute search with explicit overrides to avoid
             // race conditions with ViewSelector's collection-change effect
@@ -223,47 +231,22 @@ export function useUrlInitialize(search, dispatch) {
               preserveItem: !!urlSearch.item
             })
 
-            // If URL has an item, fetch and display it
-            if (urlSearch.item) {
-              await fetchAndDisplayItem(urlSearch.col, urlSearch.item)
-              // Default to details tab for item view, but respect URL tab if set
-              if (!urlSearch.tab) {
-                dispatch(settabSelected('details'))
-              }
-            }
+            await restoreItem(urlSearch.col, urlSearch.item, urlSearch.tab)
           } else {
             console.warn(
               `Collection "${urlSearch.col}" from URL not found in available collections`
             )
           }
-        } else {
-          // No search params — just restore immediate params
-          if (urlSearch.viz) {
-            dispatch(setSelectedVisualization(urlSearch.viz))
-          }
-          if (urlSearch.item && urlSearch.col) {
-            // Item without full search params — try to display it
-            const collection = collectionsData.find(
-              (c) => c.id === urlSearch.col
-            )
-            if (collection) {
-              dispatch(setSelectedCollection(urlSearch.col))
-              dispatch(setSelectedCollectionData(collection))
-              if (urlSearch.viz) {
-                const { visualizationKeys, hasVisualizations } =
-                  getCollectionVisualizations(urlSearch.col)
-                if (
-                  hasVisualizations &&
-                  visualizationKeys.includes(urlSearch.viz)
-                ) {
-                  dispatch(setSelectedVisualization(urlSearch.viz))
-                }
-              }
-              await fetchAndDisplayItem(urlSearch.col, urlSearch.item)
-              if (!urlSearch.tab) {
-                dispatch(settabSelected('details'))
-              }
-            }
+        } else if (urlSearch.item && urlSearch.col) {
+          // Item without full search params — try to display it
+          const collection = collectionsData.find(
+            (c) => c.id === urlSearch.col
+          )
+          if (collection) {
+            dispatch(setSelectedCollection(urlSearch.col))
+            dispatch(setSelectedCollectionData(collection))
+            restoreVisualization(urlSearch.col, urlSearch.viz)
+            await restoreItem(urlSearch.col, urlSearch.item, urlSearch.tab)
           }
         }
 
