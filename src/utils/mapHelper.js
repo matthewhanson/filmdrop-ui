@@ -8,9 +8,7 @@ import {
   setsearchGeojsonBoundary,
   setimageOverlayLoading,
   setSearchLoading,
-  settabSelected,
-  setCurrentPopupResult,
-  sethasLeftPanelTabChanged
+  setCurrentPopupResult
 } from '../redux/slices/mainSlice'
 import { searchGridCodeScenes } from './searchHelper'
 import debounce from './debounce'
@@ -179,10 +177,8 @@ export function mapClickHandler(e) {
             if (intersectingFeatures.length > 0) {
               // push to store
               store.dispatch(setClickResults(intersectingFeatures))
-              store.dispatch(settabSelected('details'))
-              store.dispatch(sethasLeftPanelTabChanged(true))
 
-              // Update URL with selected item
+              // Update URL with selected item (tab sync handled by useUrlStateSync)
               const firstItem = intersectingFeatures[0]
               if (firstItem.id) {
                 router.navigate({
