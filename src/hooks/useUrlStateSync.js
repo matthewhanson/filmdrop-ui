@@ -42,26 +42,9 @@ import {
 import { getCollectionVisualizations } from '../utils/configHelper'
 import { showApplicationAlert } from '../utils/alertHelper'
 import { newSearch } from '../utils/searchHelper'
-import { RESERVED_PARAMS } from '../router'
+import { extractQueryableParams } from '../router'
 import { deserializeQueryableFiltersFromURL } from '../utils/urlParamHelper'
 import { store } from '../redux/store'
-
-/**
- * Extract queryable filter params from search object.
- * Returns only the non-reserved keys (dynamic queryable filters).
- */
-function extractFilterParams(search) {
-  const params = new URLSearchParams()
-  for (const [key, value] of Object.entries(search)) {
-    const baseKey = key.replace(/_min$|_max$/, '')
-    if (!RESERVED_PARAMS.has(key) && !RESERVED_PARAMS.has(baseKey)) {
-      if (value !== '' && value != null) {
-        params.set(key, String(value))
-      }
-    }
-  }
-  return params
-}
 
 /**
  * Check if a search object has meaningful search-committed params
@@ -211,8 +194,8 @@ export function useUrlStateSync() {
             }
 
             // Set queryable filters from URL
-            const filterParams = extractFilterParams(urlSearch)
-            if ([...filterParams].length > 0) {
+            const filterParams = extractQueryableParams(urlSearch)
+            if (Object.keys(filterParams).length > 0) {
               // selectedCollectionData.queryables is the properties dict directly
               // (e.g. { "eo:cloud_cover": { type: "number", ... } })
               // deserializeQueryableFiltersFromURL expects { properties: ... }
@@ -234,15 +217,15 @@ export function useUrlStateSync() {
                 // No queryables schema — combine _min/_max pairs into range objects
                 const rawFilters = {}
                 const processedRangeFields = new Set()
-                filterParams.forEach((value, key) => {
+                for (const [key, value] of Object.entries(filterParams)) {
                   const minMatch = key.match(/^(.+)_min$/)
                   const maxMatch = key.match(/^(.+)_max$/)
                   if (minMatch) {
                     const fieldName = minMatch[1]
                     if (!processedRangeFields.has(fieldName)) {
                       processedRangeFields.add(fieldName)
-                      const minVal = filterParams.get(`${fieldName}_min`)
-                      const maxVal = filterParams.get(`${fieldName}_max`)
+                      const minVal = filterParams[`${fieldName}_min`]
+                      const maxVal = filterParams[`${fieldName}_max`]
                       if (minVal != null && maxVal != null) {
                         rawFilters[fieldName] = {
                           min: parseFloat(minVal),
@@ -253,7 +236,7 @@ export function useUrlStateSync() {
                   } else if (!maxMatch) {
                     rawFilters[key] = value
                   }
-                })
+                }
                 if (Object.keys(rawFilters).length > 0) {
                   dispatch(setQueryableFilters(rawFilters))
                 }
@@ -386,18 +369,13 @@ export function useUrlStateSync() {
     }
 
     // Sync queryable filters
-    const prevFilterStr = JSON.stringify(
-      Object.fromEntries(extractFilterParams(prev))
-    )
-    const currFilterStr = JSON.stringify(
-      Object.fromEntries(extractFilterParams(search))
-    )
-    if (prevFilterStr !== currFilterStr) {
-      const filterParams = extractFilterParams(search)
+    const prevFilters = extractQueryableParams(prev)
+    const currFilters = extractQueryableParams(search)
+    if (JSON.stringify(prevFilters) !== JSON.stringify(currFilters)) {
       const collData = store.getState().mainSlice.selectedCollectionData
       const queryables = collData?.queryables
       if (queryables && typeof queryables === 'object' && !queryables.error) {
-        const filters = deserializeQueryableFiltersFromURL(filterParams, {
+        const filters = deserializeQueryableFiltersFromURL(currFilters, {
           properties: queryables
         })
         dispatch(setQueryableFilters(filters))
