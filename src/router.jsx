@@ -40,7 +40,7 @@ export const RESERVED_PARAMS = new Set([
  * These are any params not in the RESERVED_PARAMS set and not
  * _min/_max suffixes of reserved params.
  */
-function extractQueryableParams(search) {
+export function extractQueryableParams(search) {
   const result = {}
   for (const [key, value] of Object.entries(search)) {
     const baseKey = key.replace(/_min$|_max$/, '')
