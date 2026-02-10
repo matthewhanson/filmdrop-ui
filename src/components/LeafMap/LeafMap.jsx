@@ -207,6 +207,11 @@ const LeafMap = () => {
       dispatch(setMap(map))
 
       addReferenceLayersToMap()
+
+      return () => {
+        syncViewportToUrl.cancel()
+        map.off('moveend', syncViewportToUrl)
+      }
     }
   }, [map])
 
