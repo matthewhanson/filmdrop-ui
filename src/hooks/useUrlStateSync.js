@@ -51,6 +51,16 @@ const SIMPLE_PARAM_HANDLERS = [
   }
 ]
 
+/**
+ * Order-independent shallow equality for plain objects with string values.
+ */
+function shallowEqual(a, b) {
+  const keysA = Object.keys(a)
+  const keysB = Object.keys(b)
+  if (keysA.length !== keysB.length) return false
+  return keysA.every((key) => a[key] === b[key])
+}
+
 export function useUrlStateSync() {
   const search = useSearch({ from: '__root__' })
   const dispatch = useDispatch()
@@ -99,7 +109,7 @@ export function useUrlStateSync() {
     // Sync queryable filters (needs JSON comparison across multiple keys)
     const prevFilters = extractQueryableParams(prev)
     const currFilters = extractQueryableParams(search)
-    if (JSON.stringify(prevFilters) !== JSON.stringify(currFilters)) {
+    if (!shallowEqual(prevFilters, currFilters)) {
       const queryables = selectedCollectionData?.queryables
       if (queryables && typeof queryables === 'object' && !queryables.error) {
         const filters = deserializeQueryableFiltersFromURL(currFilters, {
