@@ -11,7 +11,17 @@ import {
   setimageOverlayLoading
 } from '../../redux/slices/mainSlice'
 import { mockAppConfig, mockClickResults } from '../../testing/shared-mocks'
-import { describe } from 'vitest'
+import { describe, vi } from 'vitest'
+
+vi.mock('../../hooks/useUrlNavigate', () => ({
+  useUrlNavigate: () => ({
+    setTab: vi.fn(),
+    setViz: vi.fn(),
+    setItem: vi.fn(),
+    clearItem: vi.fn(),
+    setMapView: vi.fn()
+  })
+}))
 
 describe('PopupResult', () => {
   const setup = () =>

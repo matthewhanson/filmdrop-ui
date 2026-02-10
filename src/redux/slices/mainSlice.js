@@ -42,7 +42,7 @@ const initialState = {
   referenceLayers: [],
   selectedCollection: '',
   selectedVisualization: null,
-  tabSelected: 'filters',
+  tabSelected: 'search',
   selectedPopupResultIndex: 0,
   autoCenterOnItemChanged: false,
   hasLeftPanelTabChanged: false,

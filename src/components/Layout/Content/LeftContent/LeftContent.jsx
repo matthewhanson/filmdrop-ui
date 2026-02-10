@@ -5,12 +5,10 @@ import PopupResults from '../../../PopupResults/PopupResults'
 import { useSelector, useDispatch } from 'react-redux'
 import { debounceNewSearch } from '../../../../utils/searchHelper'
 import { debounceTitilerOverlay } from '../../../../utils/mapHelper'
-import {
-  settabSelected,
-  sethasLeftPanelTabChanged
-} from '../../../../redux/slices/mainSlice'
+import { sethasLeftPanelTabChanged } from '../../../../redux/slices/mainSlice'
 import { useResizablePanel } from '../../../../hooks/useResizablePanel'
 import { useLayout } from '../../../../contexts/LayoutContext'
+import { useUrlNavigate } from '../../../../hooks/useUrlNavigate'
 import DragHandleIcon from '@mui/icons-material/DragHandle'
 
 const LeftContent = () => {
@@ -35,6 +33,7 @@ const LeftContent = () => {
   )
 
   const { handleMouseDown, currentWidth } = useResizablePanel(panelRef)
+  const { setTab } = useUrlNavigate()
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyPress)
@@ -56,14 +55,14 @@ const LeftContent = () => {
     }
   }
 
-  const setFiltersTab = useCallback(() => {
-    dispatch(settabSelected('filters'))
-  }, [dispatch])
+  const setSearchTab = useCallback(() => {
+    setTab('search')
+  }, [setTab])
 
   const setDetailsTab = useCallback(() => {
-    dispatch(settabSelected('details'))
+    setTab('details')
     dispatch(sethasLeftPanelTabChanged(true))
-  }, [dispatch])
+  }, [setTab, dispatch])
 
   return (
     <div
@@ -81,11 +80,11 @@ const LeftContent = () => {
         <div className="LeftContentTabs">
           <button
             className={
-              _tabSelected === 'filters'
+              _tabSelected === 'search'
                 ? 'LeftContentTab LeftContentTabSelected'
                 : 'LeftContentTab'
             }
-            onClick={setFiltersTab}
+            onClick={setSearchTab}
           >
             <span className="LeftContentTabLabel">Search</span>
           </button>
@@ -101,7 +100,7 @@ const LeftContent = () => {
           </button>
         </div>
         <div className="LeftContentSelectedTab">
-          {_tabSelected === 'filters' ? (
+          {_tabSelected === 'search' ? (
             <Search></Search>
           ) : (
             <div className="ItemDetails">

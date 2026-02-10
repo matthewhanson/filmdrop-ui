@@ -16,6 +16,20 @@ import { mockAppConfig } from './testing/shared-mocks'
 import * as ConfigHelper from './utils/configHelper'
 import * as ThemeHelper from './utils/themeHelper'
 
+vi.mock('./hooks/useUrlStateSync', () => ({
+  useUrlStateSync: vi.fn()
+}))
+
+vi.mock('./hooks/useUrlNavigate', () => ({
+  useUrlNavigate: () => ({
+    setTab: vi.fn(),
+    setViz: vi.fn(),
+    setItem: vi.fn(),
+    clearItem: vi.fn(),
+    setMapView: vi.fn()
+  })
+}))
+
 describe('App', () => {
   const setup = () =>
     render(

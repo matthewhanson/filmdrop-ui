@@ -18,10 +18,7 @@ import { GetMosaicBoundsService } from '../services/get-mosaic-bounds'
 import GeoJSONValidation from './geojsonValidation'
 import { DEFAULT_TILE_LAYER_PARAMS } from '../components/defaults'
 import { router } from '../router'
-import {
-  getCollectionConfig,
-  getCollectionVisualizations
-} from './configHelper'
+import { getCollectionConfig } from './configHelper'
 import { appendStacHeaderCookies } from '../utils/stacRequest'
 import { getMapGeometryColors } from './themeHelper'
 
@@ -185,28 +182,16 @@ export function mapClickHandler(e) {
               store.dispatch(settabSelected('details'))
               store.dispatch(sethasLeftPanelTabChanged(true))
 
-              // Navigate to first item URL
+              // Update URL with selected item
               const firstItem = intersectingFeatures[0]
-              if (firstItem.collection && firstItem.id) {
-                const collectionId = firstItem.collection
-                const { hasVisualizations } =
-                  getCollectionVisualizations(collectionId)
-                const _selectedVisualization =
-                  store.getState().mainSlice.selectedVisualization
-
-                const navigateParams = {
-                  collectionId,
-                  itemId: firstItem.id
-                }
-
-                // Only include visualization if collection has >= 1 visualization
-                if (hasVisualizations && _selectedVisualization) {
-                  navigateParams.visualizationId = _selectedVisualization
-                }
-
+              if (firstItem.id) {
                 router.navigate({
-                  to: '/item/$collectionId/$itemId/{-$visualizationId}',
-                  params: navigateParams
+                  search: (prev) => ({
+                    ...prev,
+                    item: firstItem.id,
+                    tab: 'details'
+                  }),
+                  replace: true
                 })
               }
             }
