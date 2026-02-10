@@ -36,23 +36,6 @@ export function useUrlNavigate() {
       navigate({
         search: (prev) => ({ ...prev, item: itemId, tab: 'details' }),
         replace: true
-      }),
-
-    /**
-     * Clear item selection.
-     */
-    clearItem: () =>
-      navigate({
-        search: (prev) => ({ ...prev, item: '', tab: 'search' }),
-        replace: true
-      }),
-
-    /**
-     * Update map viewport.
-     * @param {number} z - Zoom level
-     * @param {string} c - Center as "lat,lng"
-     */
-    setMapView: (z, c) =>
-      navigate({ search: (prev) => ({ ...prev, z, c }), replace: true })
+      })
   }
 }

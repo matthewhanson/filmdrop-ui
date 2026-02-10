@@ -57,26 +57,4 @@ describe('useUrlNavigate', () => {
     expect(search.item).toBe('SCENE-123')
     expect(search.tab).toBe('details')
   })
-
-  it('clearItem clears item and switches to search tab', () => {
-    const { result } = renderHook(() => useUrlNavigate())
-    result.current.clearItem()
-
-    expect(mockNavigate).toHaveBeenCalledOnce()
-    expect(mockNavigate.mock.calls[0][0].replace).toBe(true)
-    const search = getSearchResult()
-    expect(search.item).toBe('')
-    expect(search.tab).toBe('search')
-  })
-
-  it('setMapView updates z and c', () => {
-    const { result } = renderHook(() => useUrlNavigate())
-    result.current.setMapView(12, '51.5074,-0.1278')
-
-    expect(mockNavigate).toHaveBeenCalledOnce()
-    expect(mockNavigate.mock.calls[0][0].replace).toBe(true)
-    const search = getSearchResult()
-    expect(search.z).toBe(12)
-    expect(search.c).toBe('51.5074,-0.1278')
-  })
 })
