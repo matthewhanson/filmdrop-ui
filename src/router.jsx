@@ -21,8 +21,8 @@ import App from './App'
 
 /**
  * Reserved search param names that are not queryable filters.
- * Any param not in this set (and not a _min/_max suffix of one) is treated
- * as a dynamic queryable filter.
+ * Any param not in this set is treated as a dynamic queryable filter
+ * (including _min/_max suffixed variants used for range filters).
  */
 export const RESERVED_PARAMS = new Set([
   'col',
