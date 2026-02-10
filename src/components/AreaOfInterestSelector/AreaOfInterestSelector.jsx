@@ -11,7 +11,6 @@ import {
   clearLayer,
   zoomToCollectionExtent
 } from '../../utils/mapHelper'
-import './AreaOfInterestSelector.css'
 
 const AreaOfInterestSelector = () => {
   const dispatch = useDispatch()
