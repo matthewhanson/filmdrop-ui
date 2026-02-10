@@ -184,11 +184,10 @@ export function useUrlInitialize(search, dispatch) {
             // Set queryable filters from URL
             const filterParams = extractQueryableParams(urlSearch)
             if (Object.keys(filterParams).length > 0) {
-              // selectedCollectionData.queryables is the properties dict directly
+              // collection.queryables is the properties dict directly
               // (e.g. { "eo:cloud_cover": { type: "number", ... } })
               // deserializeQueryableFiltersFromURL expects { properties: ... }
-              const collData = store.getState().mainSlice.selectedCollectionData
-              const queryables = collData?.queryables
+              const queryables = collection.queryables
               if (
                 queryables &&
                 typeof queryables === 'object' &&
@@ -200,33 +199,6 @@ export function useUrlInitialize(search, dispatch) {
                 )
                 if (Object.keys(filters).length > 0) {
                   dispatch(setQueryableFilters(filters))
-                }
-              } else {
-                // No queryables schema — combine _min/_max pairs into range objects
-                const rawFilters = {}
-                const processedRangeFields = new Set()
-                for (const [key, value] of Object.entries(filterParams)) {
-                  const minMatch = key.match(/^(.+)_min$/)
-                  const maxMatch = key.match(/^(.+)_max$/)
-                  if (minMatch) {
-                    const fieldName = minMatch[1]
-                    if (!processedRangeFields.has(fieldName)) {
-                      processedRangeFields.add(fieldName)
-                      const minVal = filterParams[`${fieldName}_min`]
-                      const maxVal = filterParams[`${fieldName}_max`]
-                      if (minVal != null && maxVal != null) {
-                        rawFilters[fieldName] = {
-                          min: parseFloat(minVal),
-                          max: parseFloat(maxVal)
-                        }
-                      }
-                    }
-                  } else if (!maxMatch) {
-                    rawFilters[key] = value
-                  }
-                }
-                if (Object.keys(rawFilters).length > 0) {
-                  dispatch(setQueryableFilters(rawFilters))
                 }
               }
             }
