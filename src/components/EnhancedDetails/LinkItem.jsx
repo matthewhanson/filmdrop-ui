@@ -9,6 +9,7 @@ import {
   isHttpLink,
   getLinkTypeFromMimeOrUrl
 } from '../../utils/defaultLinkGrouping.js'
+import OverflowTooltip from './OverflowTooltip.jsx'
 
 /**
  * Extract domain from URL
@@ -75,16 +76,18 @@ const LinkItem = React.memo(({ link }) => {
     <div role="listitem" className="link-card">
       <div className="link-content">
         {linkTitle && (
-          <div className="link-title">{sanitizeFieldValue(linkTitle)}</div>
+          <OverflowTooltip component="div" className="link-title">
+            {sanitizeFieldValue(linkTitle)}
+          </OverflowTooltip>
         )}
         {metadataItems.length > 0 && (
           <div className="link-details-row">
             {metadataItems.map((item) => (
               <div key={item.label} className="link-meta-line link-meta-pair">
                 <span className="link-meta-label">{item.label}</span>
-                <span className="link-meta-value">
+                <OverflowTooltip className="link-meta-value">
                   {sanitizeFieldValue(item.value)}
-                </span>
+                </OverflowTooltip>
               </div>
             ))}
           </div>
