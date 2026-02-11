@@ -52,7 +52,8 @@ const initialState = {
   currentPage: 1,
   totalPages: null,
   paginationHistory: [],
-  queryableFilters: {}
+  queryableFilters: {},
+  detailsResetKey: 0
 }
 
 // next, for every key in the initialState
@@ -216,6 +217,9 @@ export const mainSlice = createSlice({
     },
     setQueryableFilters: (state, action) => {
       state.queryableFilters = action.payload
+    },
+    incrementDetailsResetKey: (state) => {
+      state.detailsResetKey += 1
     }
   }
 })
@@ -273,5 +277,6 @@ export const { settotalPages } = mainSlice.actions
 export const { setpaginationHistory } = mainSlice.actions
 export const { addToPaginationHistory } = mainSlice.actions
 export const { setQueryableFilters } = mainSlice.actions
+export const { incrementDetailsResetKey } = mainSlice.actions
 
 export default mainSlice.reducer
