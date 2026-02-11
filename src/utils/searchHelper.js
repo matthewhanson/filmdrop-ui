@@ -33,7 +33,8 @@ import {
   setpaginationPrevLink,
   setcurrentPage,
   settotalPages,
-  setpaginationHistory
+  setpaginationHistory,
+  incrementDetailsResetKey
 } from '../redux/slices/mainSlice'
 import * as h3 from 'h3-js'
 import debounce from './debounce'
@@ -226,6 +227,9 @@ export function clearSearch() {
   // Reset filters to defaults
   store.dispatch(setSearchDateRangeValue(DEFAULT_DATE_RANGE))
   store.dispatch(setQueryableFilters({}))
+
+  // Reset item details accordion state
+  store.dispatch(incrementDetailsResetKey())
 
   // Update URL: preserve col, view, viz, z, c; clear dt, item, queryable filters
   router.navigate({

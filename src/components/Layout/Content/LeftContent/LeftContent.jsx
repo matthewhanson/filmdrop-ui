@@ -9,6 +9,7 @@ import { useResizablePanel } from '../../../../hooks/useResizablePanel'
 import { useLayout } from '../../../../contexts/LayoutContext'
 import { useUrlNavigate } from '../../../../hooks/useUrlNavigate'
 import DragHandleIcon from '@mui/icons-material/DragHandle'
+import { AccordionStateProvider } from '../../../../contexts/AccordionStateContext'
 
 const LeftContent = () => {
   const panelRef = useRef(null)
@@ -28,6 +29,12 @@ const LeftContent = () => {
   )
   const _selectedVisualization = useSelector(
     (state) => state.mainSlice.selectedVisualization
+  )
+  const _selectedCollection = useSelector(
+    (state) => state.mainSlice.selectedCollection
+  )
+  const _detailsResetKey = useSelector(
+    (state) => state.mainSlice.detailsResetKey
   )
 
   const { handleMouseDown, currentWidth } = useResizablePanel(panelRef)
@@ -97,13 +104,20 @@ const LeftContent = () => {
           </button>
         </div>
         <div className="LeftContentSelectedTab">
-          {_tabSelected === 'search' ? (
+          <div
+            style={{ display: _tabSelected === 'search' ? undefined : 'none' }}
+          >
             <Search></Search>
-          ) : (
-            <div className="ItemDetails">
+          </div>
+          <div
+            className="ItemDetails"
+            key={`${_selectedCollection}-${_detailsResetKey}`}
+            style={{ display: _tabSelected === 'details' ? undefined : 'none' }}
+          >
+            <AccordionStateProvider>
               <PopupResults results={_clickResults}></PopupResults>
-            </div>
-          )}
+            </AccordionStateProvider>
+          </div>
         </div>
       </div>
       {isLeftPanelVisible && (
