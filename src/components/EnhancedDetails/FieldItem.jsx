@@ -29,7 +29,7 @@ const FieldItem = ({ field, value }) => {
       {hasTooltip ? (
         <Tooltip
           title={metadata.tooltipContent}
-          placement="top-start"
+          placement="top"
           slotProps={{
             tooltip: {
               className: 'tooltip-field-label'

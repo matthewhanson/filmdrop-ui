@@ -87,7 +87,7 @@ const AssetItem = React.memo(({ asset, copiedUrl, onCopyToClipboard }) => {
         <div className="asset-actions">
           <Tooltip
             title={copiedUrl === asset.key ? 'Copied!' : 'Copy link'}
-            placement="top-start"
+            placement="top"
             slotProps={{
               tooltip: {
                 className: 'tooltip-field-label'
