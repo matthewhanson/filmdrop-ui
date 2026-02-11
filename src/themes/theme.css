@@ -197,6 +197,9 @@
   --grid-cell-tooltip: var(--brand-accent-primary);
   --grid-cell-tooltip-color: var(--white);
 
+  /* Tooltip */
+  --tooltip-border: var(--blue-gray-3);
+
   /* Map Overlay - Action Button */
   --action-button-background: var(--brand-accent-primary);
   --action-button-background-hover: var(--brand-accent-primary-dark);
@@ -409,6 +412,9 @@
   --hex-label-shadow: var(--white-alpha-95);
   --grid-cell-tooltip: var(--brand-accent-primary);
   --grid-cell-tooltip-color: var(--white);
+
+  /* Tooltip */
+  --tooltip-border: var(--transparent);
 
   /* Map Overlay - Action Button */
   --action-button-background: var(--brand-accent-primary);

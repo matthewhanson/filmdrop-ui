@@ -282,6 +282,7 @@
   font-size: 12px !important;
   max-width: 260px !important;
   box-shadow: 0 2px 8px var(--shadow-tooltip) !important;
+  border: 1px solid var(--tooltip-border) !important;
 }
 
 .icon-info,
