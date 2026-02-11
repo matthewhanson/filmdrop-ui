@@ -1,4 +1,5 @@
-import { useRef, useCallback, useEffect } from 'react'
+import { useRef, useMemo, useEffect } from 'react'
+import debounce from '../utils/debounce'
 
 /**
  * React hook for debouncing callbacks with proper cleanup
@@ -7,39 +8,18 @@ import { useRef, useCallback, useEffect } from 'react'
  * @returns {Function} Debounced callback with .cancel() method
  */
 export const useDebouncedCallback = (callback, delay) => {
-  const timeoutRef = useRef(null)
   const callbackRef = useRef(callback)
 
   // Always keep callback ref current (avoids stale closures)
   callbackRef.current = callback
 
-  const debouncedFn = useCallback(
-    (...args) => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-      }
-      timeoutRef.current = setTimeout(() => {
-        callbackRef.current(...args)
-      }, delay)
-    },
+  const debouncedFn = useMemo(
+    () => debounce((...args) => callbackRef.current(...args), delay),
     [delay]
   )
 
-  // Add cancel method
-  debouncedFn.cancel = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current)
-    }
-  }
-
   // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-      }
-    }
-  }, [])
+  useEffect(() => () => debouncedFn.cancel(), [debouncedFn])
 
   return debouncedFn
 }
