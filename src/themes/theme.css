@@ -10,10 +10,6 @@
   --opacity-muted: 0.4; /* heavily disabled, unavailable (e.g., dates outside range) */
   --opacity-disabled: 0.5; /* disabled controls */
   --opacity-secondary: 0.7; /* supporting elements, interactive icons */
-
-  /* Shadows */
-  --shadow-tooltip: rgba(0, 0, 0, 0.15);
-  --shadow-subtle: rgba(0, 0, 0, 0.2);
 }
 
 /* ------------------- DARK THEME ------------------- */
@@ -199,6 +195,7 @@
 
   /* Tooltip */
   --tooltip-border: var(--blue-gray-3);
+  --shadow-tooltip: rgba(0, 0, 0, 0.15);
 
   /* Map Overlay - Action Button */
   --action-button-background: var(--brand-accent-primary);
@@ -415,6 +412,7 @@
 
   /* Tooltip */
   --tooltip-border: var(--transparent);
+  --shadow-tooltip: rgba(0, 0, 0, 0.15);
 
   /* Map Overlay - Action Button */
   --action-button-background: var(--brand-accent-primary);
