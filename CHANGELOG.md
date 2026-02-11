@@ -35,6 +35,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fixed stale state and race condition in `fetchAndDisplayItem`
 - Fixed falsy value handling (`0`, `false`) in URL param sync default logic
 - Skipped redundant API call when selected item is already in search results
+- Changed the Search button to a split button with a Clear action that resets filters, URL params, and map view
 
 ### Removed
 
