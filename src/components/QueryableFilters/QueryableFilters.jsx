@@ -120,23 +120,6 @@ const QueryableFilters = () => {
       )
     }
 
-    // Numeric field without both min/max -> Text input
-    if (schema.type === 'number' || schema.type === 'integer') {
-      return (
-        <div key={fieldName} className="queryableField">
-          <TextField
-            label={label}
-            type="number"
-            value={currentValue ?? defaultValue ?? ''}
-            onChange={(val) => {
-              const numVal = val === '' ? null : Number(val)
-              handleFilterChange(fieldName, numVal)
-            }}
-          />
-        </div>
-      )
-    }
-
     // Enum values (string, number, or integer) -> MultiSelect
     if (
       schema.enum &&
@@ -156,6 +139,23 @@ const QueryableFilters = () => {
             value={currentValue ?? defaultValue ?? []}
             onChange={(newValue) => handleFilterChange(fieldName, newValue)}
             options={options}
+          />
+        </div>
+      )
+    }
+
+    // Numeric field without both min/max -> Text input
+    if (schema.type === 'number' || schema.type === 'integer') {
+      return (
+        <div key={fieldName} className="queryableField">
+          <TextField
+            label={label}
+            type="number"
+            value={currentValue ?? defaultValue ?? ''}
+            onChange={(val) => {
+              const numVal = val === '' ? null : Number(val)
+              handleFilterChange(fieldName, numVal)
+            }}
           />
         </div>
       )
