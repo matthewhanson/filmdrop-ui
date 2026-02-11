@@ -28,7 +28,8 @@ import { syncSelectionWithFetchedItem } from '../utils/selectionSync'
 import {
   addDataToLayer,
   footprintLayerStyle,
-  clearMapSelection
+  clearMapSelection,
+  zoomToCollectionExtent
 } from '../utils/mapHelper'
 import { getCollectionVisualizations } from '../utils/configHelper'
 import { showApplicationAlert } from '../utils/alertHelper'
@@ -260,14 +261,20 @@ export function useUrlInitialize(search, dispatch) {
               `Collection "${urlSearch.col}" from URL not found in available collections`
             )
           }
-        } else if (urlSearch.item && urlSearch.col) {
-          // Item without full search params — try to display it
+        } else if (urlSearch.col) {
+          // Collection (and optionally item/view) without full search params
           const collection = collectionsData.find((c) => c.id === urlSearch.col)
           if (collection) {
             dispatch(setSelectedCollection(urlSearch.col))
             dispatch(setSelectedCollectionData(collection))
+            zoomToCollectionExtent(collection)
+            if (urlSearch.view) {
+              dispatch(setViewMode(urlSearch.view))
+            }
             restoreVisualization(urlSearch.col, urlSearch.viz)
-            await restoreItem(urlSearch.col, urlSearch.item, urlSearch.tab)
+            if (urlSearch.item) {
+              await restoreItem(urlSearch.col, urlSearch.item, urlSearch.tab)
+            }
           }
         }
 
