@@ -4,7 +4,8 @@ import Tooltip from '@mui/material/Tooltip'
 import { getFieldLabel } from '../../utils/fieldFormatting.js'
 import { getFieldMetadata } from '../../utils/fieldDiscovery.js'
 import { useEnhancedDetails } from '../../contexts/EnhancedDetailsContext'
-import TruncatedFieldValue from './TruncatedFieldValue.jsx'
+import EnhancedFieldRenderer from './EnhancedFieldRenderer.jsx'
+import OverflowTooltip from './OverflowTooltip.jsx'
 
 /**
  * FieldItem Component
@@ -50,7 +51,9 @@ const FieldItem = ({ field, value }) => {
         labelElement
       )}
       <span className="field-value-inline">
-        <TruncatedFieldValue field={field} value={value} />
+        <OverflowTooltip className="field-value-truncated">
+          <EnhancedFieldRenderer field={field} value={value} />
+        </OverflowTooltip>
       </span>
     </div>
   )
