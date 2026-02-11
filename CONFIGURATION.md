@@ -80,6 +80,8 @@ After building with `npm run build`, place your config at `build/config/config.j
 | `SHOW_ITEM_AUTO_ZOOM`        | Boolean | `true`   | Show toggle to auto-center map on selected item         |
 | `THEME_SWITCHING_ENABLED`    | Boolean | `true`   | Enable light/dark theme switching                       |
 
+> NOTE: `SEARCH_BY_GEOM_ENABLED` is no longer configurable and is always enabled.
+
 **STAC Links Configuration:**
 
 The Links section displays STAC item links through two independent feature flags:
