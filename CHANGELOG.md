@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added `useUrlStateSync` hook for ongoing URL → Redux sync (merges path params + search params)
 - Added `urlParamHelper` utilities for serializing/deserializing queryable filters to/from URL params
 - Added unit tests for URL routing utilities, `useUrlInitialize`, and `useUrlStateSync`
+- Added `AccordionStateContext` to persist Item Details accordion expansion state across tab switches, new searches, and item navigation within the same collection
 
 ### Changed
 
@@ -36,6 +37,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fixed falsy value handling (`0`, `false`) in URL param sync default logic
 - Skipped redundant API call when selected item is already in search results
 - Changed the Search button to a split button with a Clear action that resets filters, URL params, and map view
+- Changed tab rendering to keep both Search and Item Details mounted (hidden via CSS) instead of unmounting the inactive tab, preserving component state and avoiding unnecessary re-renders
 
 ### Removed
 
