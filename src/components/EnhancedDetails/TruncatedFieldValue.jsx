@@ -10,7 +10,7 @@ import EnhancedFieldRenderer from './EnhancedFieldRenderer.jsx'
  */
 const TruncatedFieldValue = ({ field, value }) => {
   const containerRef = useRef(null)
-  const [shouldTruncate, setShouldTruncate] = useState(false)
+  const [shouldTruncate, setShouldTruncate] = useState(true)
   const [displayText, setDisplayText] = useState('')
 
   useEffect(() => {
@@ -29,6 +29,9 @@ const TruncatedFieldValue = ({ field, value }) => {
       }
 
       const parentWidth = parent.clientWidth
+
+      // Skip measurement when element is not visible (e.g., inside display:none tab)
+      if (parentWidth === 0) return
 
       // Temporarily apply nowrap to check if text would overflow
       const originalWhiteSpace = containerRef.current.style.whiteSpace
