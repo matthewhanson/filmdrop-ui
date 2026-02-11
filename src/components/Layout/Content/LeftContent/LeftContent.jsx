@@ -105,12 +105,13 @@ const LeftContent = () => {
         </div>
         <div className="LeftContentSelectedTab">
           <div
+            className="LeftContentTabPanel"
             style={{ display: _tabSelected === 'search' ? undefined : 'none' }}
           >
             <Search></Search>
           </div>
           <div
-            className="ItemDetails"
+            className="LeftContentTabPanel"
             key={`${_selectedCollection}-${_detailsResetKey}`}
             style={{ display: _tabSelected === 'details' ? undefined : 'none' }}
           >
