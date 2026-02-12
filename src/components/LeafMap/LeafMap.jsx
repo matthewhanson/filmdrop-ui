@@ -40,9 +40,12 @@ const LeafMap = () => {
   const initialPosition = useMemo(() => {
     const search = router.state.location.search
     let center = _appConfig.MAP_CENTER || DEFAULT_MAP_CENTER
-    let zoom = _appConfig.MAP_ZOOM || DEFAULT_MAP_ZOOM
+    // Ensure the initial zoom fills the viewport vertically so tiles
+    // are pre-loaded behind the loading cover (no blank bands on reveal).
+    const minZoom = Math.ceil(Math.log2(window.innerHeight / 256))
+    let zoom = Math.max(_appConfig.MAP_ZOOM || DEFAULT_MAP_ZOOM, minZoom)
     if (search.z != null) {
-      zoom = Number(search.z)
+      zoom = Math.max(Number(search.z), minZoom)
     }
     if (search.c) {
       const parts = String(search.c).split(',').map(Number)

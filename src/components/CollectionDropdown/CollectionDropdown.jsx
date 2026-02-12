@@ -107,7 +107,10 @@ const CollectionDropdown = () => {
       dispatch(setSearchLoading(false))
 
       if (isChanging) {
-        zoomToCollectionExtent(collection)
+        // Skip animation on initial selection so the zoom completes
+        // before the loading overlay disappears (no visible shift).
+        const animate = !!selectedCollectionData
+        zoomToCollectionExtent(collection, { animate })
       }
     }
   }, [
