@@ -15,7 +15,8 @@
 import {
   createRouter,
   createRootRoute,
-  createRoute
+  createRoute,
+  defaultStringifySearch
 } from '@tanstack/react-router'
 import App from './App'
 
@@ -85,4 +86,19 @@ const indexRoute = createRoute({
 
 const routeTree = rootRoute.addChildren([indexRoute])
 
-export const router = createRouter({ routeTree })
+/**
+ * Custom stringifySearch that strips empty/null/undefined values before
+ * serialization. normalizeSearch restores defaults on read, so omitting
+ * these keys keeps the URL short without losing state.
+ */
+function stringifySearch(search) {
+  const cleaned = {}
+  for (const [key, value] of Object.entries(search)) {
+    if (value !== '' && value !== undefined && value !== null) {
+      cleaned[key] = value
+    }
+  }
+  return defaultStringifySearch(cleaned)
+}
+
+export const router = createRouter({ routeTree, stringifySearch })

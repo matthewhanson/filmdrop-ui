@@ -2,7 +2,8 @@ import { describe, it, expect } from 'vitest'
 import {
   RESERVED_PARAMS,
   extractQueryableParams,
-  normalizeSearch
+  normalizeSearch,
+  router
 } from './router'
 
 describe('RESERVED_PARAMS', () => {
@@ -94,5 +95,29 @@ describe('normalizeSearch', () => {
     expect(normalizeSearch({ z: 5 }).z).toBe(5)
     expect(normalizeSearch({ z: null }).z).toBeUndefined()
     expect(normalizeSearch({}).z).toBeUndefined()
+  })
+})
+
+describe('stringifySearch', () => {
+  const stringify = router.options.stringifySearch
+
+  it('strips empty string values from the query string', () => {
+    expect(stringify({ col: 'sentinel', item: '', tab: '' })).toBe(
+      '?col=sentinel'
+    )
+  })
+
+  it('strips undefined and null values', () => {
+    expect(stringify({ col: 'test', z: undefined, c: null })).toBe('?col=test')
+  })
+
+  it('preserves 0 and false', () => {
+    const qs = stringify({ count: 0, active: false })
+    expect(qs).toContain('count=0')
+    expect(qs).toContain('active=false')
+  })
+
+  it('returns empty string when all values are empty', () => {
+    expect(stringify({ col: '', dt: '', item: '' })).toBe('')
   })
 })
