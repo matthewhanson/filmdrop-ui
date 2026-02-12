@@ -109,7 +109,8 @@ const LinkItem = React.memo(({ link }) => {
               sx={{
                 color: 'var(--brand-accent-primary)',
                 '&:hover': {
-                  backgroundColor: 'var(--mui-hover)'
+                  backgroundColor: 'var(--mui-hover)',
+                  color: 'var(--brand-accent-primary-dark)'
                 }
               }}
             >
@@ -139,7 +140,8 @@ const LinkItem = React.memo(({ link }) => {
                 sx={{
                   color: 'var(--brand-accent-primary)',
                   '&:hover': {
-                    backgroundColor: 'var(--mui-hover)'
+                    backgroundColor: 'var(--mui-hover)',
+                    color: 'var(--brand-accent-primary-dark)'
                   },
                   '&.Mui-disabled': {
                     color: 'var(--side-panel-text-color-secondary)',

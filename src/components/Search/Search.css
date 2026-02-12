@@ -114,7 +114,6 @@
   min-width: 48px;
   max-width: 48px;
   padding: 0;
-  border-left: 1px solid var(--brand-accent-primary-dark);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
 

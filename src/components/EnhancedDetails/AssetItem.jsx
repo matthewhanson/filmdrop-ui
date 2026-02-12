@@ -102,7 +102,8 @@ const AssetItem = React.memo(({ asset, copiedUrl, onCopyToClipboard }) => {
               sx={{
                 color: 'var(--brand-accent-primary)',
                 '&:hover': {
-                  backgroundColor: 'var(--mui-hover)'
+                  backgroundColor: 'var(--mui-hover)',
+                  color: 'var(--brand-accent-primary-dark)'
                 }
               }}
             >
