@@ -106,7 +106,20 @@ export function deserializeQueryableFiltersFromURL(params, queryables) {
     const schema = queryables.properties[key]
     if (!schema) continue
 
-    // Handle based on schema type
+    // Enum fields are rendered as multi-selects, so always deserialize as arrays
+    if (schema.enum) {
+      // Parse array based on the schema type
+      if (schema.type === 'number') {
+        filters[key] = value.split(',').filter(Boolean).map(parseFloat)
+      } else if (schema.type === 'integer') {
+        filters[key] = value.split(',').filter(Boolean).map(parseInt)
+      } else {
+        filters[key] = value.split(',').filter(Boolean)
+      }
+      continue
+    }
+
+    // Handle based on schema type for single values
     if (schema.type === 'number') {
       filters[key] = parseFloat(value)
     } else if (schema.type === 'integer') {
