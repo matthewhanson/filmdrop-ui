@@ -15,7 +15,6 @@ import {
   setSearchLoading,
   setshowMapAttribution,
   setshowLayerList,
-  setshowVisualizationList,
   settabSelected,
   sethasLeftPanelTabChanged
 } from '../../../../redux/slices/mainSlice'
@@ -26,10 +25,7 @@ import {
   clearMapSelection,
   selectMappedScenes
 } from '../../../../utils/mapHelper'
-import {
-  getCollectionConfig,
-  getCollectionVisualizations
-} from '../../../../utils/configHelper'
+import { getCollectionConfig } from '../../../../utils/configHelper'
 import LayerLegend from '../../../Legend/LayerLegend/LayerLegend'
 import { fetchAllFeatures } from '../../../../services/get-all-scenes-service'
 import { getBasemapConfig } from '../../../../utils/themeHelper'
@@ -37,10 +33,9 @@ import { CircularProgress } from '@mui/material'
 import DOMPurify from 'dompurify'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import { Tooltip } from 'react-tooltip'
+import 'react-tooltip/dist/react-tooltip.css'
 import LayersIcon from '@mui/icons-material/Layers'
-import Filter from '@mui/icons-material/Filter'
 import LayerList from '../../../LayerList/LayerList'
-import VisualizationList from '../../../VisualizationList/VisualizationList'
 import ExportButton from '../../../ExportButton/ExportButton'
 import Pagination from '../../../Pagination/Pagination'
 import { useLayout } from '../../../../contexts/LayoutContext'
@@ -76,15 +71,9 @@ const RightContent = () => {
   )
   const _appName = useSelector((state) => state.mainSlice.appName)
   const _showLayerList = useSelector((state) => state.mainSlice.showLayerList)
-  const _showVisualizationList = useSelector(
-    (state) => state.mainSlice.showVisualizationList
-  )
   const _currentTheme = useSelector((state) => state.mainSlice.currentTheme)
   const _selectedCollectionData = useSelector(
     (state) => state.mainSlice.selectedCollectionData
-  )
-  const _currentPopupResult = useSelector(
-    (state) => state.mainSlice.currentPopupResult
   )
   const _map = useSelector((state) => state.mainSlice.map)
   const {
@@ -183,6 +172,15 @@ const RightContent = () => {
     }
   }, [_appConfig, _currentTheme])
 
+  // Cleanup attribution tooltip timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (attributionTimeout.current) {
+        clearTimeout(attributionTimeout.current)
+      }
+    }
+  }, [])
+
   function sanitizeAttribution(dirty) {
     const clean = {
       __html: DOMPurify.sanitize(dirty, {
@@ -215,25 +213,6 @@ const RightContent = () => {
 
   function onLayerListButtonClick() {
     dispatch(setshowLayerList(!_showLayerList))
-  }
-
-  function onVisualizationButtonClick() {
-    dispatch(setshowVisualizationList(!_showVisualizationList))
-  }
-
-  // Determine if visualization button should be shown
-  const shouldShowVisualizationButton = () => {
-    if (
-      !_currentPopupResult ||
-      !_selectedCollectionData ||
-      !_appConfig?.SCENE_TILER_URL
-    ) {
-      return false
-    }
-    const { visualizationKeys } = getCollectionVisualizations(
-      _selectedCollectionData.id
-    )
-    return visualizationKeys.length > 1
   }
 
   // Use custom hook to handle map resize with debouncing
@@ -276,22 +255,10 @@ const RightContent = () => {
             ></LayersIcon>
           </div>
         )}
-      {shouldShowVisualizationButton() && (
-        <div className="visualizationButton" title="Change visualization type">
-          <Filter
-            className="visualizationButtonIcon"
-            onClick={() => onVisualizationButtonClick()}
-          ></Filter>
-        </div>
-      )}
       {_showLayerList && <LayerList></LayerList>}
-      {_showVisualizationList && <VisualizationList></VisualizationList>}
       <div className="actionButtons">
         {_appConfig.ACTION_BUTTON && (
-          <button
-            className="actionButton actionButtonCTA"
-            onClick={() => onActionClick()}
-          >
+          <button className="actionButton" onClick={() => onActionClick()}>
             {_appConfig.ACTION_BUTTON.text}
           </button>
         )}
@@ -308,8 +275,10 @@ const RightContent = () => {
                 : 'resultCountText'
             }
           >
-            Showing {_mappedScenes.length} of {_searchResults.numberMatched}{' '}
-            scenes
+            <strong>
+              Showing {_mappedScenes.length} of {_searchResults.numberMatched}{' '}
+              Scenes
+            </strong>
           </div>
           <div className="pagination">
             <Pagination />

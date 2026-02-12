@@ -10,10 +10,25 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 
 - Added `TILER_SETTINGS`, with properties `URL_SUBST`, `URL_SUBST_FIND`, `URL_SUBST_REPLACE`, to enable optional string substitution in TiTiler request URLs
+- Added dynamic queryable-based filter generation with support for range sliders, multi-selects, and text inputs
+- Added `queryableFilters` to `COLLECTIONS_CONFIG` for per-collection queryable allow-lists
+- Added `$ref` resolution in queryables service for dereferencing external JSON schemas
+- Added reusable UI components: `ButtonGroup`, `Card`, `Dropdown`, `MultiSelect`, `TextField`, `RangeSliderWithInputs`
+- Added `useDebouncedCallback` and `useRenderableQueryables` hooks
 
 ### Changed
 
+- Restricted visualization selector to the sidebar
+- Unified control heights, border radii, padding, and font styling across components
+- Refactored `Search` component with extracted `AreaOfInterestSelector` and `QueryableFilters`
+- Replaced `react-datepicker` with `@mui/x-date-pickers`
+
 ### Removed
+
+- Removed `CloudSlider` component (replaced by queryable-based filters)
+- Removed `VisualizationList` component (replaced by `VisualizationDropdown`)
+- Removed `FieldInfoIcon` component
+- Removed `SEARCH_BY_GEOM_ENABLED` config option (now always enabled)
 
 ## 7.0.1 - 2026-01-14
 

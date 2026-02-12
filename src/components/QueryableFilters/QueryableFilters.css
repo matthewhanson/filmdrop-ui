@@ -1,0 +1,11 @@
+.queryableFilters {
+  width: 100%;
+}
+
+.queryableField {
+  margin-bottom: 12px;
+}
+
+.queryableFiltersError {
+  margin-bottom: 15px;
+}

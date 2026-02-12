@@ -3,18 +3,33 @@
   flex-direction: column;
 }
 
+.popupResultHero {
+  display: flex;
+  flex-direction: column;
+}
+
+.popupResultHero .item-header {
+  width: 100%;
+}
+
 .popupResultThumbnailContainer {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  margin-top: 15px;
+  margin-top: 8px;
   margin-bottom: 10px;
-  min-height: 230px;
+  width: 100%;
+  max-width: 304px;
+  min-height: 304px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .popupResultThumbnail {
-  width: 225px;
+  width: 100%;
+  max-width: 304px;
+  border-radius: var(--radius-sm);
 }
 
 .popupResultDetails {
@@ -35,7 +50,7 @@
 }
 
 .popupResultDetailsRowKey {
-  font-weight: bold;
+  font-weight: 700;
   color: var(--side-panel-heading-color);
 }
 

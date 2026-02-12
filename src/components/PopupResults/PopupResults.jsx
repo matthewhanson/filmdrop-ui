@@ -15,11 +15,7 @@ import {
   getCollectionVisualizations
 } from '../../utils/configHelper'
 import PopupFooter from '../PopupFooter/PopupFooter.jsx'
-import {
-  isSceneInCart,
-  numberOfSelectedInCart,
-  areAllScenesSelectedInCart
-} from '../../utils/dataHelper'
+import { isSceneInCart } from '../../utils/dataHelper'
 import { debounceTitilerOverlay } from '../../utils/mapHelper'
 import { useLayout } from '../../contexts/LayoutContext'
 import { EnhancedDetailsProvider } from '../../contexts/EnhancedDetailsContext'
@@ -55,7 +51,7 @@ const PopupResults = (props) => {
     return () => {
       dispatch(setimageOverlayLoading(false))
     }
-  }, [props.results, _selectedPopupResultIndex])
+  }, [props.results, _selectedPopupResultIndex, _selectedVisualization])
 
   useEffect(() => {
     if (props.results.length > 0) {
@@ -114,55 +110,12 @@ const PopupResults = (props) => {
     )
   }
 
-  function onAddAllToCartClicked() {
-    if (areAllScenesSelectedInCart(props.results)) {
-      return
-    }
-    const cartPlusNewScenes = [..._cartItems]
-    props.results.forEach((result) => {
-      const sceneInCart = isSceneInCart(result)
-      if (!sceneInCart) {
-        cartPlusNewScenes.push(result)
-      }
-    })
-    dispatch(setcartItems(cartPlusNewScenes))
-  }
-
   return (
     <div data-testid="testPopupResults" className="popupResultsContainer">
       {props.results.length > 0 ? (
         <div className="popupResults">
-          <div className="popupHeader">
-            <div className="popupHeaderTop">
-              <div className="popupResultContentText">
-                {props.results.length + ' scenes selected'}{' '}
-                {_appConfig.CART_ENABLED &&
-                numberOfSelectedInCart(props.results) > 0
-                  ? '(' + numberOfSelectedInCart(props.results) + ' in cart)'
-                  : null}
-              </div>
-            </div>
-            {_appConfig.CART_ENABLED ? (
-              <div className="popupHeaderBottom">
-                <button
-                  className={
-                    areAllScenesSelectedInCart(props.results)
-                      ? 'popupHeaderBottomButton popupHeaderBottomButtonDisabled'
-                      : 'popupHeaderBottomButton'
-                  }
-                  onClick={onAddAllToCartClicked}
-                >
-                  Add all to cart
-                </button>
-              </div>
-            ) : null}
-          </div>
           <div
-            className={
-              _appConfig.CART_ENABLED
-                ? 'popupResultsContent popupResultsContentCartEnabled'
-                : 'popupResultsContent'
-            }
+            className="popupResultsContent"
             style={{ '--columns': _enhancedColumns }}
           >
             <PopupResult
@@ -176,25 +129,15 @@ const PopupResults = (props) => {
             >
               <EnhancedDetailsDisplay />
             </EnhancedDetailsProvider>
-
-            {_appConfig.CART_ENABLED ? (
-              <div className="popupResultsBottom">
-                <button
-                  className="popupResultsBottomButton"
-                  onClick={onAddRemoveSceneToCartClicked}
-                >
-                  {isSceneInCart(props.results[_selectedPopupResultIndex])
-                    ? 'Remove scene from cart'
-                    : 'Add scene to cart'}
-                </button>
-              </div>
-            ) : null}
           </div>
           <PopupFooter
             currentIndex={_selectedPopupResultIndex}
             totalCount={props.results.length}
             onPrevClick={onPrevClick}
             onNextClick={onNextClick}
+            cartEnabled={_appConfig.CART_ENABLED}
+            isInCart={isSceneInCart(props.results[_selectedPopupResultIndex])}
+            onCartClick={onAddRemoveSceneToCartClicked}
           />
         </div>
       ) : (

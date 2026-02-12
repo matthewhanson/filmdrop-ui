@@ -1,121 +1,134 @@
-import { React, useState, useEffect } from 'react'
-import './CollectionDropdown.css'
-import { Stack } from '@mui/material'
-import Grid from '@mui/material/Grid'
-import NativeSelect from '@mui/material/NativeSelect'
+import React, { useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   setSelectedCollectionData,
   setShowZoomNotice,
   setSearchLoading,
   sethasCollectionChanged,
-  setSelectedCollection
+  setSelectedCollection,
+  setQueryableFilters,
+  setSelectedVisualization
 } from '../../redux/slices/mainSlice'
 import {
   zoomToCollectionExtent,
   clearAllLayers,
   clearMapSelection
 } from '../../utils/mapHelper'
+import Dropdown from '../Dropdown/Dropdown'
 
-const Dropdown = () => {
-  const _selectedCollection = useSelector(
+const CollectionDropdown = () => {
+  const dispatch = useDispatch()
+  const selectedCollection = useSelector(
     (state) => state.mainSlice.selectedCollection
   )
-  const _selectedCollectionData = useSelector(
+  const selectedCollectionData = useSelector(
     (state) => state.mainSlice.selectedCollectionData
   )
-  const dispatch = useDispatch()
-  const [collectionId, setCollectionId] = useState(_selectedCollection)
-  const _collectionsData = useSelector(
+  const collectionsData = useSelector(
     (state) => state.mainSlice.collectionsData
   )
-  const _appConfig = useSelector((state) => state.mainSlice.appConfig)
+  const appConfig = useSelector((state) => state.mainSlice.appConfig)
 
-  useEffect(() => {
-    if (_collectionsData.length > 0) {
-      if (_selectedCollection !== 'Select Collection') {
-        setCollectionId(_selectedCollection)
-        return
-      }
-      // Config is already normalized, so we only need to check COLLECTIONS.default
-      const defaultCollection = _appConfig.COLLECTIONS?.default
-      if (!defaultCollection) {
-        setCollectionId(_collectionsData[0].id)
-        return
-      }
-      const defaultCollectionFound = !!_collectionsData.find(
-        (o) => o.id === defaultCollection
-      )
-      if (!defaultCollectionFound) {
-        console.log('Configuration Error: default collection not found in API')
-        setCollectionId(_collectionsData[0].id)
-      } else {
-        setCollectionId(defaultCollection)
-      }
+  // Convert collections data to dropdown options
+  const options = useMemo(() => {
+    const placeholder = { value: 'selectOne', label: 'Select Collection' }
+
+    if (!collectionsData || collectionsData.length === 0) {
+      return [placeholder]
     }
-  }, [_collectionsData])
 
+    const collectionOptions = collectionsData.map(({ id, title }) => ({
+      value: id,
+      label: title ?? id
+    }))
+
+    // Include placeholder when no collection is selected yet to avoid
+    // MUI warning about out-of-range value during the render before
+    // the useEffect sets the default collection
+    if (!selectedCollection) {
+      return [placeholder, ...collectionOptions]
+    }
+
+    return collectionOptions
+  }, [collectionsData, selectedCollection])
+
+  // Initialize default collection on mount
   useEffect(() => {
-    const selectedCollection = _collectionsData?.find(
-      (e) => e.id === collectionId
+    if (collectionsData.length === 0) return
+    if (selectedCollection) return
+
+    // Get default from config
+    const defaultCollection = appConfig.COLLECTIONS?.default
+
+    if (!defaultCollection) {
+      // No default specified, use first collection
+      dispatch(setSelectedCollection(collectionsData[0].id))
+      return
+    }
+
+    // Check if default collection exists in available collections
+    const defaultCollectionExists = collectionsData.some(
+      (c) => c.id === defaultCollection
     )
-    if (selectedCollection) {
-      dispatch(setSelectedCollection(collectionId))
-      dispatch(setSelectedCollectionData(selectedCollection))
+
+    if (!defaultCollectionExists) {
+      console.warn('Configuration Error: default collection not found in API')
+      dispatch(setSelectedCollection(collectionsData[0].id))
+    } else {
+      dispatch(setSelectedCollection(defaultCollection))
+    }
+  }, [collectionsData, selectedCollection, appConfig, dispatch])
+
+  // Update collection data when selection changes
+  useEffect(() => {
+    if (!selectedCollection) return
+
+    const collection = collectionsData.find((c) => c.id === selectedCollection)
+
+    if (collection) {
+      const isChanging = collection.id !== selectedCollectionData?.id
+
+      dispatch(setSelectedCollectionData(collection))
       dispatch(setShowZoomNotice(false))
       dispatch(setSearchLoading(false))
-      if (selectedCollection !== _selectedCollectionData) {
-        zoomToCollectionExtent(selectedCollection)
+
+      if (isChanging) {
+        zoomToCollectionExtent(collection)
       }
     }
-  }, [collectionId])
+  }, [
+    selectedCollection,
+    collectionsData,
+    selectedCollectionData?.id,
+    dispatch
+  ])
 
-  function onCollectionChanged(e) {
+  const handleCollectionChange = (e) => {
+    const newCollectionId = e.target.value
+
+    // Mark that collection has changed
     dispatch(sethasCollectionChanged(true))
-    setCollectionId(e.target.value)
+
+    // Update selected collection
+    dispatch(setSelectedCollection(newCollectionId))
+
+    // Clear map and filters
     clearMapSelection()
     clearAllLayers()
-  }
+    dispatch(setQueryableFilters({}))
 
-  function formatDate(dateString) {
-    return dateString ? dateString.split('T')[0] : null
+    // Reset visualization so new collection's default is selected
+    dispatch(setSelectedVisualization(null))
   }
 
   return (
-    <Stack>
-      <label htmlFor="collectionDropdown">Collection</label>
-      <Grid container alignItems="center">
-        <Grid size="grow">
-          <NativeSelect
-            id="collectionDropdown"
-            value={collectionId}
-            label="Collection"
-            onChange={(e) => onCollectionChanged(e)}
-          >
-            <option value="selectOne" disabled={true}>
-              Select Collection
-            </option>
-            {_collectionsData &&
-              _collectionsData.map(({ id, title }) => (
-                <option key={id} value={id}>
-                  {title ?? id}
-                </option>
-              ))}
-          </NativeSelect>
-        </Grid>
-      </Grid>
-      {_selectedCollectionData?.extent?.temporal && (
-        <div className="collectionRangeText">
-          <span>Extent:&nbsp;</span>
-          {formatDate(_selectedCollectionData.extent.temporal.interval[0][0]) ||
-            'No Lower Limit'}{' '}
-          to{' '}
-          {formatDate(_selectedCollectionData.extent.temporal.interval[0][1]) ||
-            'Present'}
-        </div>
-      )}
-    </Stack>
+    <Dropdown
+      label="Collection"
+      value={selectedCollection || 'selectOne'}
+      onChange={handleCollectionChange}
+      options={options}
+    />
   )
 }
 
-export default Dropdown
+export default CollectionDropdown

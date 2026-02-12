@@ -16,11 +16,11 @@ export async function buildCollectionsData(collections) {
       store.getState().mainSlice.appConfig.SUPPORTS_AGGREGATIONS ?? true
     if (hasAggregations) {
       ;[queryables, aggregations] = await Promise.all([
-        GetCollectionQueryablesService(collection.id),
+        GetCollectionQueryablesService(collection),
         GetCollectionAggregationsService(collection.id)
       ])
     } else {
-      queryables = await GetCollectionQueryablesService(collection.id)
+      queryables = await GetCollectionQueryablesService(collection)
     }
 
     collection.queryables = queryables

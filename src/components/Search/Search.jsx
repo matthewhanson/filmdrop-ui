@@ -1,167 +1,61 @@
-import { React, useEffect } from 'react'
+import React from 'react'
 import './Search.css'
-import { useDispatch, useSelector } from 'react-redux'
-import {
-  setshowSearchByGeom,
-  setisDrawingEnabled,
-  setsearchGeojsonBoundary,
-  setshowUploadGeojsonModal,
-  setautoCenterOnItemChanged
-} from '../../redux/slices/mainSlice'
-import 'react-tooltip/dist/react-tooltip.css'
-import DateTimeRangeSelector from '../DateTimeRangeSelector/DateTimeRangeSelector'
-import CloudSlider from '../CloudSlider/CloudSlider'
 import CollectionDropdown from '../CollectionDropdown/CollectionDropdown'
+import VisualizationDropdown from '../VisualizationDropdown/VisualizationDropdown'
+import DateTimeRangeSelector from '../DateTimeRangeSelector/DateTimeRangeSelector'
+import AreaOfInterestSelector from '../AreaOfInterestSelector/AreaOfInterestSelector'
+import QueryableFilters from '../QueryableFilters/QueryableFilters'
 import ViewSelector from '../ViewSelector/ViewSelector'
+import { useRenderableQueryables } from '../../hooks/useRenderableQueryables'
 import { newSearch } from '../../utils/searchHelper'
-import { enableMapPolyDrawing, clearLayer } from '../../utils/mapHelper'
-import { Stack, Switch } from '@mui/material'
+import { flushAllPendingCallbacks } from '../../hooks/useDebouncedCallback'
 
 const Search = () => {
-  const dispatch = useDispatch()
-  const _selectedCollectionData = useSelector(
-    (state) => state.mainSlice.selectedCollectionData
-  )
-  const _searchDateRangeValue = useSelector(
-    (state) => state.mainSlice.searchDateRangeValue
-  )
-  const _cloudCover = useSelector((state) => state.mainSlice.cloudCover)
-  const _viewMode = useSelector((state) => state.mainSlice.viewMode)
-  const _showSearchByGeom = useSelector(
-    (state) => state.mainSlice.showSearchByGeom
-  )
-  const _searchGeojsonBoundary = useSelector(
-    (state) => state.mainSlice.searchGeojsonBoundary
-  )
-  const _appConfig = useSelector((state) => state.mainSlice.appConfig)
-  const _autoCenterOnItemChanged = useSelector(
-    (state) => state.mainSlice.autoCenterOnItemChanged
-  )
-  const mosaicTilerURL = _appConfig.MOSAIC_TILER_URL || ''
+  const { hasFields } = useRenderableQueryables()
 
-  useEffect(() => {
-    dispatch(setshowSearchByGeom(false))
-  }, [_selectedCollectionData, _searchDateRangeValue, _cloudCover, _viewMode])
-
-  function processSearchBtn() {
+  const handleSearchClick = () => {
+    flushAllPendingCallbacks()
     newSearch()
-    dispatch(setshowSearchByGeom(false))
-  }
-
-  function onDrawBoundaryClicked() {
-    if (_searchGeojsonBoundary) {
-      return
-    }
-    dispatch(setshowSearchByGeom(!_showSearchByGeom))
-    dispatch(setisDrawingEnabled(true))
-    enableMapPolyDrawing()
-  }
-
-  function onUploadGeojsonButtonClicked() {
-    if (_searchGeojsonBoundary) {
-      return
-    }
-    dispatch(setshowSearchByGeom(false))
-    dispatch(setshowUploadGeojsonModal(true))
-  }
-
-  function onClearButtonClicked() {
-    if (!_searchGeojsonBoundary) {
-      return
-    }
-    dispatch(setsearchGeojsonBoundary(null))
-    dispatch(setshowSearchByGeom(false))
-    clearLayer('drawBoundsLayer')
-  }
-
-  function updateAutoCenterState() {
-    dispatch(setautoCenterOnItemChanged(!_autoCenterOnItemChanged))
   }
 
   return (
     <div className="Search" data-testid="Search">
-      <div className="searchFilters">
-        <div className={`searchContainer collectionDropdown`}>
-          <CollectionDropdown></CollectionDropdown>
+      <div className="Search__scrollable">
+        {/* Collection Section */}
+        <div className="Search__section">
+          <CollectionDropdown />
+          <VisualizationDropdown />
         </div>
-        <div className="searchContainer datePickerComponent">
-          <DateTimeRangeSelector></DateTimeRangeSelector>
-        </div>
-        <div className="searchContainer cloudSlider">
-          <CloudSlider></CloudSlider>
-        </div>
-        {mosaicTilerURL && (
-          <div className="searchContainer viewSelectorComponent">
-            <ViewSelector></ViewSelector>
+
+        {/* Location & Date Section */}
+        <div className="Search__section">
+          <h2 className="Search__section-heading">Location & Date</h2>
+          <div className="Search__section-content">
+            <AreaOfInterestSelector />
+            <DateTimeRangeSelector />
           </div>
-        )}
-        {_appConfig.SEARCH_BY_GEOM_ENABLED && (
-          <div className="searchContainer searchBoundary">
-            <Stack className="searchFilterContainer">
-              <label
-                htmlFor="searchByGeomOptionsContainer"
-                className="searchByGeomOptionsText"
-              >
-                Area of Interest
-              </label>
-              <div className="searchByGeomOptionsButtons">
-                <button
-                  className={
-                    !_searchGeojsonBoundary
-                      ? 'searchByGeomOptionsButton'
-                      : 'searchByGeomOptionsButton ' +
-                        'searchByGeomOptionsButtonDisabled'
-                  }
-                  onClick={onDrawBoundaryClicked}
-                >
-                  Draw
-                </button>
-                <button
-                  className={
-                    !_searchGeojsonBoundary
-                      ? 'searchByGeomOptionsButton'
-                      : 'searchByGeomOptionsButton ' +
-                        'searchByGeomOptionsButtonDisabled'
-                  }
-                  onClick={onUploadGeojsonButtonClicked}
-                >
-                  Upload
-                </button>
-                <button
-                  className={
-                    _searchGeojsonBoundary
-                      ? 'searchByGeomOptionsButton'
-                      : 'searchByGeomOptionsButton ' +
-                        'searchByGeomOptionsButtonDisabled'
-                  }
-                  onClick={onClearButtonClicked}
-                >
-                  Clear
-                </button>
-              </div>
-            </Stack>
-          </div>
-        )}
-        {_appConfig.SHOW_ITEM_AUTO_ZOOM && (
-          <div className="searchContainer viewSelectorComponent">
-            <Stack className="searchFilterContainer">
-              <label htmlFor="ItemAutoSearch">Item Auto-Zoom</label>
-              <Switch
-                checked={_autoCenterOnItemChanged}
-                onChange={() => updateAutoCenterState()}
-              />
-            </Stack>
+        </div>
+
+        {/* Filters Section */}
+        {hasFields && (
+          <div className="Search__section">
+            <h2 className="Search__section-heading">Filters</h2>
+            <div className="Search__section-content">
+              <QueryableFilters />
+            </div>
           </div>
         )}
       </div>
 
-      <div className="searchButtonContainer">
-        <button
-          className={`actionButton searchButton`}
-          onClick={() => processSearchBtn()}
-        >
-          Search
-        </button>
+      {/* View & Search Section */}
+      <div className="Search__section Search__section--footer">
+        <h2 className="Search__section-heading">View & Search</h2>
+        <div className="Search__section-content">
+          <ViewSelector />
+          <button className="Search__button" onClick={handleSearchClick}>
+            Search
+          </button>
+        </div>
       </div>
     </div>
   )

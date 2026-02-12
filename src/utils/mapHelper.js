@@ -23,40 +23,69 @@ import {
   getCollectionVisualizations
 } from './configHelper'
 import { appendStacHeaderCookies } from '../utils/stacRequest'
+import { getMapGeometryColors } from './themeHelper'
 
-export const footprintLayerStyle = {
-  color: '#3183f5',
-  weight: 1,
-  opacity: 1,
-  fillOpacity: 0.1,
-  fillColor: '#3183f5',
-  pane: 'searchResults'
+/**
+ * Gets the style for search result footprint layers.
+ * Reads colors from CSS variables for theme support.
+ */
+export function getFootprintLayerStyle() {
+  const colors = getMapGeometryColors()
+  return {
+    color: colors.searchResult,
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.1,
+    fillColor: colors.searchResult,
+    pane: 'searchResults'
+  }
 }
 
-export const gridCodeLayerStyle = {
-  color: '#3183f5',
-  weight: 1,
-  opacity: 1,
-  fillOpacity: 0.1,
-  fillColor: '#3183f5',
-  pane: 'searchResults'
+/**
+ * Gets the style for grid code aggregation layers.
+ * Reads colors from CSS variables for theme support.
+ */
+export function getGridCodeLayerStyle() {
+  const colors = getMapGeometryColors()
+  return {
+    color: colors.searchResult,
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.1,
+    fillColor: colors.searchResult,
+    pane: 'searchResults'
+  }
 }
 
-export const clickedFootprintLayerStyle = {
-  color: '#BEA835',
-  weight: 4,
-  opacity: 0.65,
-  fillOpacity: 0,
-  pane: 'searchResults'
+/**
+ * Gets the style for clicked/highlighted scene footprints.
+ * Reads colors from CSS variables for theme support.
+ */
+export function getClickedFootprintLayerStyle() {
+  const colors = getMapGeometryColors()
+  return {
+    color: colors.highlighted,
+    weight: 4,
+    opacity: 0.65,
+    fillOpacity: 0,
+    pane: 'searchResults'
+  }
 }
 
-export const cartFootprintLayerStyle = {
-  color: '#ad5c11',
-  weight: 3,
-  opacity: 1,
-  fillOpacity: 0.1,
-  fillColor: '#ad5c11',
-  pane: 'searchResults'
+/**
+ * Gets the style for cart item footprints.
+ * Reads colors from CSS variables for theme support.
+ */
+export function getCartFootprintLayerStyle() {
+  const colors = getMapGeometryColors()
+  return {
+    color: colors.cartItem,
+    weight: 3,
+    opacity: 1,
+    fillOpacity: 0.1,
+    fillColor: colors.cartItem,
+    pane: 'searchResults'
+  }
 }
 
 const customSearchPointIconStyle = L.icon({
@@ -67,24 +96,47 @@ const customSearchPointIconStyle = L.icon({
   shadowUrl: '/marker-shadow.png'
 })
 
-export const customSearchLineStyle = {
-  color: '#00C07B',
-  weight: 2,
-  opacity: 1,
-  dashArray: '4, 4',
-  dashOffset: '0',
-  pane: 'drawPane'
+/**
+ * Gets the style for user-drawn line boundaries.
+ * Reads colors from CSS variables for theme support.
+ */
+export function getCustomSearchLineStyle() {
+  const colors = getMapGeometryColors()
+  return {
+    color: colors.aoiBoundary,
+    weight: 2,
+    opacity: 1,
+    dashArray: '4, 4',
+    dashOffset: '0',
+    pane: 'drawPane'
+  }
 }
 
-export const customSearchPolygonStyle = {
-  color: '#00C07B',
-  weight: 2,
-  opacity: 1,
-  fillOpacity: 0,
-  dashArray: '4, 4',
-  dashOffset: '0',
-  pane: 'drawPane'
+/**
+ * Gets the style for user-drawn polygon boundaries.
+ * Reads colors from CSS variables for theme support.
+ */
+export function getCustomSearchPolygonStyle() {
+  const colors = getMapGeometryColors()
+  return {
+    color: colors.aoiBoundary,
+    weight: 2,
+    opacity: 1,
+    fillOpacity: 0,
+    dashArray: '4, 4',
+    dashOffset: '0',
+    pane: 'drawPane'
+  }
 }
+
+// Backward-compatible exports - these evaluate at import time
+// For dynamic theme support, use the getter functions instead
+export const footprintLayerStyle = getFootprintLayerStyle()
+export const gridCodeLayerStyle = getGridCodeLayerStyle()
+export const clickedFootprintLayerStyle = getClickedFootprintLayerStyle()
+export const cartFootprintLayerStyle = getCartFootprintLayerStyle()
+export const customSearchLineStyle = getCustomSearchLineStyle()
+export const customSearchPolygonStyle = getCustomSearchPolygonStyle()
 
 export function mapClickHandler(e) {
   if (store.getState().mainSlice.isDrawingEnabled) {
@@ -607,11 +659,16 @@ const parameters = {
   },
   expression: (tilerParams) => {
     const value = tilerParams?.expression
-    return value && `expression=${value}`
+    return value && `expression=${encodeURIComponent(value)}`
   },
   rescale: (tilerParams) => {
     const value = tilerParams?.rescale
-    return value && `rescale=${value}`
+    if (!value) return null
+    // Handle array of rescale values (one per band) - TiTiler expects separate rescale params
+    if (Array.isArray(value)) {
+      return value.map((v) => `rescale=${v}`).join('&')
+    }
+    return `rescale=${value}`
   },
   colormapName: (tilerParams) => {
     const value = tilerParams?.colormap_name
@@ -713,11 +770,12 @@ export function enableMapPolyDrawing() {
 
     // save drawn items
     map.on(L.Draw.Event.CREATED, (e) => {
-      e.layer.options.color = '#00FF00'
+      const colors = getMapGeometryColors()
+      e.layer.options.color = colors.aoiBoundary
       map.eachLayer(function (layer) {
         if (layer.layer_name === 'drawBoundsLayer') {
           const drawLayer = e.layer
-          drawLayer.setStyle(customSearchPolygonStyle)
+          drawLayer.setStyle(getCustomSearchPolygonStyle())
           drawLayer.options.interactive = false
           layer.addLayer(drawLayer)
           const data = layer.toGeoJSON()

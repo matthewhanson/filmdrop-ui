@@ -26,16 +26,18 @@ export async function SearchService(searchParams, typeOfSearch) {
   }
   appendStacHeaderCookies(requestHeaders)
 
-  await fetch(
-    `${
-      store.getState().mainSlice.appConfig.STAC_API_URL
-    }/search?${searchParams}`,
-    {
-      credentials:
-        store.getState().mainSlice.appConfig.FETCH_CREDENTIALS || 'same-origin',
-      headers: requestHeaders
-    }
-  )
+  const stacApiUrl = `${
+    store.getState().mainSlice.appConfig.STAC_API_URL
+  }/search?${searchParams}`
+
+  console.log('STAC API Search Request:', stacApiUrl)
+  console.log('Search Parameters:', searchParams)
+
+  await fetch(stacApiUrl, {
+    credentials:
+      store.getState().mainSlice.appConfig.FETCH_CREDENTIALS || 'same-origin',
+    headers: requestHeaders
+  })
     .then((response) => {
       if (response.ok) {
         return response.json()

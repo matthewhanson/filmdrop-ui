@@ -4,7 +4,6 @@ import {
   DEFAULT_THEME_SWITCHING_ENABLED,
   DEFAULT_EXPORT_ENABLED,
   DEFAULT_SHOW_ITEM_AUTO_ZOOM,
-  DEFAULT_SEARCH_BY_GEOM_ENABLED,
   DEFAULT_STAC_LINK_ENABLED,
   DEFAULT_STAC_LINKS_SECTION_ENABLED,
   DEFAULT_RIGHT_SIDEBAR_ENABLED,
@@ -523,9 +522,11 @@ export function autoConfigureRendering(config) {
 
       // Optional: rescale
       if (renderDef.rescale && Array.isArray(renderDef.rescale)) {
-        // Convert [[0,10000],[0,10000],[0,10000]] to "0,10000,0,10000,0,10000"
-        const rescaleFlat = renderDef.rescale.flat().join(',')
-        processedRender.rescale = [rescaleFlat]
+        // Convert [[0,10000],[0,10000],[0,10000]] to ["0,10000", "0,10000", "0,10000"]
+        // Each inner array becomes a "min,max" string - one per band
+        processedRender.rescale = renderDef.rescale.map((band) =>
+          Array.isArray(band) ? band.join(',') : String(band)
+        )
       }
 
       // Optional: colormap_name
@@ -602,8 +603,6 @@ export function applyConfigDefaults(config) {
     EXPORT_ENABLED: config.EXPORT_ENABLED ?? DEFAULT_EXPORT_ENABLED,
     SHOW_ITEM_AUTO_ZOOM:
       config.SHOW_ITEM_AUTO_ZOOM ?? DEFAULT_SHOW_ITEM_AUTO_ZOOM,
-    SEARCH_BY_GEOM_ENABLED:
-      config.SEARCH_BY_GEOM_ENABLED ?? DEFAULT_SEARCH_BY_GEOM_ENABLED,
     RIGHT_SIDEBAR_ENABLED:
       config.RIGHT_SIDEBAR_ENABLED ?? DEFAULT_RIGHT_SIDEBAR_ENABLED,
     // STAC Links configuration

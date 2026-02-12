@@ -1,0 +1,53 @@
+.ButtonGroup__buttons.MuiToggleButtonGroup-root {
+  width: 100%;
+  border: 1px solid var(--side-panel-toggle-button-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.ButtonGroup__buttons.MuiToggleButtonGroup-root .MuiToggleButtonGroup-grouped {
+  flex: 1;
+  height: 36px;
+  font-size: 12px;
+  font-weight: 400;
+  text-transform: capitalize;
+  background: var(--side-panel-toggle-button-background);
+  color: var(--side-panel-toggle-button-color);
+  border: none;
+  border-radius: 0;
+  margin: 0;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ButtonGroup__buttons.MuiToggleButtonGroup-root
+  .MuiToggleButtonGroup-grouped:not(:last-of-type) {
+  border-right: 1px solid var(--side-panel-toggle-button-border);
+}
+
+.ButtonGroup__buttons.MuiToggleButtonGroup-root
+  .MuiToggleButtonGroup-grouped:hover {
+  background: var(--side-panel-toggle-button-background-hover);
+  color: var(--side-panel-toggle-button-color);
+}
+
+.ButtonGroup__buttons.MuiToggleButtonGroup-root
+  .MuiToggleButtonGroup-grouped.Mui-selected {
+  background: var(--side-panel-toggle-button-background-selected);
+  color: var(--side-panel-toggle-button-color-selected);
+}
+
+.ButtonGroup__buttons.MuiToggleButtonGroup-root
+  .MuiToggleButtonGroup-grouped.Mui-selected:hover {
+  background: var(--side-panel-toggle-button-background-selected);
+  color: var(--side-panel-toggle-button-color-selected);
+}
+
+.ButtonGroup__buttons.MuiToggleButtonGroup-root
+  .MuiToggleButtonGroup-grouped.Mui-disabled {
+  opacity: var(--opacity-disabled);
+  color: var(--side-panel-toggle-button-color);
+}

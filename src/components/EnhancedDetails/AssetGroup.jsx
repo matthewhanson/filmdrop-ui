@@ -13,7 +13,11 @@ const AssetGroup = React.memo(
     }
 
     return (
-      <GroupContainer groupName={groupName} gridClassName="asset-grid">
+      <GroupContainer
+        groupName={groupName}
+        gridClassName="asset-grid"
+        count={assets.length}
+      >
         {assets.map((asset) => (
           <AssetItem
             key={asset.key}

@@ -74,19 +74,20 @@ After building with `npm run build`, place your config at `build/config/config.j
 | `CART_ENABLED`               | Boolean | `false`  | Enable shopping cart features for scene selection       |
 | `EXPORT_ENABLED`             | Boolean | `true`   | Enable GeoJSON export of search results                 |
 | `RIGHT_SIDEBAR_ENABLED`      | Boolean | `false`  | Anchor the sidebar panel on the right                   |
-| `SEARCH_BY_GEOM_ENABLED`     | Boolean | `true`   | Allow users to draw or upload GeoJSON for search bounds |
-| `STAC_LINK_ENABLED`          | Boolean | `false`  | Show STAC API Item link in Links section                |
-| `STAC_LINKS_SECTION_ENABLED` | Boolean | `false`  | Show comprehensive Links section (grouped by rel type)  |
+| `STAC_LINK_ENABLED`          | Boolean | `true`   | Show STAC API Item link in Links section                |
+| `STAC_LINKS_SECTION_ENABLED` | Boolean | `true`   | Show comprehensive Links section (grouped by rel type)  |
 | `STAC_LINKS_EXCLUDE_LIST`    | Array   | See note | Link rel types to hide from Links section (power-users) |
 | `SHOW_ITEM_AUTO_ZOOM`        | Boolean | `true`   | Show toggle to auto-center map on selected item         |
 | `THEME_SWITCHING_ENABLED`    | Boolean | `true`   | Enable light/dark theme switching                       |
+
+> NOTE: `SEARCH_BY_GEOM_ENABLED` is no longer configurable and is always enabled.
 
 **STAC Links Configuration:**
 
 The Links section displays STAC item links through two independent feature flags:
 
-- **`STAC_LINK_ENABLED`** (`false` by default): Shows the STAC API Item link (the item's canonical link to itself)
-- **`STAC_LINKS_SECTION_ENABLED`** (`false` by default): Shows a comprehensive Links section with all other item links grouped by relationship type
+- **`STAC_LINK_ENABLED`** (`true` by default): Shows the STAC API Item link (the item's canonical link to itself)
+- **`STAC_LINKS_SECTION_ENABLED`** (`true` by default): Shows a comprehensive Links section with all other item links grouped by relationship type
 
 Both flags can be enabled independently. Links are displayed under a single "Links" header when at least one flag is enabled.
 
@@ -147,7 +148,7 @@ Both flags can be enabled independently. Links are displayed under a single "Lin
 }
 ```
 
-**Hide all links (default):**
+**Hide all links:**
 
 ```json
 {
@@ -442,7 +443,7 @@ configuration when needed.
 }
 // Result:
 // sceneTilerParams.assets = ["red", "green", "blue"]
-// sceneTilerParams.rescale = ["0,10000,0,10000,0,10000"]
+// sceneTilerParams.rescale = ["0,10000", "0,10000", "0,10000"]
 ```
 
 **Scenario 2: NDVI with colormap**
@@ -522,6 +523,7 @@ improves maintainability.
 | `mosaicTilerParams`     | Object | TiTiler mosaic parameters (same structure as sceneTilerParams)                                                                |
 | `sceneMinZoom`          | Number | Minimum zoom level required for Scene and Mosaic views (default: 7)                                                           |
 | `popupDisplayFields`    | Array  | STAC property names to display in popup (e.g., `["datetime", "platform"]`)                                                    |
+| `queryableFilters`      | Array  | Allowlist of queryable fields to show as filters. See [Dynamic Property Filtering](#dynamic-property-filtering).              |
 | `tileLayerParams`       | Object | Leaflet tile layer options (e.g., `minZoom`, `maxZoom`, `opacity`)                                                            |
 | `enhancedDisplayConfig` | Object | Enhanced details configuration with `property_groups` and `asset_groups`                                                      |
 
@@ -551,6 +553,7 @@ improves maintainability.
           "rescale": ["-1,1"]
         }
       },
+      "queryableFilters": ["eo:cloud_cover"],
       "mosaicTilerParams": {
         "assets": ["visual"]
       },
@@ -567,6 +570,50 @@ improves maintainability.
 
 **Note:** The `visualizations` field is automatically populated when auto-configuration is enabled. All render definitions from
 the STAC Collection are stored here. The first visualization is used as the default for rendering.
+
+#### Dynamic Property Filtering
+
+FilmDrop UI automatically discovers filterable properties from each STAC collection's
+[OGC Queryables](https://docs.ogc.org/is/17-069r4/17-069r4.html#_queryables) endpoint.
+The application renders appropriate filter controls based on the queryable schema:
+
+| Schema Type                      | UI Control            | Example Property      |
+| -------------------------------- | --------------------- | --------------------- |
+| Numeric with `minimum`/`maximum` | Range slider          | `eo:cloud_cover`      |
+| String/Number/Integer with enum  | Multi-select dropdown | `sar:polarizations`   |
+| String (plain)                   | Text input            | `platform`            |
+| Number/Integer (without min/max) | Numeric input         | Custom numeric fields |
+
+##### Controlling Which Filters Appear
+
+By default, all supported queryables from a collection are displayed as filters. Use the
+`queryableFilters` property to limit filters to specific fields:
+
+```json
+{
+  "COLLECTIONS_CONFIG": {
+    "sentinel-2-l2a": {
+      "queryableFilters": ["eo:cloud_cover"]
+    },
+    "sentinel-1-grd": {
+      "queryableFilters": ["sar:polarizations", "sar:instrument_mode"]
+    },
+    "landsat-c2-l2": {
+      "queryableFilters": []
+    }
+  }
+}
+```
+
+Behavior:
+
+- **Array provided**: Only listed queryables appear as filters (allowlist)
+- **Empty array `[]`**: No queryable filters shown for that collection
+- **Property omitted**: All supported queryables are shown
+
+> **Note:** Collections must expose a queryables endpoint (link with
+> `rel="http://www.opengis.net/def/rel/ogc/1.0/queryables"`). If no queryables link
+> is found, no property filters are displayed for that collection.
 
 #### Legacy Format (Deprecated)
 
@@ -1027,6 +1074,14 @@ See `config_helper/config-new-format-example.json` for a comprehensive example w
 - Verify CSS theme selectors match configuration
 - Check `THEME_SWITCHING_ENABLED` matches CSS structure
 - See [CSS Theme Configuration](#theme-configuration)
+
+### Filters not appearing
+
+- Verify the collection has a queryables endpoint (check collection links for
+  `rel="http://www.opengis.net/def/rel/ogc/1.0/queryables"`)
+- Check browser console for queryables fetch errors
+- Ensure queryable schemas have supported types (number with min/max, enum values, string, or number)
+- If using `queryableFilters` allowlist, verify field names match exactly
 
 ## Additional Resources
 

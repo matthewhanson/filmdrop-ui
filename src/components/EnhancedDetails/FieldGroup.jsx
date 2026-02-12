@@ -41,7 +41,11 @@ const FieldGroup = React.memo(function FieldGroup({
     : groupName
 
   return (
-    <GroupContainer groupName={groupTitle} defaultExpanded={defaultExpanded}>
+    <GroupContainer
+      groupName={groupTitle}
+      defaultExpanded={defaultExpanded}
+      count={fieldItems.length}
+    >
       {fieldItems.map(([field, value]) => (
         <FieldItem key={field} field={field} value={value} />
       ))}

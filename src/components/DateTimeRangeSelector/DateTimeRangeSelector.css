@@ -1,85 +1,152 @@
-label {
-  position: relative;
-  top: 2px;
+.datePickerHelperText {
+  font-size: 12px;
+  color: var(--side-panel-input-helper-text-color);
+  margin-bottom: 8px;
 }
 
 .datePickerContainer {
   display: flex;
   flex-direction: row;
   width: 100%;
-  margin-top: 15px;
-  margin-bottom: 15px;
+  gap: 16px;
 }
 
-.reactDatePicker {
-  width: 80px;
-}
-
-.datePicker {
-  font-size: 14px;
-  min-width: 150px;
-}
-
-.datePicker label {
-  font-size: 16px;
-}
-
-.datePicker select {
-  margin-top: 5px;
-}
-
-.datePicker label span svg {
-  height: 16px;
-  width: 16px;
-  position: relative;
-  top: 1px;
-  left: 4px;
-  margin-right: 10px;
-}
-
-.datePicker .react-tooltip {
-  font-weight: normal;
-  line-height: 1.6;
-}
-
-.dateToolTipIcon {
-  cursor: pointer;
-}
-
-span.error-true {
-  color: #bc3131;
-}
-
-.react-calendar {
-  width: 270px;
-}
-
-#dateRange-tooltip {
-  opacity: 1;
-  z-index: 999;
-}
-
-.dateRangeSpanText {
+.datePickerInputWrapper {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-left: 5px;
-  margin-right: 5px;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
 }
 
-/* !important used here to override a MUI icon style to work in non-MUI datepicker */
-.datePicker-icon {
-  color: var(--side-panel-datepicker-icon-color);
-  height: 1rem !important;
-  width: 1rem !important;
-  cursor: pointer;
-}
-
-.react-datepicker__today-button:hover {
-  background-color: #d3d3d3;
-}
-
-.datePickerLabelUTCText {
-  font-weight: 100;
+.datePickerInputLabel {
   font-size: 12px;
+  color: var(--side-panel-input-helper-text-color);
+  margin-top: 4px;
+}
+
+/* Override input font size, padding, background, height, and text color */
+.datePickerContainer .MuiPickersOutlinedInput-root {
+  font-size: 12px;
+  padding-left: 10px !important;
+  padding-right: 0px !important;
+  background-color: var(--side-panel-input-background) !important;
+  color: var(--side-panel-input-color) !important;
+  height: 36px !important;
+  box-sizing: border-box !important;
+}
+
+/* Make calendar icon button smaller and reduce spacing */
+.datePickerContainer .MuiInputAdornment-root {
+  margin-left: 0px !important;
+}
+
+.datePickerContainer .MuiInputAdornment-root .MuiIconButton-root {
+  padding: 4px !important;
+  margin-right: 4px !important;
+}
+
+.datePickerContainer .MuiInputAdornment-root .MuiIconButton-root:hover {
+  background-color: var(--mui-hover) !important;
+}
+
+.datePickerContainer .MuiInputAdornment-root .MuiSvgIcon-root {
+  font-size: 20px !important;
+  color: var(--side-panel-text-color) !important;
+  opacity: var(--opacity-secondary);
+  transition: opacity 0.2s ease;
+}
+
+.datePickerContainer
+  .MuiInputAdornment-root
+  .MuiIconButton-root:hover
+  .MuiSvgIcon-root {
+  opacity: 1;
+}
+
+.datePickerContainer .MuiPickersOutlinedInput-root input,
+.datePickerContainer .MuiPickersSectionList-sectionContent,
+.datePickerContainer .MuiPickersSectionList-sectionSeparator {
+  font-size: 12px;
+  color: var(--side-panel-input-color);
+}
+
+/* Override default border color */
+.datePickerContainer
+  .MuiPickersOutlinedInput-root
+  > .MuiPickersOutlinedInput-notchedOutline {
+  border-color: var(--side-panel-input-border) !important;
+}
+
+/* Override hover border - disable hover effect */
+.datePickerContainer
+  .MuiPickersOutlinedInput-root:not(.Mui-focused):hover
+  > .MuiPickersOutlinedInput-notchedOutline {
+  border-color: var(--side-panel-input-border-hover) !important;
+}
+
+/* Override focused border color */
+.datePickerContainer
+  .MuiPickersOutlinedInput-root.Mui-focused
+  > .MuiPickersOutlinedInput-notchedOutline {
+  border-color: var(--side-panel-input-border-focused) !important;
+  border-width: 1px !important;
+}
+
+/* Calendar popup - text colors (background set via slotProps in component) */
+
+/* Calendar header (month/year label + navigation arrows) */
+.MuiPickersCalendarHeader-label {
+  font-size: 16px !important;
+  color: var(--side-panel-datepicker-popup-color) !important;
+}
+
+.MuiPickersCalendarHeader-switchViewButton,
+.MuiPickersArrowSwitcher-button {
+  color: var(--side-panel-datepicker-popup-color) !important;
+}
+
+/* Day-of-week column headers (S, M, T, ...) */
+.MuiDayCalendar-weekDayLabel {
+  color: var(--page-content-color) !important;
+}
+
+/* Day buttons - default state */
+.MuiPickersDay-root {
+  color: var(--side-panel-datepicker-popup-color) !important;
+}
+
+.MuiPickersDay-root:hover {
+  background-color: var(--mui-hover) !important;
+}
+
+/* Day buttons - today */
+.MuiPickersDay-root.MuiPickersDay-today {
+  border-color: var(--side-panel-datepicker-today-border) !important;
+}
+
+/* Day buttons - selected */
+.MuiPickersDay-root.Mui-selected {
+  background-color: var(--side-panel-datepicker-selected-background) !important;
+  color: var(--side-panel-datepicker-selected-color) !important;
+}
+
+/* Day buttons - disabled / outside current month */
+.MuiPickersDay-root.Mui-disabled {
+  color: var(--page-content-color) !important;
+  opacity: var(--opacity-muted);
+}
+
+/* Year picker */
+.MuiYearCalendar-button {
+  font-size: 16px !important;
+  color: var(--side-panel-datepicker-popup-color) !important;
+}
+
+.MuiYearCalendar-button:hover {
+  background-color: var(--mui-hover) !important;
+}
+
+.MuiYearCalendar-button.Mui-selected {
+  background-color: var(--side-panel-datepicker-selected-background) !important;
+  color: var(--side-panel-datepicker-selected-color) !important;
 }

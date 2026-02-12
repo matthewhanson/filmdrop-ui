@@ -48,7 +48,9 @@ const LinkDisplay = React.memo(({ selfLink, otherLinks }) => {
         <GroupContainer
           groupName={getRelTypeTitle('self')}
           className="link-group"
+          gridClassName="link-grid"
           renderChildrenInGrid={true}
+          count={1}
         >
           <LinkItem link={selfLink} />
         </GroupContainer>
@@ -58,25 +60,20 @@ const LinkDisplay = React.memo(({ selfLink, otherLinks }) => {
       {hasOtherLinks &&
         otherLinkGroups &&
         otherLinkGroups.length > 0 &&
-        otherLinkGroups.map((group) => {
-          const groupTitle =
-            group.links.length > 1
-              ? `${group.title} (${group.links.length})`
-              : group.title
-
-          return (
-            <GroupContainer
-              key={group.rel}
-              groupName={groupTitle}
-              className="link-group"
-              renderChildrenInGrid={true}
-            >
-              {group.links.map((link, index) => (
-                <LinkItem key={`${group.rel}-${index}`} link={link} />
-              ))}
-            </GroupContainer>
-          )
-        })}
+        otherLinkGroups.map((group) => (
+          <GroupContainer
+            key={group.rel}
+            groupName={group.title}
+            className="link-group"
+            gridClassName="link-grid"
+            renderChildrenInGrid={true}
+            count={group.links.length}
+          >
+            {group.links.map((link, index) => (
+              <LinkItem key={`${group.rel}-${index}`} link={link} />
+            ))}
+          </GroupContainer>
+        ))}
     </div>
   )
 })

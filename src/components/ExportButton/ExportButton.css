@@ -6,15 +6,20 @@
 }
 
 .downloadButton {
-  background-color: var(--side-panel-button-background);
-  color: var(--side-panel-button-color);
+  background-color: var(--map-info-overlay-background);
+  color: var(--map-info-overlay-color);
   cursor: pointer;
-  border: 1px solid var(--side-panel-button-border);
-  border-radius: 5px;
-  padding: 5px 5px 3px 5px;
-  height: 33px;
+  border: 1px solid var(--map-info-overlay-button-border);
+  border-radius: var(--radius-md);
+  padding: 0;
+  width: 35px;
+  height: 35px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .downloadButton:hover {
-  background-color: var(--side-panel-button-background-hover);
+  background-color: var(--map-info-overlay-button-background-hover);
 }

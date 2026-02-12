@@ -4,6 +4,7 @@ import Search from '../../../Search/Search'
 import PopupResults from '../../../PopupResults/PopupResults'
 import { useSelector, useDispatch } from 'react-redux'
 import { debounceNewSearch } from '../../../../utils/searchHelper'
+import { debounceTitilerOverlay } from '../../../../utils/mapHelper'
 import {
   settabSelected,
   sethasLeftPanelTabChanged
@@ -26,6 +27,12 @@ const LeftContent = () => {
   const _isRightSidebarEnabled = useSelector(
     (state) => state.mainSlice.appConfig?.RIGHT_SIDEBAR_ENABLED ?? false
   )
+  const _currentPopupResult = useSelector(
+    (state) => state.mainSlice.currentPopupResult
+  )
+  const _selectedVisualization = useSelector(
+    (state) => state.mainSlice.selectedVisualization
+  )
 
   const { handleMouseDown, currentWidth } = useResizablePanel(panelRef)
 
@@ -35,6 +42,13 @@ const LeftContent = () => {
       document.removeEventListener('keydown', handleKeyPress)
     }
   }, [])
+
+  // Update map visualization when selection changes (works regardless of active tab)
+  useEffect(() => {
+    if (_currentPopupResult && _selectedVisualization) {
+      debounceTitilerOverlay(_currentPopupResult)
+    }
+  }, [_selectedVisualization, _currentPopupResult])
 
   const handleKeyPress = (event) => {
     if (event.ctrlKey && event.key === ' ') {
@@ -73,7 +87,7 @@ const LeftContent = () => {
             }
             onClick={setFiltersTab}
           >
-            Filters
+            <span className="LeftContentTabLabel">Search</span>
           </button>
           <button
             className={
@@ -83,7 +97,7 @@ const LeftContent = () => {
             }
             onClick={setDetailsTab}
           >
-            Item Details
+            <span className="LeftContentTabLabel">Item Details</span>
           </button>
         </div>
         <div className="LeftContentSelectedTab">

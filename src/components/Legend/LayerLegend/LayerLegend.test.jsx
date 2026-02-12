@@ -86,12 +86,7 @@ describe('LayerLegend', () => {
       })
     })
     describe('confirm conditional search area render', () => {
-      it('should not render search area legend item if searchGeojsonBoundary set in redux', () => {
-        const mockAppConfigSearchEnabled = {
-          ...mockAppConfig,
-          SEARCH_BY_GEOM_ENABLED: 'true'
-        }
-        store.dispatch(setappConfig(mockAppConfigSearchEnabled))
+      it('should not render search area legend item if searchGeojsonBoundary is not set', () => {
         setup()
         expect(screen.queryByText(/search area/i)).not.toBeInTheDocument()
       })

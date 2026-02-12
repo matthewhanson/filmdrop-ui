@@ -2,14 +2,14 @@
   margin-left: 0px;
   margin-right: 10px;
   border: 1px var(--page-header-button-border) solid;
-  border-radius: 6px;
-  padding: 5px;
+  border-radius: var(--radius-sm);
+  width: 38px;
+  height: 38px;
   cursor: pointer;
   transition: all 0.33s ease-in-out;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 40px;
   background: var(--page-header-button-background);
   color: var(--page-header-button-color);
 }
@@ -25,7 +25,7 @@
 }
 
 .theme-switcher-icon {
-  font-size: 18px;
+  font-size: 16px;
   line-height: 1;
   display: flex;
   align-items: center;
@@ -33,6 +33,6 @@
 }
 
 .theme-switcher-icon svg {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
 }
