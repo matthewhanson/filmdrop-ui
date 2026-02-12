@@ -414,8 +414,12 @@ export const debounceTitilerOverlay = debounce(
 function addImageOverlay(item) {
   const sceneTilerURL =
     store.getState().mainSlice.appConfig.SCENE_TILER_URL || ''
+  const sceneTilerBaseUrl = sceneTilerURL.replace(/\/+$/, '')
+  const tileMatrixSetId =
+    store.getState().mainSlice.appConfig.TITILER_TILE_MATRIX_SET ||
+    'WebMercatorQuad'
   const visualizations = getCollectionConfig(item?.collection, 'visualizations')
-  if (!item || !sceneTilerURL || !visualizations) {
+  if (!item || !sceneTilerBaseUrl || !visualizations) {
     if (!visualizations && item?.collection) {
       console.warn(
         `[TiTiler Scene] Cannot display scene imagery - no visualizations configured for collection '${item.collection}'`
@@ -467,8 +471,13 @@ function addImageOverlay(item) {
           // Find and replace within the titiler url, if configured
           featureURL = findReplaceTitilerUrl(featureURL)
 
+          const queryParts = []
+          if (scale() === 2) queryParts.push('tilesize=512')
+          queryParts.push(`url=${encodeURIComponent(featureURL)}`)
+          if (tilerParams) queryParts.push(tilerParams)
+
           const currentSelectionImageTileLayer = L.tileLayer(
-            `${sceneTilerURL}/stac/tiles/{z}/{x}/{y}@${scale()}x.png?url=${featureURL}&${tilerParams}`,
+            `${sceneTilerBaseUrl}/stac/tiles/${tileMatrixSetId}/{z}/{x}/{y}.png?${queryParts.join('&')}`,
             tileLayerParams
           )
             .on('load', function () {
