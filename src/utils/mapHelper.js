@@ -585,8 +585,9 @@ const constructSceneTilerParams = (
   const expression = parameters.expression(tilerParams)
   if (expression) {
     params.push(expression)
-    // When using expression with assets, tell TiTiler each asset is a 1-band dataset
-    if (tilerParams?.assets && tilerParams.assets.length > 0) {
+    // When using expression with multiple assets, tell TiTiler each asset is a 1-band dataset.
+    // For single multi-band assets (e.g. NAIP), skip this so bands are accessible as {asset}_b{N}.
+    if (tilerParams?.assets && tilerParams.assets.length > 1) {
       params.push('asset_as_band=true')
     }
   }

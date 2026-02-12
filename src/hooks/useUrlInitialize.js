@@ -29,7 +29,8 @@ import {
   addDataToLayer,
   footprintLayerStyle,
   clearMapSelection,
-  zoomToCollectionExtent
+  zoomToCollectionExtent,
+  zoomToItemExtent
 } from '../utils/mapHelper'
 import { getCollectionVisualizations } from '../utils/configHelper'
 import { showApplicationAlert } from '../utils/alertHelper'
@@ -64,7 +65,7 @@ export function useUrlInitialize(search, dispatch) {
    * Sets clickResults, currentPopupResult, and triggers raster overlay.
    */
   const fetchAndDisplayItem = useCallback(
-    async (collectionId, itemId) => {
+    async (collectionId, itemId, prefetchedItem) => {
       if (!collectionId || !itemId) return
 
       latestItemRequest.current = itemId
@@ -81,11 +82,13 @@ export function useUrlInitialize(search, dispatch) {
         dispatch(setClickResults(clickResults))
         dispatch(setselectedPopupResultIndex(selectedIndex))
         dispatch(setCurrentPopupResult(currentResult))
-        return
+        return cachedItem
       }
 
       try {
-        const result = await GetItemService(collectionId, itemId)
+        // Use pre-fetched item or fetch from API
+        const result =
+          prefetchedItem ?? (await GetItemService(itemId, collectionId))
 
         // Discard result if a newer item request was initiated during the fetch
         if (latestItemRequest.current !== itemId) return
@@ -138,6 +141,7 @@ export function useUrlInitialize(search, dispatch) {
         dispatch(setClickResults(clickResults))
         dispatch(setselectedPopupResultIndex(selectedIndex))
         dispatch(setCurrentPopupResult(currentResult))
+        return result
       } catch (error) {
         console.error('Error fetching item:', error)
         showApplicationAlert(
@@ -179,9 +183,12 @@ export function useUrlInitialize(search, dispatch) {
       }
     }
 
-    async function restoreItem(col, item, tab) {
+    async function restoreItem(col, item, tab, prefetchedItem) {
       if (!item) return
-      await fetchAndDisplayItem(col, item)
+      const fetchedItem = await fetchAndDisplayItem(col, item, prefetchedItem)
+      if (fetchedItem) {
+        zoomToItemExtent(fetchedItem)
+      }
       // Default to details tab for item view, but respect URL tab if set
       if (!tab) {
         dispatch(settabSelected('details'))
@@ -267,14 +274,39 @@ export function useUrlInitialize(search, dispatch) {
           if (collection) {
             dispatch(setSelectedCollection(urlSearch.col))
             dispatch(setSelectedCollectionData(collection))
-            zoomToCollectionExtent(collection)
             if (urlSearch.view) {
               dispatch(setViewMode(urlSearch.view))
             }
             restoreVisualization(urlSearch.col, urlSearch.viz)
             if (urlSearch.item) {
+              // Item zoom will set the map view — skip collection zoom
               await restoreItem(urlSearch.col, urlSearch.item, urlSearch.tab)
+            } else {
+              zoomToCollectionExtent(collection)
             }
+          }
+        } else if (urlSearch.item) {
+          // Item only — search for it to discover the collection
+          const item = await GetItemService(urlSearch.item)
+          if (!item.error && item.collection) {
+            const collection = collectionsData.find(
+              (c) => c.id === item.collection
+            )
+            if (collection) {
+              dispatch(setSelectedCollection(item.collection))
+              dispatch(setSelectedCollectionData(collection))
+              restoreVisualization(item.collection, urlSearch.viz)
+            }
+            // Display the item and zoom to it (pass pre-fetched item to
+            // avoid a redundant API call)
+            await restoreItem(
+              item.collection,
+              urlSearch.item,
+              urlSearch.tab,
+              item
+            )
+          } else {
+            showApplicationAlert('error', `Item "${urlSearch.item}" not found`)
           }
         }
 

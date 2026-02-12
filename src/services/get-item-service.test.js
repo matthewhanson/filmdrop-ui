@@ -12,36 +12,34 @@ vi.mock('../utils/authHelper', () => ({
 // Mock fetch globally
 global.fetch = vi.fn()
 
-describe('GetItemService', () => {
-  const mockStacApiUrl = 'https://stac-api.example.com'
-  const mockCollectionId = 'sentinel-2-l2a'
-  const mockItemId = 'S2A_17SNB_20230617_0_L2A'
-  const mockItemResponse = {
-    type: 'Feature',
-    id: mockItemId,
-    collection: mockCollectionId,
-    geometry: { type: 'Polygon', coordinates: [[[]]] },
-    properties: { datetime: '2023-06-17T00:00:00Z' }
-  }
+const mockStacApiUrl = 'https://stac-api.example.com'
+const mockCollectionId = 'sentinel-2-l2a'
+const mockItemId = 'S2A_17SNB_20230617_0_L2A'
+const mockItemResponse = {
+  type: 'Feature',
+  id: mockItemId,
+  collection: mockCollectionId,
+  geometry: { type: 'Polygon', coordinates: [[[]]] },
+  properties: { datetime: '2023-06-17T00:00:00Z' }
+}
 
-  beforeEach(() => {
-    vi.clearAllMocks()
-    // Setup default app config
-    store.dispatch(
-      setappConfig({
-        STAC_API_URL: mockStacApiUrl,
-        APP_TOKEN_AUTH_ENABLED: false,
-        FETCH_CREDENTIALS: 'same-origin'
-      })
-    )
-    // Clear localStorage
-    localStorage.clear()
-  })
+beforeEach(() => {
+  vi.clearAllMocks()
+  store.dispatch(
+    setappConfig({
+      STAC_API_URL: mockStacApiUrl,
+      APP_TOKEN_AUTH_ENABLED: false,
+      FETCH_CREDENTIALS: 'same-origin'
+    })
+  )
+  localStorage.clear()
+})
 
-  afterEach(() => {
-    vi.restoreAllMocks()
-  })
+afterEach(() => {
+  vi.restoreAllMocks()
+})
 
+describe('GetItemService with collectionId', () => {
   describe('URL construction', () => {
     it('constructs correct STAC API endpoint URL', async () => {
       global.fetch.mockResolvedValueOnce({
@@ -49,7 +47,7 @@ describe('GetItemService', () => {
         json: async () => mockItemResponse
       })
 
-      await GetItemService(mockCollectionId, mockItemId)
+      await GetItemService(mockItemId, mockCollectionId)
 
       expect(global.fetch).toHaveBeenCalledWith(
         `${mockStacApiUrl}/collections/${mockCollectionId}/items/${mockItemId}`,
@@ -64,7 +62,7 @@ describe('GetItemService', () => {
         json: async () => mockItemResponse
       })
 
-      await GetItemService(mockCollectionId, specialItemId)
+      await GetItemService(specialItemId, mockCollectionId)
 
       expect(global.fetch).toHaveBeenCalledWith(
         `${mockStacApiUrl}/collections/${mockCollectionId}/items/${specialItemId}`,
@@ -90,7 +88,7 @@ describe('GetItemService', () => {
         json: async () => mockItemResponse
       })
 
-      await GetItemService(mockCollectionId, mockItemId)
+      await GetItemService(mockItemId, mockCollectionId)
 
       expect(global.fetch).toHaveBeenCalledWith(
         expect.any(String),
@@ -119,7 +117,7 @@ describe('GetItemService', () => {
         json: async () => mockItemResponse
       })
 
-      await GetItemService(mockCollectionId, mockItemId)
+      await GetItemService(mockItemId, mockCollectionId)
 
       const callArgs = global.fetch.mock.calls[0][1]
       const authHeader = callArgs.headers.get('Authorization')
@@ -140,7 +138,7 @@ describe('GetItemService', () => {
         json: async () => mockItemResponse
       })
 
-      await GetItemService(mockCollectionId, mockItemId)
+      await GetItemService(mockItemId, mockCollectionId)
 
       const callArgs = global.fetch.mock.calls[0][1]
       const authHeader = callArgs.headers.get('Authorization')
@@ -163,7 +161,7 @@ describe('GetItemService', () => {
         json: async () => mockItemResponse
       })
 
-      await GetItemService(mockCollectionId, mockItemId)
+      await GetItemService(mockItemId, mockCollectionId)
 
       expect(global.fetch).toHaveBeenCalledWith(
         expect.any(String),
@@ -186,7 +184,7 @@ describe('GetItemService', () => {
         json: async () => mockItemResponse
       })
 
-      await GetItemService(mockCollectionId, mockItemId)
+      await GetItemService(mockItemId, mockCollectionId)
 
       expect(global.fetch).toHaveBeenCalledWith(
         expect.any(String),
@@ -204,7 +202,7 @@ describe('GetItemService', () => {
         json: async () => mockItemResponse
       })
 
-      const result = await GetItemService(mockCollectionId, mockItemId)
+      const result = await GetItemService(mockItemId, mockCollectionId)
 
       expect(result).toEqual(mockItemResponse)
       expect(result.error).toBeUndefined()
@@ -218,7 +216,7 @@ describe('GetItemService', () => {
         status: 404
       })
 
-      const result = await GetItemService(mockCollectionId, mockItemId)
+      const result = await GetItemService(mockItemId, mockCollectionId)
 
       expect(result).toEqual({ error: true, status: 404 })
     })
@@ -229,7 +227,7 @@ describe('GetItemService', () => {
         status: 403
       })
 
-      const result = await GetItemService(mockCollectionId, mockItemId)
+      const result = await GetItemService(mockItemId, mockCollectionId)
 
       expect(authHelper.logoutUser).toHaveBeenCalledOnce()
       expect(result).toEqual({ error: true, status: 403 })
@@ -241,7 +239,7 @@ describe('GetItemService', () => {
         status: 500
       })
 
-      const result = await GetItemService(mockCollectionId, mockItemId)
+      const result = await GetItemService(mockItemId, mockCollectionId)
 
       expect(result).toEqual({ error: true, status: 500 })
       expect(authHelper.logoutUser).not.toHaveBeenCalled()
@@ -250,7 +248,7 @@ describe('GetItemService', () => {
     it('returns error object with null status on network failure', async () => {
       global.fetch.mockRejectedValueOnce(new Error('Network error'))
 
-      const result = await GetItemService(mockCollectionId, mockItemId)
+      const result = await GetItemService(mockItemId, mockCollectionId)
 
       expect(result).toEqual({ error: true, status: null })
     })
@@ -263,9 +261,97 @@ describe('GetItemService', () => {
         }
       })
 
-      const result = await GetItemService(mockCollectionId, mockItemId)
+      const result = await GetItemService(mockItemId, mockCollectionId)
 
       expect(result).toEqual({ error: true, status: null })
     })
+  })
+})
+
+describe('GetItemService without collectionId', () => {
+  it('uses the search endpoint with ids param', async () => {
+    global.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        type: 'FeatureCollection',
+        features: [mockItemResponse]
+      })
+    })
+
+    await GetItemService(mockItemId)
+
+    const calledUrl = global.fetch.mock.calls[0][0]
+    expect(calledUrl).toBe(`${mockStacApiUrl}/search?ids=${mockItemId}`)
+  })
+
+  it('returns item when exactly one match found', async () => {
+    global.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        type: 'FeatureCollection',
+        features: [mockItemResponse]
+      })
+    })
+
+    const result = await GetItemService(mockItemId)
+
+    expect(result).toEqual(mockItemResponse)
+    expect(result.error).toBeUndefined()
+  })
+
+  it('returns 404 error when no matches found', async () => {
+    global.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        type: 'FeatureCollection',
+        features: []
+      })
+    })
+
+    const result = await GetItemService(mockItemId)
+
+    expect(result).toEqual({ error: true, status: 404 })
+  })
+
+  it('returns 404 error when multiple matches found (ambiguous)', async () => {
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    global.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        type: 'FeatureCollection',
+        features: [
+          { ...mockItemResponse, collection: 'collection-a' },
+          { ...mockItemResponse, collection: 'collection-b' }
+        ]
+      })
+    })
+
+    const result = await GetItemService(mockItemId)
+
+    expect(result).toEqual({ error: true, status: 404 })
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Ambiguous item ID')
+    )
+    consoleSpy.mockRestore()
+  })
+
+  it('calls logoutUser on 403 response', async () => {
+    global.fetch.mockResolvedValueOnce({
+      ok: false,
+      status: 403
+    })
+
+    const result = await GetItemService(mockItemId)
+
+    expect(authHelper.logoutUser).toHaveBeenCalledOnce()
+    expect(result).toEqual({ error: true, status: 403 })
+  })
+
+  it('returns error object with null status on network failure', async () => {
+    global.fetch.mockRejectedValueOnce(new Error('Network error'))
+
+    const result = await GetItemService(mockItemId)
+
+    expect(result).toEqual({ error: true, status: null })
   })
 })

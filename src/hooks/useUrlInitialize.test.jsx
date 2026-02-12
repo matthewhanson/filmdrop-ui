@@ -400,7 +400,7 @@ describe('useUrlInitialize', () => {
         await result.current.fetchAndDisplayItem('sentinel-2', 'not-cached')
       })
 
-      expect(GetItemService).toHaveBeenCalledWith('sentinel-2', 'not-cached')
+      expect(GetItemService).toHaveBeenCalledWith('not-cached', 'sentinel-2')
 
       // Clean up
       store.dispatch(setSearchResults(null))
