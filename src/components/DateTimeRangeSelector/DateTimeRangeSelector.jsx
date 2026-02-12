@@ -48,7 +48,9 @@ const DateTimeRangeSelector = () => {
     return `Available: ${startFormatted} to ${endFormatted}`
   }, [selectedCollectionData])
 
-  // When collection changes, validate and update date range if needed
+  // When collection changes, reset date range:
+  // - Finite collections (definite end date): use full temporal extent
+  // - Ongoing collections (null end date): use last 2 weeks from today
   useEffect(() => {
     if (!selectedCollectionData?.extent?.temporal?.interval?.[0]) {
       return
@@ -63,27 +65,28 @@ const DateTimeRangeSelector = () => {
     }
 
     const collectionStartDate = dayjs(collectionStart)
-    const collectionEndDate = collectionEnd ? dayjs(collectionEnd) : dayjs() // Use current date if collection is ongoing
+    const collectionEndDate = collectionEnd ? dayjs(collectionEnd) : dayjs()
 
-    const currentStartDate = dayjs(searchDateRangeValue[0])
-    const currentEndDate = dayjs(searchDateRangeValue[1])
-
-    // Update date range if current range is completely outside collection extent
-    const isOutsideRange =
-      (currentStartDate.isBefore(collectionStartDate) &&
-        currentEndDate.isBefore(collectionStartDate)) ||
-      (currentStartDate.isAfter(collectionEndDate) &&
-        currentEndDate.isAfter(collectionEndDate))
-
-    if (isOutsideRange) {
+    if (collectionEnd) {
+      // Finite collection (e.g. NAIP) — use full extent
       dispatch(
         setSearchDateRangeValue([
           collectionStartDate.toISOString(),
           collectionEndDate.toISOString()
         ])
       )
+    } else {
+      // Ongoing collection (null end date, e.g. Sentinel-2) — last 2 weeks
+      const twoWeeksAgo = dayjs().subtract(14, 'day')
+      const newStart = twoWeeksAgo.isBefore(collectionStartDate)
+        ? collectionStartDate
+        : twoWeeksAgo
+
+      dispatch(
+        setSearchDateRangeValue([newStart.toISOString(), dayjs().toISOString()])
+      )
     }
-  }, [selectedCollectionData, dispatch]) // Intentionally NOT including searchDateRangeValue to avoid loops
+  }, [selectedCollectionData, dispatch])
 
   // Handle date changes - dispatch directly to Redux
   // MUI DatePicker passes dayjs objects directly
