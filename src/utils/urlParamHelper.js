@@ -112,7 +112,10 @@ export function deserializeQueryableFiltersFromURL(params, queryables) {
       if (schema.type === 'number') {
         filters[key] = value.split(',').filter(Boolean).map(parseFloat)
       } else if (schema.type === 'integer') {
-        filters[key] = value.split(',').filter(Boolean).map(parseInt)
+        filters[key] = value
+          .split(',')
+          .filter(Boolean)
+          .map((v) => parseInt(v, 10))
       } else {
         filters[key] = value.split(',').filter(Boolean)
       }

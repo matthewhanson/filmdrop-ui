@@ -159,6 +159,60 @@ describe('deserializeQueryableFiltersFromURL', () => {
     }
     expect(deserializeQueryableFiltersFromURL(params, queryables)).toEqual({})
   })
+
+  it('deserializes string enum as array', () => {
+    const params = { platform: 'sentinel-2a,sentinel-2b' }
+    const queryables = {
+      properties: {
+        platform: {
+          type: 'string',
+          enum: ['sentinel-2a', 'sentinel-2b', 'landsat-8']
+        }
+      }
+    }
+    expect(deserializeQueryableFiltersFromURL(params, queryables)).toEqual({
+      platform: ['sentinel-2a', 'sentinel-2b']
+    })
+  })
+
+  it('deserializes number enum as array of numbers', () => {
+    const params = { resolution: '10,20,60' }
+    const queryables = {
+      properties: {
+        resolution: { type: 'number', enum: [10, 20, 60] }
+      }
+    }
+    const result = deserializeQueryableFiltersFromURL(params, queryables)
+    expect(result).toEqual({ resolution: [10, 20, 60] })
+    result.resolution.forEach((v) => expect(typeof v).toBe('number'))
+  })
+
+  it('deserializes integer enum as array of integers', () => {
+    const params = { band: '1,2,3' }
+    const queryables = {
+      properties: {
+        band: { type: 'integer', enum: [1, 2, 3, 4] }
+      }
+    }
+    const result = deserializeQueryableFiltersFromURL(params, queryables)
+    expect(result).toEqual({ band: [1, 2, 3] })
+    result.band.forEach((v) => expect(Number.isInteger(v)).toBe(true))
+  })
+
+  it('deserializes single enum value as one-element array', () => {
+    const params = { platform: 'sentinel-2a' }
+    const queryables = {
+      properties: {
+        platform: {
+          type: 'string',
+          enum: ['sentinel-2a', 'sentinel-2b']
+        }
+      }
+    }
+    expect(deserializeQueryableFiltersFromURL(params, queryables)).toEqual({
+      platform: ['sentinel-2a']
+    })
+  })
 })
 
 describe('serialize/deserialize roundtrip', () => {
@@ -178,6 +232,33 @@ describe('serialize/deserialize roundtrip', () => {
         gsd: { type: 'number' },
         count: { type: 'integer' },
         constellation: { type: 'string' }
+      }
+    }
+
+    const serialized = serializeQueryableFiltersForUrl(originalFilters)
+    const deserialized = deserializeQueryableFiltersFromURL(
+      serialized,
+      queryables
+    )
+
+    expect(deserialized).toEqual(originalFilters)
+  })
+
+  it('preserves enum filter state through serialization roundtrip', () => {
+    const originalFilters = {
+      platform: ['sentinel-2a', 'sentinel-2b'],
+      resolution: [10, 20],
+      band: [1, 3]
+    }
+
+    const queryables = {
+      properties: {
+        platform: {
+          type: 'string',
+          enum: ['sentinel-2a', 'sentinel-2b', 'landsat-8']
+        },
+        resolution: { type: 'number', enum: [10, 20, 60] },
+        band: { type: 'integer', enum: [1, 2, 3, 4] }
       }
     }
 
