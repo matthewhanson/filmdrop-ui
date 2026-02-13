@@ -29,7 +29,7 @@ import {
 import * as h3 from 'h3-js'
 import debounce from './debounce'
 import { AddMosaicService } from '../services/post-mosaic-service'
-import { router } from '../router'
+import { router, getPathParams } from '../router'
 import { appendStacHeaderCookies } from '../utils/stacRequest'
 import { serializeQueryableFiltersForUrl } from './urlParamHelper'
 
@@ -102,18 +102,30 @@ export function newSearch(options = {}) {
   store.dispatch(setpaginationHistory([]))
 
   // Commit current search state to URL (replace — no history entry)
+  const collectionId = _selectedCollection?.id || ''
+  const currentPathParams = getPathParams()
+  const currentItemId = preserveItem ? currentPathParams.itemId || '' : ''
+
   router.navigate({
+    to: currentItemId
+      ? '/$collectionId/$itemId'
+      : collectionId
+        ? '/$collectionId'
+        : '/',
+    params: currentItemId
+      ? { collectionId, itemId: currentItemId }
+      : collectionId
+        ? { collectionId }
+        : {},
     search: (prev) => ({
       // Only preserve immediate/map params — don't spread all of prev,
       // which would carry stale queryable filters from a previous collection.
       tab: prev.tab,
       z: prev.z,
       c: prev.c,
-      col: _selectedCollection?.id || '',
       dt,
       view: viewMode || 'scene',
       viz: _state.selectedVisualization || '',
-      item: preserveItem ? prev.item : '',
       ...serializeQueryableFiltersForUrl(_state.queryableFilters)
     }),
     replace: true

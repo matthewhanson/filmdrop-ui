@@ -7,11 +7,11 @@ import {
 } from './router'
 
 describe('RESERVED_PARAMS', () => {
-  it('contains exactly the 8 expected keys', () => {
+  it('contains exactly the 6 expected keys (col and item are path params)', () => {
     expect(RESERVED_PARAMS).toEqual(
-      new Set(['col', 'dt', 'view', 'viz', 'item', 'tab', 'z', 'c'])
+      new Set(['dt', 'view', 'viz', 'tab', 'z', 'c'])
     )
-    expect(RESERVED_PARAMS.size).toBe(8)
+    expect(RESERVED_PARAMS.size).toBe(6)
   })
 })
 
@@ -19,11 +19,9 @@ describe('extractQueryableParams', () => {
   it('returns empty object when all params are reserved', () => {
     expect(
       extractQueryableParams({
-        col: 'sentinel-2',
         dt: '2024-01-01/2024-01-31',
         view: 'scene',
         tab: 'search',
-        item: '',
         viz: '',
         z: 10,
         c: '40,-100'
@@ -34,7 +32,6 @@ describe('extractQueryableParams', () => {
   it('returns only non-reserved params', () => {
     expect(
       extractQueryableParams({
-        col: 'sentinel-2',
         dt: '2024/2024',
         'eo:cloud_cover': '50',
         platform: 'sentinel-2a'
@@ -65,14 +62,20 @@ describe('extractQueryableParams', () => {
 describe('normalizeSearch', () => {
   it('defaults missing params to empty strings, z to undefined', () => {
     const result = normalizeSearch({})
-    expect(result.col).toBe('')
     expect(result.dt).toBe('')
     expect(result.view).toBe('')
     expect(result.viz).toBe('')
-    expect(result.item).toBe('')
     expect(result.tab).toBe('')
     expect(result.z).toBeUndefined()
     expect(result.c).toBe('')
+  })
+
+  it('passes through unknown params as queryable filters', () => {
+    const result = normalizeSearch({ col: 'sentinel-2', item: 'SCENE-123' })
+    // col and item are path params now; if they appear in search they
+    // pass through extractQueryableParams like any non-reserved key
+    expect(result.col).toBe('sentinel-2')
+    expect(result.item).toBe('SCENE-123')
   })
 
   it('validates view against allowed values and rejects invalid', () => {
@@ -102,13 +105,11 @@ describe('stringifySearch', () => {
   const stringify = router.options.stringifySearch
 
   it('strips empty string values from the query string', () => {
-    expect(stringify({ col: 'sentinel', item: '', tab: '' })).toBe(
-      '?col=sentinel'
-    )
+    expect(stringify({ dt: 'val', tab: '' })).toBe('?dt=val')
   })
 
   it('strips undefined and null values', () => {
-    expect(stringify({ col: 'test', z: undefined, c: null })).toBe('?col=test')
+    expect(stringify({ dt: 'test', z: undefined, c: null })).toBe('?dt=test')
   })
 
   it('preserves 0 and false', () => {
@@ -118,6 +119,6 @@ describe('stringifySearch', () => {
   })
 
   it('returns empty string when all values are empty', () => {
-    expect(stringify({ col: '', dt: '', item: '' })).toBe('')
+    expect(stringify({ dt: '', view: '' })).toBe('')
   })
 })

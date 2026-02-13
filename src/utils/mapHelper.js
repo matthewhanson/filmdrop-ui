@@ -15,7 +15,7 @@ import debounce from './debounce'
 import { GetMosaicBoundsService } from '../services/get-mosaic-bounds'
 import GeoJSONValidation from './geojsonValidation'
 import { DEFAULT_TILE_LAYER_PARAMS } from '../components/defaults'
-import { router } from '../router'
+import { router, getPathParams } from '../router'
 import { getCollectionConfig } from './configHelper'
 import { appendStacHeaderCookies } from '../utils/stacRequest'
 import { getMapGeometryColors } from './themeHelper'
@@ -181,12 +181,11 @@ export function mapClickHandler(e) {
               // Update URL with selected item (tab sync handled by useUrlStateSync)
               const firstItem = intersectingFeatures[0]
               if (firstItem.id) {
+                const { collectionId } = getPathParams()
                 router.navigate({
-                  search: (prev) => ({
-                    ...prev,
-                    item: firstItem.id,
-                    tab: 'details'
-                  }),
+                  to: '/$collectionId/$itemId',
+                  params: { collectionId, itemId: firstItem.id },
+                  search: (prev) => ({ ...prev, tab: 'details' }),
                   replace: true
                 })
               }

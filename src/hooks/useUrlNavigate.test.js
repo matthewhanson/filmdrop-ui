@@ -3,17 +3,17 @@ import { renderHook } from '@testing-library/react'
 import { useUrlNavigate } from './useUrlNavigate'
 
 const mockNavigate = vi.fn()
+const mockParams = { collectionId: 'sentinel-2' }
 vi.mock('@tanstack/react-router', () => ({
-  useNavigate: () => mockNavigate
+  useNavigate: () => mockNavigate,
+  useParams: () => mockParams
 }))
 
 describe('useUrlNavigate', () => {
   const prev = {
-    col: 'sentinel-2',
     dt: '2024-01-01/2024-01-31',
     view: 'scene',
     viz: 'true-color',
-    item: '',
     tab: 'search',
     z: 10,
     c: '40,-100'
@@ -47,14 +47,29 @@ describe('useUrlNavigate', () => {
     expect(getSearchResult()).toEqual({ ...prev, viz: 'false-color' })
   })
 
-  it('setItem sets item and switches to details tab', () => {
+  it('setItem navigates to /$collectionId/$itemId path and switches to details tab', () => {
     const { result } = renderHook(() => useUrlNavigate())
     result.current.setItem('SCENE-123')
 
     expect(mockNavigate).toHaveBeenCalledOnce()
-    expect(mockNavigate.mock.calls[0][0].replace).toBe(true)
-    const search = getSearchResult()
-    expect(search.item).toBe('SCENE-123')
-    expect(search.tab).toBe('details')
+    const call = mockNavigate.mock.calls[0][0]
+    expect(call.to).toBe('/$collectionId/$itemId')
+    expect(call.params).toEqual({
+      collectionId: 'sentinel-2',
+      itemId: 'SCENE-123'
+    })
+    expect(call.replace).toBe(true)
+    expect(getSearchResult().tab).toBe('details')
+  })
+
+  it('clearItem navigates back to /$collectionId path', () => {
+    const { result } = renderHook(() => useUrlNavigate())
+    result.current.clearItem()
+
+    expect(mockNavigate).toHaveBeenCalledOnce()
+    const call = mockNavigate.mock.calls[0][0]
+    expect(call.to).toBe('/$collectionId')
+    expect(call.params).toEqual({ collectionId: 'sentinel-2' })
+    expect(call.replace).toBe(true)
   })
 })

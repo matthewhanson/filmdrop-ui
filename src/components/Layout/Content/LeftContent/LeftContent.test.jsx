@@ -13,6 +13,17 @@ import {
 import { mockAppConfig } from '../../../../testing/shared-mocks'
 import userEvent from '@testing-library/user-event'
 
+vi.mock('@tanstack/react-router', () => ({
+  useNavigate: () => vi.fn(),
+  useParams: () => ({}),
+  createRootRoute: vi.fn(() => ({ addChildren: vi.fn(() => ({})) })),
+  createRoute: vi.fn(() => ({ addChildren: vi.fn(() => ({})) })),
+  createRouter: vi.fn(() => ({
+    state: { location: { search: {} }, matches: [] }
+  })),
+  defaultStringifySearch: vi.fn()
+}))
+
 // Mock useUrlNavigate so setTab dispatches to Redux (simulating URL→Redux sync)
 vi.mock('../../../../hooks/useUrlNavigate', async () => {
   const { store } = await import('../../../../redux/store')
@@ -21,7 +32,8 @@ vi.mock('../../../../hooks/useUrlNavigate', async () => {
     useUrlNavigate: () => ({
       setTab: (tab) => store.dispatch(settabSelected(tab)),
       setViz: vi.fn(),
-      setItem: vi.fn()
+      setItem: vi.fn(),
+      clearItem: vi.fn()
     })
   }
 })

@@ -188,10 +188,12 @@ export function useUrlInitialize(search, dispatch) {
       }
     }
 
+    const hasExplicitMapPosition = search.z != null || !!search.c
+
     async function restoreItem(col, item, tab, prefetchedItem) {
       if (!item) return
       const fetchedItem = await fetchAndDisplayItem(col, item, prefetchedItem)
-      if (fetchedItem) {
+      if (fetchedItem && !hasExplicitMapPosition) {
         zoomToItemExtent(fetchedItem)
       }
       // Default to details tab for item view, but respect URL tab if set
@@ -283,43 +285,36 @@ export function useUrlInitialize(search, dispatch) {
             if (urlSearch.view) {
               dispatch(setViewMode(urlSearch.view))
             }
+
+            // Set queryable filters from URL
+            const filterParams = extractQueryableParams(urlSearch)
+            if (Object.keys(filterParams).length > 0) {
+              const queryables = collection.queryables
+              if (
+                queryables &&
+                typeof queryables === 'object' &&
+                !queryables.error
+              ) {
+                const filters = deserializeQueryableFiltersFromURL(
+                  filterParams,
+                  { properties: queryables }
+                )
+                if (Object.keys(filters).length > 0) {
+                  dispatch(setQueryableFilters(filters))
+                }
+              }
+            }
+
             restoreVisualization(urlSearch.col, urlSearch.viz)
             if (urlSearch.item) {
-              // Item zoom will set the map view — skip collection zoom
               await restoreItem(urlSearch.col, urlSearch.item, urlSearch.tab)
-            } else {
+            } else if (!hasExplicitMapPosition) {
               zoomToCollectionExtent(collection)
             }
           } else {
             showApplicationAlert(
               'warning',
               `Collection "${urlSearch.col}" not found`
-            )
-          }
-        } else if (urlSearch.item) {
-          // Item only — search for it to discover the collection
-          const item = await GetItemService(urlSearch.item)
-          if (!item.error && item.collection) {
-            const collection = collectionsData.find(
-              (c) => c.id === item.collection
-            )
-            if (collection) {
-              dispatch(setSelectedCollection(item.collection))
-              dispatch(setSelectedCollectionData(collection))
-              restoreVisualization(item.collection, urlSearch.viz)
-            }
-            // Display the item and zoom to it (pass pre-fetched item to
-            // avoid a redundant API call)
-            await restoreItem(
-              item.collection,
-              urlSearch.item,
-              urlSearch.tab,
-              item
-            )
-          } else {
-            showApplicationAlert(
-              'warning',
-              `Item "${urlSearch.item}" not found`
             )
           }
         }

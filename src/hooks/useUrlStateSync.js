@@ -9,9 +9,12 @@
  *
  * Data flow is one-directional (URL → Redux only).
  * Components write to URL via useUrlNavigate or router.navigate.
+ *
+ * Collection and item come from path params (/:collectionId/:itemId).
+ * All other state comes from search params.
  */
-import { useEffect } from 'react'
-import { useSearch } from '@tanstack/react-router'
+import { useEffect, useMemo } from 'react'
+import { useSearch, useParams } from '@tanstack/react-router'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   setSelectedCollection,
@@ -30,7 +33,7 @@ import { useUrlInitialize } from './useUrlInitialize'
  * Declarative map for simple URL param → Redux sync.
  * Each entry defines how a single param maps to a Redux action.
  *
- * - param: URL search param key
+ * - param: key in the combined urlState object
  * - action: Redux action creator to dispatch
  * - defaultValue: fallback when param is falsy (omit to dispatch raw value)
  * - transform: optional (value) => dispatchable value; return null to skip
@@ -64,7 +67,20 @@ function shallowEqual(a, b) {
 
 export function useUrlStateSync() {
   const search = useSearch({ from: '__root__' })
+  const params = useParams({ strict: false })
   const dispatch = useDispatch()
+
+  // Build combined URL state: search params + path params mapped to col/item
+  const collectionId = params.collectionId || ''
+  const itemId = params.itemId || ''
+  const urlState = useMemo(
+    () => ({
+      ...search,
+      col: collectionId,
+      item: itemId
+    }),
+    [search, collectionId, itemId]
+  )
 
   const selectedCollectionData = useSelector(
     (state) => state.mainSlice.selectedCollectionData
@@ -74,24 +90,29 @@ export function useUrlStateSync() {
   )
 
   const { isInitialized, prevSearch, fetchAndDisplayItem, clearItemSelection } =
-    useUrlInitialize(search, dispatch)
+    useUrlInitialize(urlState, dispatch)
 
   /**
    * Ongoing URL → Redux sync.
-   * Runs whenever URL search params change after initialization.
+   * Runs whenever URL params change after initialization.
    */
   useEffect(() => {
     if (!isInitialized.current) return
     if (prevSearch.current === null) return
 
     const prev = prevSearch.current
-    prevSearch.current = search
+    prevSearch.current = urlState
 
     // Validate collection change before processing other params
-    if (search.col !== prev.col && search.col) {
-      const collectionExists = collectionsData?.some((c) => c.id === search.col)
+    if (urlState.col !== prev.col && urlState.col) {
+      const collectionExists = collectionsData?.some(
+        (c) => c.id === urlState.col
+      )
       if (!collectionExists) {
-        showApplicationAlert('warning', `Collection "${search.col}" not found`)
+        showApplicationAlert(
+          'warning',
+          `Collection "${urlState.col}" not found`
+        )
         // Skip dispatching the invalid collection — leave state unchanged
         // but still process other param changes below
       }
@@ -105,19 +126,19 @@ export function useUrlStateSync() {
       transform,
       requireTruthy
     } of SIMPLE_PARAM_HANDLERS) {
-      if (search[param] !== prev[param]) {
-        if (requireTruthy && !search[param]) continue
+      if (urlState[param] !== prev[param]) {
+        if (requireTruthy && !urlState[param]) continue
         // Skip invalid collection — already handled above
-        if (param === 'col' && search.col) {
+        if (param === 'col' && urlState.col) {
           const collectionExists = collectionsData?.some(
-            (c) => c.id === search.col
+            (c) => c.id === urlState.col
           )
           if (!collectionExists) continue
         }
         const raw =
-          defaultValue !== undefined && !search[param]
+          defaultValue !== undefined && !urlState[param]
             ? defaultValue
-            : search[param]
+            : urlState[param]
         if (transform) {
           const value = transform(raw)
           if (value !== null) dispatch(action(value))
@@ -129,7 +150,7 @@ export function useUrlStateSync() {
 
     // Sync queryable filters (needs JSON comparison across multiple keys)
     const prevFilters = extractQueryableParams(prev)
-    const currFilters = extractQueryableParams(search)
+    const currFilters = extractQueryableParams(urlState)
     if (!shallowEqual(prevFilters, currFilters)) {
       const queryables = selectedCollectionData?.queryables
       if (queryables && typeof queryables === 'object' && !queryables.error) {
@@ -141,16 +162,16 @@ export function useUrlStateSync() {
     }
 
     // Sync item selection (async fetch or clear)
-    if (search.item !== prev.item) {
-      if (search.item) {
-        const col = search.col || prev.col
-        fetchAndDisplayItem(col, search.item)
+    if (urlState.item !== prev.item) {
+      if (urlState.item) {
+        const col = urlState.col || prev.col
+        fetchAndDisplayItem(col, urlState.item)
       } else {
         clearItemSelection()
       }
     }
   }, [
-    search,
+    urlState,
     selectedCollectionData,
     collectionsData,
     dispatch,

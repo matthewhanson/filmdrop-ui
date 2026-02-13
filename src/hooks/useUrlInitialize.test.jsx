@@ -20,7 +20,7 @@ import { newSearch } from '../utils/searchHelper'
 vi.mock('@tanstack/react-router', () => ({
   useSearch: vi.fn(),
   createRootRoute: vi.fn(() => ({ addChildren: vi.fn(() => ({})) })),
-  createRoute: vi.fn(() => ({})),
+  createRoute: vi.fn(() => ({ addChildren: vi.fn(() => ({})) })),
   createRouter: vi.fn(() => ({}))
 }))
 

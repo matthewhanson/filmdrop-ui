@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate, useParams } from '@tanstack/react-router'
 import {
   setSelectedCollectionData,
   setShowZoomNotice,
   setSearchLoading,
   sethasCollectionChanged,
-  setSelectedCollection,
   setQueryableFilters,
   setSelectedVisualization
 } from '../../redux/slices/mainSlice'
@@ -18,6 +18,8 @@ import Dropdown from '../Dropdown/Dropdown'
 
 const CollectionDropdown = () => {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const params = useParams({ strict: false })
   const selectedCollection = useSelector(
     (state) => state.mainSlice.selectedCollection
   )
@@ -52,32 +54,44 @@ const CollectionDropdown = () => {
     return collectionOptions
   }, [collectionsData, selectedCollection])
 
-  // Initialize default collection on mount
+  // Initialize default collection on mount — navigate to collection path
+  // so URL→Redux sync sets selectedCollection.
+  // Skip if URL path already specifies a collection (useUrlInitialize will handle it).
   useEffect(() => {
     if (collectionsData.length === 0) return
     if (selectedCollection) return
+    if (params.collectionId) return
 
     // Get default from config
     const defaultCollection = appConfig.COLLECTIONS?.default
 
+    let defaultId
     if (!defaultCollection) {
-      // No default specified, use first collection
-      dispatch(setSelectedCollection(collectionsData[0].id))
-      return
-    }
-
-    // Check if default collection exists in available collections
-    const defaultCollectionExists = collectionsData.some(
-      (c) => c.id === defaultCollection
-    )
-
-    if (!defaultCollectionExists) {
-      console.warn('Configuration Error: default collection not found in API')
-      dispatch(setSelectedCollection(collectionsData[0].id))
+      defaultId = collectionsData[0].id
     } else {
-      dispatch(setSelectedCollection(defaultCollection))
+      const defaultCollectionExists = collectionsData.some(
+        (c) => c.id === defaultCollection
+      )
+      if (!defaultCollectionExists) {
+        console.warn('Configuration Error: default collection not found in API')
+        defaultId = collectionsData[0].id
+      } else {
+        defaultId = defaultCollection
+      }
     }
-  }, [collectionsData, selectedCollection, appConfig, dispatch])
+
+    navigate({
+      to: '/$collectionId',
+      params: { collectionId: defaultId },
+      replace: true
+    })
+  }, [
+    collectionsData,
+    selectedCollection,
+    appConfig,
+    navigate,
+    params.collectionId
+  ])
 
   // Update collection data when selection changes
   useEffect(() => {
@@ -109,9 +123,6 @@ const CollectionDropdown = () => {
     // Mark that collection has changed
     dispatch(sethasCollectionChanged(true))
 
-    // Update selected collection
-    dispatch(setSelectedCollection(newCollectionId))
-
     // Clear map and filters
     clearMapSelection()
     clearAllLayers()
@@ -119,6 +130,19 @@ const CollectionDropdown = () => {
 
     // Reset visualization so new collection's default is selected
     dispatch(setSelectedVisualization(null))
+
+    // Navigate to collection path — URL→Redux sync handles setSelectedCollection
+    navigate({
+      to: '/$collectionId',
+      params: { collectionId: newCollectionId },
+      search: (prev) => ({
+        // Preserve map position; clear search-committed params for new collection
+        z: prev.z,
+        c: prev.c,
+        tab: prev.tab
+      }),
+      replace: true
+    })
   }
 
   return (

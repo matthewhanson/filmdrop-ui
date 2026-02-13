@@ -16,12 +16,14 @@ import {
   setQueryableFilters
 } from '../redux/slices/mainSlice'
 
-// Mock TanStack Router
+// Mock TanStack Router — search params no longer include col/item
 let mockSearch = {}
+let mockParams = {}
 vi.mock('@tanstack/react-router', () => ({
   useSearch: () => mockSearch,
+  useParams: () => mockParams,
   createRootRoute: vi.fn(() => ({ addChildren: vi.fn(() => ({})) })),
-  createRoute: vi.fn(() => ({})),
+  createRoute: vi.fn(() => ({ addChildren: vi.fn(() => ({})) })),
   createRouter: vi.fn(() => ({}))
 }))
 
@@ -72,28 +74,35 @@ vi.mock('../utils/urlParamHelper', () => ({
   }))
 }))
 
-const baseSearch = {
-  col: 'sentinel-2',
+// Base search params (no col/item — those come from path params)
+const baseSearchParams = {
   dt: '2024-01-01/2024-06-30',
   view: 'scene',
   viz: 'true-color',
-  item: '',
   tab: 'search',
   z: 10,
   c: '40,-100'
+}
+
+// Base combined state (as seen by prevSearch after combining search + path params)
+const baseState = {
+  ...baseSearchParams,
+  col: 'sentinel-2',
+  item: ''
 }
 
 describe('useUrlStateSync — Phase 2 ongoing sync', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockIsInitialized.current = true
-    mockPrevSearch.current = { ...baseSearch }
-    mockSearch = { ...baseSearch }
+    mockPrevSearch.current = { ...baseState }
+    mockSearch = { ...baseSearchParams }
+    mockParams = { collectionId: 'sentinel-2' }
   })
 
   it('does not dispatch when not yet initialized', () => {
     mockIsInitialized.current = false
-    mockSearch = { ...baseSearch, tab: 'details' }
+    mockSearch = { ...baseSearchParams, tab: 'details' }
 
     renderHook(() => useUrlStateSync())
 
@@ -102,7 +111,7 @@ describe('useUrlStateSync — Phase 2 ongoing sync', () => {
 
   it('does not dispatch when prevSearch is null', () => {
     mockPrevSearch.current = null
-    mockSearch = { ...baseSearch, tab: 'details' }
+    mockSearch = { ...baseSearchParams, tab: 'details' }
 
     renderHook(() => useUrlStateSync())
 
@@ -117,7 +126,7 @@ describe('useUrlStateSync — Phase 2 ongoing sync', () => {
 
   describe('tab sync', () => {
     it('dispatches settabSelected when tab changes', () => {
-      mockSearch = { ...baseSearch, tab: 'details' }
+      mockSearch = { ...baseSearchParams, tab: 'details' }
 
       renderHook(() => useUrlStateSync())
 
@@ -125,8 +134,8 @@ describe('useUrlStateSync — Phase 2 ongoing sync', () => {
     })
 
     it('dispatches default "search" when tab is cleared', () => {
-      mockPrevSearch.current = { ...baseSearch, tab: 'details' }
-      mockSearch = { ...baseSearch, tab: '' }
+      mockPrevSearch.current = { ...baseState, tab: 'details' }
+      mockSearch = { ...baseSearchParams, tab: '' }
 
       renderHook(() => useUrlStateSync())
 
@@ -136,7 +145,7 @@ describe('useUrlStateSync — Phase 2 ongoing sync', () => {
 
   describe('viz sync', () => {
     it('dispatches setSelectedVisualization when viz changes', () => {
-      mockSearch = { ...baseSearch, viz: 'false-color' }
+      mockSearch = { ...baseSearchParams, viz: 'false-color' }
 
       renderHook(() => useUrlStateSync())
 
@@ -146,7 +155,7 @@ describe('useUrlStateSync — Phase 2 ongoing sync', () => {
     })
 
     it('dispatches null when viz is cleared', () => {
-      mockSearch = { ...baseSearch, viz: '' }
+      mockSearch = { ...baseSearchParams, viz: '' }
 
       renderHook(() => useUrlStateSync())
 
@@ -156,7 +165,7 @@ describe('useUrlStateSync — Phase 2 ongoing sync', () => {
 
   describe('view sync', () => {
     it('dispatches setViewMode when view changes', () => {
-      mockSearch = { ...baseSearch, view: 'hex' }
+      mockSearch = { ...baseSearchParams, view: 'hex' }
 
       renderHook(() => useUrlStateSync())
 
@@ -164,7 +173,7 @@ describe('useUrlStateSync — Phase 2 ongoing sync', () => {
     })
 
     it('dispatches default "scene" when view is cleared', () => {
-      mockSearch = { ...baseSearch, view: '' }
+      mockSearch = { ...baseSearchParams, view: '' }
 
       renderHook(() => useUrlStateSync())
 
@@ -172,9 +181,9 @@ describe('useUrlStateSync — Phase 2 ongoing sync', () => {
     })
   })
 
-  describe('col sync', () => {
-    it('dispatches setSelectedCollection when col changes', () => {
-      mockSearch = { ...baseSearch, col: 'landsat-8' }
+  describe('col sync (via path params)', () => {
+    it('dispatches setSelectedCollection when collectionId path param changes', () => {
+      mockParams = { collectionId: 'landsat-8' }
 
       renderHook(() => useUrlStateSync())
 
@@ -184,7 +193,7 @@ describe('useUrlStateSync — Phase 2 ongoing sync', () => {
     })
 
     it('does NOT dispatch when col is cleared (requireTruthy)', () => {
-      mockSearch = { ...baseSearch, col: '' }
+      mockParams = {}
 
       renderHook(() => useUrlStateSync())
 
@@ -196,7 +205,7 @@ describe('useUrlStateSync — Phase 2 ongoing sync', () => {
     })
 
     it('shows warning alert and skips dispatch for invalid collection', () => {
-      mockSearch = { ...baseSearch, col: 'nonexistent-collection' }
+      mockParams = { collectionId: 'nonexistent-collection' }
 
       renderHook(() => useUrlStateSync())
 
@@ -214,7 +223,7 @@ describe('useUrlStateSync — Phase 2 ongoing sync', () => {
 
   describe('dt sync', () => {
     it('dispatches setSearchDateRangeValue with parsed parts', () => {
-      mockSearch = { ...baseSearch, dt: '2025-01-01/2025-12-31' }
+      mockSearch = { ...baseSearchParams, dt: '2025-01-01/2025-12-31' }
 
       renderHook(() => useUrlStateSync())
 
@@ -224,7 +233,7 @@ describe('useUrlStateSync — Phase 2 ongoing sync', () => {
     })
 
     it('does NOT dispatch when dt is cleared (requireTruthy)', () => {
-      mockSearch = { ...baseSearch, dt: '' }
+      mockSearch = { ...baseSearchParams, dt: '' }
 
       renderHook(() => useUrlStateSync())
 
@@ -235,7 +244,7 @@ describe('useUrlStateSync — Phase 2 ongoing sync', () => {
     })
 
     it('does NOT dispatch when dt has invalid format', () => {
-      mockSearch = { ...baseSearch, dt: 'invalid-date' }
+      mockSearch = { ...baseSearchParams, dt: 'invalid-date' }
 
       renderHook(() => useUrlStateSync())
 
@@ -249,9 +258,9 @@ describe('useUrlStateSync — Phase 2 ongoing sync', () => {
 
   describe('queryable filters sync', () => {
     it('dispatches setQueryableFilters when filter params change', () => {
-      mockPrevSearch.current = { ...baseSearch }
+      mockPrevSearch.current = { ...baseState }
       mockSearch = {
-        ...baseSearch,
+        ...baseSearchParams,
         'eo:cloud_cover_min': '0',
         'eo:cloud_cover_max': '50'
       }
@@ -266,8 +275,11 @@ describe('useUrlStateSync — Phase 2 ongoing sync', () => {
 
     it('does not dispatch when filter params are unchanged', () => {
       // Both prev and current have the same filter params
-      mockPrevSearch.current = { ...baseSearch, 'eo:cloud_cover_min': '0' }
-      mockSearch = { ...baseSearch, 'eo:cloud_cover_min': '0' }
+      mockPrevSearch.current = {
+        ...baseState,
+        'eo:cloud_cover_min': '0'
+      }
+      mockSearch = { ...baseSearchParams, 'eo:cloud_cover_min': '0' }
 
       renderHook(() => useUrlStateSync())
 
@@ -275,9 +287,9 @@ describe('useUrlStateSync — Phase 2 ongoing sync', () => {
     })
   })
 
-  describe('item sync', () => {
-    it('calls fetchAndDisplayItem when item is set', () => {
-      mockSearch = { ...baseSearch, item: 'SCENE-123' }
+  describe('item sync (via path params)', () => {
+    it('calls fetchAndDisplayItem when itemId path param is set', () => {
+      mockParams = { collectionId: 'sentinel-2', itemId: 'SCENE-123' }
 
       renderHook(() => useUrlStateSync())
 
@@ -287,21 +299,9 @@ describe('useUrlStateSync — Phase 2 ongoing sync', () => {
       )
     })
 
-    it('uses previous col when current col is empty', () => {
-      mockPrevSearch.current = { ...baseSearch, col: 'sentinel-2' }
-      mockSearch = { ...baseSearch, col: '', item: 'SCENE-123' }
-
-      renderHook(() => useUrlStateSync())
-
-      expect(mockFetchAndDisplayItem).toHaveBeenCalledWith(
-        'sentinel-2',
-        'SCENE-123'
-      )
-    })
-
-    it('calls clearItemSelection when item is cleared', () => {
-      mockPrevSearch.current = { ...baseSearch, item: 'SCENE-123' }
-      mockSearch = { ...baseSearch, item: '' }
+    it('calls clearItemSelection when itemId is cleared', () => {
+      mockPrevSearch.current = { ...baseState, item: 'SCENE-123' }
+      mockParams = { collectionId: 'sentinel-2' }
 
       renderHook(() => useUrlStateSync())
 
@@ -309,8 +309,8 @@ describe('useUrlStateSync — Phase 2 ongoing sync', () => {
     })
 
     it('does not call either when item is unchanged', () => {
-      mockPrevSearch.current = { ...baseSearch, item: 'SCENE-123' }
-      mockSearch = { ...baseSearch, item: 'SCENE-123' }
+      mockPrevSearch.current = { ...baseState, item: 'SCENE-123' }
+      mockParams = { collectionId: 'sentinel-2', itemId: 'SCENE-123' }
 
       renderHook(() => useUrlStateSync())
 
@@ -320,13 +320,17 @@ describe('useUrlStateSync — Phase 2 ongoing sync', () => {
   })
 
   describe('updates prevSearch ref', () => {
-    it('sets prevSearch to current search after processing', () => {
-      const newSearch = { ...baseSearch, tab: 'details' }
-      mockSearch = newSearch
+    it('sets prevSearch to current combined state after processing', () => {
+      mockSearch = { ...baseSearchParams, tab: 'details' }
 
       renderHook(() => useUrlStateSync())
 
-      expect(mockPrevSearch.current).toBe(newSearch)
+      expect(mockPrevSearch.current).toEqual({
+        ...baseSearchParams,
+        tab: 'details',
+        col: 'sentinel-2',
+        item: ''
+      })
     })
   })
 })
