@@ -10,7 +10,6 @@ import {
   setimageOverlayLoading,
   setselectedPopupResultIndex
 } from '../../redux/slices/mainSlice'
-import { getCollectionConfig } from '../../utils/configHelper'
 import PopupFooter from '../PopupFooter/PopupFooter.jsx'
 import { isSceneInCart } from '../../utils/dataHelper'
 import { debounceTitilerOverlay } from '../../utils/mapHelper'
