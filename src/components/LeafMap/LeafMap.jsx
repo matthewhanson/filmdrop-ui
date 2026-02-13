@@ -1,4 +1,4 @@
-import { React, useEffect, useState, useRef } from 'react'
+import { React, useEffect, useState, useRef, useMemo } from 'react'
 import './LeafMap.css'
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -14,6 +14,8 @@ import { SearchControl, OpenStreetMapProvider } from 'leaflet-geosearch'
 import 'leaflet-geosearch/dist/geosearch.css'
 import { mapClickHandler, addReferenceLayersToMap } from '../../utils/mapHelper'
 import { setScenesForCartLayer } from '../../utils/dataHelper'
+import debounce from '../../utils/debounce'
+import { router } from '../../router'
 import {
   DEFAULT_MAP_CENTER,
   DEFAULT_MAP_ZOOM,
@@ -31,6 +33,25 @@ const LeafMap = () => {
 
   const [map, setLocalMap] = useState({})
   const [mapTouched, setmapTouched] = useState(false)
+
+  // Read initial map position from URL so the map starts at the shared
+  // position on first render. MapContainer only uses center/zoom on mount,
+  // so this must be computed before the first render (not in an effect).
+  const initialPosition = useMemo(() => {
+    const search = router.state.location.search
+    let center = _appConfig.MAP_CENTER || DEFAULT_MAP_CENTER
+    let zoom = _appConfig.MAP_ZOOM || DEFAULT_MAP_ZOOM
+    if (search.z != null) {
+      zoom = Number(search.z)
+    }
+    if (search.c) {
+      const parts = String(search.c).split(',').map(Number)
+      if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+        center = parts
+      }
+    }
+    return { center, zoom }
+  }, []) // Only compute once on mount
 
   const mapMarkerIcon = L.icon({
     iconSize: [25, 41],
@@ -163,10 +184,34 @@ const LeafMap = () => {
         }
       })
 
+      // Sync map viewport to URL (debounced)
+      const syncViewportToUrl = debounce(() => {
+        try {
+          const center = map.getCenter()
+          const zoom = map.getZoom()
+          router.navigate({
+            search: (prev) => ({
+              ...prev,
+              z: Math.round(zoom),
+              c: `${center.lat.toFixed(4)},${center.lng.toFixed(4)}`
+            }),
+            replace: true
+          })
+        } catch {
+          // Map may have been destroyed (e.g. during test cleanup)
+        }
+      }, 300)
+      map.on('moveend', syncViewportToUrl)
+
       // push map into redux state
       dispatch(setMap(map))
 
       addReferenceLayersToMap()
+
+      return () => {
+        syncViewportToUrl.cancel()
+        map.off('moveend', syncViewportToUrl)
+      }
     }
   }, [map])
 
@@ -176,10 +221,8 @@ const LeafMap = () => {
       <MapContainer
         className="mainMap"
         ref={mapRef}
-        center={
-          _appConfig.MAP_CENTER ? _appConfig.MAP_CENTER : DEFAULT_MAP_CENTER
-        }
-        zoom={_appConfig.MAP_ZOOM ? _appConfig.MAP_ZOOM : DEFAULT_MAP_ZOOM}
+        center={initialPosition.center}
+        zoom={initialPosition.zoom}
         scrollWheelZoom={true}
         zoomControl={false}
         attributionControl={false}

@@ -21,8 +21,11 @@ import {
   zoomToItemExtent
 } from './utils/mapHelper'
 import { LayoutProvider } from './contexts/LayoutContext'
+import { useUrlStateSync } from './hooks/useUrlStateSync'
+import { Outlet } from '@tanstack/react-router'
 
 function App() {
+  useUrlStateSync()
   const dispatch = useDispatch()
   const _showUploadGeojsonModal = useSelector(
     (state) => state.mainSlice.showUploadGeojsonModal
@@ -135,6 +138,7 @@ function App() {
               ) : null}
               {_showApplicationAlert ? <SystemMessage></SystemMessage> : null}
               {_showCartModal ? <CartModal></CartModal> : null}
+              <Outlet />
             </div>
           )
         ) : (

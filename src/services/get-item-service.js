@@ -3,50 +3,72 @@ import { logoutUser } from '../utils/authHelper'
 import { appendStacHeaderCookies } from '../utils/stacRequest'
 
 /**
- * Fetches a single STAC item from the API
- * @param {string} collectionId - The collection ID containing the item
+ * Fetches a single STAC item from the API.
+ *
+ * When collectionId is provided, fetches directly from
+ * /collections/{collectionId}/items/{itemId}.
+ *
+ * When collectionId is omitted, searches across all collections via
+ * /search?ids={itemId}. Returns an error if the item is not found or
+ * if multiple items match (ambiguous IDs across collections).
+ *
  * @param {string} itemId - The unique identifier for the item
+ * @param {string} [collectionId] - The collection ID (optional)
  * @returns {Promise<Object>} The STAC item GeoJSON feature or error object {error: true, status: number}
  * @example
- * const item = await GetItemService('sentinel-2-l2a', 'S2A_17SNB_20230617_0_L2A')
- * if (item.error) {
- *   // Handle error based on status code
- * } else {
- *   // Process valid STAC item
- * }
+ * // Known collection
+ * const item = await GetItemService('S2A_17SNB_20230617_0_L2A', 'sentinel-2-l2a')
+ * // Unknown collection — discovers it via search
+ * const item = await GetItemService('S2A_17SNB_20230617_0_L2A')
  */
-export async function GetItemService(collectionId, itemId) {
+export async function GetItemService(itemId, collectionId) {
+  const appConfig = store.getState().mainSlice.appConfig
+
   const requestHeaders = new Headers()
   const JWT = localStorage.getItem('APP_AUTH_TOKEN')
-  const isSTACTokenAuthEnabled =
-    store.getState().mainSlice.appConfig.APP_TOKEN_AUTH_ENABLED ?? false
-  if (JWT && isSTACTokenAuthEnabled) {
+  if (JWT && (appConfig.APP_TOKEN_AUTH_ENABLED ?? false)) {
     requestHeaders.append('Authorization', `Bearer ${JWT}`)
   }
   appendStacHeaderCookies(requestHeaders)
 
+  const url = collectionId
+    ? `${appConfig.STAC_API_URL}/collections/${collectionId}/items/${itemId}`
+    : `${appConfig.STAC_API_URL}/search?${new URLSearchParams({ ids: itemId })}`
+
   try {
-    const response = await fetch(
-      `${store.getState().mainSlice.appConfig.STAC_API_URL}/collections/${collectionId}/items/${itemId}`,
-      {
-        credentials:
-          store.getState().mainSlice.appConfig.FETCH_CREDENTIALS ||
-          'same-origin',
-        headers: requestHeaders
+    const response = await fetch(url, {
+      credentials: appConfig.FETCH_CREDENTIALS || 'same-origin',
+      headers: requestHeaders
+    })
+
+    if (!response.ok) {
+      if (response.status === 403) {
+        logoutUser()
       }
-    )
-
-    if (response.ok) {
-      return await response.json()
+      return { error: true, status: response.status }
     }
 
-    // Handle 403 by logging out user (token expired or invalid)
-    if (response.status === 403) {
-      logoutUser()
+    const json = await response.json()
+
+    // Direct endpoint returns the item; search endpoint returns a FeatureCollection
+    if (collectionId) {
+      return json
     }
 
-    // Return error info for caller to handle
-    return { error: true, status: response.status }
+    const features = json.features ?? []
+    if (features.length === 1) {
+      return features[0]
+    }
+
+    if (features.length > 1) {
+      console.warn(
+        `Ambiguous item ID "${itemId}": found in ${features.length} collections ` +
+          `(${features.map((f) => f.collection).join(', ')}). ` +
+          'Use ?col=<collection>&item=<id> to disambiguate.'
+      )
+    }
+
+    return { error: true, status: 404 }
   } catch (error) {
     console.error('Error fetching STAC item:', error)
     return { error: true, status: null }

@@ -29,8 +29,9 @@ import {
 import * as h3 from 'h3-js'
 import debounce from './debounce'
 import { AddMosaicService } from '../services/post-mosaic-service'
-import { router } from '../router'
+import { router, getPathParams } from '../router'
 import { appendStacHeaderCookies } from '../utils/stacRequest'
+import { serializeQueryableFiltersForUrl } from './urlParamHelper'
 
 /**
  * Convert queryable filters from Redux state into STAC Query Extension format
@@ -74,17 +75,24 @@ function buildQueryFromFilters(queryableFilters) {
   return query
 }
 
-export function newSearch() {
+export function newSearch(options = {}) {
+  const { viewMode: overrideViewMode, preserveItem = false } = options
+
+  // Snapshot all needed Redux state upfront, before any dispatches or URL writes.
+  const _state = store.getState().mainSlice
+  const _selectedCollection = _state.selectedCollectionData
+  const viewMode = overrideViewMode || _state.viewMode
+  const dateRange = _state.searchDateRangeValue
+  const dt =
+    dateRange && dateRange[0] && dateRange[1]
+      ? `${dateRange[0]}/${dateRange[1]}`
+      : ''
+
   clearMapSelection()
   clearAllLayers()
   store.dispatch(setSearchResults(null))
   store.dispatch(setShowZoomNotice(false))
   store.dispatch(setSearchLoading(false))
-
-  // Reset URL to root if currently on a STAC item route
-  if (window.location.pathname.startsWith('/item/')) {
-    router.navigate({ to: '/' })
-  }
 
   // Reset pagination state for new search
   store.dispatch(setpaginationNextLink(null))
@@ -93,7 +101,35 @@ export function newSearch() {
   store.dispatch(settotalPages(null))
   store.dispatch(setpaginationHistory([]))
 
-  const _selectedCollection = store.getState().mainSlice.selectedCollectionData
+  // Commit current search state to URL (replace — no history entry)
+  const collectionId = _selectedCollection?.id || ''
+  const currentPathParams = getPathParams()
+  const currentItemId = preserveItem ? currentPathParams.itemId || '' : ''
+
+  router.navigate({
+    to: currentItemId
+      ? '/$collectionId/$itemId'
+      : collectionId
+        ? '/$collectionId'
+        : '/',
+    params: currentItemId
+      ? { collectionId, itemId: currentItemId }
+      : collectionId
+        ? { collectionId }
+        : {},
+    search: (prev) => ({
+      // Only preserve immediate/map params — don't spread all of prev,
+      // which would carry stale queryable filters from a previous collection.
+      tab: prev.tab,
+      z: prev.z,
+      c: prev.c,
+      dt,
+      view: viewMode || 'scene',
+      viz: _state.selectedVisualization || '',
+      ...serializeQueryableFiltersForUrl(_state.queryableFilters)
+    }),
+    replace: true
+  })
 
   // Get minimum zoom level for scene/mosaic views
   const sceneMinZoom =
@@ -111,8 +147,6 @@ export function newSearch() {
   const includesGridCode = _selectedCollection.aggregations?.some(
     (el) => el.name === 'grid_code_frequency'
   )
-
-  const viewMode = store.getState().mainSlice.viewMode
 
   // Handle mosaic mode
   if (viewMode === 'mosaic') {

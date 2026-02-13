@@ -13,6 +13,30 @@ import { mockCollectionsData, mockAppConfig } from '../../testing/shared-mocks'
 import * as mapHelper from '../../utils/mapHelper'
 import userEvent from '@testing-library/user-event'
 
+// Mock useNavigate so it simulates URL→Redux sync for selectedCollection
+const mockNavigate = vi.fn()
+vi.mock('@tanstack/react-router', async () => {
+  const { store } = await import('../../redux/store')
+  const { setSelectedCollection } = await import('../../redux/slices/mainSlice')
+  return {
+    useParams: () => ({}),
+    useNavigate: () => {
+      return (...args) => {
+        mockNavigate(...args)
+        // Simulate URL→Redux sync: extract collectionId from params
+        const navOptions = args[0]
+        if (navOptions?.params?.collectionId) {
+          store.dispatch(setSelectedCollection(navOptions.params.collectionId))
+        }
+      }
+    },
+    createRootRoute: vi.fn(() => ({ addChildren: vi.fn(() => ({})) })),
+    createRoute: vi.fn(() => ({ addChildren: vi.fn(() => ({})) })),
+    createRouter: vi.fn(() => ({})),
+    defaultStringifySearch: vi.fn()
+  }
+})
+
 describe('CollectionDropdown', () => {
   const setup = () =>
     render(
@@ -26,6 +50,7 @@ describe('CollectionDropdown', () => {
     store.dispatch(setappConfig(mockAppConfig))
     store.dispatch(setCollectionsData(mockCollectionsData))
     store.dispatch(setSelectedCollection(null))
+    mockNavigate.mockClear()
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -55,7 +80,7 @@ describe('CollectionDropdown', () => {
       await userEvent.click(option)
       expect(store.getState().mainSlice.hasCollectionChanged).toBeTruthy()
     })
-    it('should dispatch and call functions to reset map', async () => {
+    it('should navigate to collection path and call functions to reset map', async () => {
       const spyZoomToCollectionExtent = vi.spyOn(
         mapHelper,
         'zoomToCollectionExtent'
@@ -71,11 +96,19 @@ describe('CollectionDropdown', () => {
       })
       await userEvent.click(option)
       expect(store.getState().mainSlice.showZoomNotice).toBeFalsy()
-      expect(store.getState().mainSlice.searchResults).toBeNull()
       expect(store.getState().mainSlice.searchLoading).toBeFalsy()
       expect(spyZoomToCollectionExtent).toHaveBeenCalled()
       expect(spyClearMapSelection).toHaveBeenCalled()
       expect(spyClearAllLayers).toHaveBeenCalled()
+      // Verify navigate was called with collection path
+      expect(mockNavigate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          to: '/$collectionId',
+          params: expect.objectContaining({
+            collectionId: expect.any(String)
+          })
+        })
+      )
     })
   })
 })

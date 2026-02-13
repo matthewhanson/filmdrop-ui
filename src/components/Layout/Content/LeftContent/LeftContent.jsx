@@ -2,19 +2,15 @@ import { React, useEffect, useCallback, useRef } from 'react'
 import './LeftContent.css'
 import Search from '../../../Search/Search'
 import PopupResults from '../../../PopupResults/PopupResults'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { debounceNewSearch } from '../../../../utils/searchHelper'
 import { debounceTitilerOverlay } from '../../../../utils/mapHelper'
-import {
-  settabSelected,
-  sethasLeftPanelTabChanged
-} from '../../../../redux/slices/mainSlice'
 import { useResizablePanel } from '../../../../hooks/useResizablePanel'
 import { useLayout } from '../../../../contexts/LayoutContext'
+import { useUrlNavigate } from '../../../../hooks/useUrlNavigate'
 import DragHandleIcon from '@mui/icons-material/DragHandle'
 
 const LeftContent = () => {
-  const dispatch = useDispatch()
   const panelRef = useRef(null)
   const { isLeftPanelVisible } = useLayout()
 
@@ -35,6 +31,7 @@ const LeftContent = () => {
   )
 
   const { handleMouseDown, currentWidth } = useResizablePanel(panelRef)
+  const { setTab } = useUrlNavigate()
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyPress)
@@ -56,14 +53,13 @@ const LeftContent = () => {
     }
   }
 
-  const setFiltersTab = useCallback(() => {
-    dispatch(settabSelected('filters'))
-  }, [dispatch])
+  const setSearchTab = useCallback(() => {
+    setTab('search')
+  }, [setTab])
 
   const setDetailsTab = useCallback(() => {
-    dispatch(settabSelected('details'))
-    dispatch(sethasLeftPanelTabChanged(true))
-  }, [dispatch])
+    setTab('details')
+  }, [setTab])
 
   return (
     <div
@@ -81,11 +77,11 @@ const LeftContent = () => {
         <div className="LeftContentTabs">
           <button
             className={
-              _tabSelected === 'filters'
+              _tabSelected === 'search'
                 ? 'LeftContentTab LeftContentTabSelected'
                 : 'LeftContentTab'
             }
-            onClick={setFiltersTab}
+            onClick={setSearchTab}
           >
             <span className="LeftContentTabLabel">Search</span>
           </button>
@@ -101,7 +97,7 @@ const LeftContent = () => {
           </button>
         </div>
         <div className="LeftContentSelectedTab">
-          {_tabSelected === 'filters' ? (
+          {_tabSelected === 'search' ? (
             <Search></Search>
           ) : (
             <div className="ItemDetails">

@@ -42,10 +42,9 @@ const initialState = {
   referenceLayers: [],
   selectedCollection: '',
   selectedVisualization: null,
-  tabSelected: 'filters',
+  tabSelected: 'search',
   selectedPopupResultIndex: 0,
   autoCenterOnItemChanged: false,
-  hasLeftPanelTabChanged: false,
   authTokenExists: false,
   currentTheme: null,
   paginationNextLink: null,
@@ -191,9 +190,6 @@ export const mainSlice = createSlice({
     setautoCenterOnItemChanged: (state, action) => {
       state.autoCenterOnItemChanged = action.payload
     },
-    sethasLeftPanelTabChanged: (state, action) => {
-      state.hasLeftPanelTabChanged = action.payload
-    },
     setauthTokenExists: (state, action) => {
       state.authTokenExists = action.payload
     },
@@ -268,7 +264,6 @@ export const { setreferenceLayers } = mainSlice.actions
 export const { settabSelected } = mainSlice.actions
 export const { setselectedPopupResultIndex } = mainSlice.actions
 export const { setautoCenterOnItemChanged } = mainSlice.actions
-export const { sethasLeftPanelTabChanged } = mainSlice.actions
 export const { setauthTokenExists } = mainSlice.actions
 export const { setCurrentTheme } = mainSlice.actions
 export const { setpaginationNextLink } = mainSlice.actions

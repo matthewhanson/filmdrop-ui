@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   setViewMode,
@@ -9,6 +9,7 @@ import './ViewSelector.css'
 import ButtonGroup from '../ButtonGroup/ButtonGroup'
 import { getCurrentMapZoomLevel } from '../../utils/mapHelper'
 import { getCollectionConfig } from '../../utils/configHelper'
+import { router } from '../../router'
 
 const DEFAULT_SCENE_MIN_ZOOM = 7
 
@@ -29,7 +30,12 @@ const ViewSelector = () => {
   // Once true, auto-switching based on zoom level is disabled until
   // the collection changes. This preserves the user's explicit choice
   // while still resetting on collection change.
-  const [isManualSelection, setIsManualSelection] = useState(false)
+  // Treat URL-provided view mode as a manual selection so auto-switch
+  // doesn't override it on initial load.
+  const urlHasView = useRef(!!router.state.location.search.view)
+  const [isManualSelection, setIsManualSelection] = useState(
+    () => !!router.state.location.search.view
+  )
 
   // Check if collection supports hex and grid aggregations
   const supportsHex = useMemo(
@@ -61,6 +67,13 @@ const ViewSelector = () => {
   // Reset to default view when collection changes
   useEffect(() => {
     if (!selectedCollectionData) return
+
+    // On initial load from a shared URL with an explicit view param,
+    // skip the default-view reset so the URL's view mode is preserved.
+    if (urlHasView.current) {
+      urlHasView.current = false
+      return
+    }
 
     // Default to hex if available, otherwise grid, otherwise scene
     const defaultView = supportsHex

@@ -5,7 +5,6 @@ import {
   setSearchResults,
   setmappedScenes,
   settabSelected,
-  sethasLeftPanelTabChanged,
   setpaginationNextLink,
   setpaginationPrevLink,
   setcurrentPage,
@@ -80,7 +79,6 @@ export async function SearchService(searchParams, typeOfSearch) {
         store.dispatch(setSearchLoading(false))
         store.dispatch(setClickResults(json.features))
         store.dispatch(settabSelected('details'))
-        store.dispatch(sethasLeftPanelTabChanged(true))
       }
     })
     .catch((error) => {
