@@ -1,0 +1,27 @@
+.VisualizationDropdown__checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  margin-top: 12px;
+  margin-left: -4px;
+}
+
+.VisualizationDropdown__checkbox .MuiCheckbox-root {
+  padding: 4px !important;
+  margin-right: 4px !important;
+  color: var(--side-panel-checkbox-color-unchecked) !important;
+}
+
+.VisualizationDropdown__checkbox .MuiCheckbox-root.Mui-checked {
+  color: var(--side-panel-checkbox-color-checked) !important;
+}
+
+.VisualizationDropdown__checkbox .MuiCheckbox-root:hover {
+  background-color: var(--mui-hover) !important;
+}
+
+.VisualizationDropdown__checkbox span {
+  font-size: 12px;
+  color: var(--side-panel-text-color-secondary);
+}

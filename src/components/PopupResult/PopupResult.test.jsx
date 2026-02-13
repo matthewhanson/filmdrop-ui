@@ -7,6 +7,17 @@ import { setappConfig } from '../../redux/slices/mainSlice'
 import { mockAppConfig, mockClickResults } from '../../testing/shared-mocks'
 import { describe, beforeEach, vi, it, expect } from 'vitest'
 
+vi.mock('../../utils/mapHelper')
+
+vi.mock('../../hooks/useUrlNavigate', () => ({
+  useUrlNavigate: () => ({
+    setTab: vi.fn(),
+    setViz: vi.fn(),
+    setItem: vi.fn(),
+    clearItem: vi.fn()
+  })
+}))
+
 describe('PopupResult', () => {
   const setup = (result = mockClickResults[0]) =>
     render(

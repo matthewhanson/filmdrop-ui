@@ -4,6 +4,7 @@ import './PopupResult.css'
 import { useSelector } from 'react-redux'
 import { debounceTitilerOverlay, zoomToItemExtent } from '../../utils/mapHelper'
 import ItemHeader from '../EnhancedDetails/ItemHeader.jsx'
+import VisualizationDropdown from '../VisualizationDropdown/VisualizationDropdown'
 
 const PopupResult = (props) => {
   const _appConfig = useSelector((state) => state.mainSlice.appConfig)
@@ -70,6 +71,7 @@ const PopupResult = (props) => {
             id={props.result.id}
             collection={props.result.collection}
           />
+          <VisualizationDropdown />
         </div>
       ) : null}
     </div>

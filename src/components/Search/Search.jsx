@@ -5,7 +5,6 @@ import ButtonGroup from '@mui/material/ButtonGroup'
 import Tooltip from '@mui/material/Tooltip'
 import RestartAltIcon from '@mui/icons-material/RestartAlt'
 import CollectionDropdown from '../CollectionDropdown/CollectionDropdown'
-import VisualizationDropdown from '../VisualizationDropdown/VisualizationDropdown'
 import DateTimeRangeSelector from '../DateTimeRangeSelector/DateTimeRangeSelector'
 import AreaOfInterestSelector from '../AreaOfInterestSelector/AreaOfInterestSelector'
 import QueryableFilters from '../QueryableFilters/QueryableFilters'
@@ -32,7 +31,6 @@ const Search = () => {
         {/* Collection Section */}
         <div className="Search__section">
           <CollectionDropdown />
-          <VisualizationDropdown />
         </div>
 
         {/* Location & Date Section */}

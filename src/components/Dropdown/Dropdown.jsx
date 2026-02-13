@@ -4,7 +4,14 @@ import { Select, MenuItem, OutlinedInput } from '@mui/material'
 import Card from '../Card/Card'
 import './Dropdown.css'
 
-const Dropdown = ({ label, value, onChange, options, className = '' }) => {
+const Dropdown = ({
+  label,
+  value,
+  onChange,
+  options,
+  className = '',
+  children
+}) => {
   const handleChange = (event) => {
     onChange(event)
   }
@@ -26,6 +33,7 @@ const Dropdown = ({ label, value, onChange, options, className = '' }) => {
           </MenuItem>
         ))}
       </Select>
+      {children}
     </Card>
   )
 }
@@ -40,7 +48,8 @@ Dropdown.propTypes = {
       label: PropTypes.string.isRequired
     })
   ).isRequired,
-  className: PropTypes.string
+  className: PropTypes.string,
+  children: PropTypes.node
 }
 
 export default Dropdown

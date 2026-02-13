@@ -1,16 +1,27 @@
 import React, { useEffect, useMemo } from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import { Checkbox as MuiCheckbox } from '@mui/material'
 import { getCollectionVisualizations } from '../../utils/configHelper'
 import { useUrlNavigate } from '../../hooks/useUrlNavigate'
+import { setShowSceneOverlay } from '../../redux/slices/mainSlice'
+import { clearLayer, debounceTitilerOverlay } from '../../utils/mapHelper'
 import Dropdown from '../Dropdown/Dropdown'
+import './VisualizationDropdown.css'
 
 const VisualizationDropdown = () => {
+  const dispatch = useDispatch()
   const { setViz } = useUrlNavigate()
   const selectedCollection = useSelector(
     (state) => state.mainSlice.selectedCollection
   )
   const selectedVisualization = useSelector(
     (state) => state.mainSlice.selectedVisualization
+  )
+  const showSceneOverlay = useSelector(
+    (state) => state.mainSlice.showSceneOverlay
+  )
+  const currentPopupResult = useSelector(
+    (state) => state.mainSlice.currentPopupResult
   )
 
   const { visualizations, visualizationKeys, hasVisualizations } =
@@ -48,6 +59,18 @@ const VisualizationDropdown = () => {
     setViz(e.target.value)
   }
 
+  const handleShowOnMapChange = (e) => {
+    const checked = e.target.checked
+    dispatch(setShowSceneOverlay(checked))
+    if (checked) {
+      if (currentPopupResult) {
+        debounceTitilerOverlay(currentPopupResult)
+      }
+    } else {
+      clearLayer('clickedSceneImageLayer')
+    }
+  }
+
   // Only render if collection has multiple visualizations
   if (visualizationKeys.length <= 1) return null
 
@@ -57,7 +80,16 @@ const VisualizationDropdown = () => {
       value={selectedVisualization || visualizationKeys[0] || ''}
       onChange={handleVisualizationChange}
       options={options}
-    />
+    >
+      <label className="VisualizationDropdown__checkbox">
+        <MuiCheckbox
+          checked={showSceneOverlay}
+          onChange={handleShowOnMapChange}
+          size="small"
+        />
+        <span>Show on map</span>
+      </label>
+    </Dropdown>
   )
 }
 

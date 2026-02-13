@@ -423,6 +423,11 @@ export const debounceTitilerOverlay = debounce(
 )
 
 function addImageOverlay(item) {
+  const showSceneOverlay = store.getState().mainSlice.showSceneOverlay
+  if (!showSceneOverlay) {
+    store.dispatch(setimageOverlayLoading(false))
+    return
+  }
   const sceneTilerURL =
     store.getState().mainSlice.appConfig.SCENE_TILER_URL || ''
   const visualizations = getCollectionConfig(item?.collection, 'visualizations')
