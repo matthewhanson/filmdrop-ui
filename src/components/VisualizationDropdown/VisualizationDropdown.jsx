@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import { Select, MenuItem, OutlinedInput } from '@mui/material'
 import { Checkbox as MuiCheckbox } from '@mui/material'
 import { getCollectionVisualizations } from '../../utils/configHelper'
 import { useUrlNavigate } from '../../hooks/useUrlNavigate'
 import { setShowSceneOverlay } from '../../redux/slices/mainSlice'
 import { clearLayer, debounceTitilerOverlay } from '../../utils/mapHelper'
-import Dropdown from '../Dropdown/Dropdown'
 import './VisualizationDropdown.css'
 
 const VisualizationDropdown = () => {
@@ -75,21 +75,34 @@ const VisualizationDropdown = () => {
   if (visualizationKeys.length <= 1) return null
 
   return (
-    <Dropdown
-      label="Visualization"
-      value={selectedVisualization || visualizationKeys[0] || ''}
-      onChange={handleVisualizationChange}
-      options={options}
-    >
-      <label className="VisualizationDropdown__checkbox">
-        <MuiCheckbox
-          checked={showSceneOverlay}
-          onChange={handleShowOnMapChange}
-          size="small"
-        />
-        <span>Show on map</span>
-      </label>
-    </Dropdown>
+    <div className="VisualizationDropdown">
+      <span className="VisualizationDropdown__label">Visualization</span>
+      <div className="VisualizationDropdown__controls">
+        <Select
+          className="Dropdown__select"
+          value={selectedVisualization || visualizationKeys[0] || ''}
+          onChange={handleVisualizationChange}
+          input={<OutlinedInput />}
+          MenuProps={{
+            classes: { paper: 'Dropdown__menu' }
+          }}
+        >
+          {options.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </Select>
+        <label className="VisualizationDropdown__checkbox">
+          <MuiCheckbox
+            checked={showSceneOverlay}
+            onChange={handleShowOnMapChange}
+            size="small"
+          />
+          <span>Show on map</span>
+        </label>
+      </div>
+    </div>
   )
 }
 

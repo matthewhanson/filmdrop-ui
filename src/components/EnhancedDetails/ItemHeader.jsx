@@ -8,7 +8,7 @@ import './ItemHeader.css'
  * ItemHeader Component
  * Displays item ID and collection information in a card
  */
-const ItemHeader = ({ id, collection }) => {
+const ItemHeader = ({ id, collection, children }) => {
   return (
     <Card className="item-header">
       <div className="item-header-fields">
@@ -25,13 +25,15 @@ const ItemHeader = ({ id, collection }) => {
           </OverflowTooltip>
         </div>
       </div>
+      {children}
     </Card>
   )
 }
 
 ItemHeader.propTypes = {
   id: PropTypes.string.isRequired,
-  collection: PropTypes.string.isRequired
+  collection: PropTypes.string.isRequired,
+  children: PropTypes.node
 }
 
 export default ItemHeader

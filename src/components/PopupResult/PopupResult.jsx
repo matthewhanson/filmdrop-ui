@@ -66,11 +66,9 @@ const PopupResult = (props) => {
               </picture>
             </div>
           )}
-          <ItemHeader
-            id={props.result.id}
-            collection={props.result.collection}
-          />
-          <VisualizationDropdown />
+          <ItemHeader id={props.result.id} collection={props.result.collection}>
+            <VisualizationDropdown />
+          </ItemHeader>
         </div>
       ) : null}
     </div>
