@@ -239,14 +239,17 @@ export function clearSearch() {
   store.dispatch(setSearchDateRangeValue(DEFAULT_DATE_RANGE))
   store.dispatch(setQueryableFilters({}))
 
-  // Update URL: preserve col, view, viz, z, c; clear dt, item, queryable filters
+  // Update URL: preserve collection path, view, viz, z, c; clear dt, item, queryable filters
+  const currentPathParams = getPathParams()
+  const collectionId = currentPathParams.collectionId || ''
+
   router.navigate({
+    to: collectionId ? '/$collectionId' : '/',
+    params: collectionId ? { collectionId } : {},
     search: (prev) => ({
-      col: prev.col,
       dt: '',
       view: prev.view,
       viz: prev.viz,
-      item: '',
       tab: 'search',
       z: prev.z,
       c: prev.c
