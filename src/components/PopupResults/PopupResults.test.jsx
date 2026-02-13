@@ -4,6 +4,7 @@ import PopupResults from './PopupResults'
 import { Provider } from 'react-redux'
 import { store } from '../../redux/store'
 import { LayoutProvider } from '../../contexts/LayoutContext'
+import { AccordionStateProvider } from '../../contexts/AccordionStateContext'
 import {
   setShowPopupModal,
   setappConfig,
@@ -27,7 +28,9 @@ describe('PopupResult', () => {
     render(
       <Provider store={store}>
         <LayoutProvider>
-          <PopupResults results={mockClickResults} />
+          <AccordionStateProvider>
+            <PopupResults results={mockClickResults} />
+          </AccordionStateProvider>
         </LayoutProvider>
       </Provider>
     )

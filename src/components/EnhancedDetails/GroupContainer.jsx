@@ -1,9 +1,10 @@
-import React, { useState, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
 import Collapse from '@mui/material/Collapse'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import { normalizeGroupName } from '../../utils/fieldGrouping.js'
+import { useAccordionState } from '../../contexts/AccordionStateContext.jsx'
 
 /**
  * Reusable group container component for consistent styling and accessibility
@@ -23,9 +24,10 @@ const GroupContainer = React.memo(
       () => normalizeGroupName(groupName),
       [groupName]
     )
-    const [open, setOpen] = useState(!!defaultExpanded)
+    const { isExpanded, toggleGroup } = useAccordionState()
+    const open = isExpanded(groupName, defaultExpanded)
 
-    const onToggle = () => setOpen((prev) => !prev)
+    const onToggle = () => toggleGroup(groupName, open)
 
     return (
       <div

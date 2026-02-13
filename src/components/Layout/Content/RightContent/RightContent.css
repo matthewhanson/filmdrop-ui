@@ -228,6 +228,15 @@
   transform: translate(-50%, -50%);
 }
 
+/* Opaque cover over the map while tiles load after the initial collection zoom */
+.mapLoadingCover {
+  position: absolute;
+  inset: 0;
+  background: var(--app-background-loading);
+  z-index: 498;
+}
+
+/* Semi-transparent overlay over the full viewport (grays out header/sidebar) */
 .appLoadingContainer {
   position: fixed;
   top: 0;

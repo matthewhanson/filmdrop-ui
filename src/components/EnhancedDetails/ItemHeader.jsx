@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Card from '../Card/Card'
+import OverflowTooltip from './OverflowTooltip.jsx'
 import './ItemHeader.css'
 
 /**
@@ -13,13 +14,15 @@ const ItemHeader = ({ id, collection }) => {
       <div className="item-header-fields">
         <div className="item-header-field">
           <span className="item-header-label">Item ID</span>
-          <span className="item-header-value item-header-value--truncate">
+          <OverflowTooltip className="item-header-value item-header-value--truncate">
             {id}
-          </span>
+          </OverflowTooltip>
         </div>
         <div className="item-header-field">
           <span className="item-header-label">Collection</span>
-          <span className="item-header-value">{collection}</span>
+          <OverflowTooltip className="item-header-value item-header-value--truncate">
+            {collection}
+          </OverflowTooltip>
         </div>
       </div>
     </Card>

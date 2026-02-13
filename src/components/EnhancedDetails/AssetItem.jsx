@@ -10,6 +10,7 @@ import {
   getFileTypeAbbreviation,
   getFileType
 } from '../../utils/defaultAssetGrouping.js'
+import OverflowTooltip from './OverflowTooltip.jsx'
 
 /**
  * Format file size in human-readable format
@@ -63,9 +64,9 @@ const AssetItem = React.memo(({ asset, copiedUrl, onCopyToClipboard }) => {
     <div role="listitem" className="asset-card">
       <div className="asset-content">
         <div className="asset-title-row">
-          <span className="field-label-inline">
+          <OverflowTooltip className="field-label-inline">
             {sanitizeFieldValue(assetLabel)}
-          </span>
+          </OverflowTooltip>
         </div>
         {asset.description && (
           <div className="asset-description">
@@ -77,9 +78,9 @@ const AssetItem = React.memo(({ asset, copiedUrl, onCopyToClipboard }) => {
             {metadataItems.map((item) => (
               <div key={item.label} className="asset-meta-line asset-meta-pair">
                 <span className="asset-meta-label">{item.label}</span>
-                <span className="asset-meta-value">
+                <OverflowTooltip className="asset-meta-value">
                   {sanitizeFieldValue(item.value)}
-                </span>
+                </OverflowTooltip>
               </div>
             ))}
           </div>
@@ -101,7 +102,8 @@ const AssetItem = React.memo(({ asset, copiedUrl, onCopyToClipboard }) => {
               sx={{
                 color: 'var(--brand-accent-primary)',
                 '&:hover': {
-                  backgroundColor: 'var(--mui-hover)'
+                  backgroundColor: 'var(--mui-hover)',
+                  color: 'var(--brand-accent-primary-dark)'
                 }
               }}
             >

@@ -59,7 +59,7 @@
   font-size: 11px;
   font-weight: 500;
   color: var(--brand-accent-primary);
-  background: var(--brand-accent-primary-light);
+  background: var(--side-panel-badge-background);
   padding: 2px 8px;
   border-radius: var(--radius-pill);
   line-height: 1.2;
@@ -150,8 +150,8 @@
   flex: 1;
   display: flex;
   align-items: center;
-  word-break: break-word;
   font-size: 14px;
+  min-width: 0;
 }
 
 .asset-list .field-value-inline {
@@ -199,7 +199,9 @@
 }
 
 .asset-meta-value {
-  word-break: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .grid-system-name {
@@ -312,12 +314,6 @@
   max-width: 100%;
 }
 
-/* Override word-break for truncated values */
-.field-value-inline:has(.field-value-truncated) {
-  word-break: normal;
-  min-width: 0;
-}
-
 /* Link item styling (plain rows, no card borders) */
 .link-card {
   color: var(--side-panel-text-color);
@@ -373,7 +369,9 @@
 }
 
 .link-meta-value {
-  word-break: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .link-actions {

@@ -213,6 +213,17 @@ const RightContent = () => {
     dispatch(setshowLayerList(!_showLayerList))
   }
 
+  // Keep the opaque map cover up after the loading overlay disappears,
+  // giving React effects time to fire the collection zoom and tiles
+  // time to load behind it.
+  const [mapCoverVisible, setMapCoverVisible] = useState(_showAppLoading)
+  useEffect(() => {
+    if (!_showAppLoading && mapCoverVisible) {
+      const timer = setTimeout(() => setMapCoverVisible(false), 800)
+      return () => clearTimeout(timer)
+    }
+  }, [_showAppLoading, mapCoverVisible])
+
   // Use custom hook to handle map resize with debouncing
   useMapResizeHandler(_map, rightContentRef)
 
@@ -338,7 +349,8 @@ const RightContent = () => {
           ></CircularProgress>
         </div>
       ) : null}
-      {_showAppLoading && (
+      {mapCoverVisible && <div className="mapLoadingCover" />}
+      {(_showAppLoading || mapCoverVisible) && (
         <div
           className="appLoadingContainer"
           data-testid="test_applicationLoadingAnimation"

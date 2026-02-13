@@ -298,10 +298,22 @@ export function deselectFeature() {
   clearLayer('clickedSceneImageLayer')
 }
 
-function zoomToBounds(bounds) {
+function zoomToBounds(bounds, options) {
   const map = store.getState().mainSlice.map
   if (map && Object.keys(map).length > 0) {
-    map.fitBounds(bounds)
+    // Prevent blank bands: on large viewports the map container can be
+    // taller than the Mercator world at the zoom fitBounds would choose.
+    // In that case, zoom to the center of the bounds at the minimum
+    // level that fills the container vertically instead.
+    const containerHeight = map.getContainer()?.clientHeight
+    if (containerHeight > 0) {
+      const minZoom = Math.ceil(Math.log2(containerHeight / 256))
+      if (map.getBoundsZoom(bounds) < minZoom) {
+        map.setView(bounds.getCenter(), minZoom, options)
+        return
+      }
+    }
+    map.fitBounds(bounds, options)
   }
 }
 
@@ -332,7 +344,7 @@ export function bboxFromMapBounds() {
   }
 }
 
-export function zoomToCollectionExtent(collection) {
+export function zoomToCollectionExtent(collection, options) {
   if (
     collection.extent.spatial.bbox &&
     collection.extent.spatial.bbox.length >= 1
@@ -342,7 +354,7 @@ export function zoomToCollectionExtent(collection) {
     )
     const viewportBounds = leafletBoundsFromBBOX(bboxFromMapBounds())
     if (!collectionBounds.contains(viewportBounds)) {
-      zoomToBounds(collectionBounds)
+      zoomToBounds(collectionBounds, options)
     }
   }
 }
