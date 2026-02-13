@@ -25,6 +25,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 
+- Updated tile URL structure to support OGC API - Tiles conformant tilers (TiTiler 1.x+, other OGC-compliant tilers).
+  Tile paths now include TileMatrixSetId: `/stac/tiles/{tileMatrixSetId}/{z}/{x}/{y}`. Currently hardcoded to `WebMercatorQuad`.
 - Restricted visualization selector to the sidebar
 - Unified control heights, border radii, padding, and font styling across components
 - Refactored `Search` component with extracted `AreaOfInterestSelector` and `QueryableFilters`
