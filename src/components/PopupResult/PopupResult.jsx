@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import './PopupResult.css'
 import { useSelector } from 'react-redux'
-import { debounceTitilerOverlay, zoomToItemExtent } from '../../utils/mapHelper'
+import { zoomToItemExtent } from '../../utils/mapHelper'
 import ItemHeader from '../EnhancedDetails/ItemHeader.jsx'
 import VisualizationDropdown from '../VisualizationDropdown/VisualizationDropdown'
 
@@ -18,7 +18,6 @@ const PopupResult = (props) => {
       if (_autoCenterOnItemChanged) {
         zoomToItemExtent(props.result)
       }
-      debounceTitilerOverlay(props.result)
       const thumbnailURLForSelection = props.result?.links?.find(
         ({ rel }) => rel === 'thumbnail'
       )?.href
