@@ -4,6 +4,8 @@ import { useUrlStateSync } from './useUrlStateSync'
 
 import { deserializeQueryableFiltersFromURL } from '../utils/urlParamHelper'
 
+import { showApplicationAlert } from '../utils/alertHelper'
+
 // Import action types for assertion matching
 import {
   setSelectedCollection,
@@ -23,6 +25,10 @@ vi.mock('@tanstack/react-router', () => ({
   createRouter: vi.fn(() => ({}))
 }))
 
+vi.mock('../utils/alertHelper', () => ({
+  showApplicationAlert: vi.fn()
+}))
+
 // Mock Redux
 const mockDispatch = vi.fn()
 const mockCollectionData = {
@@ -30,11 +36,18 @@ const mockCollectionData = {
     'eo:cloud_cover': { type: 'number', minimum: 0, maximum: 100 }
   }
 }
+const mockCollectionsData = [
+  { id: 'sentinel-2', title: 'Sentinel-2' },
+  { id: 'landsat-8', title: 'Landsat 8' }
+]
 vi.mock('react-redux', () => ({
   useDispatch: () => mockDispatch,
   useSelector: (selector) =>
     selector({
-      mainSlice: { selectedCollectionData: mockCollectionData }
+      mainSlice: {
+        selectedCollectionData: mockCollectionData,
+        collectionsData: mockCollectionsData
+      }
     })
 }))
 
@@ -176,6 +189,22 @@ describe('useUrlStateSync — Phase 2 ongoing sync', () => {
       renderHook(() => useUrlStateSync())
 
       // Should not have a setSelectedCollection dispatch with empty string
+      const colDispatches = mockDispatch.mock.calls.filter(
+        (call) => call[0]?.type === setSelectedCollection('').type
+      )
+      expect(colDispatches).toHaveLength(0)
+    })
+
+    it('shows warning alert and skips dispatch for invalid collection', () => {
+      mockSearch = { ...baseSearch, col: 'nonexistent-collection' }
+
+      renderHook(() => useUrlStateSync())
+
+      expect(showApplicationAlert).toHaveBeenCalledWith(
+        'warning',
+        expect.stringContaining('nonexistent-collection')
+      )
+      // Should not have dispatched setSelectedCollection
       const colDispatches = mockDispatch.mock.calls.filter(
         (call) => call[0]?.type === setSelectedCollection('').type
       )

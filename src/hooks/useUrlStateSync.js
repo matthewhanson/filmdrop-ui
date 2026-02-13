@@ -23,6 +23,7 @@ import {
 } from '../redux/slices/mainSlice'
 import { extractQueryableParams } from '../router'
 import { deserializeQueryableFiltersFromURL } from '../utils/urlParamHelper'
+import { showApplicationAlert } from '../utils/alertHelper'
 import { useUrlInitialize } from './useUrlInitialize'
 
 /**
@@ -68,6 +69,9 @@ export function useUrlStateSync() {
   const selectedCollectionData = useSelector(
     (state) => state.mainSlice.selectedCollectionData
   )
+  const collectionsData = useSelector(
+    (state) => state.mainSlice.collectionsData
+  )
 
   const { isInitialized, prevSearch, fetchAndDisplayItem, clearItemSelection } =
     useUrlInitialize(search, dispatch)
@@ -83,6 +87,16 @@ export function useUrlStateSync() {
     const prev = prevSearch.current
     prevSearch.current = search
 
+    // Validate collection change before processing other params
+    if (search.col !== prev.col && search.col) {
+      const collectionExists = collectionsData?.some((c) => c.id === search.col)
+      if (!collectionExists) {
+        showApplicationAlert('warning', `Collection "${search.col}" not found`)
+        // Skip dispatching the invalid collection — leave state unchanged
+        // but still process other param changes below
+      }
+    }
+
     // Process simple params via handler map
     for (const {
       param,
@@ -93,6 +107,13 @@ export function useUrlStateSync() {
     } of SIMPLE_PARAM_HANDLERS) {
       if (search[param] !== prev[param]) {
         if (requireTruthy && !search[param]) continue
+        // Skip invalid collection — already handled above
+        if (param === 'col' && search.col) {
+          const collectionExists = collectionsData?.some(
+            (c) => c.id === search.col
+          )
+          if (!collectionExists) continue
+        }
         const raw =
           defaultValue !== undefined && !search[param]
             ? defaultValue
@@ -131,6 +152,7 @@ export function useUrlStateSync() {
   }, [
     search,
     selectedCollectionData,
+    collectionsData,
     dispatch,
     fetchAndDisplayItem,
     clearItemSelection

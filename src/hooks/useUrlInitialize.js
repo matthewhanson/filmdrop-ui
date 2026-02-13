@@ -96,7 +96,7 @@ export function useUrlInitialize(search, dispatch) {
         if (result.error) {
           if (result.status === 404) {
             showApplicationAlert(
-              'error',
+              'warning',
               `Item "${itemId}" not found in collection "${collectionId}"`
             )
           } else if (result.status === 403) {
@@ -180,6 +180,11 @@ export function useUrlInitialize(search, dispatch) {
         getCollectionVisualizations(col)
       if (hasVisualizations && visualizationKeys.includes(viz)) {
         dispatch(setSelectedVisualization(viz))
+      } else if (viz) {
+        showApplicationAlert(
+          'warning',
+          `Visualization "${viz}" not found for collection "${col}"`
+        )
       }
     }
 
@@ -264,8 +269,9 @@ export function useUrlInitialize(search, dispatch) {
 
             await restoreItem(urlSearch.col, urlSearch.item, urlSearch.tab)
           } else {
-            console.warn(
-              `Collection "${urlSearch.col}" from URL not found in available collections`
+            showApplicationAlert(
+              'warning',
+              `Collection "${urlSearch.col}" not found`
             )
           }
         } else if (urlSearch.col) {
@@ -284,6 +290,11 @@ export function useUrlInitialize(search, dispatch) {
             } else {
               zoomToCollectionExtent(collection)
             }
+          } else {
+            showApplicationAlert(
+              'warning',
+              `Collection "${urlSearch.col}" not found`
+            )
           }
         } else if (urlSearch.item) {
           // Item only — search for it to discover the collection
@@ -306,7 +317,10 @@ export function useUrlInitialize(search, dispatch) {
               item
             )
           } else {
-            showApplicationAlert('error', `Item "${urlSearch.item}" not found`)
+            showApplicationAlert(
+              'warning',
+              `Item "${urlSearch.item}" not found`
+            )
           }
         }
 

@@ -215,8 +215,7 @@ describe('useUrlInitialize', () => {
       })
     })
 
-    it('warns when collection not found', async () => {
-      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    it('shows warning alert when collection not found', async () => {
       const search = {
         ...mockSearch,
         col: 'nonexistent',
@@ -231,10 +230,30 @@ describe('useUrlInitialize', () => {
       await waitFor(() => {
         expect(result.current.isInitialized.current).toBe(true)
       })
-      expect(consoleSpy).toHaveBeenCalledWith(
+      expect(showApplicationAlert).toHaveBeenCalledWith(
+        'warning',
         expect.stringContaining('nonexistent')
       )
-      consoleSpy.mockRestore()
+    })
+
+    it('shows warning alert when collection-only URL has invalid collection', async () => {
+      const search = {
+        ...mockSearch,
+        col: 'nonexistent'
+      }
+
+      const { result } = renderHook(
+        () => useUrlInitialize(search, mockDispatch),
+        { wrapper }
+      )
+
+      await waitFor(() => {
+        expect(result.current.isInitialized.current).toBe(true)
+      })
+      expect(showApplicationAlert).toHaveBeenCalledWith(
+        'warning',
+        expect.stringContaining('nonexistent')
+      )
     })
 
     it('only initializes once (idempotent)', async () => {
@@ -278,7 +297,7 @@ describe('useUrlInitialize', () => {
       expect(GetItemService).not.toHaveBeenCalled()
     })
 
-    it('shows error alert on 404', async () => {
+    it('shows warning alert on 404', async () => {
       GetItemService.mockResolvedValue({ error: true, status: 404 })
 
       const { result } = renderHook(
@@ -291,7 +310,7 @@ describe('useUrlInitialize', () => {
       })
 
       expect(showApplicationAlert).toHaveBeenCalledWith(
-        'error',
+        'warning',
         expect.stringContaining('missing-item')
       )
     })
@@ -458,7 +477,7 @@ describe('useUrlInitialize', () => {
       )
     })
 
-    it('ignores invalid visualization key', async () => {
+    it('shows warning alert for invalid visualization key', async () => {
       getCollectionVisualizations.mockReturnValue({
         visualizationKeys: ['true-color'],
         hasVisualizations: true
@@ -487,6 +506,12 @@ describe('useUrlInitialize', () => {
           call[0]?.payload === 'nonexistent-viz'
       )
       expect(vizDispatches).toHaveLength(0)
+
+      // Should show warning alert
+      expect(showApplicationAlert).toHaveBeenCalledWith(
+        'warning',
+        expect.stringContaining('nonexistent-viz')
+      )
     })
   })
 })
