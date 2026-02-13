@@ -76,25 +76,46 @@
   border-top: 1px solid var(--side-panel-horizontal-divider-color);
 }
 
-.Search__button {
-  width: 100%;
+/* Split Button Group */
+
+.Search__button-group.MuiButtonGroup-root {
+  margin-top: 12px;
+  border-radius: var(--radius-sm);
+}
+
+.Search__button-group .MuiButton-root {
   height: 48px;
   background: var(--action-button-background);
   color: var(--action-button-color);
   border: none;
-  border-radius: var(--radius-sm);
+  text-transform: none;
+  font-family: inherit;
+}
+
+.Search__button-group .MuiButtonGroup-grouped:not(:last-of-type) {
+  border-right: none;
+}
+
+.Search__button-group .MuiButton-root:hover {
+  background: var(--action-button-background-hover);
+}
+
+.Search__button-group .MuiButton-root:active {
+  background: var(--action-button-background-hover);
+}
+
+.Search__button.MuiButton-root {
   font-size: 18px;
   font-weight: 600;
-  cursor: pointer;
-  margin-top: 12px;
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
 }
 
-.Search__button:hover {
-  background: var(--action-button-background-hover);
-}
-
-.Search__button:active {
-  background: var(--action-button-background-hover);
+.Search__clear-button.MuiButton-root {
+  min-width: 48px;
+  max-width: 48px;
+  padding: 0;
+  border-left: 1px solid var(--brand-accent-primary-dark);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
 
 /* Leaflet Map Control Border Overrides */

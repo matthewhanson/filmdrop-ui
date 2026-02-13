@@ -2,11 +2,13 @@ import { store } from '../redux/store'
 import {
   DEFAULT_SCENE_MIN_ZOOM,
   DEFAULT_API_MAX_ITEMS,
-  DEFAULT_MOSAIC_MAX_ITEMS
+  DEFAULT_MOSAIC_MAX_ITEMS,
+  DEFAULT_DATE_RANGE
 } from '../components/defaults'
 import {
   getCurrentMapZoomLevel,
   clearAllLayers,
+  clearLayer,
   bboxFromMapBounds,
   clearMapSelection
 } from './mapHelper'
@@ -20,6 +22,13 @@ import {
   setShowZoomNotice,
   setZoomLevelNeeded,
   setSearchResults,
+  setShowPopupModal,
+  setSearchDateRangeValue,
+  setQueryableFilters,
+  setmappedScenes,
+  setselectedPopupResultIndex,
+  setsearchGeojsonBoundary,
+  setisDrawingEnabled,
   setpaginationNextLink,
   setpaginationPrevLink,
   setcurrentPage,
@@ -198,6 +207,55 @@ export function newSearch(options = {}) {
     store.dispatch(setZoomLevelNeeded(sceneMinZoom))
     store.dispatch(setShowZoomNotice(true))
   }
+}
+
+export function clearSearch() {
+  // Clear map layers: selection highlights, imagery overlays, search results
+  clearMapSelection()
+  clearAllLayers()
+  clearLayer('drawBoundsLayer')
+
+  // Clear drawn AOI boundary
+  store.dispatch(setsearchGeojsonBoundary(null))
+  store.dispatch(setisDrawingEnabled(false))
+
+  // Clear search results and related state
+  store.dispatch(setSearchResults(null))
+  store.dispatch(setSearchLoading(false))
+  store.dispatch(setSearchType(null))
+  store.dispatch(setShowZoomNotice(false))
+  store.dispatch(setmappedScenes([]))
+  store.dispatch(setShowPopupModal(false))
+  store.dispatch(setselectedPopupResultIndex(0))
+
+  // Reset pagination
+  store.dispatch(setpaginationNextLink(null))
+  store.dispatch(setpaginationPrevLink(null))
+  store.dispatch(setcurrentPage(1))
+  store.dispatch(settotalPages(null))
+  store.dispatch(setpaginationHistory([]))
+
+  // Reset filters to defaults
+  store.dispatch(setSearchDateRangeValue(DEFAULT_DATE_RANGE))
+  store.dispatch(setQueryableFilters({}))
+
+  // Update URL: preserve collection path, view, viz, z, c; clear dt, item, queryable filters
+  const currentPathParams = getPathParams()
+  const collectionId = currentPathParams.collectionId || ''
+
+  router.navigate({
+    to: collectionId ? '/$collectionId' : '/',
+    params: collectionId ? { collectionId } : {},
+    search: (prev) => ({
+      dt: '',
+      view: prev.view,
+      viz: prev.viz,
+      tab: 'search',
+      z: prev.z,
+      c: prev.c
+    }),
+    replace: true
+  })
 }
 
 function buildSearchScenesParams(gridCodeToSearchIn) {

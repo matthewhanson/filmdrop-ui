@@ -93,7 +93,6 @@ const LinkItem = React.memo(({ link }) => {
           <Tooltip
             title={copiedUrl === link.href ? 'Copied!' : 'Copy link'}
             placement="top"
-            arrow
             slotProps={{
               tooltip: {
                 className: 'tooltip-field-label'
@@ -118,7 +117,6 @@ const LinkItem = React.memo(({ link }) => {
           <Tooltip
             title={isHttp ? 'Open in new tab' : 'Requires S3 access'}
             placement="top"
-            arrow
             slotProps={{
               tooltip: {
                 className: 'tooltip-field-label'

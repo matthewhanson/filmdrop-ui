@@ -6,7 +6,7 @@ import { Provider } from 'react-redux'
 import { store } from '../../redux/store'
 import { setappConfig } from '../../redux/slices/mainSlice'
 import { mockAppConfig } from '../../testing/shared-mocks'
-import { newSearch } from '../../utils/searchHelper'
+import { newSearch, clearSearch } from '../../utils/searchHelper'
 import * as useRenderableQueryablesModule from '../../hooks/useRenderableQueryables'
 
 vi.mock('@tanstack/react-router', () => ({
@@ -66,8 +66,13 @@ describe('Search', () => {
   describe('basic rendering', () => {
     it('should render the search button', () => {
       setup()
+      expect(screen.getByRole('button', { name: 'Search' })).toBeInTheDocument()
+    })
+
+    it('should render the clear search button', () => {
+      setup()
       expect(
-        screen.getByRole('button', { name: /search/i })
+        screen.getByRole('button', { name: /clear search/i })
       ).toBeInTheDocument()
     })
 
@@ -85,9 +90,23 @@ describe('Search', () => {
   describe('search button interaction', () => {
     it('should call newSearch when search button is clicked', () => {
       setup()
-      const searchButton = screen.getByRole('button', { name: /search/i })
+      const searchButton = screen.getByRole('button', { name: 'Search' })
       fireEvent.click(searchButton)
       expect(newSearch).toHaveBeenCalledTimes(1)
+    })
+
+    it('should call clearSearch when clear button is clicked', () => {
+      setup()
+      const clearButton = screen.getByRole('button', { name: /clear search/i })
+      fireEvent.click(clearButton)
+      expect(clearSearch).toHaveBeenCalledTimes(1)
+    })
+
+    it('should not call newSearch when clear button is clicked', () => {
+      setup()
+      const clearButton = screen.getByRole('button', { name: /clear search/i })
+      fireEvent.click(clearButton)
+      expect(newSearch).not.toHaveBeenCalled()
     })
   })
 

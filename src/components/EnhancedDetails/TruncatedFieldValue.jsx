@@ -59,8 +59,7 @@ const TruncatedFieldValue = ({ field, value }) => {
   return (
     <Tooltip
       title={displayText}
-      placement="top-start"
-      arrow
+      placement="top"
       disableHoverListener={!shouldTruncate}
       componentsProps={{
         tooltip: {
