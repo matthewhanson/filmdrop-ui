@@ -59,6 +59,7 @@ describe('App', () => {
       })
     })
     afterEach(() => {
+      vi.clearAllMocks()
       vi.restoreAllMocks()
     })
     it('should call GetCollectionsService once', () => {
@@ -132,6 +133,7 @@ describe('App', () => {
   })
   describe('on app render without config', () => {
     afterEach(() => {
+      vi.clearAllMocks()
       vi.restoreAllMocks()
     })
     it('should showAppLoading page', () => {

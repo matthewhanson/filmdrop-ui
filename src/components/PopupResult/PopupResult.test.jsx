@@ -19,7 +19,7 @@ describe('PopupResult', () => {
     store.dispatch(setappConfig(mockAppConfig))
     vi.clearAllMocks()
     // Mock Image constructor to simulate successful image load
-    global.Image = vi.fn().mockImplementation(() => {
+    global.Image = vi.fn(function () {
       const img = {
         onload: null,
         onerror: null,
@@ -72,7 +72,7 @@ describe('PopupResult', () => {
 
     it('should not render thumbnail container when image fails to load', () => {
       // Mock Image to simulate failed load (e.g., 404)
-      global.Image = vi.fn().mockImplementation(() => {
+      global.Image = vi.fn(function () {
         const img = {
           onload: null,
           onerror: null,
