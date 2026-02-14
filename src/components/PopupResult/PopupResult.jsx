@@ -11,7 +11,7 @@ const PopupResult = (props) => {
   const _autoCenterOnItemChanged = useSelector(
     (state) => state.mainSlice.autoCenterOnItemChanged
   )
-  const [thumbnailURL, setthumbnailURL] = useState(null)
+  const [thumbnailInfo, setThumbnailInfo] = useState(null)
 
   useEffect(() => {
     if (props.result) {
@@ -24,7 +24,7 @@ const PopupResult = (props) => {
 
       // If no thumbnail available, clear immediately
       if (!thumbnailURLForSelection) {
-        setthumbnailURL(null)
+        setThumbnailInfo(null)
         return
       }
 
@@ -32,7 +32,11 @@ const PopupResult = (props) => {
       const image = new Image()
       image.onload = function () {
         if (this.width > 0) {
-          setthumbnailURL(thumbnailURLForSelection)
+          setThumbnailInfo({
+            url: thumbnailURLForSelection,
+            width: this.width,
+            height: this.height
+          })
         }
       }
       image.src = thumbnailURLForSelection
@@ -51,11 +55,16 @@ const PopupResult = (props) => {
     >
       {props.result ? (
         <div className="popupResultHero">
-          {thumbnailURL && (
-            <div className="popupResultThumbnailContainer">
+          {thumbnailInfo && (
+            <div
+              className="popupResultThumbnailContainer"
+              style={{
+                aspectRatio: `${thumbnailInfo.width} / ${thumbnailInfo.height}`
+              }}
+            >
               <picture>
                 <img
-                  src={thumbnailURL}
+                  src={thumbnailInfo.url}
                   alt="thumbnail"
                   className="popupResultThumbnail"
                   onError={({ currentTarget }) => {

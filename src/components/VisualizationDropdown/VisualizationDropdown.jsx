@@ -71,8 +71,7 @@ const VisualizationDropdown = () => {
     }
   }
 
-  // Only render if collection has multiple visualizations
-  if (visualizationKeys.length <= 1) return null
+  if (!hasVisualizations) return null
 
   return (
     <div className="VisualizationDropdown">
