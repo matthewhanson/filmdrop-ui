@@ -39,6 +39,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Changed the Search button to a split button with a Clear action that resets filters, URL params, and map view
 - Changed tab rendering to keep both Search and Item Details mounted (hidden via CSS) instead of unmounting the inactive tab, preserving component state and avoiding unnecessary re-renders
 - Set zoom level on initial load of the app such that there are not blank bands above and below the map
+- Moved visualization selector to the Item Details tab
 
 ### Removed
 

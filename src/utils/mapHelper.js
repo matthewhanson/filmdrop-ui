@@ -423,6 +423,11 @@ export const debounceTitilerOverlay = debounce(
 )
 
 function addImageOverlay(item) {
+  const showSceneOverlay = store.getState().mainSlice.showSceneOverlay
+  if (!showSceneOverlay) {
+    store.dispatch(setimageOverlayLoading(false))
+    return
+  }
   const sceneTilerURL =
     store.getState().mainSlice.appConfig.SCENE_TILER_URL || ''
   const visualizations = getCollectionConfig(item?.collection, 'visualizations')
@@ -836,22 +841,22 @@ function styleFeatures(feature, geojsonLayer) {
     feature.geometry.type === 'LineString' ||
     feature.geometry.type === 'MultiLineString'
   ) {
-    return customSearchLineStyle
+    return getCustomSearchLineStyle()
   }
   if (
     feature.geometry.type === 'Polygon' ||
     feature.geometry.type === 'MultiPolygon'
   ) {
-    return customSearchPolygonStyle
+    return getCustomSearchPolygonStyle()
   }
   if (feature.geometry.type === 'GeometryCollection') {
     const accumulatedStyle = {}
     feature.geometry.geometries.forEach((part) => {
       if (part.type === 'LineString' || part.type === 'MultiLineString') {
-        Object.assign(accumulatedStyle, customSearchLineStyle)
+        Object.assign(accumulatedStyle, getCustomSearchLineStyle())
       }
       if (part.type === 'Polygon' || part.type === 'MultiPolygon') {
-        Object.assign(accumulatedStyle, customSearchPolygonStyle)
+        Object.assign(accumulatedStyle, getCustomSearchPolygonStyle())
       }
     })
     return accumulatedStyle

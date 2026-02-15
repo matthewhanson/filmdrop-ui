@@ -53,7 +53,8 @@ const initialState = {
   totalPages: null,
   paginationHistory: [],
   queryableFilters: {},
-  detailsResetKey: 0
+  detailsResetKey: 0,
+  showSceneOverlay: true
 }
 
 // next, for every key in the initialState
@@ -220,6 +221,9 @@ export const mainSlice = createSlice({
     },
     incrementDetailsResetKey: (state) => {
       state.detailsResetKey += 1
+    },
+    setShowSceneOverlay: (state, action) => {
+      state.showSceneOverlay = action.payload
     }
   }
 })
@@ -278,5 +282,6 @@ export const { setpaginationHistory } = mainSlice.actions
 export const { addToPaginationHistory } = mainSlice.actions
 export const { setQueryableFilters } = mainSlice.actions
 export const { incrementDetailsResetKey } = mainSlice.actions
+export const { setShowSceneOverlay } = mainSlice.actions
 
 export default mainSlice.reducer

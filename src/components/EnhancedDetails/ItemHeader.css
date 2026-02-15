@@ -16,15 +16,15 @@
 }
 
 .item-header-label {
-  font-size: 12px;
-  font-weight: 400;
-  color: var(--side-panel-text-color-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--side-panel-heading-color);
 }
 
 .item-header-value {
   font-size: 14px;
-  font-weight: 500;
-  color: var(--side-panel-text-color);
+  font-weight: 400;
+  color: var(--side-panel-text-color-secondary);
   line-height: 1.4;
 }
 

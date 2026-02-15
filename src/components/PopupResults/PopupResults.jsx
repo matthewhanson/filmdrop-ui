@@ -125,7 +125,7 @@ const PopupResults = (props) => {
         <div className="popupResultsEmpty">
           <span className="popupResultsEmptyPrimaryText">Nothing Selected</span>
           <span className="popupResultsEmptySecondaryText">
-            search and click footprint on map to view details
+            Search and click footprint on map to view Item Details.
           </span>
         </div>
       )}

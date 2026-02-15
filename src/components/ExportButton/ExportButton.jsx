@@ -2,6 +2,7 @@ import { React } from 'react'
 import './ExportButton.css'
 import { useSelector } from 'react-redux'
 import DownloadIcon from '@mui/icons-material/Download'
+import Tooltip from '@mui/material/Tooltip'
 import { showApplicationAlert } from '../../utils/alertHelper'
 
 const ExportButton = () => {
@@ -36,9 +37,19 @@ const ExportButton = () => {
 
   return (
     <div className="ExportButton">
-      <button className="downloadButton" onClick={() => onExportClick()}>
-        <DownloadIcon fontSize="small"></DownloadIcon>
-      </button>
+      <Tooltip
+        title="Download GeoJSON"
+        placement="left"
+        slotProps={{
+          tooltip: {
+            className: 'tooltip-field-label'
+          }
+        }}
+      >
+        <button className="downloadButton" onClick={() => onExportClick()}>
+          <DownloadIcon fontSize="small"></DownloadIcon>
+        </button>
+      </Tooltip>
     </div>
   )
 }
