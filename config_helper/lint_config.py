@@ -45,7 +45,6 @@ def lint_config(file_path):
         "THEME_SWITCHING_ENABLED": bool,
         "CART_ENABLED": bool,
         "BRAND_LOGO": dict,
-        "POPUP_DISPLAY_FIELDS": dict,
         "APP_NAME": str,
         "APP_FAVICON": str,
         "MAP_ZOOM": int,
