@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+### Fixed
+
+- Corrected the multi-select filter component to properly lose focus after deleting chips.
+
 ## v7.1.0-pre - 2026-01-15
 
 ### Added
