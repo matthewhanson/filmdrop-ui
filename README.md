@@ -113,8 +113,7 @@ Create `public/config/config.json` (development) or `build/config/config.json` (
       "sceneTilerParams": {
         "assets": ["red", "green", "blue"]
       },
-      "sceneMinZoom": 7,
-      "popupDisplayFields": ["datetime", "platform"]
+      "sceneMinZoom": 7
     }
   }
 }
@@ -201,13 +200,11 @@ based on the collection's STAC metadata if not specified:
   "COLLECTIONS_CONFIG": {
     "sentinel-2-l2a": {
       "sceneTilerParams": { "assets": ["red", "green", "blue"] },
-      "sceneMinZoom": 7,
-      "popupDisplayFields": ["datetime", "platform", "eo:cloud_cover"]
+      "sceneMinZoom": 7
     },
     "landsat-c2-l2": {
       "sceneTilerParams": { "assets": ["red", "green", "blue"] },
-      "sceneMinZoom": 7,
-      "popupDisplayFields": ["datetime", "platform", "instruments"]
+      "sceneMinZoom": 7
     }
   }
 }
