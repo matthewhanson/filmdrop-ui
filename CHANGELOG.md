@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 
 - Corrected the multi-select filter component to properly lose focus after deleting chips.
+- Fixed map auto-zoom when loading items via `/:collectionId/:itemId` URLs
 
 ## v7.1.0-pre - 2026-01-15
 
