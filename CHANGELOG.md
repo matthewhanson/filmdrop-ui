@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+### Added
+
+- Added a NumericRangeInputs component for numeric fields that supports unbounded, min-only, and max-only queryables.
+
 ### Fixed
 
 - Corrected the multi-select filter component to properly lose focus after deleting chips.
