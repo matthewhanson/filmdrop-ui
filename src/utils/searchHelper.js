@@ -48,7 +48,7 @@ import { serializeQueryableFiltersForUrl } from './urlParamHelper'
  * @param {Object} queryableFilters - Filter values from Redux (fieldName -> value)
  * @returns {Object} Query object in STAC Query Extension format
  */
-function buildQueryFromFilters(queryableFilters) {
+export function buildQueryFromFilters(queryableFilters) {
   const query = {}
 
   Object.entries(queryableFilters).forEach(([fieldName, value]) => {
@@ -56,16 +56,17 @@ function buildQueryFromFilters(queryableFilters) {
       return
     }
 
-    // Handle range values (object with min/max from RangeSlider)
+    // Handle range values (object with min and/or max)
     if (
       typeof value === 'object' &&
       !Array.isArray(value) &&
-      'min' in value &&
-      'max' in value
+      ('min' in value || 'max' in value)
     ) {
-      query[fieldName] = {
-        gte: value.min,
-        lte: value.max
+      const queryVal = {}
+      if ('min' in value) queryVal.gte = value.min
+      if ('max' in value) queryVal.lte = value.max
+      if (Object.keys(queryVal).length > 0) {
+        query[fieldName] = queryVal
       }
       return
     }
