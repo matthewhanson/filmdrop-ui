@@ -235,5 +235,40 @@ describe('NumericRangeInputs', () => {
       expect(minInput).toHaveValue(null)
       expect(maxInput).toHaveValue(null)
     })
+
+    it('should sync local state when parent clears value (clear all filters)', () => {
+      const { rerender, onChange } = renderComponent({
+        value: { min: 25, max: 75 }
+      })
+      const minInput = screen.getByLabelText('Test Field minimum value')
+      const maxInput = screen.getByLabelText('Test Field maximum value')
+
+      // Simulate entering values (focus, type, blur)
+      fireEvent.focus(minInput)
+      fireEvent.change(minInput, { target: { value: '25' } })
+      fireEvent.blur(minInput)
+
+      fireEvent.focus(maxInput)
+      fireEvent.change(maxInput, { target: { value: '75' } })
+      fireEvent.blur(maxInput)
+
+      // Parent clears value (e.g. "clear all filters")
+      rerender(
+        <NumericRangeInputs
+          value={{}}
+          onChange={onChange}
+          label="Test Field"
+          mode="unbounded"
+        />
+      )
+
+      // Re-focus inputs — should show cleared values, not stale "25"/"75"
+      fireEvent.focus(minInput)
+      expect(minInput).toHaveValue(null)
+      fireEvent.blur(minInput)
+
+      fireEvent.focus(maxInput)
+      expect(maxInput).toHaveValue(null)
+    })
   })
 })

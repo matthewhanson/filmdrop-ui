@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import Card from '../Card/Card'
 import OverflowTooltip from '../EnhancedDetails/OverflowTooltip'
@@ -22,6 +22,18 @@ const NumericRangeInputs = ({
   const [maxInput, setMaxInput] = useState(isMaxFixed ? max : (value.max ?? ''))
   const [isEditingMin, setIsEditingMin] = useState(false)
   const [isEditingMax, setIsEditingMax] = useState(false)
+
+  useEffect(() => {
+    if (!isEditingMin && !isMinFixed) {
+      setMinInput(value.min ?? '')
+    }
+  }, [value.min, isEditingMin, isMinFixed])
+
+  useEffect(() => {
+    if (!isEditingMax && !isMaxFixed) {
+      setMaxInput(value.max ?? '')
+    }
+  }, [value.max, isEditingMax, isMaxFixed])
 
   const roundIfInteger = (val) => (integerType ? Math.round(val) : val)
 
