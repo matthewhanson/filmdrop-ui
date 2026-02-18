@@ -73,3 +73,7 @@
 .numericRangeInput--fixed:hover {
   border-color: var(--side-panel-input-border);
 }
+
+.numericRangeInput--fixed:focus {
+  border-color: var(--side-panel-input-border);
+}
