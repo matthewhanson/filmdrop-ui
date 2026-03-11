@@ -23,6 +23,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Corrected the multi-select filter component to properly lose focus after deleting chips.
 - Fixed map auto-zoom when loading items via `/:collectionId/:itemId` URLs.
 - Fixed search and mosaic requests sending invalid or undefined bbox when viewport bounds are missing; URL bbox param and zoom-to-extent now handle null bounds safely.
+- Resolve dependency vulnerabilities: DOMPurify XSS (GHSA-v2wj-7wpq-c8vv), Rollup path
+  traversal (GHSA-mw96-cpmx-2vgc); upgrade `dompurify` to ^3.3.2, override `rollup` to ^4.59.0.
 
 ## v7.1.0-pre - 2026-01-15
 
