@@ -10,6 +10,7 @@ import {
   clearAllLayers,
   clearLayer,
   bboxFromMapBounds,
+  clampAndRoundBbox,
   clearMapSelection
 } from './mapHelper'
 import { getCollectionConfig } from './configHelper'
@@ -285,7 +286,7 @@ function buildSearchScenesParams(gridCodeToSearchIn) {
       'intersects',
       encodeURIComponent(JSON.stringify(_searchGeojsonBoundary.geometry))
     )
-  } else {
+  } else if (bbox) {
     searchParams.set('bbox', bbox)
   }
 
@@ -364,7 +365,7 @@ function buildSearchAggregateParams(gridType) {
       'intersects',
       encodeURIComponent(JSON.stringify(_searchGeojsonBoundary.geometry))
     )
-  } else {
+  } else if (bbox) {
     searchParams.set('bbox', bbox)
   }
 
@@ -384,11 +385,12 @@ function buildSearchAggregateParams(gridType) {
     .join('&')
 }
 
-function buildUrlParamFromBBOX() {
+export function buildUrlParamFromBBOX() {
   const viewportBounds = bboxFromMapBounds()
-  const neLng = viewportBounds[2] > 180 ? 180 : viewportBounds[2]
-  const swLng = viewportBounds[0] < -180 ? -180 : viewportBounds[0]
-  return [swLng, viewportBounds[1], neLng, viewportBounds[3]].join(',')
+  if (!viewportBounds) return ''
+  const bbox = clampAndRoundBbox(viewportBounds)
+  if (!bbox) return ''
+  return [bbox[0], bbox[1], bbox[2], bbox[3]].join(',')
 }
 
 export function mapHexGridFromJson(json) {
@@ -541,6 +543,8 @@ export function searchGridCodeScenes(gridCodeToSearchIn) {
 
 export const debounceNewSearch = debounce(() => newSearch(), 300)
 
+export { buildSearchScenesParams, buildSearchAggregateParams }
+
 function newMosaicSearch() {
   clearAllLayers()
   store.dispatch(setSearchResults(null))
@@ -551,7 +555,10 @@ function newMosaicSearch() {
   const datetime = convertDate(store.getState().mainSlice.searchDateRangeValue)
   const _searchGeojsonBoundary =
     store.getState().mainSlice.searchGeojsonBoundary
-  const bboxFromMap = bboxFromMapBounds()
+  let bboxFromMap = bboxFromMapBounds()
+  if (bboxFromMap) {
+    bboxFromMap = clampAndRoundBbox(bboxFromMap)
+  }
 
   const createMosaicBody = {
     stac_api_root: store.getState().mainSlice.appConfig.STAC_API_URL,
@@ -564,7 +571,7 @@ function newMosaicSearch() {
   }
   if (_searchGeojsonBoundary) {
     createMosaicBody.intersects = _searchGeojsonBoundary.geometry
-  } else {
+  } else if (bboxFromMap) {
     createMosaicBody.bbox = bboxFromMap
   }
 
