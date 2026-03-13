@@ -10,15 +10,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 
 - Added a NumericRangeInputs component for numeric fields that supports unbounded, min-only, and max-only queryables.
+- Added unit tests for bbox coordinate rounding/clamping (`mapHelper`) and URL/search param bbox handling (`searchHelper`).
 
 ### Changed
 
 - Moved Item pagination buttons from below to above the Item Details content.
+- Limited bbox precision to 6 decimals in map bounds and search/URL params; longitude clamped to [-180, 180]. Exported `roundCoord`, `clampAndRoundBbox` for reuse.
+- Item Details field grid: column layout set to `minmax(0, 40%) 1fr`, alignment and padding adjusted for clearer spacing and to avoid overflowing text.
 
 ### Fixed
 
 - Corrected the multi-select filter component to properly lose focus after deleting chips.
-- Fixed map auto-zoom when loading items via `/:collectionId/:itemId` URLs
+- Fixed map auto-zoom when loading items via `/:collectionId/:itemId` URLs.
+- Fixed search and mosaic requests sending invalid or undefined bbox when viewport bounds are missing; URL bbox param and zoom-to-extent now handle null bounds safely.
+- Resolve dependency vulnerabilities: DOMPurify XSS (GHSA-v2wj-7wpq-c8vv), Rollup path
+  traversal (GHSA-mw96-cpmx-2vgc); upgrade `dompurify` to ^3.3.2, override `rollup` to ^4.59.0.
 
 ## v7.1.0-pre - 2026-01-15
 
