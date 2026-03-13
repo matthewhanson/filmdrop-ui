@@ -11,6 +11,7 @@ import {
   clearAllLayers,
   clearLayer,
   bboxFromMapBounds,
+  clampAndRoundBbox,
   clearMapSelection,
   hasMosaicImageLayer
 } from './mapHelper'
@@ -300,7 +301,7 @@ function buildSearchScenesParams(gridCodeToSearchIn, options = {}) {
       'intersects',
       encodeURIComponent(JSON.stringify(_searchGeojsonBoundary.geometry))
     )
-  } else {
+  } else if (bbox) {
     searchParams.set('bbox', bbox)
   }
 
@@ -379,7 +380,7 @@ function buildSearchAggregateParams(gridType) {
       'intersects',
       encodeURIComponent(JSON.stringify(_searchGeojsonBoundary.geometry))
     )
-  } else {
+  } else if (bbox) {
     searchParams.set('bbox', bbox)
   }
 
@@ -399,11 +400,12 @@ function buildSearchAggregateParams(gridType) {
     .join('&')
 }
 
-function buildUrlParamFromBBOX() {
+export function buildUrlParamFromBBOX() {
   const viewportBounds = bboxFromMapBounds()
-  const neLng = viewportBounds[2] > 180 ? 180 : viewportBounds[2]
-  const swLng = viewportBounds[0] < -180 ? -180 : viewportBounds[0]
-  return [swLng, viewportBounds[1], neLng, viewportBounds[3]].join(',')
+  if (!viewportBounds) return ''
+  const bbox = clampAndRoundBbox(viewportBounds)
+  if (!bbox) return ''
+  return [bbox[0], bbox[1], bbox[2], bbox[3]].join(',')
 }
 
 export function mapHexGridFromJson(json) {
@@ -556,24 +558,29 @@ export function searchGridCodeScenes(gridCodeToSearchIn) {
 
 export const debounceNewSearch = debounce(() => newSearch(), 300)
 
-const buildMosaicCreateBody = () => {
+export { buildSearchScenesParams, buildSearchAggregateParams }
+
+function buildMosaicCreateBody() {
   const state = store.getState().mainSlice
-  const selectedCollectionData = state.selectedCollectionData
+  const _selectedCollectionData = state.selectedCollectionData
   const datetime = convertDate(state.searchDateRangeValue)
-  const searchGeojsonBoundary = state.searchGeojsonBoundary
-  const bboxFromMap = bboxFromMapBounds()
+  const _searchGeojsonBoundary = state.searchGeojsonBoundary
+  let bboxFromMap = bboxFromMapBounds()
+  if (bboxFromMap) {
+    bboxFromMap = clampAndRoundBbox(bboxFromMap)
+  }
 
   const createMosaicBody = {
     stac_api_root: state.appConfig.STAC_API_URL,
-    asset_name: constructMosaicAssetVal(selectedCollectionData.id),
-    collections: [selectedCollectionData.id],
+    asset_name: constructMosaicAssetVal(_selectedCollectionData.id),
+    collections: [_selectedCollectionData.id],
     datetime,
     max_items: state.appConfig.MOSAIC_MAX_ITEMS || DEFAULT_MOSAIC_MAX_ITEMS
   }
 
-  if (searchGeojsonBoundary) {
-    createMosaicBody.intersects = searchGeojsonBoundary.geometry
-  } else {
+  if (_searchGeojsonBoundary) {
+    createMosaicBody.intersects = _searchGeojsonBoundary.geometry
+  } else if (bboxFromMap) {
     createMosaicBody.bbox = bboxFromMap
   }
 
@@ -657,14 +664,16 @@ async function newMosaicSearch() {
     console.error('Error fetching top items for mosaic comparison', error)
   }
 
+  const compareWindow = Math.min(effectiveCompareCount, compareCount)
+
   if (
     topItemIds &&
-    mosaicCache?.lastMosaicCompareCount === effectiveCompareCount &&
+    mosaicCache?.lastMosaicCompareCount === compareWindow &&
     hasMosaicImageLayer() &&
     areTopItemsEqual(
       mosaicCache?.lastMosaicTopItemIds,
       topItemIds,
-      effectiveCompareCount
+      compareWindow
     )
   ) {
     store.dispatch(setSearchLoading(false))
@@ -696,7 +705,7 @@ async function newMosaicSearch() {
   AddMosaicService(requestOptions, {
     signature,
     topItemIds,
-    compareCount: effectiveCompareCount
+    compareCount: compareWindow
   })
 }
 
