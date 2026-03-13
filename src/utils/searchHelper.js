@@ -3,6 +3,7 @@ import {
   DEFAULT_SCENE_MIN_ZOOM,
   DEFAULT_API_MAX_ITEMS,
   DEFAULT_MOSAIC_MAX_ITEMS,
+  DEFAULT_MOSAIC_TOP_COMPARE_ITEMS,
   DEFAULT_DATE_RANGE
 } from '../components/defaults'
 import {
@@ -11,11 +12,12 @@ import {
   clearLayer,
   bboxFromMapBounds,
   clampAndRoundBbox,
-  clearMapSelection
+  clearMapSelection,
+  hasMosaicImageLayer
 } from './mapHelper'
 import { getCollectionConfig } from './configHelper'
 import { convertDateForURL, convertDate } from './datetime'
-import { SearchService } from '../services/get-search-service'
+import * as getSearchService from '../services/get-search-service'
 import { AggregateSearchService } from '../services/get-aggregate-service'
 import {
   setSearchLoading,
@@ -35,6 +37,7 @@ import {
   setcurrentPage,
   settotalPages,
   setpaginationHistory,
+  setMosaicCache,
   incrementDetailsResetKey
 } from '../redux/slices/mainSlice'
 import * as h3 from 'h3-js'
@@ -87,7 +90,7 @@ export function buildQueryFromFilters(queryableFilters) {
   return query
 }
 
-export function newSearch(options = {}) {
+export async function newSearch(options = {}) {
   const { viewMode: overrideViewMode, preserveItem = false } = options
 
   // Snapshot all needed Redux state upfront, before any dispatches or URL writes.
@@ -101,10 +104,12 @@ export function newSearch(options = {}) {
       : ''
 
   clearMapSelection()
-  clearAllLayers()
-  store.dispatch(setSearchResults(null))
-  store.dispatch(setShowZoomNotice(false))
-  store.dispatch(setSearchLoading(false))
+  if (viewMode !== 'mosaic') {
+    clearAllLayers()
+    store.dispatch(setSearchResults(null))
+    store.dispatch(setShowZoomNotice(false))
+    store.dispatch(setSearchLoading(false))
+  }
 
   // Reset pagination state for new search
   store.dispatch(setpaginationNextLink(null))
@@ -143,6 +148,24 @@ export function newSearch(options = {}) {
     replace: true
   })
 
+  // Handle mosaic mode
+  if (viewMode === 'mosaic') {
+    if (!_selectedCollection) {
+      return
+    }
+    const sceneMinZoom =
+      getCollectionConfig(_selectedCollection.id, 'sceneMinZoom') ||
+      DEFAULT_SCENE_MIN_ZOOM
+    const currentMapZoomLevel = getCurrentMapZoomLevel()
+    if (currentMapZoomLevel < sceneMinZoom) {
+      store.dispatch(setZoomLevelNeeded(sceneMinZoom))
+      store.dispatch(setShowZoomNotice(true))
+      return
+    }
+    store.dispatch(setSearchLoading(true))
+    return newMosaicSearch()
+  }
+
   // Get minimum zoom level for scene/mosaic views
   const sceneMinZoom =
     getCollectionConfig(_selectedCollection.id, 'sceneMinZoom') ||
@@ -160,17 +183,6 @@ export function newSearch(options = {}) {
     (el) => el.name === 'grid_code_frequency'
   )
 
-  // Handle mosaic mode
-  if (viewMode === 'mosaic') {
-    if (currentMapZoomLevel < sceneMinZoom) {
-      store.dispatch(setZoomLevelNeeded(sceneMinZoom))
-      store.dispatch(setShowZoomNotice(true))
-      return
-    }
-    newMosaicSearch()
-    return
-  }
-
   // Handle user-selected view mode
   if (viewMode === 'scene') {
     // User wants scene view - check zoom level
@@ -182,7 +194,7 @@ export function newSearch(options = {}) {
     const searchScenesParams = buildSearchScenesParams()
     store.dispatch(setSearchType('scene'))
     store.dispatch(setSearchLoading(true))
-    SearchService(searchScenesParams, 'scene')
+    getSearchService.SearchService(searchScenesParams, 'scene')
     return
   } else if (viewMode === 'hex' && includesGeoHex) {
     // User wants hex view - no zoom restriction
@@ -205,7 +217,7 @@ export function newSearch(options = {}) {
     const searchScenesParams = buildSearchScenesParams()
     store.dispatch(setSearchType('scene'))
     store.dispatch(setSearchLoading(true))
-    SearchService(searchScenesParams, 'scene')
+    getSearchService.SearchService(searchScenesParams, 'scene')
   } else {
     store.dispatch(setZoomLevelNeeded(sceneMinZoom))
     store.dispatch(setShowZoomNotice(true))
@@ -264,14 +276,17 @@ export function clearSearch() {
   })
 }
 
-function buildSearchScenesParams(gridCodeToSearchIn) {
+function buildSearchScenesParams(gridCodeToSearchIn, options = {}) {
   const _selectedCollection = store.getState().mainSlice.selectedCollectionData
   const bbox = buildUrlParamFromBBOX()
   const _dateTimeRange = convertDateForURL(
     store.getState().mainSlice.searchDateRangeValue
   )
   const limit =
-    store.getState().mainSlice.appConfig.API_MAX_ITEMS || DEFAULT_API_MAX_ITEMS
+    options.limit != null
+      ? options.limit
+      : store.getState().mainSlice.appConfig.API_MAX_ITEMS ||
+        DEFAULT_API_MAX_ITEMS
   const collections = _selectedCollection.id
   const _searchGeojsonBoundary =
     store.getState().mainSlice.searchGeojsonBoundary
@@ -538,48 +553,136 @@ export function mapGridCodeFromJson(json) {
 
 export function searchGridCodeScenes(gridCodeToSearchIn) {
   const searchScenesParams = buildSearchScenesParams(gridCodeToSearchIn)
-  SearchService(searchScenesParams, 'grid-code')
+  getSearchService.SearchService(searchScenesParams, 'grid-code')
 }
 
 export const debounceNewSearch = debounce(() => newSearch(), 300)
 
 export { buildSearchScenesParams, buildSearchAggregateParams }
 
-function newMosaicSearch() {
-  clearAllLayers()
-  store.dispatch(setSearchResults(null))
-  store.dispatch(setShowZoomNotice(false))
-  store.dispatch(setSearchLoading(true))
-  const _selectedCollectionData =
-    store.getState().mainSlice.selectedCollectionData
-  const datetime = convertDate(store.getState().mainSlice.searchDateRangeValue)
-  const _searchGeojsonBoundary =
-    store.getState().mainSlice.searchGeojsonBoundary
+function buildMosaicCreateBody() {
+  const state = store.getState().mainSlice
+  const _selectedCollectionData = state.selectedCollectionData
+  const datetime = convertDate(state.searchDateRangeValue)
+  const _searchGeojsonBoundary = state.searchGeojsonBoundary
   let bboxFromMap = bboxFromMapBounds()
   if (bboxFromMap) {
     bboxFromMap = clampAndRoundBbox(bboxFromMap)
   }
 
   const createMosaicBody = {
-    stac_api_root: store.getState().mainSlice.appConfig.STAC_API_URL,
+    stac_api_root: state.appConfig.STAC_API_URL,
     asset_name: constructMosaicAssetVal(_selectedCollectionData.id),
     collections: [_selectedCollectionData.id],
     datetime,
-    max_items:
-      store.getState().mainSlice.appConfig.MOSAIC_MAX_ITEMS ||
-      DEFAULT_MOSAIC_MAX_ITEMS
+    max_items: state.appConfig.MOSAIC_MAX_ITEMS || DEFAULT_MOSAIC_MAX_ITEMS
   }
+
   if (_searchGeojsonBoundary) {
     createMosaicBody.intersects = _searchGeojsonBoundary.geometry
   } else if (bboxFromMap) {
     createMosaicBody.bbox = bboxFromMap
   }
 
-  // Add queryable filters from Redux state
-  const queryableFilters = store.getState().mainSlice.queryableFilters
+  const queryableFilters = state.queryableFilters
   const query = buildQueryFromFilters(queryableFilters)
   if (Object.keys(query).length > 0) {
     createMosaicBody.query = query
+  }
+
+  return createMosaicBody
+}
+
+const getMosaicRequestSignature = (createMosaicBody) => {
+  const sorted = sortObjectKeys(createMosaicBody)
+  return JSON.stringify(sorted)
+}
+
+const sortObjectKeys = (value) => {
+  if (Array.isArray(value)) {
+    return value.map((item) => sortObjectKeys(item))
+  }
+  if (value && typeof value === 'object') {
+    const sortedKeys = Object.keys(value).sort()
+    const result = {}
+    sortedKeys.forEach((key) => {
+      result[key] = sortObjectKeys(value[key])
+    })
+    return result
+  }
+  return value
+}
+
+const areTopItemsEqual = (prevIds, nextIds, compareCount) => {
+  if (!prevIds || !nextIds) {
+    return false
+  }
+  const count = Math.min(compareCount, prevIds.length, nextIds.length)
+  if (count === 0) {
+    return false
+  }
+  for (let i = 0; i < count; i += 1) {
+    if (prevIds[i] !== nextIds[i]) {
+      return false
+    }
+  }
+  return true
+}
+
+async function newMosaicSearch() {
+  const createMosaicBody = buildMosaicCreateBody()
+  const signature = getMosaicRequestSignature(createMosaicBody)
+  const state = store.getState().mainSlice
+  const { mosaicCache } = state
+  const maxItems = state.appConfig.MOSAIC_MAX_ITEMS || DEFAULT_MOSAIC_MAX_ITEMS
+  const compareCount = Math.min(maxItems, DEFAULT_MOSAIC_TOP_COMPARE_ITEMS)
+
+  // Unchanged request body and compare window with mosaic layer present: skip refresh
+  if (
+    mosaicCache?.lastMosaicRequestSignature === signature &&
+    mosaicCache?.lastMosaicCompareCount === compareCount &&
+    hasMosaicImageLayer()
+  ) {
+    store.dispatch(setSearchLoading(false))
+    return
+  }
+
+  let topItemIds = null
+  let effectiveCompareCount = compareCount
+
+  try {
+    const searchParams = buildSearchScenesParams(undefined, {
+      limit: compareCount
+    })
+    const result = await getSearchService.fetchTopItemsForMosaic(
+      searchParams,
+      compareCount
+    )
+    topItemIds = result.itemIds
+    effectiveCompareCount = result.effectiveLimit
+  } catch (error) {
+    console.error('Error fetching top items for mosaic comparison', error)
+  }
+
+  const compareWindow = Math.min(effectiveCompareCount, compareCount)
+
+  if (
+    topItemIds &&
+    mosaicCache?.lastMosaicCompareCount === compareWindow &&
+    hasMosaicImageLayer() &&
+    areTopItemsEqual(
+      mosaicCache?.lastMosaicTopItemIds,
+      topItemIds,
+      compareWindow
+    )
+  ) {
+    store.dispatch(setSearchLoading(false))
+    store.dispatch(
+      setMosaicCache({
+        lastMosaicRequestSignature: signature
+      })
+    )
+    return
   }
 
   const requestHeaders = new Headers()
@@ -592,11 +695,18 @@ function newMosaicSearch() {
     method: 'POST',
     headers: requestHeaders,
     body: JSON.stringify(createMosaicBody),
-    credentials:
-      store.getState().mainSlice.appConfig.FETCH_CREDENTIALS || 'same-origin'
+    credentials: state.appConfig.FETCH_CREDENTIALS || 'same-origin'
   }
 
-  AddMosaicService(requestOptions)
+  clearAllLayers()
+  store.dispatch(setSearchResults(null))
+  store.dispatch(setShowZoomNotice(false))
+
+  AddMosaicService(requestOptions, {
+    signature,
+    topItemIds,
+    compareCount: compareWindow
+  })
 }
 
 const constructMosaicAssetVal = (collection) => {

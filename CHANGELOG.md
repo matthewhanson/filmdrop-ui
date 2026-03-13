@@ -11,12 +11,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Added a NumericRangeInputs component for numeric fields that supports unbounded, min-only, and max-only queryables.
 - Added unit tests for bbox coordinate rounding/clamping (`mapHelper`) and URL/search param bbox handling (`searchHelper`).
+- Added mosaic search caching metadata to track the last mosaic request and top N item IDs for re-use across searches.
 
 ### Changed
 
 - Moved Item pagination buttons from below to above the Item Details content.
 - Limited bbox precision to 6 decimals in map bounds and search/URL params; longitude clamped to [-180, 180]. Exported `roundCoord`, `clampAndRoundBbox` for reuse.
 - Item Details field grid: column layout set to `minmax(0, 40%) 1fr`, alignment and padding adjusted for clearer spacing and to avoid overflowing text.
+- Updated mosaic search flow to fetch a small set of top items for comparison before creating a new mosaic, reducing redundant mosaic tiler requests.
+- Prevented `newSearch` from clearing map layers and results when running in mosaic view where an existing mosaic image layer is being reused.
 
 ### Fixed
 
@@ -25,6 +28,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fixed search and mosaic requests sending invalid or undefined bbox when viewport bounds are missing; URL bbox param and zoom-to-extent now handle null bounds safely.
 - Resolve dependency vulnerabilities: DOMPurify XSS (GHSA-v2wj-7wpq-c8vv), Rollup path
   traversal (GHSA-mw96-cpmx-2vgc); upgrade `dompurify` to ^3.3.2, override `rollup` to ^4.59.0.
+- Fixed repeated mosaic layer recreation on identical mosaic searches by reusing the existing mosaic image layer when the request parameters and top items have not changed.
 
 ## v7.1.0-pre - 2026-01-15
 

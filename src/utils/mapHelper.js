@@ -777,6 +777,20 @@ export async function addMosaicLayer(json) {
   }
 }
 
+export function hasMosaicImageLayer() {
+  const map = store.getState().mainSlice.map
+  if (!map || Object.keys(map).length === 0) {
+    return false
+  }
+  let hasLayer = false
+  map.eachLayer((layer) => {
+    if (layer.layer_name === 'mosaicImageLayer') {
+      hasLayer = true
+    }
+  })
+  return hasLayer
+}
+
 export function enableMapPolyDrawing() {
   const map = store.getState().mainSlice.map
   if (map && Object.keys(map).length > 0) {
