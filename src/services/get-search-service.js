@@ -88,3 +88,42 @@ export async function SearchService(searchParams, typeOfSearch) {
       console.error(message, error)
     })
 }
+
+export async function fetchTopItemsForMosaic(searchParams, limit) {
+  const requestHeaders = new Headers()
+  const JWT = localStorage.getItem('APP_AUTH_TOKEN')
+  const isSTACTokenAuthEnabled =
+    store.getState().mainSlice.appConfig.APP_TOKEN_AUTH_ENABLED ?? false
+  if (JWT && isSTACTokenAuthEnabled) {
+    requestHeaders.append('Authorization', `Bearer ${JWT}`)
+  }
+  appendStacHeaderCookies(requestHeaders)
+
+  const effectiveLimit = Math.max(1, limit || 1)
+
+  const stacApiUrl = `${
+    store.getState().mainSlice.appConfig.STAC_API_URL
+  }/search?${searchParams}`
+
+  const response = await fetch(stacApiUrl, {
+    credentials:
+      store.getState().mainSlice.appConfig.FETCH_CREDENTIALS || 'same-origin',
+    headers: requestHeaders
+  })
+
+  if (!response.ok) {
+    throw new Error(
+      `Error fetching top items for mosaic (status ${response.status})`
+    )
+  }
+
+  const json = await response.json()
+  const itemIds = Array.isArray(json.features)
+    ? json.features.map((feature) => feature.id).filter(Boolean)
+    : []
+
+  return {
+    itemIds,
+    effectiveLimit: Math.min(effectiveLimit, itemIds.length)
+  }
+}

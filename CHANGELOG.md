@@ -10,15 +10,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 
 - Added a NumericRangeInputs component for numeric fields that supports unbounded, min-only, and max-only queryables.
+- Added mosaic search caching metadata to track the last mosaic request and top N item IDs for re-use across searches.
 
 ### Changed
 
 - Moved Item pagination buttons from below to above the Item Details content.
+- Updated mosaic search flow to fetch a small set of top items for comparison before creating a new mosaic, reducing redundant mosaic tiler requests.
+- Prevented `newSearch` from clearing map layers and results when running in mosaic view where an existing mosaic image layer is being reused.
 
 ### Fixed
 
 - Corrected the multi-select filter component to properly lose focus after deleting chips.
 - Fixed map auto-zoom when loading items via `/:collectionId/:itemId` URLs
+- Fixed repeated mosaic layer recreation on identical mosaic searches by reusing the existing mosaic image layer when the request parameters and top items have not changed.
 
 ## v7.1.0-pre - 2026-01-15
 
