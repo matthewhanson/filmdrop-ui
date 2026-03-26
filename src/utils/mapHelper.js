@@ -331,6 +331,21 @@ export function setMapZoomLevel(level) {
   }
 }
 
+const COORD_PRECISION = 6
+export const roundCoord = (n) => Number(n.toFixed(COORD_PRECISION))
+const roundBbox = (bbox) => bbox.map(roundCoord)
+
+export const clampAndRoundBbox = (bbox) => {
+  if (!bbox || bbox.length < 4) return bbox
+  const clampLng = (lng) => (lng < -180 ? -180 : lng > 180 ? 180 : lng)
+  return [
+    roundCoord(clampLng(bbox[0])),
+    roundCoord(bbox[1]),
+    roundCoord(clampLng(bbox[2])),
+    roundCoord(bbox[3])
+  ]
+}
+
 function leafletBoundsFromBBOX(bbox) {
   const swCorner = L.latLng(bbox[1], bbox[0])
   const neCorner = L.latLng(bbox[3], bbox[2])
@@ -342,12 +357,12 @@ export function bboxFromMapBounds() {
   const map = store.getState().mainSlice.map
   if (map && Object.keys(map).length > 0) {
     const mapBounds = map.getBounds()
-    return [
+    return roundBbox([
       mapBounds._southWest.lng,
       mapBounds._southWest.lat,
       mapBounds._northEast.lng,
       mapBounds._northEast.lat
-    ]
+    ])
   }
 }
 
@@ -359,7 +374,9 @@ export function zoomToCollectionExtent(collection, options) {
     const collectionBounds = leafletBoundsFromBBOX(
       collection.extent.spatial.bbox[0]
     )
-    const viewportBounds = leafletBoundsFromBBOX(bboxFromMapBounds())
+    const bbox = bboxFromMapBounds()
+    if (!bbox) return
+    const viewportBounds = leafletBoundsFromBBOX(bbox)
     if (!collectionBounds.contains(viewportBounds)) {
       zoomToBounds(collectionBounds, options)
     }
@@ -804,6 +821,20 @@ export async function addMosaicLayer(json) {
       })
     })
   }
+}
+
+export function hasMosaicImageLayer() {
+  const map = store.getState().mainSlice.map
+  if (!map || Object.keys(map).length === 0) {
+    return false
+  }
+  let hasLayer = false
+  map.eachLayer((layer) => {
+    if (layer.layer_name === 'mosaicImageLayer') {
+      hasLayer = true
+    }
+  })
+  return hasLayer
 }
 
 export function enableMapPolyDrawing() {
