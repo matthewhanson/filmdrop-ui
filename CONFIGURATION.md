@@ -583,6 +583,18 @@ fields are supported:
 | `expression`    | `expression`      | Band math expression (e.g., `"(nir-red)/(nir+red)"`)                  |
 | `resampling`    | `resampling`      | Resampling method (e.g., `"nearest"`, `"bilinear"`)                   |
 
+**TiTiler-Specific Parameter Inference:**
+
+FilmDrop UI automatically infers certain TiTiler parameters that are not part of the STAC Render Extension specification:
+
+- **`asset_as_band`**: Automatically set to `true` when a visualization has an `expression` and specifies multiple `assets`.
+  This tells TiTiler to treat each asset as a 1-band dataset for band math operations.
+- **`unscale`**: Automatically set to `true` for expression-based visualizations (e.g., NDVI) to apply scale/offset metadata
+  from the raster. For RGB-style visualizations without expressions, `unscale` is omitted to preserve the historical raw DN behavior.
+
+> **Note**: These parameters are inferred automatically based on the visualization structure and do not need to be specified in
+> the configuration. The STAC Render Extension does not include these TiTiler-specific parameters.
+
 For example, a STAC Collection with this `renders` object:
 
 ```json

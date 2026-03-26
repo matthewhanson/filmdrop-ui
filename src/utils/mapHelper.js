@@ -20,6 +20,13 @@ import { getCollectionConfig } from './configHelper'
 import { appendStacHeaderCookies } from '../utils/stacRequest'
 import { getMapGeometryColors } from './themeHelper'
 
+const isDev =
+  typeof import.meta !== 'undefined' && Boolean(import.meta.env?.DEV)
+
+const debugLog = (...args) => {
+  if (isDev) console.debug(...args)
+}
+
 /**
  * Gets the style for search result footprint layers.
  * Reads colors from CSS variables for theme support.
@@ -447,8 +454,10 @@ function addImageOverlay(item) {
   }
   const sceneTilerURL =
     store.getState().mainSlice.appConfig.SCENE_TILER_URL || ''
+  const sceneTilerBaseUrl = sceneTilerURL.replace(/\/+$/, '')
+  const tileMatrixSetId = 'WebMercatorQuad'
   const visualizations = getCollectionConfig(item?.collection, 'visualizations')
-  if (!item || !sceneTilerURL || !visualizations) {
+  if (!item || !sceneTilerBaseUrl || !visualizations) {
     if (!visualizations && item?.collection) {
       console.warn(
         `[TiTiler Scene] Cannot display scene imagery - no visualizations configured for collection '${item.collection}'`
@@ -500,8 +509,13 @@ function addImageOverlay(item) {
           // Find and replace within the titiler url, if configured
           featureURL = findReplaceTitilerUrl(featureURL)
 
+          const queryParts = []
+          if (scale() === 2) queryParts.push('tilesize=512')
+          queryParts.push(`url=${encodeURIComponent(featureURL)}`)
+          if (tilerParams) queryParts.push(tilerParams)
+
           const currentSelectionImageTileLayer = L.tileLayer(
-            `${sceneTilerURL}/stac/tiles/{z}/{x}/{y}@${scale()}x.png?url=${featureURL}&${tilerParams}`,
+            `${sceneTilerBaseUrl}/stac/tiles/${tileMatrixSetId}/{z}/{x}/{y}.png?${queryParts.join('&')}`,
             tileLayerParams
           )
             .on('load', function () {
@@ -509,7 +523,7 @@ function addImageOverlay(item) {
             })
             .on('tileerror', function () {
               store.dispatch(setimageOverlayLoading(false))
-              console.log('Tile Error')
+              debugLog('[TiTiler Scene] Tile error')
             })
 
           map.eachLayer(function (layer) {
@@ -542,7 +556,7 @@ const getTileLayerParams = (collection) => {
     'tileLayerParams'
   )
   if (!collectionTileLayerParams) {
-    console.log(`tileLayerParams not defined for ${collection}`)
+    debugLog(`[TiTiler Scene] tileLayerParams not defined for ${collection}`)
     return {}
   }
   return collectionTileLayerParams
@@ -594,7 +608,7 @@ const constructSceneTilerParams = (
 
   const tilerParams = visualizations[visualizationKey]
 
-  console.log(
+  debugLog(
     `[TiTiler Scene] Collection: ${collection}, using visualization: ${visualizationKey}`,
     tilerParams
   )
@@ -602,6 +616,16 @@ const constructSceneTilerParams = (
   if (!tilerParams) return ''
 
   const params = []
+
+  // Unscale applies scale/offset metadata.
+  // Default to unscale for expression-based visualizations (e.g., NDVI), since
+  // derived indices typically expect physical values. For RGB-style visualizations
+  // tuned to raw DN ranges, keep the historical behavior unless explicitly enabled.
+  const explicitUnscale = tilerParams?.unscale
+  const shouldUnscale =
+    explicitUnscale === true ||
+    (explicitUnscale == null && Boolean(tilerParams?.expression))
+  if (shouldUnscale) params.push('unscale=true')
 
   const [asset, assetsParam] = constructSceneAssetsParam(tilerParams)
   params.push(assetsParam)
@@ -618,10 +642,18 @@ const constructSceneTilerParams = (
   const expression = parameters.expression(tilerParams)
   if (expression) {
     params.push(expression)
-    // When using expression with multiple assets, tell TiTiler each asset is a 1-band dataset.
-    // For single multi-band assets (e.g. NAIP), skip this so bands are accessible as {asset}_b{N}.
-    if (tilerParams?.assets && tilerParams.assets.length > 1) {
-      params.push('asset_as_band=true')
+
+    // `asset_as_band` is only needed for some expression modes.
+    // Prefer an explicit per-visualization override. Otherwise, if the
+    // visualization provides multiple assets, enable `asset_as_band` by default.
+    // The deployed FilmDrop TiTiler expects this for multi-asset expressions.
+    const explicitAssetAsBand = parameters.assetAsBand(tilerParams)
+    if (explicitAssetAsBand) {
+      params.push(explicitAssetAsBand)
+    } else {
+      if (Array.isArray(tilerParams?.assets) && tilerParams.assets.length > 1) {
+        params.push('asset_as_band=true')
+      }
     }
   }
 
@@ -705,6 +737,12 @@ const parameters = {
         .map((x) => `bidx=${x}`)
         .join('&')
     }
+  },
+  assetAsBand: (tilerParams) => {
+    const value = tilerParams?.asset_as_band
+    if (value === true) return 'asset_as_band=true'
+    if (value === false) return 'asset_as_band=false'
+    return null
   }
 }
 
@@ -713,6 +751,14 @@ export const constructMosaicTilerParams = (collection) => {
   if (!tilerParams) return ''
 
   const params = []
+
+  // Unscale applies scale/offset metadata. Default on for expression-based
+  // mosaic visualizations, or opt-in via config.
+  const explicitUnscale = tilerParams?.unscale
+  const shouldUnscale =
+    explicitUnscale === true ||
+    (explicitUnscale == null && Boolean(tilerParams?.expression))
+  if (shouldUnscale) params.push('unscale=true')
 
   const bidx = parameters.bidx(tilerParams)
   if (bidx) params.push(bidx)
@@ -765,7 +811,7 @@ export async function addMosaicLayer(json) {
         })
         .on('tileerror', function () {
           store.dispatch(setSearchLoading(false))
-          console.log('Tile Error')
+          debugLog('[TiTiler Mosaic] Tile error')
         })
 
       map.eachLayer(function (layer) {
