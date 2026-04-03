@@ -1,12 +1,13 @@
 .LayerLegend {
   position: absolute;
   z-index: 5;
-  bottom: 20px;
-  left: 20px;
-  padding: 10px;
+  bottom: 10px;
+  left: 10px;
+  padding: 6px 10px;
   background-color: var(--map-info-overlay-background);
+  border: 1px solid var(--map-info-overlay-border);
   color: var(--map-info-overlay-color);
-  border-radius: 5px;
+  border-radius: var(--radius-md);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -20,12 +21,12 @@
 }
 
 .hexLegendLabel {
-  font-weight: bold;
+  font-weight: 700;
 }
 
 .legendRow {
-  margin-top: 4px;
-  margin-bottom: 8px;
+  margin-top: 5px;
+  margin-bottom: 5px;
   display: flex;
   flex-direction: row;
 }
@@ -41,7 +42,7 @@
 }
 
 .searchAreaLegendSymbol {
-  border-color: #00c07b;
+  border-color: var(--map-geometry-aoi-boundary);
   border-style: dashed;
 }
 
@@ -52,14 +53,14 @@
 }
 
 .sceneLegendSymbol {
-  border-color: #3183f5;
-  background-color: #3183f52e;
+  border-color: var(--map-geometry-search-result);
+  background-color: var(--map-geometry-search-result-fill);
   border-style: solid;
 }
 
 .sceneInCartLegendSymbol {
-  border-color: #ad5c11;
-  background-color: #ad5c1129;
+  border-color: var(--map-geometry-cart-item);
+  background-color: var(--map-geometry-cart-item-fill);
   border-style: solid;
 }
 

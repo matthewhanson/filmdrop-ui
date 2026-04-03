@@ -10,25 +10,18 @@ import {
   setimageOverlayLoading,
   setselectedPopupResultIndex
 } from '../../redux/slices/mainSlice'
-import {
-  getCollectionConfig,
-  getCollectionVisualizations
-} from '../../utils/configHelper'
 import PopupFooter from '../PopupFooter/PopupFooter.jsx'
-import {
-  isSceneInCart,
-  numberOfSelectedInCart,
-  areAllScenesSelectedInCart
-} from '../../utils/dataHelper'
+import { isSceneInCart } from '../../utils/dataHelper'
 import { debounceTitilerOverlay } from '../../utils/mapHelper'
 import { useLayout } from '../../contexts/LayoutContext'
 import { EnhancedDetailsProvider } from '../../contexts/EnhancedDetailsContext'
 import EnhancedDetailsDisplay from '../EnhancedDetails/EnhancedDetailsDisplay.jsx'
-import { router } from '../../router'
+import { useUrlNavigate } from '../../hooks/useUrlNavigate'
 
 const PopupResults = (props) => {
   const dispatch = useDispatch()
   const { enhancedColumns: _enhancedColumns } = useLayout()
+  const { setItem } = useUrlNavigate()
   const _cartItems = useSelector((state) => state.mainSlice.cartItems)
   const _appConfig = useSelector((state) => state.mainSlice.appConfig)
   const _currentPopupResult = useSelector(
@@ -55,7 +48,7 @@ const PopupResults = (props) => {
     return () => {
       dispatch(setimageOverlayLoading(false))
     }
-  }, [props.results, _selectedPopupResultIndex])
+  }, [props.results, _selectedPopupResultIndex, _selectedVisualization])
 
   useEffect(() => {
     if (props.results.length > 0) {
@@ -63,27 +56,11 @@ const PopupResults = (props) => {
 
       // Update URL when navigating between items
       const currentItem = props.results[_selectedPopupResultIndex]
-      if (currentItem && currentItem.collection && currentItem.id) {
-        const collectionId = currentItem.collection
-        const { hasVisualizations } = getCollectionVisualizations(collectionId)
-
-        const navigateParams = {
-          collectionId,
-          itemId: currentItem.id
-        }
-
-        // Only include visualization if collection has >= 1 visualization
-        if (hasVisualizations && _selectedVisualization) {
-          navigateParams.visualizationId = _selectedVisualization
-        }
-
-        router.navigate({
-          to: '/item/$collectionId/$itemId/{-$visualizationId}',
-          params: navigateParams
-        })
+      if (currentItem && currentItem.id) {
+        setItem(currentItem.id)
       }
     }
-  }, [_selectedPopupResultIndex, props.results, _selectedVisualization])
+  }, [_selectedPopupResultIndex, props.results])
 
   const onNextClick = useCallback(() => {
     if (_selectedPopupResultIndex < props.results.length - 1) {
@@ -114,55 +91,21 @@ const PopupResults = (props) => {
     )
   }
 
-  function onAddAllToCartClicked() {
-    if (areAllScenesSelectedInCart(props.results)) {
-      return
-    }
-    const cartPlusNewScenes = [..._cartItems]
-    props.results.forEach((result) => {
-      const sceneInCart = isSceneInCart(result)
-      if (!sceneInCart) {
-        cartPlusNewScenes.push(result)
-      }
-    })
-    dispatch(setcartItems(cartPlusNewScenes))
-  }
-
   return (
     <div data-testid="testPopupResults" className="popupResultsContainer">
       {props.results.length > 0 ? (
         <div className="popupResults">
-          <div className="popupHeader">
-            <div className="popupHeaderTop">
-              <div className="popupResultContentText">
-                {props.results.length + ' scenes selected'}{' '}
-                {_appConfig.CART_ENABLED &&
-                numberOfSelectedInCart(props.results) > 0
-                  ? '(' + numberOfSelectedInCart(props.results) + ' in cart)'
-                  : null}
-              </div>
-            </div>
-            {_appConfig.CART_ENABLED ? (
-              <div className="popupHeaderBottom">
-                <button
-                  className={
-                    areAllScenesSelectedInCart(props.results)
-                      ? 'popupHeaderBottomButton popupHeaderBottomButtonDisabled'
-                      : 'popupHeaderBottomButton'
-                  }
-                  onClick={onAddAllToCartClicked}
-                >
-                  Add all to cart
-                </button>
-              </div>
-            ) : null}
-          </div>
+          <PopupFooter
+            currentIndex={_selectedPopupResultIndex}
+            totalCount={props.results.length}
+            onPrevClick={onPrevClick}
+            onNextClick={onNextClick}
+            cartEnabled={_appConfig.CART_ENABLED}
+            isInCart={isSceneInCart(props.results[_selectedPopupResultIndex])}
+            onCartClick={onAddRemoveSceneToCartClicked}
+          />
           <div
-            className={
-              _appConfig.CART_ENABLED
-                ? 'popupResultsContent popupResultsContentCartEnabled'
-                : 'popupResultsContent'
-            }
+            className="popupResultsContent"
             style={{ '--columns': _enhancedColumns }}
           >
             <PopupResult
@@ -176,32 +119,13 @@ const PopupResults = (props) => {
             >
               <EnhancedDetailsDisplay />
             </EnhancedDetailsProvider>
-
-            {_appConfig.CART_ENABLED ? (
-              <div className="popupResultsBottom">
-                <button
-                  className="popupResultsBottomButton"
-                  onClick={onAddRemoveSceneToCartClicked}
-                >
-                  {isSceneInCart(props.results[_selectedPopupResultIndex])
-                    ? 'Remove scene from cart'
-                    : 'Add scene to cart'}
-                </button>
-              </div>
-            ) : null}
           </div>
-          <PopupFooter
-            currentIndex={_selectedPopupResultIndex}
-            totalCount={props.results.length}
-            onPrevClick={onPrevClick}
-            onNextClick={onNextClick}
-          />
         </div>
       ) : (
         <div className="popupResultsEmpty">
           <span className="popupResultsEmptyPrimaryText">Nothing Selected</span>
           <span className="popupResultsEmptySecondaryText">
-            search and click footprint on map to view details
+            Search and click footprint on map to view Item Details.
           </span>
         </div>
       )}

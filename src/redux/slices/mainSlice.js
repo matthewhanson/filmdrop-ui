@@ -6,8 +6,6 @@ import { DEFAULT_DATE_RANGE } from '../../components/defaults'
 const initialState = {
   map: {},
   dateTime: [],
-  cloudCover: 30,
-  showCloudSlider: true,
   searchResults: null,
   clickResults: [],
   searchLoading: false,
@@ -24,7 +22,6 @@ const initialState = {
   searchDateRangeValue: DEFAULT_DATE_RANGE,
   localGridData: {},
   hasCollectionChanged: false,
-  showSearchByGeom: false,
   isDrawingEnabled: false,
   mapDrawPolygonHandler: null,
   searchGeojsonBoundary: null,
@@ -43,19 +40,26 @@ const initialState = {
   showLayerList: false,
   showVisualizationList: false,
   referenceLayers: [],
-  selectedCollection: 'Select Collection',
+  selectedCollection: '',
   selectedVisualization: null,
-  tabSelected: 'filters',
+  tabSelected: 'search',
   selectedPopupResultIndex: 0,
   autoCenterOnItemChanged: false,
-  hasLeftPanelTabChanged: false,
   authTokenExists: false,
   currentTheme: null,
   paginationNextLink: null,
   paginationPrevLink: null,
   currentPage: 1,
   totalPages: null,
-  paginationHistory: []
+  paginationHistory: [],
+  queryableFilters: {},
+  detailsResetKey: 0,
+  showSceneOverlay: true,
+  mosaicCache: {
+    lastMosaicRequestSignature: null,
+    lastMosaicTopItemIds: null,
+    lastMosaicCompareCount: null
+  }
 }
 
 // next, for every key in the initialState
@@ -69,12 +73,6 @@ export const mainSlice = createSlice({
     mainSliceReset: () => initialState,
     setMap: (state, action) => {
       state.map = action.payload
-    },
-    setCloudCover: (state, action) => {
-      state.cloudCover = action.payload
-    },
-    setShowCloudSlider: (state, action) => {
-      state.showCloudSlider = action.payload
     },
     setSelectedCollection: (state, action) => {
       state.selectedCollection = action.payload
@@ -129,9 +127,6 @@ export const mainSlice = createSlice({
     },
     sethasCollectionChanged: (state, action) => {
       state.hasCollectionChanged = action.payload
-    },
-    setshowSearchByGeom: (state, action) => {
-      state.showSearchByGeom = action.payload
     },
     setisDrawingEnabled: (state, action) => {
       state.isDrawingEnabled = action.payload
@@ -202,9 +197,6 @@ export const mainSlice = createSlice({
     setautoCenterOnItemChanged: (state, action) => {
       state.autoCenterOnItemChanged = action.payload
     },
-    sethasLeftPanelTabChanged: (state, action) => {
-      state.hasLeftPanelTabChanged = action.payload
-    },
     setauthTokenExists: (state, action) => {
       state.authTokenExists = action.payload
     },
@@ -228,6 +220,21 @@ export const mainSlice = createSlice({
     },
     addToPaginationHistory: (state, action) => {
       state.paginationHistory = [...state.paginationHistory, action.payload]
+    },
+    setQueryableFilters: (state, action) => {
+      state.queryableFilters = action.payload
+    },
+    setMosaicCache: (state, action) => {
+      state.mosaicCache = {
+        ...state.mosaicCache,
+        ...action.payload
+      }
+    },
+    incrementDetailsResetKey: (state) => {
+      state.detailsResetKey += 1
+    },
+    setShowSceneOverlay: (state, action) => {
+      state.showSceneOverlay = action.payload
     }
   }
 })
@@ -236,8 +243,6 @@ export const mainSlice = createSlice({
 // reducer/action info that you added above
 export const { mainSliceReset } = mainSlice.actions
 export const { setMap } = mainSlice.actions
-export const { setCloudCover } = mainSlice.actions
-export const { setShowCloudSlider } = mainSlice.actions
 export const { setSelectedCollection } = mainSlice.actions
 export const { setSelectedVisualization } = mainSlice.actions
 export const { setSearchResults } = mainSlice.actions
@@ -256,7 +261,6 @@ export const { setSelectedCollectionData } = mainSlice.actions
 export const { setSearchDateRangeValue } = mainSlice.actions
 export const { setLocalGridData } = mainSlice.actions
 export const { sethasCollectionChanged } = mainSlice.actions
-export const { setshowSearchByGeom } = mainSlice.actions
 export const { setisDrawingEnabled } = mainSlice.actions
 export const { setmapDrawPolygonHandler } = mainSlice.actions
 export const { setsearchGeojsonBoundary } = mainSlice.actions
@@ -279,7 +283,6 @@ export const { setreferenceLayers } = mainSlice.actions
 export const { settabSelected } = mainSlice.actions
 export const { setselectedPopupResultIndex } = mainSlice.actions
 export const { setautoCenterOnItemChanged } = mainSlice.actions
-export const { sethasLeftPanelTabChanged } = mainSlice.actions
 export const { setauthTokenExists } = mainSlice.actions
 export const { setCurrentTheme } = mainSlice.actions
 export const { setpaginationNextLink } = mainSlice.actions
@@ -287,6 +290,10 @@ export const { setpaginationPrevLink } = mainSlice.actions
 export const { setcurrentPage } = mainSlice.actions
 export const { settotalPages } = mainSlice.actions
 export const { setpaginationHistory } = mainSlice.actions
+export const { setMosaicCache } = mainSlice.actions
 export const { addToPaginationHistory } = mainSlice.actions
+export const { setQueryableFilters } = mainSlice.actions
+export const { incrementDetailsResetKey } = mainSlice.actions
+export const { setShowSceneOverlay } = mainSlice.actions
 
 export default mainSlice.reducer

@@ -2,33 +2,42 @@ import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import './PopupResult.css'
 import { useSelector } from 'react-redux'
-import { debounceTitilerOverlay, zoomToItemExtent } from '../../utils/mapHelper'
+import { zoomToItemExtent } from '../../utils/mapHelper'
+import ItemHeader from '../EnhancedDetails/ItemHeader.jsx'
+import VisualizationDropdown from '../VisualizationDropdown/VisualizationDropdown'
 
 const PopupResult = (props) => {
   const _appConfig = useSelector((state) => state.mainSlice.appConfig)
   const _autoCenterOnItemChanged = useSelector(
     (state) => state.mainSlice.autoCenterOnItemChanged
   )
-  const [thumbnailURL, setthumbnailURL] = useState(null)
+  const [thumbnailInfo, setThumbnailInfo] = useState(null)
 
   useEffect(() => {
     if (props.result) {
       if (_autoCenterOnItemChanged) {
         zoomToItemExtent(props.result)
       }
-      debounceTitilerOverlay(props.result)
       const thumbnailURLForSelection = props.result?.links?.find(
         ({ rel }) => rel === 'thumbnail'
       )?.href
 
+      // If no thumbnail available, clear immediately
+      if (!thumbnailURLForSelection) {
+        setThumbnailInfo(null)
+        return
+      }
+
+      // Preload the new image, keeping the previous one visible until ready
       const image = new Image()
       image.onload = function () {
         if (this.width > 0) {
-          setthumbnailURL(thumbnailURLForSelection)
+          setThumbnailInfo({
+            url: thumbnailURLForSelection,
+            width: this.width,
+            height: this.height
+          })
         }
-      }
-      image.onerror = function () {
-        setthumbnailURL('/ThumbnailNotAvailable.png')
       }
       image.src = thumbnailURLForSelection
     }
@@ -45,22 +54,30 @@ const PopupResult = (props) => {
       }
     >
       {props.result ? (
-        <div>
-          <div className="popupResultThumbnailContainer">
-            {thumbnailURL ? (
+        <div className="popupResultHero">
+          {thumbnailInfo && (
+            <div
+              className="popupResultThumbnailContainer"
+              style={{
+                aspectRatio: `${thumbnailInfo.width} / ${thumbnailInfo.height}`
+              }}
+            >
               <picture>
                 <img
-                  src={thumbnailURL}
+                  src={thumbnailInfo.url}
                   alt="thumbnail"
                   className="popupResultThumbnail"
                   onError={({ currentTarget }) => {
                     currentTarget.onerror = null // prevents looping
-                    currentTarget.parentElement.remove()
+                    currentTarget.parentElement.parentElement.remove()
                   }}
-                ></img>
+                />
               </picture>
-            ) : null}
-          </div>
+            </div>
+          )}
+          <ItemHeader id={props.result.id} collection={props.result.collection}>
+            <VisualizationDropdown />
+          </ItemHeader>
         </div>
       ) : null}
     </div>

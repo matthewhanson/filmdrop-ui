@@ -8,7 +8,7 @@ import { defineConfig, configDefaults } from 'vitest/config'
 import svgrPlugin from 'vite-plugin-svgr'
 
 export default defineConfig({
-  base: './',
+  base: '/',
   define: {
     'process.env.REACT_APP_VERSION': JSON.stringify(
       require('./package.json').version

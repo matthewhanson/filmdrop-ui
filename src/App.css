@@ -1,12 +1,12 @@
 .App {
   height: 100%;
   width: 100%;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', Arial, Helvetica, sans-serif;
   background-color: var(--app-background-loading);
 }
 
 .leaflet-tooltip {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', Arial, Helvetica, sans-serif;
 }
 
 .appLoading {

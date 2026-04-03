@@ -8,55 +8,86 @@ import {
   setsearchGeojsonBoundary,
   setimageOverlayLoading,
   setSearchLoading,
-  settabSelected,
-  setCurrentPopupResult,
-  sethasLeftPanelTabChanged
+  setCurrentPopupResult
 } from '../redux/slices/mainSlice'
 import { searchGridCodeScenes } from './searchHelper'
 import debounce from './debounce'
 import { GetMosaicBoundsService } from '../services/get-mosaic-bounds'
 import GeoJSONValidation from './geojsonValidation'
 import { DEFAULT_TILE_LAYER_PARAMS } from '../components/defaults'
-import { router } from '../router'
-import {
-  getCollectionConfig,
-  getCollectionVisualizations
-} from './configHelper'
+import { router, getPathParams } from '../router'
+import { getCollectionConfig } from './configHelper'
 import { appendStacHeaderCookies } from '../utils/stacRequest'
+import { getMapGeometryColors } from './themeHelper'
 
-export const footprintLayerStyle = {
-  color: '#3183f5',
-  weight: 1,
-  opacity: 1,
-  fillOpacity: 0.1,
-  fillColor: '#3183f5',
-  pane: 'searchResults'
+const isDev =
+  typeof import.meta !== 'undefined' && Boolean(import.meta.env?.DEV)
+
+const debugLog = (...args) => {
+  if (isDev) console.debug(...args)
 }
 
-export const gridCodeLayerStyle = {
-  color: '#3183f5',
-  weight: 1,
-  opacity: 1,
-  fillOpacity: 0.1,
-  fillColor: '#3183f5',
-  pane: 'searchResults'
+/**
+ * Gets the style for search result footprint layers.
+ * Reads colors from CSS variables for theme support.
+ */
+export function getFootprintLayerStyle() {
+  const colors = getMapGeometryColors()
+  return {
+    color: colors.searchResult,
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.1,
+    fillColor: colors.searchResult,
+    pane: 'searchResults'
+  }
 }
 
-export const clickedFootprintLayerStyle = {
-  color: '#BEA835',
-  weight: 4,
-  opacity: 0.65,
-  fillOpacity: 0,
-  pane: 'searchResults'
+/**
+ * Gets the style for grid code aggregation layers.
+ * Reads colors from CSS variables for theme support.
+ */
+export function getGridCodeLayerStyle() {
+  const colors = getMapGeometryColors()
+  return {
+    color: colors.searchResult,
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.1,
+    fillColor: colors.searchResult,
+    pane: 'searchResults'
+  }
 }
 
-export const cartFootprintLayerStyle = {
-  color: '#ad5c11',
-  weight: 3,
-  opacity: 1,
-  fillOpacity: 0.1,
-  fillColor: '#ad5c11',
-  pane: 'searchResults'
+/**
+ * Gets the style for clicked/highlighted scene footprints.
+ * Reads colors from CSS variables for theme support.
+ */
+export function getClickedFootprintLayerStyle() {
+  const colors = getMapGeometryColors()
+  return {
+    color: colors.highlighted,
+    weight: 4,
+    opacity: 0.65,
+    fillOpacity: 0,
+    pane: 'searchResults'
+  }
+}
+
+/**
+ * Gets the style for cart item footprints.
+ * Reads colors from CSS variables for theme support.
+ */
+export function getCartFootprintLayerStyle() {
+  const colors = getMapGeometryColors()
+  return {
+    color: colors.cartItem,
+    weight: 3,
+    opacity: 1,
+    fillOpacity: 0.1,
+    fillColor: colors.cartItem,
+    pane: 'searchResults'
+  }
 }
 
 const customSearchPointIconStyle = L.icon({
@@ -67,24 +98,47 @@ const customSearchPointIconStyle = L.icon({
   shadowUrl: '/marker-shadow.png'
 })
 
-export const customSearchLineStyle = {
-  color: '#00C07B',
-  weight: 2,
-  opacity: 1,
-  dashArray: '4, 4',
-  dashOffset: '0',
-  pane: 'drawPane'
+/**
+ * Gets the style for user-drawn line boundaries.
+ * Reads colors from CSS variables for theme support.
+ */
+export function getCustomSearchLineStyle() {
+  const colors = getMapGeometryColors()
+  return {
+    color: colors.aoiBoundary,
+    weight: 2,
+    opacity: 1,
+    dashArray: '4, 4',
+    dashOffset: '0',
+    pane: 'drawPane'
+  }
 }
 
-export const customSearchPolygonStyle = {
-  color: '#00C07B',
-  weight: 2,
-  opacity: 1,
-  fillOpacity: 0,
-  dashArray: '4, 4',
-  dashOffset: '0',
-  pane: 'drawPane'
+/**
+ * Gets the style for user-drawn polygon boundaries.
+ * Reads colors from CSS variables for theme support.
+ */
+export function getCustomSearchPolygonStyle() {
+  const colors = getMapGeometryColors()
+  return {
+    color: colors.aoiBoundary,
+    weight: 2,
+    opacity: 1,
+    fillOpacity: 0,
+    dashArray: '4, 4',
+    dashOffset: '0',
+    pane: 'drawPane'
+  }
 }
+
+// Backward-compatible exports - these evaluate at import time
+// For dynamic theme support, use the getter functions instead
+export const footprintLayerStyle = getFootprintLayerStyle()
+export const gridCodeLayerStyle = getGridCodeLayerStyle()
+export const clickedFootprintLayerStyle = getClickedFootprintLayerStyle()
+export const cartFootprintLayerStyle = getCartFootprintLayerStyle()
+export const customSearchLineStyle = getCustomSearchLineStyle()
+export const customSearchPolygonStyle = getCustomSearchPolygonStyle()
 
 export function mapClickHandler(e) {
   if (store.getState().mainSlice.isDrawingEnabled) {
@@ -130,31 +184,16 @@ export function mapClickHandler(e) {
             if (intersectingFeatures.length > 0) {
               // push to store
               store.dispatch(setClickResults(intersectingFeatures))
-              store.dispatch(settabSelected('details'))
-              store.dispatch(sethasLeftPanelTabChanged(true))
 
-              // Navigate to first item URL
+              // Update URL with selected item (tab sync handled by useUrlStateSync)
               const firstItem = intersectingFeatures[0]
-              if (firstItem.collection && firstItem.id) {
-                const collectionId = firstItem.collection
-                const { hasVisualizations } =
-                  getCollectionVisualizations(collectionId)
-                const _selectedVisualization =
-                  store.getState().mainSlice.selectedVisualization
-
-                const navigateParams = {
-                  collectionId,
-                  itemId: firstItem.id
-                }
-
-                // Only include visualization if collection has >= 1 visualization
-                if (hasVisualizations && _selectedVisualization) {
-                  navigateParams.visualizationId = _selectedVisualization
-                }
-
+              if (firstItem.id) {
+                const { collectionId } = getPathParams()
                 router.navigate({
-                  to: '/item/$collectionId/$itemId/{-$visualizationId}',
-                  params: navigateParams
+                  to: '/$collectionId/$itemId',
+                  params: { collectionId, itemId: firstItem.id },
+                  search: (prev) => ({ ...prev, tab: 'details' }),
+                  replace: true
                 })
               }
             }
@@ -266,10 +305,22 @@ export function deselectFeature() {
   clearLayer('clickedSceneImageLayer')
 }
 
-function zoomToBounds(bounds) {
+function zoomToBounds(bounds, options) {
   const map = store.getState().mainSlice.map
   if (map && Object.keys(map).length > 0) {
-    map.fitBounds(bounds)
+    // Prevent blank bands: on large viewports the map container can be
+    // taller than the Mercator world at the zoom fitBounds would choose.
+    // In that case, zoom to the center of the bounds at the minimum
+    // level that fills the container vertically instead.
+    const containerHeight = map.getContainer()?.clientHeight
+    if (containerHeight > 0) {
+      const minZoom = Math.ceil(Math.log2(containerHeight / 256))
+      if (map.getBoundsZoom(bounds) < minZoom) {
+        map.setView(bounds.getCenter(), minZoom, options)
+        return
+      }
+    }
+    map.fitBounds(bounds, options)
   }
 }
 
@@ -278,6 +329,21 @@ export function setMapZoomLevel(level) {
   if (map && Object.keys(map).length > 0) {
     map.setZoom(level)
   }
+}
+
+const COORD_PRECISION = 6
+export const roundCoord = (n) => Number(n.toFixed(COORD_PRECISION))
+const roundBbox = (bbox) => bbox.map(roundCoord)
+
+export const clampAndRoundBbox = (bbox) => {
+  if (!bbox || bbox.length < 4) return bbox
+  const clampLng = (lng) => (lng < -180 ? -180 : lng > 180 ? 180 : lng)
+  return [
+    roundCoord(clampLng(bbox[0])),
+    roundCoord(bbox[1]),
+    roundCoord(clampLng(bbox[2])),
+    roundCoord(bbox[3])
+  ]
 }
 
 function leafletBoundsFromBBOX(bbox) {
@@ -291,16 +357,16 @@ export function bboxFromMapBounds() {
   const map = store.getState().mainSlice.map
   if (map && Object.keys(map).length > 0) {
     const mapBounds = map.getBounds()
-    return [
+    return roundBbox([
       mapBounds._southWest.lng,
       mapBounds._southWest.lat,
       mapBounds._northEast.lng,
       mapBounds._northEast.lat
-    ]
+    ])
   }
 }
 
-export function zoomToCollectionExtent(collection) {
+export function zoomToCollectionExtent(collection, options) {
   if (
     collection.extent.spatial.bbox &&
     collection.extent.spatial.bbox.length >= 1
@@ -308,9 +374,11 @@ export function zoomToCollectionExtent(collection) {
     const collectionBounds = leafletBoundsFromBBOX(
       collection.extent.spatial.bbox[0]
     )
-    const viewportBounds = leafletBoundsFromBBOX(bboxFromMapBounds())
+    const bbox = bboxFromMapBounds()
+    if (!bbox) return
+    const viewportBounds = leafletBoundsFromBBOX(bbox)
     if (!collectionBounds.contains(viewportBounds)) {
-      zoomToBounds(collectionBounds)
+      zoomToBounds(collectionBounds, options)
     }
   }
 }
@@ -379,10 +447,17 @@ export const debounceTitilerOverlay = debounce(
 )
 
 function addImageOverlay(item) {
+  const showSceneOverlay = store.getState().mainSlice.showSceneOverlay
+  if (!showSceneOverlay) {
+    store.dispatch(setimageOverlayLoading(false))
+    return
+  }
   const sceneTilerURL =
     store.getState().mainSlice.appConfig.SCENE_TILER_URL || ''
+  const sceneTilerBaseUrl = sceneTilerURL.replace(/\/+$/, '')
+  const tileMatrixSetId = 'WebMercatorQuad'
   const visualizations = getCollectionConfig(item?.collection, 'visualizations')
-  if (!item || !sceneTilerURL || !visualizations) {
+  if (!item || !sceneTilerBaseUrl || !visualizations) {
     if (!visualizations && item?.collection) {
       console.warn(
         `[TiTiler Scene] Cannot display scene imagery - no visualizations configured for collection '${item.collection}'`
@@ -401,9 +476,7 @@ function addImageOverlay(item) {
 
   clearLayer('clickedSceneImageLayer')
 
-  const featureURL = item?.links
-    ?.find((x) => x?.rel === 'self')
-    ?.href?.toString()
+  let featureURL = item?.links?.find((x) => x?.rel === 'self')?.href?.toString()
   const tilerParams = constructSceneTilerParams(
     _selectedCollectionData.id,
     _selectedVisualization
@@ -432,8 +505,17 @@ function addImageOverlay(item) {
             ...collectionTileLayerParams,
             bounds: tileBounds
           }
+
+          // Find and replace within the titiler url, if configured
+          featureURL = findReplaceTitilerUrl(featureURL)
+
+          const queryParts = []
+          if (scale() === 2) queryParts.push('tilesize=512')
+          queryParts.push(`url=${encodeURIComponent(featureURL)}`)
+          if (tilerParams) queryParts.push(tilerParams)
+
           const currentSelectionImageTileLayer = L.tileLayer(
-            `${sceneTilerURL}/stac/tiles/{z}/{x}/{y}@${scale()}x.png?url=${featureURL}&${tilerParams}`,
+            `${sceneTilerBaseUrl}/stac/tiles/${tileMatrixSetId}/{z}/{x}/{y}.png?${queryParts.join('&')}`,
             tileLayerParams
           )
             .on('load', function () {
@@ -441,7 +523,7 @@ function addImageOverlay(item) {
             })
             .on('tileerror', function () {
               store.dispatch(setimageOverlayLoading(false))
-              console.log('Tile Error')
+              debugLog('[TiTiler Scene] Tile error')
             })
 
           map.eachLayer(function (layer) {
@@ -474,7 +556,7 @@ const getTileLayerParams = (collection) => {
     'tileLayerParams'
   )
   if (!collectionTileLayerParams) {
-    console.log(`tileLayerParams not defined for ${collection}`)
+    debugLog(`[TiTiler Scene] tileLayerParams not defined for ${collection}`)
     return {}
   }
   return collectionTileLayerParams
@@ -526,7 +608,7 @@ const constructSceneTilerParams = (
 
   const tilerParams = visualizations[visualizationKey]
 
-  console.log(
+  debugLog(
     `[TiTiler Scene] Collection: ${collection}, using visualization: ${visualizationKey}`,
     tilerParams
   )
@@ -534,6 +616,16 @@ const constructSceneTilerParams = (
   if (!tilerParams) return ''
 
   const params = []
+
+  // Unscale applies scale/offset metadata.
+  // Default to unscale for expression-based visualizations (e.g., NDVI), since
+  // derived indices typically expect physical values. For RGB-style visualizations
+  // tuned to raw DN ranges, keep the historical behavior unless explicitly enabled.
+  const explicitUnscale = tilerParams?.unscale
+  const shouldUnscale =
+    explicitUnscale === true ||
+    (explicitUnscale == null && Boolean(tilerParams?.expression))
+  if (shouldUnscale) params.push('unscale=true')
 
   const [asset, assetsParam] = constructSceneAssetsParam(tilerParams)
   params.push(assetsParam)
@@ -550,9 +642,18 @@ const constructSceneTilerParams = (
   const expression = parameters.expression(tilerParams)
   if (expression) {
     params.push(expression)
-    // When using expression with assets, tell TiTiler each asset is a 1-band dataset
-    if (tilerParams?.assets && tilerParams.assets.length > 0) {
-      params.push('asset_as_band=true')
+
+    // `asset_as_band` is only needed for some expression modes.
+    // Prefer an explicit per-visualization override. Otherwise, if the
+    // visualization provides multiple assets, enable `asset_as_band` by default.
+    // The deployed FilmDrop TiTiler expects this for multi-asset expressions.
+    const explicitAssetAsBand = parameters.assetAsBand(tilerParams)
+    if (explicitAssetAsBand) {
+      params.push(explicitAssetAsBand)
+    } else {
+      if (Array.isArray(tilerParams?.assets) && tilerParams.assets.length > 1) {
+        params.push('asset_as_band=true')
+      }
     }
   }
 
@@ -605,11 +706,16 @@ const parameters = {
   },
   expression: (tilerParams) => {
     const value = tilerParams?.expression
-    return value && `expression=${value}`
+    return value && `expression=${encodeURIComponent(value)}`
   },
   rescale: (tilerParams) => {
     const value = tilerParams?.rescale
-    return value && `rescale=${value}`
+    if (!value) return null
+    // Handle array of rescale values (one per band) - TiTiler expects separate rescale params
+    if (Array.isArray(value)) {
+      return value.map((v) => `rescale=${v}`).join('&')
+    }
+    return `rescale=${value}`
   },
   colormapName: (tilerParams) => {
     const value = tilerParams?.colormap_name
@@ -631,6 +737,12 @@ const parameters = {
         .map((x) => `bidx=${x}`)
         .join('&')
     }
+  },
+  assetAsBand: (tilerParams) => {
+    const value = tilerParams?.asset_as_band
+    if (value === true) return 'asset_as_band=true'
+    if (value === false) return 'asset_as_band=false'
+    return null
   }
 }
 
@@ -639,6 +751,14 @@ export const constructMosaicTilerParams = (collection) => {
   if (!tilerParams) return ''
 
   const params = []
+
+  // Unscale applies scale/offset metadata. Default on for expression-based
+  // mosaic visualizations, or opt-in via config.
+  const explicitUnscale = tilerParams?.unscale
+  const shouldUnscale =
+    explicitUnscale === true ||
+    (explicitUnscale == null && Boolean(tilerParams?.expression))
+  if (shouldUnscale) params.push('unscale=true')
 
   const bidx = parameters.bidx(tilerParams)
   if (bidx) params.push(bidx)
@@ -691,7 +811,7 @@ export async function addMosaicLayer(json) {
         })
         .on('tileerror', function () {
           store.dispatch(setSearchLoading(false))
-          console.log('Tile Error')
+          debugLog('[TiTiler Mosaic] Tile error')
         })
 
       map.eachLayer(function (layer) {
@@ -703,6 +823,20 @@ export async function addMosaicLayer(json) {
   }
 }
 
+export function hasMosaicImageLayer() {
+  const map = store.getState().mainSlice.map
+  if (!map || Object.keys(map).length === 0) {
+    return false
+  }
+  let hasLayer = false
+  map.eachLayer((layer) => {
+    if (layer.layer_name === 'mosaicImageLayer') {
+      hasLayer = true
+    }
+  })
+  return hasLayer
+}
+
 export function enableMapPolyDrawing() {
   const map = store.getState().mainSlice.map
   if (map && Object.keys(map).length > 0) {
@@ -711,11 +845,12 @@ export function enableMapPolyDrawing() {
 
     // save drawn items
     map.on(L.Draw.Event.CREATED, (e) => {
-      e.layer.options.color = '#00FF00'
+      const colors = getMapGeometryColors()
+      e.layer.options.color = colors.aoiBoundary
       map.eachLayer(function (layer) {
         if (layer.layer_name === 'drawBoundsLayer') {
           const drawLayer = e.layer
-          drawLayer.setStyle(customSearchPolygonStyle)
+          drawLayer.setStyle(getCustomSearchPolygonStyle())
           drawLayer.options.interactive = false
           layer.addLayer(drawLayer)
           const data = layer.toGeoJSON()
@@ -783,22 +918,22 @@ function styleFeatures(feature, geojsonLayer) {
     feature.geometry.type === 'LineString' ||
     feature.geometry.type === 'MultiLineString'
   ) {
-    return customSearchLineStyle
+    return getCustomSearchLineStyle()
   }
   if (
     feature.geometry.type === 'Polygon' ||
     feature.geometry.type === 'MultiPolygon'
   ) {
-    return customSearchPolygonStyle
+    return getCustomSearchPolygonStyle()
   }
   if (feature.geometry.type === 'GeometryCollection') {
     const accumulatedStyle = {}
     feature.geometry.geometries.forEach((part) => {
       if (part.type === 'LineString' || part.type === 'MultiLineString') {
-        Object.assign(accumulatedStyle, customSearchLineStyle)
+        Object.assign(accumulatedStyle, getCustomSearchLineStyle())
       }
       if (part.type === 'Polygon' || part.type === 'MultiPolygon') {
-        Object.assign(accumulatedStyle, customSearchPolygonStyle)
+        Object.assign(accumulatedStyle, getCustomSearchPolygonStyle())
       }
     })
     return accumulatedStyle
@@ -895,4 +1030,41 @@ export function toggleReferenceLayerVisibility(combinedLayerNameToToggle) {
       }
     })
   }
+}
+
+// if TILER_SETTINGS.URL_SUBST = true, modify the get request url made to titiler by finding and replacing
+// strings defined by TILER_URL_SUBST_F and TILER_URL_SUBST_R
+function findReplaceTitilerUrl(featureURL) {
+  let ret = featureURL
+
+  const replaceTitilerURL =
+    store.getState().mainSlice.appConfig.TILER_SETTINGS?.URL_SUBST ?? false
+  if (replaceTitilerURL === true) {
+    const findStr =
+      store.getState().mainSlice.appConfig.TILER_SETTINGS.URL_SUBST_FIND
+    const replaceStr =
+      store.getState().mainSlice.appConfig.TILER_SETTINGS.URL_SUBST_REPLACE
+
+    if (findStr === undefined || replaceStr === undefined) {
+      console.warn(
+        '[TILER_SETTINGS.URL_SUBST] URL_SUBST = true but URL_SUBST_FIND or URL_SUBST_REPLACE is not set. Skipping substitution.'
+      )
+    } else if (typeof findStr !== 'string' || typeof replaceStr !== 'string') {
+      console.warn(
+        '[TILER_SETTINGS.URL_SUBST] URL_SUBST_FIND and URL_SUBST_REPLACE must be strings. Skipping substitution.'
+      )
+    } else {
+      // replace can fail
+      try {
+        ret = ret.replace(findStr, replaceStr)
+      } catch (err) {
+        console.error(
+          '[TILER_SETTINGS.URL_SUBST] Error performing substitution:',
+          err
+        )
+      }
+    }
+  }
+
+  return ret
 }

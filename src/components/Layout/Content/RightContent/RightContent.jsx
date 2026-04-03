@@ -15,9 +15,7 @@ import {
   setSearchLoading,
   setshowMapAttribution,
   setshowLayerList,
-  setshowVisualizationList,
-  settabSelected,
-  sethasLeftPanelTabChanged
+  settabSelected
 } from '../../../../redux/slices/mainSlice'
 import {
   setMapZoomLevel,
@@ -26,10 +24,7 @@ import {
   clearMapSelection,
   selectMappedScenes
 } from '../../../../utils/mapHelper'
-import {
-  getCollectionConfig,
-  getCollectionVisualizations
-} from '../../../../utils/configHelper'
+import { getCollectionConfig } from '../../../../utils/configHelper'
 import LayerLegend from '../../../Legend/LayerLegend/LayerLegend'
 import { fetchAllFeatures } from '../../../../services/get-all-scenes-service'
 import { getBasemapConfig } from '../../../../utils/themeHelper'
@@ -37,10 +32,9 @@ import { CircularProgress } from '@mui/material'
 import DOMPurify from 'dompurify'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import { Tooltip } from 'react-tooltip'
+import 'react-tooltip/dist/react-tooltip.css'
 import LayersIcon from '@mui/icons-material/Layers'
-import Filter from '@mui/icons-material/Filter'
 import LayerList from '../../../LayerList/LayerList'
-import VisualizationList from '../../../VisualizationList/VisualizationList'
 import ExportButton from '../../../ExportButton/ExportButton'
 import Pagination from '../../../Pagination/Pagination'
 import { useLayout } from '../../../../contexts/LayoutContext'
@@ -76,15 +70,9 @@ const RightContent = () => {
   )
   const _appName = useSelector((state) => state.mainSlice.appName)
   const _showLayerList = useSelector((state) => state.mainSlice.showLayerList)
-  const _showVisualizationList = useSelector(
-    (state) => state.mainSlice.showVisualizationList
-  )
   const _currentTheme = useSelector((state) => state.mainSlice.currentTheme)
   const _selectedCollectionData = useSelector(
     (state) => state.mainSlice.selectedCollectionData
-  )
-  const _currentPopupResult = useSelector(
-    (state) => state.mainSlice.currentPopupResult
   )
   const _map = useSelector((state) => state.mainSlice.map)
   const {
@@ -170,7 +158,6 @@ const RightContent = () => {
   function onSelectAllScenesClicked() {
     selectMappedScenes()
     dispatch(settabSelected('details'))
-    dispatch(sethasLeftPanelTabChanged(true))
   }
 
   useEffect(() => {
@@ -182,6 +169,15 @@ const RightContent = () => {
       setmapAttribution(null)
     }
   }, [_appConfig, _currentTheme])
+
+  // Cleanup attribution tooltip timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (attributionTimeout.current) {
+        clearTimeout(attributionTimeout.current)
+      }
+    }
+  }, [])
 
   function sanitizeAttribution(dirty) {
     const clean = {
@@ -217,24 +213,16 @@ const RightContent = () => {
     dispatch(setshowLayerList(!_showLayerList))
   }
 
-  function onVisualizationButtonClick() {
-    dispatch(setshowVisualizationList(!_showVisualizationList))
-  }
-
-  // Determine if visualization button should be shown
-  const shouldShowVisualizationButton = () => {
-    if (
-      !_currentPopupResult ||
-      !_selectedCollectionData ||
-      !_appConfig?.SCENE_TILER_URL
-    ) {
-      return false
+  // Keep the opaque map cover up after the loading overlay disappears,
+  // giving React effects time to fire the collection zoom and tiles
+  // time to load behind it.
+  const [mapCoverVisible, setMapCoverVisible] = useState(_showAppLoading)
+  useEffect(() => {
+    if (!_showAppLoading && mapCoverVisible) {
+      const timer = setTimeout(() => setMapCoverVisible(false), 800)
+      return () => clearTimeout(timer)
     }
-    const { visualizationKeys } = getCollectionVisualizations(
-      _selectedCollectionData.id
-    )
-    return visualizationKeys.length > 1
-  }
+  }, [_showAppLoading, mapCoverVisible])
 
   // Use custom hook to handle map resize with debouncing
   useMapResizeHandler(_map, rightContentRef)
@@ -276,22 +264,10 @@ const RightContent = () => {
             ></LayersIcon>
           </div>
         )}
-      {shouldShowVisualizationButton() && (
-        <div className="visualizationButton" title="Change visualization type">
-          <Filter
-            className="visualizationButtonIcon"
-            onClick={() => onVisualizationButtonClick()}
-          ></Filter>
-        </div>
-      )}
       {_showLayerList && <LayerList></LayerList>}
-      {_showVisualizationList && <VisualizationList></VisualizationList>}
       <div className="actionButtons">
         {_appConfig.ACTION_BUTTON && (
-          <button
-            className="actionButton actionButtonCTA"
-            onClick={() => onActionClick()}
-          >
+          <button className="actionButton" onClick={() => onActionClick()}>
             {_appConfig.ACTION_BUTTON.text}
           </button>
         )}
@@ -308,8 +284,10 @@ const RightContent = () => {
                 : 'resultCountText'
             }
           >
-            Showing {_mappedScenes.length} of {_searchResults.numberMatched}{' '}
-            scenes
+            <strong>
+              Showing {_mappedScenes.length} of {_searchResults.numberMatched}{' '}
+              Scenes
+            </strong>
           </div>
           <div className="pagination">
             <Pagination />
@@ -371,7 +349,8 @@ const RightContent = () => {
           ></CircularProgress>
         </div>
       ) : null}
-      {_showAppLoading && (
+      {mapCoverVisible && <div className="mapLoadingCover" />}
+      {(_showAppLoading || mapCoverVisible) && (
         <div
           className="appLoadingContainer"
           data-testid="test_applicationLoadingAnimation"

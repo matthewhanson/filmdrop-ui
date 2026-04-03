@@ -1,0 +1,119 @@
+/* Header row with label and pills */
+.rangeSliderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0px;
+}
+
+.rangeSliderLabel {
+  font-size: 14px;
+  color: var(--side-panel-card-label-color);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  margin-right: 8px;
+}
+
+/* Value pills on the right side of header - single container */
+.rangeSliderValuePills {
+  display: flex;
+  gap: 0;
+  align-items: center;
+  flex-shrink: 0;
+  background: var(--side-panel-slider-value-container-background);
+  border: 1px solid var(--side-panel-slider-value-container-border);
+  border-radius: var(--radius-sm);
+  padding: 0 8px;
+  height: 28px;
+}
+
+.rangeSliderValuePills:hover {
+  border-color: var(--side-panel-input-border-hover);
+}
+
+.rangeSliderValuePills:focus-within {
+  border-color: var(--side-panel-slider-value-container-border-focused);
+  background: var(--side-panel-slider-value-container-background);
+}
+
+.rangeSliderValuePill {
+  width: 24px;
+  background: transparent;
+  border: none;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--side-panel-slider-value-color);
+  text-align: center;
+  box-sizing: border-box;
+  padding: 0;
+}
+
+.rangeSliderValuePill:focus {
+  outline: none;
+}
+
+/* Hide number input spinners */
+.rangeSliderValuePill::-webkit-outer-spin-button,
+.rangeSliderValuePill::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.rangeSliderValuePill[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.rangeSliderValueSeparator {
+  font-size: 12px;
+  color: var(--side-panel-slider-separator-color);
+  margin: 0 4px;
+}
+
+/* Slider track container */
+.rangeSliderTrackContainer {
+  padding: 4px 8px;
+}
+
+/* MUI Slider customization to match spec */
+.rangeSlider {
+  padding: 0 !important;
+  height: 6px !important;
+}
+
+/* Slider rail (inactive/background track) */
+.rangeSlider .MuiSlider-rail {
+  height: 5px;
+  border-radius: var(--radius-xs);
+  background-color: var(--side-panel-slider-rail);
+  opacity: 1;
+}
+
+/* Slider track (active/selected range) */
+.rangeSlider .MuiSlider-track {
+  height: 6px;
+  border-radius: var(--radius-xs);
+  background-color: var(--side-panel-slider-track);
+  border: none;
+}
+
+/* Slider thumb (handle) */
+.rangeSlider .MuiSlider-thumb {
+  width: 16px;
+  height: 16px;
+  background-color: var(--side-panel-slider-thumb-fill);
+  border: 1.5px solid var(--side-panel-slider-thumb-border);
+  box-shadow: none;
+}
+
+.rangeSlider .MuiSlider-thumb:hover,
+.rangeSlider .MuiSlider-thumb.Mui-focusVisible {
+  box-shadow: 0 0 0 5px var(--mui-hover);
+}
+
+.rangeSlider .MuiSlider-thumb:active,
+.rangeSlider .MuiSlider-thumb.Mui-active {
+  box-shadow: 0 0 0 7px var(--mui-hover);
+}

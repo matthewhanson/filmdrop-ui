@@ -9,7 +9,7 @@
  * Fetches the root catalog from a STAC API
  * @param {string} apiUrl - The base URL of the STAC API
  * @param {Object} options - Optional fetch options
- * @param {Object} options.headers - Custom headers to include (merged with defaults)
+ * @param {Headers} options.headers - Custom headers to include, must be of type Headers
  * @param {string} options.credentials - Credentials mode ('same-origin', 'include', etc.)
  * @returns {Promise<Object>} The root catalog object
  * @throws {Error} If the fetch fails or returns non-OK response
@@ -20,13 +20,12 @@ export async function getRootCatalog(apiUrl, options = {}) {
   }
 
   const { headers = {}, credentials, ...otherOptions } = options
+  const requestHeaders = normalizeHeaders(headers)
+  requestHeaders['Content-Type'] = 'application/json'
 
   const fetchOptions = {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      ...headers
-    },
+    headers: requestHeaders,
     ...otherOptions
   }
 
@@ -60,7 +59,7 @@ export async function getRootCatalog(apiUrl, options = {}) {
  * Fetches all collections from a STAC API
  * @param {string} apiUrl - The base URL of the STAC API
  * @param {Object} options - Optional fetch options
- * @param {Object} options.headers - Custom headers to include (merged with defaults)
+ * @param {Headers} options.headers - Custom headers to include, must be of type Headers
  * @param {string} options.credentials - Credentials mode ('same-origin', 'include', etc.)
  * @returns {Promise<Object>} The collections response object with collections array
  * @throws {Error} If the fetch fails or returns non-OK response
@@ -73,13 +72,12 @@ export async function getCollections(apiUrl, options = {}) {
   const collectionsUrl = `${apiUrl.replace(/\/$/, '')}/collections`
 
   const { headers = {}, credentials, ...otherOptions } = options
+  const requestHeaders = normalizeHeaders(headers)
+  requestHeaders['Content-Type'] = 'application/json'
 
   const fetchOptions = {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      ...headers
-    },
+    headers: requestHeaders,
     ...otherOptions
   }
 
@@ -114,7 +112,7 @@ export async function getCollections(apiUrl, options = {}) {
  * @param {string} apiUrl - The base URL of the STAC API
  * @param {string} collectionId - The ID of the collection to fetch
  * @param {Object} options - Optional fetch options
- * @param {Object} options.headers - Custom headers to include (merged with defaults)
+ * @param {Headers} options.headers - Custom headers to include, must be of type Headers
  * @param {string} options.credentials - Credentials mode ('same-origin', 'include', etc.)
  * @returns {Promise<Object>} The collection object
  * @throws {Error} If the fetch fails or returns non-OK response
@@ -130,13 +128,12 @@ export async function getCollection(apiUrl, collectionId, options = {}) {
   const collectionUrl = `${apiUrl.replace(/\/$/, '')}/collections/${collectionId}`
 
   const { headers = {}, credentials, ...otherOptions } = options
+  const requestHeaders = normalizeHeaders(headers)
+  requestHeaders['Content-Type'] = 'application/json'
 
   const fetchOptions = {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      ...headers
-    },
+    headers: requestHeaders,
     ...otherOptions
   }
 
@@ -260,6 +257,22 @@ export async function checkConformance(apiUrl, conformanceUris) {
   }
 
   return result
+}
+
+function normalizeHeaders(headers) {
+  if (!headers) {
+    return {}
+  }
+
+  if (typeof Headers !== 'undefined' && headers instanceof Headers) {
+    const normalized = {}
+    headers.forEach((value, key) => {
+      normalized[key] = value
+    })
+    return normalized
+  }
+
+  return { ...headers }
 }
 
 // Re-export conformance constants for convenience

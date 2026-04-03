@@ -1,0 +1,68 @@
+/* Style the MUI Select */
+.Dropdown__select {
+  width: 100%;
+  background: var(--side-panel-input-background);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--side-panel-input-color);
+}
+
+/* Standardize control height */
+.Dropdown__select .MuiSelect-select {
+  padding: 8px 32px 8px 12px !important;
+  font-size: 12px !important;
+  height: 36px !important;
+  box-sizing: border-box !important;
+  color: var(--side-panel-input-color) !important;
+}
+
+/* Style the outlined input */
+.Dropdown__select .MuiOutlinedInput-notchedOutline {
+  border: 1px solid var(--side-panel-input-border);
+  border-radius: var(--radius-sm);
+}
+
+.Dropdown__select:hover .MuiOutlinedInput-notchedOutline {
+  border-color: var(--side-panel-input-border-hover) !important;
+}
+
+.Dropdown__select.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: var(--side-panel-input-border-focused) !important;
+  border-width: 1px !important;
+}
+
+/* Style dropdown icon */
+.Dropdown__select .MuiSelect-icon {
+  color: var(--side-panel-text-color);
+  opacity: var(--opacity-secondary);
+  transition: opacity 0.2s ease;
+}
+
+.Dropdown__select:hover .MuiSelect-icon {
+  opacity: 1;
+}
+
+/* Style dropdown menu paper */
+.Dropdown__menu {
+  background-color: var(--side-panel-menu-background) !important;
+  color: var(--side-panel-input-color) !important;
+}
+
+/* Style dropdown menu items */
+.Dropdown__menu .MuiMenuItem-root {
+  font-size: 12px !important;
+  padding: 6px 16px !important;
+  color: var(--side-panel-input-color) !important;
+}
+
+.Dropdown__menu .MuiMenuItem-root:hover {
+  background-color: var(--side-panel-menu-item-background-hover) !important;
+}
+
+.Dropdown__menu .MuiMenuItem-root.Mui-selected {
+  background-color: var(--side-panel-menu-item-background-selected) !important;
+}
+
+.Dropdown__menu .MuiMenuItem-root.Mui-selected:hover {
+  background-color: var(--side-panel-menu-item-background-selected) !important;
+}

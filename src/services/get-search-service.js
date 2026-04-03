@@ -5,7 +5,6 @@ import {
   setSearchResults,
   setmappedScenes,
   settabSelected,
-  sethasLeftPanelTabChanged,
   setpaginationNextLink,
   setpaginationPrevLink,
   setcurrentPage,
@@ -26,16 +25,18 @@ export async function SearchService(searchParams, typeOfSearch) {
   }
   appendStacHeaderCookies(requestHeaders)
 
-  await fetch(
-    `${
-      store.getState().mainSlice.appConfig.STAC_API_URL
-    }/search?${searchParams}`,
-    {
-      credentials:
-        store.getState().mainSlice.appConfig.FETCH_CREDENTIALS || 'same-origin',
-      headers: requestHeaders
-    }
-  )
+  const stacApiUrl = `${
+    store.getState().mainSlice.appConfig.STAC_API_URL
+  }/search?${searchParams}`
+
+  console.log('STAC API Search Request:', stacApiUrl)
+  console.log('Search Parameters:', searchParams)
+
+  await fetch(stacApiUrl, {
+    credentials:
+      store.getState().mainSlice.appConfig.FETCH_CREDENTIALS || 'same-origin',
+    headers: requestHeaders
+  })
     .then((response) => {
       if (response.ok) {
         return response.json()
@@ -78,7 +79,6 @@ export async function SearchService(searchParams, typeOfSearch) {
         store.dispatch(setSearchLoading(false))
         store.dispatch(setClickResults(json.features))
         store.dispatch(settabSelected('details'))
-        store.dispatch(sethasLeftPanelTabChanged(true))
       }
     })
     .catch((error) => {
@@ -87,4 +87,43 @@ export async function SearchService(searchParams, typeOfSearch) {
       // log full error for diagnosing client side errors if needed
       console.error(message, error)
     })
+}
+
+export async function fetchTopItemsForMosaic(searchParams, limit) {
+  const requestHeaders = new Headers()
+  const JWT = localStorage.getItem('APP_AUTH_TOKEN')
+  const isSTACTokenAuthEnabled =
+    store.getState().mainSlice.appConfig.APP_TOKEN_AUTH_ENABLED ?? false
+  if (JWT && isSTACTokenAuthEnabled) {
+    requestHeaders.append('Authorization', `Bearer ${JWT}`)
+  }
+  appendStacHeaderCookies(requestHeaders)
+
+  const effectiveLimit = Math.max(1, limit || 1)
+
+  const stacApiUrl = `${
+    store.getState().mainSlice.appConfig.STAC_API_URL
+  }/search?${searchParams}`
+
+  const response = await fetch(stacApiUrl, {
+    credentials:
+      store.getState().mainSlice.appConfig.FETCH_CREDENTIALS || 'same-origin',
+    headers: requestHeaders
+  })
+
+  if (!response.ok) {
+    throw new Error(
+      `Error fetching top items for mosaic (status ${response.status})`
+    )
+  }
+
+  const json = await response.json()
+  const itemIds = Array.isArray(json.features)
+    ? json.features.map((feature) => feature.id).filter(Boolean)
+    : []
+
+  return {
+    itemIds,
+    effectiveLimit: Math.min(effectiveLimit, itemIds.length)
+  }
 }

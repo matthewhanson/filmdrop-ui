@@ -1,11 +1,10 @@
 .popupFooter {
-  font-size: 18px;
   display: flex;
-  flex-direction: row;
   align-items: center;
   justify-content: center;
-  min-height: 50px;
-  border-top: var(--side-panel-horizontal-divider-color) 3px solid;
+  margin-top: -8px;
+  padding: 0px 8px 12px;
+  border-bottom: 1px solid var(--side-panel-horizontal-divider-color);
 }
 
 .popupFooterControls {
@@ -15,24 +14,32 @@
   justify-content: space-between;
 }
 
-.popupFooterButtonsGroup {
+.popupFooterNav {
   display: flex;
-  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+}
+
+.popupFooterCount {
+  font-size: 14px;
+  min-width: 60px;
+  text-align: center;
+  user-select: none;
 }
 
 .popupFooterButton {
   background-color: var(--side-panel-button-background);
   color: var(--side-panel-button-color);
-  border: 0px;
-  font-weight: bold;
+  font-weight: 700;
   height: 30px;
   width: 30px;
-  border: var(--side-panel-button-border) solid 1px;
+  border: 1px solid var(--side-panel-button-border);
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: color 0.33s ease-in-out;
+  transition: background-color 0.2s ease;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
@@ -43,7 +50,7 @@
 }
 
 .popupFooterButton:disabled {
-  opacity: 0.35;
+  opacity: var(--opacity-muted);
   cursor: default;
 }
 
@@ -51,14 +58,24 @@
   background-color: var(--side-panel-button-background);
 }
 
-.popupFooterButtonRight {
-  margin-left: -1px;
-  border-top-right-radius: 5px;
-  border-bottom-right-radius: 5px;
+.popupFooterCartButton {
+  background-color: var(--side-panel-button-background);
+  color: var(--side-panel-button-color);
+  height: 30px;
+  width: 30px;
+  border: 1px solid var(--side-panel-button-border);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
-.popupFooterButtonLeft {
-  margin-left: -1px;
-  border-top-left-radius: 5px;
-  border-bottom-left-radius: 5px;
+.popupFooterCartButton:hover {
+  background-color: var(--side-panel-button-background-hover);
+}
+
+.popupFooterCartButton--add {
+  color: var(--side-panel-button-icon-accent);
 }

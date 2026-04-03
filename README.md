@@ -37,7 +37,7 @@ Check out
 
 - **🔍 Search**
   - Date/time range filtering
-  - Cloud cover filtering
+  - Dynamic property filtering (based on collection queryables)
   - Draw or upload GeoJSON search bounds
   - Interactive map with Leaflet
   - Light/dark theme support
@@ -113,8 +113,7 @@ Create `public/config/config.json` (development) or `build/config/config.json` (
       "sceneTilerParams": {
         "assets": ["red", "green", "blue"]
       },
-      "sceneMinZoom": 7,
-      "popupDisplayFields": ["datetime", "platform"]
+      "sceneMinZoom": 7
     }
   }
 }
@@ -133,7 +132,10 @@ Some FilmDrop features require specific STAC API extensions:
 - **Grid Code Aggregation** - Custom `grid:code` property
   - Items must include grid identifier (e.g., MGRS, WRS2)
 
-- **Cloud Cover Filtering** - [EO Extension](https://github.com/stac-extensions/eo)
+- **Dynamic Property Filtering** - Requires a [OGC API Queryables](https://docs.ogc.org/is/19-079r2/19-079r2.html#queryables) endpoint
+  - FilmDrop auto-discovers filterable properties from each collection's queryables schema
+  - Supported filter types: range sliders (numeric), multi-select (enums), text and numeric inputs
+  - Use `queryableFilters` in `COLLECTIONS_CONFIG` to limit which properties appear as filters
 
 - **Automatic Rendering** -
   [Render Extension](https://github.com/stac-extensions/render) (Optional)
@@ -203,13 +205,11 @@ based on the collection's STAC metadata if not specified:
   "COLLECTIONS_CONFIG": {
     "sentinel-2-l2a": {
       "sceneTilerParams": { "assets": ["red", "green", "blue"] },
-      "sceneMinZoom": 7,
-      "popupDisplayFields": ["datetime", "platform", "eo:cloud_cover"]
+      "sceneMinZoom": 7
     },
     "landsat-c2-l2": {
       "sceneTilerParams": { "assets": ["red", "green", "blue"] },
-      "sceneMinZoom": 7,
-      "popupDisplayFields": ["datetime", "platform", "instruments"]
+      "sceneMinZoom": 7
     }
   }
 }

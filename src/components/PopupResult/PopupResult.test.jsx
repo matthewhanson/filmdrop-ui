@@ -5,7 +5,18 @@ import { Provider } from 'react-redux'
 import { store } from '../../redux/store'
 import { setappConfig } from '../../redux/slices/mainSlice'
 import { mockAppConfig, mockClickResults } from '../../testing/shared-mocks'
-import { describe, beforeEach, vi } from 'vitest'
+import { describe, beforeEach, vi, it, expect } from 'vitest'
+
+vi.mock('../../utils/mapHelper')
+
+vi.mock('../../hooks/useUrlNavigate', () => ({
+  useUrlNavigate: () => ({
+    setTab: vi.fn(),
+    setViz: vi.fn(),
+    setItem: vi.fn(),
+    clearItem: vi.fn()
+  })
+}))
 
 describe('PopupResult', () => {
   const setup = (result = mockClickResults[0]) =>
@@ -19,18 +30,35 @@ describe('PopupResult', () => {
     store.dispatch(setappConfig(mockAppConfig))
     vi.clearAllMocks()
     // Mock Image constructor to simulate successful image load
-    global.Image = vi.fn(() => ({
-      onload: null,
-      onerror: null,
-      src: '',
-      width: 100,
-      height: 100
-    }))
+    global.Image = vi.fn(function () {
+      const img = {
+        onload: null,
+        onerror: null,
+        src: '',
+        width: 100,
+        height: 100
+      }
+      // Trigger onload when src is set
+      Object.defineProperty(img, 'src', {
+        set(value) {
+          this._src = value
+          if (this.onload) {
+            this.onload.call(this)
+          }
+        },
+        get() {
+          return this._src
+        }
+      })
+      return img
+    })
   })
 
   describe('thumbnail display', () => {
-    it('should render thumbnail container even when image loads asynchronously', () => {
+    it('should render thumbnail container when image loads successfully', async () => {
       setup()
+      // Wait for the useEffect and state update
+      await screen.findByAltText('thumbnail')
       const thumbnailContainer = screen
         .getByTestId('testPopupResult')
         .querySelector('.popupResultThumbnailContainer')
@@ -46,10 +74,45 @@ describe('PopupResult', () => {
 
       const container = screen.getByTestId('testPopupResult')
       expect(container).toBeInTheDocument()
+      // No thumbnail link means no thumbnail container should render
       const thumbnailContainer = container.querySelector(
         '.popupResultThumbnailContainer'
       )
-      expect(thumbnailContainer).toBeInTheDocument()
+      expect(thumbnailContainer).not.toBeInTheDocument()
+    })
+
+    it('should not render thumbnail container when image fails to load', () => {
+      // Mock Image to simulate failed load (e.g., 404)
+      global.Image = vi.fn(function () {
+        const img = {
+          onload: null,
+          onerror: null,
+          src: '',
+          width: 0,
+          height: 0
+        }
+        Object.defineProperty(img, 'src', {
+          set(value) {
+            this._src = value
+            // Simulate image load but with width 0 (treated as failure)
+            if (this.onload) {
+              this.onload.call(this)
+            }
+          },
+          get() {
+            return this._src
+          }
+        })
+        return img
+      })
+      setup()
+
+      const container = screen.getByTestId('testPopupResult')
+      // Thumbnail container should NOT render when image doesn't load properly
+      const thumbnailContainer = container.querySelector(
+        '.popupResultThumbnailContainer'
+      )
+      expect(thumbnailContainer).not.toBeInTheDocument()
     })
   })
 

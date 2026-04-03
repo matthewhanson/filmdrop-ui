@@ -2,17 +2,22 @@ import { store } from '../redux/store'
 import {
   DEFAULT_SCENE_MIN_ZOOM,
   DEFAULT_API_MAX_ITEMS,
-  DEFAULT_MOSAIC_MAX_ITEMS
+  DEFAULT_MOSAIC_MAX_ITEMS,
+  DEFAULT_MOSAIC_TOP_COMPARE_ITEMS,
+  DEFAULT_DATE_RANGE
 } from '../components/defaults'
 import {
   getCurrentMapZoomLevel,
   clearAllLayers,
+  clearLayer,
   bboxFromMapBounds,
-  clearMapSelection
+  clampAndRoundBbox,
+  clearMapSelection,
+  hasMosaicImageLayer
 } from './mapHelper'
 import { getCollectionConfig } from './configHelper'
 import { convertDateForURL, convertDate } from './datetime'
-import { SearchService } from '../services/get-search-service'
+import * as getSearchService from '../services/get-search-service'
 import { AggregateSearchService } from '../services/get-aggregate-service'
 import {
   setSearchLoading,
@@ -20,28 +25,90 @@ import {
   setShowZoomNotice,
   setZoomLevelNeeded,
   setSearchResults,
+  setShowPopupModal,
+  setSearchDateRangeValue,
+  setQueryableFilters,
+  setmappedScenes,
+  setselectedPopupResultIndex,
+  setsearchGeojsonBoundary,
+  setisDrawingEnabled,
   setpaginationNextLink,
   setpaginationPrevLink,
   setcurrentPage,
   settotalPages,
-  setpaginationHistory
+  setpaginationHistory,
+  setMosaicCache,
+  incrementDetailsResetKey
 } from '../redux/slices/mainSlice'
 import * as h3 from 'h3-js'
 import debounce from './debounce'
 import { AddMosaicService } from '../services/post-mosaic-service'
-import { router } from '../router'
+import { router, getPathParams } from '../router'
 import { appendStacHeaderCookies } from '../utils/stacRequest'
+import { serializeQueryableFiltersForUrl } from './urlParamHelper'
 
-export function newSearch() {
+/**
+ * Convert queryable filters from Redux state into STAC Query Extension format
+ * @param {Object} queryableFilters - Filter values from Redux (fieldName -> value)
+ * @returns {Object} Query object in STAC Query Extension format
+ */
+export function buildQueryFromFilters(queryableFilters) {
+  const query = {}
+
+  Object.entries(queryableFilters).forEach(([fieldName, value]) => {
+    if (value === null || value === undefined) {
+      return
+    }
+
+    // Handle range values (object with min and/or max)
+    if (
+      typeof value === 'object' &&
+      !Array.isArray(value) &&
+      ('min' in value || 'max' in value)
+    ) {
+      const queryVal = {}
+      if ('min' in value) queryVal.gte = value.min
+      if ('max' in value) queryVal.lte = value.max
+      if (Object.keys(queryVal).length > 0) {
+        query[fieldName] = queryVal
+      }
+      return
+    }
+
+    // Handle array values (multi-select, can be any type including numbers)
+    if (Array.isArray(value)) {
+      if (value.length > 0) {
+        query[fieldName] = { in: value }
+      }
+      return
+    }
+
+    // Handle boolean and single values
+    query[fieldName] = { eq: value }
+  })
+
+  return query
+}
+
+export async function newSearch(options = {}) {
+  const { viewMode: overrideViewMode, preserveItem = false } = options
+
+  // Snapshot all needed Redux state upfront, before any dispatches or URL writes.
+  const _state = store.getState().mainSlice
+  const _selectedCollection = _state.selectedCollectionData
+  const viewMode = overrideViewMode || _state.viewMode
+  const dateRange = _state.searchDateRangeValue
+  const dt =
+    dateRange && dateRange[0] && dateRange[1]
+      ? `${dateRange[0]}/${dateRange[1]}`
+      : ''
+
   clearMapSelection()
-  clearAllLayers()
-  store.dispatch(setSearchResults(null))
-  store.dispatch(setShowZoomNotice(false))
-  store.dispatch(setSearchLoading(false))
-
-  // Reset URL to root if currently on a STAC item route
-  if (window.location.pathname.startsWith('/item/')) {
-    router.navigate({ to: '/' })
+  if (viewMode !== 'mosaic') {
+    clearAllLayers()
+    store.dispatch(setSearchResults(null))
+    store.dispatch(setShowZoomNotice(false))
+    store.dispatch(setSearchLoading(false))
   }
 
   // Reset pagination state for new search
@@ -51,7 +118,53 @@ export function newSearch() {
   store.dispatch(settotalPages(null))
   store.dispatch(setpaginationHistory([]))
 
-  const _selectedCollection = store.getState().mainSlice.selectedCollectionData
+  // Commit current search state to URL (replace — no history entry)
+  const collectionId = _selectedCollection?.id || ''
+  const currentPathParams = getPathParams()
+  const currentItemId = preserveItem ? currentPathParams.itemId || '' : ''
+
+  router.navigate({
+    to: currentItemId
+      ? '/$collectionId/$itemId'
+      : collectionId
+        ? '/$collectionId'
+        : '/',
+    params: currentItemId
+      ? { collectionId, itemId: currentItemId }
+      : collectionId
+        ? { collectionId }
+        : {},
+    search: (prev) => ({
+      // Only preserve immediate/map params — don't spread all of prev,
+      // which would carry stale queryable filters from a previous collection.
+      tab: prev.tab,
+      z: prev.z,
+      c: prev.c,
+      dt,
+      view: viewMode || 'scene',
+      viz: _state.selectedVisualization || '',
+      ...serializeQueryableFiltersForUrl(_state.queryableFilters)
+    }),
+    replace: true
+  })
+
+  // Handle mosaic mode
+  if (viewMode === 'mosaic') {
+    if (!_selectedCollection) {
+      return
+    }
+    const sceneMinZoom =
+      getCollectionConfig(_selectedCollection.id, 'sceneMinZoom') ||
+      DEFAULT_SCENE_MIN_ZOOM
+    const currentMapZoomLevel = getCurrentMapZoomLevel()
+    if (currentMapZoomLevel < sceneMinZoom) {
+      store.dispatch(setZoomLevelNeeded(sceneMinZoom))
+      store.dispatch(setShowZoomNotice(true))
+      return
+    }
+    store.dispatch(setSearchLoading(true))
+    return newMosaicSearch()
+  }
 
   // Get minimum zoom level for scene/mosaic views
   const sceneMinZoom =
@@ -70,19 +183,6 @@ export function newSearch() {
     (el) => el.name === 'grid_code_frequency'
   )
 
-  const viewMode = store.getState().mainSlice.viewMode
-
-  // Handle mosaic mode
-  if (viewMode === 'mosaic') {
-    if (currentMapZoomLevel < sceneMinZoom) {
-      store.dispatch(setZoomLevelNeeded(sceneMinZoom))
-      store.dispatch(setShowZoomNotice(true))
-      return
-    }
-    newMosaicSearch()
-    return
-  }
-
   // Handle user-selected view mode
   if (viewMode === 'scene') {
     // User wants scene view - check zoom level
@@ -94,7 +194,7 @@ export function newSearch() {
     const searchScenesParams = buildSearchScenesParams()
     store.dispatch(setSearchType('scene'))
     store.dispatch(setSearchLoading(true))
-    SearchService(searchScenesParams, 'scene')
+    getSearchService.SearchService(searchScenesParams, 'scene')
     return
   } else if (viewMode === 'hex' && includesGeoHex) {
     // User wants hex view - no zoom restriction
@@ -117,21 +217,76 @@ export function newSearch() {
     const searchScenesParams = buildSearchScenesParams()
     store.dispatch(setSearchType('scene'))
     store.dispatch(setSearchLoading(true))
-    SearchService(searchScenesParams, 'scene')
+    getSearchService.SearchService(searchScenesParams, 'scene')
   } else {
     store.dispatch(setZoomLevelNeeded(sceneMinZoom))
     store.dispatch(setShowZoomNotice(true))
   }
 }
 
-function buildSearchScenesParams(gridCodeToSearchIn) {
+export function clearSearch() {
+  // Clear map layers: selection highlights, imagery overlays, search results
+  clearMapSelection()
+  clearAllLayers()
+  clearLayer('drawBoundsLayer')
+
+  // Clear drawn AOI boundary
+  store.dispatch(setsearchGeojsonBoundary(null))
+  store.dispatch(setisDrawingEnabled(false))
+
+  // Clear search results and related state
+  store.dispatch(setSearchResults(null))
+  store.dispatch(setSearchLoading(false))
+  store.dispatch(setSearchType(null))
+  store.dispatch(setShowZoomNotice(false))
+  store.dispatch(setmappedScenes([]))
+  store.dispatch(setShowPopupModal(false))
+  store.dispatch(setselectedPopupResultIndex(0))
+
+  // Reset pagination
+  store.dispatch(setpaginationNextLink(null))
+  store.dispatch(setpaginationPrevLink(null))
+  store.dispatch(setcurrentPage(1))
+  store.dispatch(settotalPages(null))
+  store.dispatch(setpaginationHistory([]))
+
+  // Reset filters to defaults
+  store.dispatch(setSearchDateRangeValue(DEFAULT_DATE_RANGE))
+  store.dispatch(setQueryableFilters({}))
+
+  // Reset item details accordion state
+  store.dispatch(incrementDetailsResetKey())
+
+  // Update URL: preserve collection path, view, viz, z, c; clear dt, item, queryable filters
+  const currentPathParams = getPathParams()
+  const collectionId = currentPathParams.collectionId || ''
+
+  router.navigate({
+    to: collectionId ? '/$collectionId' : '/',
+    params: collectionId ? { collectionId } : {},
+    search: (prev) => ({
+      dt: '',
+      view: prev.view,
+      viz: prev.viz,
+      tab: 'search',
+      z: prev.z,
+      c: prev.c
+    }),
+    replace: true
+  })
+}
+
+function buildSearchScenesParams(gridCodeToSearchIn, options = {}) {
   const _selectedCollection = store.getState().mainSlice.selectedCollectionData
   const bbox = buildUrlParamFromBBOX()
   const _dateTimeRange = convertDateForURL(
     store.getState().mainSlice.searchDateRangeValue
   )
   const limit =
-    store.getState().mainSlice.appConfig.API_MAX_ITEMS || DEFAULT_API_MAX_ITEMS
+    options.limit != null
+      ? options.limit
+      : store.getState().mainSlice.appConfig.API_MAX_ITEMS ||
+        DEFAULT_API_MAX_ITEMS
   const collections = _selectedCollection.id
   const _searchGeojsonBoundary =
     store.getState().mainSlice.searchGeojsonBoundary
@@ -146,44 +301,29 @@ function buildSearchScenesParams(gridCodeToSearchIn) {
       'intersects',
       encodeURIComponent(JSON.stringify(_searchGeojsonBoundary.geometry))
     )
-  } else {
+  } else if (bbox) {
     searchParams.set('bbox', bbox)
   }
 
-  const query = {}
-  if (_selectedCollection.queryables?.['eo:cloud_cover']) {
-    query['eo:cloud_cover'] = {
-      gte: 0,
-      lte: store.getState().mainSlice.cloudCover
-    }
-  }
-  if (_selectedCollection.queryables?.['sar:polarizations']) {
-    query['sar:polarizations'] = { in: ['VV', 'VH'] }
-  }
+  // Build query from queryable filters
+  const queryableFilters = store.getState().mainSlice.queryableFilters
+  const query = buildQueryFromFilters(queryableFilters)
+
+  // Add grid:code filter if provided
   if (gridCodeToSearchIn) {
     query['grid:code'] = { in: gridCodeToSearchIn }
   }
 
-  let searchParamsStr
   if (Object.keys(query).length > 0) {
     searchParams.set('query', encodeURIComponent(JSON.stringify(query)))
-
-    searchParamsStr = [...searchParams]
-      .reduce((obj, x) => {
-        obj.push(x.join('='))
-        return obj
-      }, [])
-      .join('&')
-  } else {
-    searchParamsStr = [...searchParams]
-      .reduce((obj, x) => {
-        obj.push(x.join('='))
-        return obj
-      }, [])
-      .join('&')
   }
 
-  return searchParamsStr
+  return [...searchParams]
+    .reduce((obj, x) => {
+      obj.push(x.join('='))
+      return obj
+    }, [])
+    .join('&')
 }
 
 function buildSearchAggregateParams(gridType) {
@@ -240,47 +380,32 @@ function buildSearchAggregateParams(gridType) {
       'intersects',
       encodeURIComponent(JSON.stringify(_searchGeojsonBoundary.geometry))
     )
-  } else {
+  } else if (bbox) {
     searchParams.set('bbox', bbox)
   }
 
-  const query = {}
-  if (_selectedCollection.queryables?.['eo:cloud_cover']) {
-    query['eo:cloud_cover'] = {
-      gte: 0,
-      lte: store.getState().mainSlice.cloudCover
-    }
-  }
-  if (_selectedCollection.queryables?.['sar:polarizations']) {
-    query['sar:polarizations'] = { in: ['VV', 'VH'] }
-  }
+  // Build query from queryable filters
+  const queryableFilters = store.getState().mainSlice.queryableFilters
+  const query = buildQueryFromFilters(queryableFilters)
 
-  let aggregateParamsStr
   if (Object.keys(query).length > 0) {
     searchParams.set('query', encodeURIComponent(JSON.stringify(query)))
-
-    aggregateParamsStr = [...searchParams]
-      .reduce((obj, x) => {
-        obj.push(x.join('='))
-        return obj
-      }, [])
-      .join('&')
-  } else {
-    aggregateParamsStr = [...searchParams]
-      .reduce((obj, x) => {
-        obj.push(x.join('='))
-        return obj
-      }, [])
-      .join('&')
   }
-  return aggregateParamsStr
+
+  return [...searchParams]
+    .reduce((obj, x) => {
+      obj.push(x.join('='))
+      return obj
+    }, [])
+    .join('&')
 }
 
-function buildUrlParamFromBBOX() {
+export function buildUrlParamFromBBOX() {
   const viewportBounds = bboxFromMapBounds()
-  const neLng = viewportBounds[2] > 180 ? 180 : viewportBounds[2]
-  const swLng = viewportBounds[0] < -180 ? -180 : viewportBounds[0]
-  return [swLng, viewportBounds[1], neLng, viewportBounds[3]].join(',')
+  if (!viewportBounds) return ''
+  const bbox = clampAndRoundBbox(viewportBounds)
+  if (!bbox) return ''
+  return [bbox[0], bbox[1], bbox[2], bbox[3]].join(',')
 }
 
 export function mapHexGridFromJson(json) {
@@ -428,45 +553,136 @@ export function mapGridCodeFromJson(json) {
 
 export function searchGridCodeScenes(gridCodeToSearchIn) {
   const searchScenesParams = buildSearchScenesParams(gridCodeToSearchIn)
-  SearchService(searchScenesParams, 'grid-code')
+  getSearchService.SearchService(searchScenesParams, 'grid-code')
 }
 
 export const debounceNewSearch = debounce(() => newSearch(), 300)
 
-function newMosaicSearch() {
-  clearAllLayers()
-  store.dispatch(setSearchResults(null))
-  store.dispatch(setShowZoomNotice(false))
-  store.dispatch(setSearchLoading(true))
-  const _selectedCollectionData =
-    store.getState().mainSlice.selectedCollectionData
-  const datetime = convertDate(store.getState().mainSlice.searchDateRangeValue)
-  const _searchGeojsonBoundary =
-    store.getState().mainSlice.searchGeojsonBoundary
-  const bboxFromMap = bboxFromMapBounds()
+export { buildSearchScenesParams, buildSearchAggregateParams }
+
+function buildMosaicCreateBody() {
+  const state = store.getState().mainSlice
+  const _selectedCollectionData = state.selectedCollectionData
+  const datetime = convertDate(state.searchDateRangeValue)
+  const _searchGeojsonBoundary = state.searchGeojsonBoundary
+  let bboxFromMap = bboxFromMapBounds()
+  if (bboxFromMap) {
+    bboxFromMap = clampAndRoundBbox(bboxFromMap)
+  }
 
   const createMosaicBody = {
-    stac_api_root: store.getState().mainSlice.appConfig.STAC_API_URL,
+    stac_api_root: state.appConfig.STAC_API_URL,
     asset_name: constructMosaicAssetVal(_selectedCollectionData.id),
     collections: [_selectedCollectionData.id],
     datetime,
-    max_items:
-      store.getState().mainSlice.appConfig.MOSAIC_MAX_ITEMS ||
-      DEFAULT_MOSAIC_MAX_ITEMS
+    max_items: state.appConfig.MOSAIC_MAX_ITEMS || DEFAULT_MOSAIC_MAX_ITEMS
   }
+
   if (_searchGeojsonBoundary) {
     createMosaicBody.intersects = _searchGeojsonBoundary.geometry
-  } else {
+  } else if (bboxFromMap) {
     createMosaicBody.bbox = bboxFromMap
   }
 
-  if (store.getState().mainSlice.showCloudSlider) {
-    createMosaicBody.query = {
-      'eo:cloud_cover': {
-        gte: 0,
-        lte: store.getState().mainSlice.cloudCover
-      }
+  const queryableFilters = state.queryableFilters
+  const query = buildQueryFromFilters(queryableFilters)
+  if (Object.keys(query).length > 0) {
+    createMosaicBody.query = query
+  }
+
+  return createMosaicBody
+}
+
+const getMosaicRequestSignature = (createMosaicBody) => {
+  const sorted = sortObjectKeys(createMosaicBody)
+  return JSON.stringify(sorted)
+}
+
+const sortObjectKeys = (value) => {
+  if (Array.isArray(value)) {
+    return value.map((item) => sortObjectKeys(item))
+  }
+  if (value && typeof value === 'object') {
+    const sortedKeys = Object.keys(value).sort()
+    const result = {}
+    sortedKeys.forEach((key) => {
+      result[key] = sortObjectKeys(value[key])
+    })
+    return result
+  }
+  return value
+}
+
+const areTopItemsEqual = (prevIds, nextIds, compareCount) => {
+  if (!prevIds || !nextIds) {
+    return false
+  }
+  const count = Math.min(compareCount, prevIds.length, nextIds.length)
+  if (count === 0) {
+    return false
+  }
+  for (let i = 0; i < count; i += 1) {
+    if (prevIds[i] !== nextIds[i]) {
+      return false
     }
+  }
+  return true
+}
+
+async function newMosaicSearch() {
+  const createMosaicBody = buildMosaicCreateBody()
+  const signature = getMosaicRequestSignature(createMosaicBody)
+  const state = store.getState().mainSlice
+  const { mosaicCache } = state
+  const maxItems = state.appConfig.MOSAIC_MAX_ITEMS || DEFAULT_MOSAIC_MAX_ITEMS
+  const compareCount = Math.min(maxItems, DEFAULT_MOSAIC_TOP_COMPARE_ITEMS)
+
+  // Unchanged request body and compare window with mosaic layer present: skip refresh
+  if (
+    mosaicCache?.lastMosaicRequestSignature === signature &&
+    mosaicCache?.lastMosaicCompareCount === compareCount &&
+    hasMosaicImageLayer()
+  ) {
+    store.dispatch(setSearchLoading(false))
+    return
+  }
+
+  let topItemIds = null
+  let effectiveCompareCount = compareCount
+
+  try {
+    const searchParams = buildSearchScenesParams(undefined, {
+      limit: compareCount
+    })
+    const result = await getSearchService.fetchTopItemsForMosaic(
+      searchParams,
+      compareCount
+    )
+    topItemIds = result.itemIds
+    effectiveCompareCount = result.effectiveLimit
+  } catch (error) {
+    console.error('Error fetching top items for mosaic comparison', error)
+  }
+
+  const compareWindow = Math.min(effectiveCompareCount, compareCount)
+
+  if (
+    topItemIds &&
+    mosaicCache?.lastMosaicCompareCount === compareWindow &&
+    hasMosaicImageLayer() &&
+    areTopItemsEqual(
+      mosaicCache?.lastMosaicTopItemIds,
+      topItemIds,
+      compareWindow
+    )
+  ) {
+    store.dispatch(setSearchLoading(false))
+    store.dispatch(
+      setMosaicCache({
+        lastMosaicRequestSignature: signature
+      })
+    )
+    return
   }
 
   const requestHeaders = new Headers()
@@ -479,11 +695,18 @@ function newMosaicSearch() {
     method: 'POST',
     headers: requestHeaders,
     body: JSON.stringify(createMosaicBody),
-    credentials:
-      store.getState().mainSlice.appConfig.FETCH_CREDENTIALS || 'same-origin'
+    credentials: state.appConfig.FETCH_CREDENTIALS || 'same-origin'
   }
 
-  AddMosaicService(requestOptions)
+  clearAllLayers()
+  store.dispatch(setSearchResults(null))
+  store.dispatch(setShowZoomNotice(false))
+
+  AddMosaicService(requestOptions, {
+    signature,
+    topItemIds,
+    compareCount: compareWindow
+  })
 }
 
 const constructMosaicAssetVal = (collection) => {

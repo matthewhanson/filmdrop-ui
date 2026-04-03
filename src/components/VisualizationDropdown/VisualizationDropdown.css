@@ -1,0 +1,47 @@
+.VisualizationDropdown {
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--side-panel-card-border);
+  gap: 6px;
+}
+
+.VisualizationDropdown__label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--side-panel-heading-color);
+}
+
+.VisualizationDropdown__controls {
+  display: flex;
+  flex-direction: column;
+}
+
+.VisualizationDropdown__checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  margin-top: 8px;
+  margin-left: -4px;
+}
+
+.VisualizationDropdown__checkbox .MuiCheckbox-root {
+  padding: 4px !important;
+  margin-right: 4px !important;
+  color: var(--side-panel-checkbox-color-unchecked) !important;
+}
+
+.VisualizationDropdown__checkbox .MuiCheckbox-root.Mui-checked {
+  color: var(--side-panel-checkbox-color-checked) !important;
+}
+
+.VisualizationDropdown__checkbox .MuiCheckbox-root:hover {
+  background-color: var(--mui-hover) !important;
+}
+
+.VisualizationDropdown__checkbox span {
+  font-size: 14px;
+  color: var(--side-panel-text-color-secondary);
+}

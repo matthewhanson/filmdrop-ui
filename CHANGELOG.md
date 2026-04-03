@@ -9,13 +9,80 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
-- new migration script (migrate_config.py) to convert legacy config formats to the new structure
+- Added a NumericRangeInputs component for numeric fields that supports unbounded, min-only, and max-only queryables.
+- Added unit tests for bbox coordinate rounding/clamping (`mapHelper`) and URL/search param bbox handling (`searchHelper`).
+- Added mosaic search caching metadata to track the last mosaic request and top N item IDs for re-use across searches.
 
 ### Changed
 
-- lint_config suports detecting config formats (legacy, new, mixed)
+- Moved Item pagination buttons from below to above the Item Details content.
+- Limited bbox precision to 6 decimals in map bounds and search/URL params; longitude clamped to [-180, 180]. Exported `roundCoord`, `clampAndRoundBbox` for reuse.
+- Item Details field grid: column layout set to `minmax(0, 40%) 1fr`, alignment and padding adjusted for clearer spacing and to avoid overflowing text.
+- Updated mosaic search flow to fetch a small set of top items for comparison before creating a new mosaic, reducing redundant mosaic tiler requests.
+- Prevented `newSearch` from clearing map layers and results when running in mosaic view where an existing mosaic image layer is being reused.
+
+### Fixed
+
+- Corrected the multi-select filter component to properly lose focus after deleting chips.
+- Fixed map auto-zoom when loading items via `/:collectionId/:itemId` URLs.
+- Fixed search and mosaic requests sending invalid or undefined bbox when viewport bounds are missing; URL bbox param and zoom-to-extent now handle null bounds safely.
+- Resolve dependency vulnerabilities: DOMPurify XSS (GHSA-v2wj-7wpq-c8vv), Rollup path
+  traversal (GHSA-mw96-cpmx-2vgc); upgrade `dompurify` to ^3.3.2, override `rollup` to ^4.59.0.
+- Fixed repeated mosaic layer recreation on identical mosaic searches by reusing the existing mosaic image layer when the request parameters and top items have not changed.
+
+## v7.1.0-pre - 2026-01-15
+
+### Added
+
+- Added `TILER_SETTINGS`, with properties `URL_SUBST`, `URL_SUBST_FIND`, `URL_SUBST_REPLACE`, to enable optional string substitution in TiTiler request URLs
+- Added dynamic queryable-based filter generation with support for range sliders, multi-selects, and text inputs
+- Added `queryableFilters` to `COLLECTIONS_CONFIG` for per-collection queryable allow-lists
+- Added `$ref` resolution in queryables service for dereferencing external JSON schemas
+- Added reusable UI components: `ButtonGroup`, `Card`, `Dropdown`, `MultiSelect`, `TextField`, `RangeSliderWithInputs`
+- Added `useDebouncedCallback` and `useRenderableQueryables` hooks
+- Added URL state management: collection and item selection use path segments (`/:collectionId/:itemId`), all other state persisted in URL search params for shareable links
+- Added `useUrlNavigate` hook for components to update URL params (`setItem`, `clearItem`, `setTab`, `setViz`)
+- Added `useUrlInitialize` hook for restoring full app state (collection, dates, filters, visualization, selected item) from URL on load
+- Added `useUrlStateSync` hook for ongoing URL → Redux sync (merges path params + search params)
+- Added `urlParamHelper` utilities for serializing/deserializing queryable filters to/from URL params
+- Added unit tests for URL routing utilities, `useUrlInitialize`, and `useUrlStateSync`
+- Added `AccordionStateContext` to persist Item Details accordion expansion state across tab switches, new searches, and item navigation within the same collection
+
+### Changed
+
+- Updated tile URL structure to support OGC API - Tiles conformant tilers (TiTiler 1.x+, other OGC-compliant tilers).
+  Tile paths now include TileMatrixSetId: `/stac/tiles/{tileMatrixSetId}/{z}/{x}/{y}`. Currently hardcoded to `WebMercatorQuad`.
+- Restricted visualization selector to the sidebar
+- Unified control heights, border radii, padding, and font styling across components
+- Refactored `Search` component with extracted `AreaOfInterestSelector` and `QueryableFilters`
+- Replaced `react-datepicker` with `@mui/x-date-pickers`
+- Refactored `router.jsx` to use path-based routes for collection/item selection and `validateSearch` for search param parsing
+- Visualization selection now routed through URL params instead of direct Redux dispatch
+- Consolidated store reads in `newSearch` to a single upfront snapshot to prevent stale-state bugs
+- Replaced `JSON.stringify` with `shallowEqual` for queryable filter comparison
+- Fixed stale state and race condition in `fetchAndDisplayItem`
+- Fixed falsy value handling (`0`, `false`) in URL param sync default logic
+- Skipped redundant API call when selected item is already in search results
+- Changed the Search button to a split button with a Clear action that resets filters, URL params, and map view
+- Changed tab rendering to keep both Search and Item Details mounted (hidden via CSS) instead of unmounting the inactive tab, preserving component state and avoiding unnecessary re-renders
+- Set zoom level on initial load of the app such that there are not blank bands above and below the map
+- Moved visualization selector to the Item Details tab
 
 ### Removed
+
+- Removed `CloudSlider` component (replaced by queryable-based filters)
+- Removed `VisualizationList` component (replaced by `VisualizationDropdown`)
+- Removed `FieldInfoIcon` component
+- Removed `routerHelper.js` (replaced by `urlParamHelper.js`)
+- Removed unused `setMapView` from `useUrlNavigate`
+- Removed dead `hasLeftPanelTabChanged` state and dual dispatch in `mapHelper`
+- Removed `SEARCH_BY_GEOM_ENABLED` config option (now always enabled)
+
+## 7.0.1 - 2026-01-14
+
+### Changed
+
+- Vite build config - base path changed to absolute (`/`) instead of relative (`./`)
 
 ## 7.0.0 - 2026-01-09
 

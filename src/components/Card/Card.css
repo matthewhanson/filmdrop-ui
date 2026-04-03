@@ -1,0 +1,21 @@
+.Card {
+  background: var(--side-panel-card-background);
+  border: 1px solid var(--side-panel-card-border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.Card__label {
+  font-size: 14px;
+  color: var(--side-panel-card-label-color);
+  margin-bottom: 4px;
+  display: block;
+}
+
+.Card__content {
+  display: flex;
+  flex-direction: column;
+}

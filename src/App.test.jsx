@@ -16,6 +16,31 @@ import { mockAppConfig } from './testing/shared-mocks'
 import * as ConfigHelper from './utils/configHelper'
 import * as ThemeHelper from './utils/themeHelper'
 
+vi.mock('./hooks/useUrlStateSync', () => ({
+  useUrlStateSync: vi.fn()
+}))
+
+vi.mock('@tanstack/react-router', () => ({
+  Outlet: () => null,
+  useNavigate: () => vi.fn(),
+  useParams: () => ({}),
+  createRootRoute: vi.fn(() => ({ addChildren: vi.fn(() => ({})) })),
+  createRoute: vi.fn(() => ({ addChildren: vi.fn(() => ({})) })),
+  createRouter: vi.fn(() => ({
+    state: { location: { search: {} }, matches: [] }
+  })),
+  defaultStringifySearch: vi.fn()
+}))
+
+vi.mock('./hooks/useUrlNavigate', () => ({
+  useUrlNavigate: () => ({
+    setTab: vi.fn(),
+    setViz: vi.fn(),
+    setItem: vi.fn(),
+    clearItem: vi.fn()
+  })
+}))
+
 describe('App', () => {
   const setup = () =>
     render(
@@ -34,6 +59,7 @@ describe('App', () => {
       })
     })
     afterEach(() => {
+      vi.clearAllMocks()
       vi.restoreAllMocks()
     })
     it('should call GetCollectionsService once', () => {
@@ -107,6 +133,7 @@ describe('App', () => {
   })
   describe('on app render without config', () => {
     afterEach(() => {
+      vi.clearAllMocks()
       vi.restoreAllMocks()
     })
     it('should showAppLoading page', () => {

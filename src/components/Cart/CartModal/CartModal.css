@@ -16,8 +16,8 @@
   width: 95%;
   min-height: 300px;
   min-width: 500px;
-  background-color: var(--map-alert-overlay-secondary-background);
-  border-radius: 5px;
+  background-color: var(--map-info-overlay-secondary-background);
+  border-radius: var(--radius-md);
 }
 
 .cartModalTopBar {
@@ -26,14 +26,14 @@
   height: 50px;
   width: 100%;
   align-items: center;
-  background-color: var(--map-alert-overlay-primary-background);
-  color: var(--map-alert-overlay-primary-color);
+  background-color: var(--map-info-overlay-background);
+  color: var(--map-info-overlay-color);
   display: flex;
   flex-direction: row;
   font-size: 18px;
-  font-weight: bold;
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
+  font-weight: 700;
+  border-top-left-radius: var(--radius-md);
+  border-top-right-radius: var(--radius-md);
   justify-content: space-between;
 }
 
@@ -43,7 +43,7 @@
 
 .closeCartModal {
   background-color: transparent;
-  color: var(--map-alert-overlay-primary-color);
+  color: var(--map-info-overlay-color);
   border: 0px;
   font-size: 24px;
   cursor: pointer;

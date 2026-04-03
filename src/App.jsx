@@ -21,8 +21,11 @@ import {
   zoomToItemExtent
 } from './utils/mapHelper'
 import { LayoutProvider } from './contexts/LayoutContext'
+import { useUrlStateSync } from './hooks/useUrlStateSync'
+import { Outlet } from '@tanstack/react-router'
 
 function App() {
+  useUrlStateSync()
   const dispatch = useDispatch()
   const _showUploadGeojsonModal = useSelector(
     (state) => state.mainSlice.showUploadGeojsonModal
@@ -39,6 +42,9 @@ function App() {
     (state) => state.mainSlice.currentPopupResult
   )
   const _map = useSelector((state) => state.mainSlice.map)
+  const _autoCenterOnItemChanged = useSelector(
+    (state) => state.mainSlice.autoCenterOnItemChanged
+  )
   const [showLogin, setShowLogin] = useState(false)
 
   useEffect(() => {
@@ -107,12 +113,12 @@ function App() {
         }
       })
 
-      // Auto-zoom to item extent if enabled in config
-      if (_appConfig?.SHOW_ITEM_AUTO_ZOOM) {
+      // Auto-zoom to item extent if enabled and checkbox is checked
+      if (_appConfig?.SHOW_ITEM_AUTO_ZOOM && _autoCenterOnItemChanged) {
         zoomToItemExtent(_currentPopupResult)
       }
     }
-  }, [_currentPopupResult, _map, _appConfig])
+  }, [_currentPopupResult, _map, _appConfig, _autoCenterOnItemChanged])
 
   return (
     <React.StrictMode>
@@ -132,6 +138,7 @@ function App() {
               ) : null}
               {_showApplicationAlert ? <SystemMessage></SystemMessage> : null}
               {_showCartModal ? <CartModal></CartModal> : null}
+              <Outlet />
             </div>
           )
         ) : (

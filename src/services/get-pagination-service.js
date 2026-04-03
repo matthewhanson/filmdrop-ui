@@ -18,7 +18,7 @@ import {
 } from '../utils/mapHelper'
 import { appendStacHeaderCookies } from '../utils/stacRequest'
 import { DEFAULT_API_MAX_ITEMS } from '../components/defaults'
-import { router } from '../router'
+import { router, getPathParams } from '../router'
 
 /**
  * Fetch a specific page of search results using pagination links
@@ -35,9 +35,15 @@ export async function FetchPageService(pageUrl, pageNumber) {
   }
   appendStacHeaderCookies(requestHeaders)
 
-  // Reset URL to root if currently on a STAC item route
-  if (window.location.pathname.startsWith('/item/')) {
-    router.navigate({ to: '/' })
+  // If currently viewing an item, navigate back to collection path
+  const pathParams = getPathParams()
+  if (pathParams.itemId) {
+    router.navigate({
+      to: '/$collectionId',
+      params: { collectionId: pathParams.collectionId },
+      search: (prev) => ({ ...prev }),
+      replace: true
+    })
   }
 
   store.dispatch(setSearchLoading(true))

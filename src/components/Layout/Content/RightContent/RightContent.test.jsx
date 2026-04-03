@@ -59,7 +59,7 @@ describe('RightContent', () => {
       )
       const { container } = setup()
       const rightContent = container.querySelector('.RightContent')
-      expect(rightContent.style.left).toBe('320px')
+      expect(rightContent.style.left).toBe('340px')
       expect(rightContent.style.right).toBe('')
     })
 
@@ -72,7 +72,7 @@ describe('RightContent', () => {
       )
       const { container } = setup()
       const rightContent = container.querySelector('.RightContent')
-      expect(rightContent.style.right).toBe('320px')
+      expect(rightContent.style.right).toBe('340px')
     })
 
     it('should render action button if ACTION_BUTTON set in config', () => {
@@ -161,10 +161,9 @@ describe('RightContent', () => {
       store.dispatch(setShowAppLoading(true))
       store.dispatch(setappName('Test App'))
       setup()
-      expect(
-        screen.queryByTestId('test_applicationLoadingAnimation')
-      ).toBeInTheDocument()
-      expect(screen.queryByText(/loading test app/i)).toBeInTheDocument()
+      const container = screen.queryByTestId('test_applicationLoadingAnimation')
+      expect(container).toBeInTheDocument()
+      expect(container).toHaveTextContent(/loading test app/i)
     })
     it('should not render application loading animation when showAppLoading loading is false', async () => {
       store.dispatch(setappConfig(mockAppConfig))
@@ -174,7 +173,6 @@ describe('RightContent', () => {
       expect(
         screen.queryByTestId('test_applicationLoadingAnimation')
       ).not.toBeInTheDocument()
-      expect(screen.queryByText(/loading test app/i)).not.toBeInTheDocument()
     })
     it('should render zoom notice if showZoomNotice set to true in redux', () => {
       store.dispatch(setShowZoomNotice(true))

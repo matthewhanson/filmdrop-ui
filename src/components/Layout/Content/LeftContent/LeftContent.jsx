@@ -2,18 +2,16 @@ import { React, useEffect, useCallback, useRef } from 'react'
 import './LeftContent.css'
 import Search from '../../../Search/Search'
 import PopupResults from '../../../PopupResults/PopupResults'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { debounceNewSearch } from '../../../../utils/searchHelper'
-import {
-  settabSelected,
-  sethasLeftPanelTabChanged
-} from '../../../../redux/slices/mainSlice'
+import { debounceTitilerOverlay } from '../../../../utils/mapHelper'
 import { useResizablePanel } from '../../../../hooks/useResizablePanel'
 import { useLayout } from '../../../../contexts/LayoutContext'
+import { useUrlNavigate } from '../../../../hooks/useUrlNavigate'
 import DragHandleIcon from '@mui/icons-material/DragHandle'
+import { AccordionStateProvider } from '../../../../contexts/AccordionStateContext'
 
 const LeftContent = () => {
-  const dispatch = useDispatch()
   const panelRef = useRef(null)
   const { isLeftPanelVisible } = useLayout()
 
@@ -26,8 +24,21 @@ const LeftContent = () => {
   const _isRightSidebarEnabled = useSelector(
     (state) => state.mainSlice.appConfig?.RIGHT_SIDEBAR_ENABLED ?? false
   )
+  const _currentPopupResult = useSelector(
+    (state) => state.mainSlice.currentPopupResult
+  )
+  const _selectedVisualization = useSelector(
+    (state) => state.mainSlice.selectedVisualization
+  )
+  const _selectedCollection = useSelector(
+    (state) => state.mainSlice.selectedCollection
+  )
+  const _detailsResetKey = useSelector(
+    (state) => state.mainSlice.detailsResetKey
+  )
 
   const { handleMouseDown, currentWidth } = useResizablePanel(panelRef)
+  const { setTab } = useUrlNavigate()
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyPress)
@@ -36,20 +47,26 @@ const LeftContent = () => {
     }
   }, [])
 
+  // Update map visualization when selection changes (works regardless of active tab)
+  useEffect(() => {
+    if (_currentPopupResult && _selectedVisualization) {
+      debounceTitilerOverlay(_currentPopupResult)
+    }
+  }, [_selectedVisualization, _currentPopupResult])
+
   const handleKeyPress = (event) => {
     if (event.ctrlKey && event.key === ' ') {
       debounceNewSearch()
     }
   }
 
-  const setFiltersTab = useCallback(() => {
-    dispatch(settabSelected('filters'))
-  }, [dispatch])
+  const setSearchTab = useCallback(() => {
+    setTab('search')
+  }, [setTab])
 
   const setDetailsTab = useCallback(() => {
-    dispatch(settabSelected('details'))
-    dispatch(sethasLeftPanelTabChanged(true))
-  }, [dispatch])
+    setTab('details')
+  }, [setTab])
 
   return (
     <div
@@ -67,13 +84,13 @@ const LeftContent = () => {
         <div className="LeftContentTabs">
           <button
             className={
-              _tabSelected === 'filters'
+              _tabSelected === 'search'
                 ? 'LeftContentTab LeftContentTabSelected'
                 : 'LeftContentTab'
             }
-            onClick={setFiltersTab}
+            onClick={setSearchTab}
           >
-            Filters
+            <span className="LeftContentTabLabel">Search</span>
           </button>
           <button
             className={
@@ -83,17 +100,25 @@ const LeftContent = () => {
             }
             onClick={setDetailsTab}
           >
-            Item Details
+            <span className="LeftContentTabLabel">Item Details</span>
           </button>
         </div>
         <div className="LeftContentSelectedTab">
-          {_tabSelected === 'filters' ? (
+          <div
+            className="LeftContentTabPanel"
+            style={{ display: _tabSelected === 'search' ? undefined : 'none' }}
+          >
             <Search></Search>
-          ) : (
-            <div className="ItemDetails">
+          </div>
+          <div
+            className="LeftContentTabPanel"
+            key={`${_selectedCollection}-${_detailsResetKey}`}
+            style={{ display: _tabSelected === 'details' ? undefined : 'none' }}
+          >
+            <AccordionStateProvider>
               <PopupResults results={_clickResults}></PopupResults>
-            </div>
-          )}
+            </AccordionStateProvider>
+          </div>
         </div>
       </div>
       {isLeftPanelVisible && (

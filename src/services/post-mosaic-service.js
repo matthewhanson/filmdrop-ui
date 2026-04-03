@@ -1,8 +1,8 @@
 import { store } from '../redux/store'
-import { setSearchLoading } from '../redux/slices/mainSlice'
+import { setSearchLoading, setMosaicCache } from '../redux/slices/mainSlice'
 import { addMosaicLayer } from '../utils/mapHelper'
 
-export async function AddMosaicService(reqParams) {
+export async function AddMosaicService(reqParams, cacheMetadata) {
   const mosaicTilerURL = store.getState().mainSlice.appConfig.MOSAIC_TILER_URL
   await fetch(`${mosaicTilerURL}/mosaicjson/mosaics`, reqParams)
     .then((response) => {
@@ -13,6 +13,15 @@ export async function AddMosaicService(reqParams) {
     })
     .then((json) => {
       addMosaicLayer(json)
+      if (cacheMetadata) {
+        store.dispatch(
+          setMosaicCache({
+            lastMosaicRequestSignature: cacheMetadata.signature,
+            lastMosaicTopItemIds: cacheMetadata.topItemIds,
+            lastMosaicCompareCount: cacheMetadata.compareCount
+          })
+        )
+      }
     })
     .catch((error) => {
       store.dispatch(setSearchLoading(false))

@@ -8,6 +8,7 @@ import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { getStacFieldType } from '../../utils/fieldDiscovery.js'
 import { extractFieldComponents } from '../../utils/fieldFormatting.js'
+import { sanitizeFieldValue } from '../../utils/securityHelper.js'
 import { FieldDisplay } from './FieldDisplayComponents.jsx'
 import { useEnhancedDetails } from '../../contexts/EnhancedDetailsContext'
 
@@ -29,7 +30,7 @@ const EnhancedFieldRenderer = ({ field, value }) => {
 
   // If no components were extracted, fall back to simple text rendering
   if (!components || components.length === 0) {
-    return String(value || '')
+    return sanitizeFieldValue(value)
   }
 
   return (
