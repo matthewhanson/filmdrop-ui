@@ -2,6 +2,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { AggregateSearchService } from './get-aggregate-service'
 import { store } from '../redux/store'
 import { setappConfig } from '../redux/slices/mainSlice'
+import * as searchHelper from '../utils/searchHelper'
+import * as mapHelper from '../utils/mapHelper'
 
 const DEFAULT_AGGREGATE_ERROR_SUMMARY =
   'Error Fetching Aggregate Search Results'
@@ -25,6 +27,40 @@ afterEach(() => {
 })
 
 describe('AggregateSearchService error handling', () => {
+  it('returns undefined on successful hex aggregate and still updates map layer', async () => {
+    const searchParams = 'collections=demo&limit=10'
+    const responseJson = { aggregations: [] }
+    const mappedGrid = {
+      type: 'FeatureCollection',
+      features: [],
+      properties: { largestRatio: 1 }
+    }
+    const layerOptions = { style: {} }
+
+    vi.spyOn(searchHelper, 'mapHexGridFromJson').mockReturnValue(mappedGrid)
+    vi.spyOn(mapHelper, 'buildHexGridLayerOptions').mockReturnValue(
+      layerOptions
+    )
+    const addDataSpy = vi
+      .spyOn(mapHelper, 'addDataToLayer')
+      .mockImplementation(() => {})
+
+    global.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => responseJson
+    })
+
+    const result = await AggregateSearchService(searchParams, 'hex')
+
+    expect(result).toBeUndefined()
+    expect(addDataSpy).toHaveBeenCalledWith(
+      mappedGrid,
+      'searchResultsLayer',
+      layerOptions,
+      true
+    )
+  })
+
   it('returns normalized error for non-OK JSON and unquotes description', async () => {
     const consoleErrorSpy = vi
       .spyOn(console, 'error')

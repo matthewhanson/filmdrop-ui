@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import {
   STAC_UPLOAD_ERROR_CONTEXT_LABEL,
   MAX_STAC_ERROR_BODY_CHARS,
+  getStacErrorResult,
   normalizeStacErrorResponse,
   normalizeStacNetworkError
 } from './stacErrorHelper'
@@ -162,5 +163,18 @@ describe('normalizeStacNetworkError', () => {
         details: 'Network error'
       })
     )
+  })
+})
+
+describe('getStacErrorResult', () => {
+  it('returns result when error flag is present', () => {
+    const result = { error: true, summary: 'Boom' }
+    expect(getStacErrorResult(result)).toBe(result)
+  })
+
+  it('returns undefined when result is missing or not an error payload', () => {
+    expect(getStacErrorResult(undefined)).toBeUndefined()
+    expect(getStacErrorResult({})).toBeUndefined()
+    expect(getStacErrorResult({ error: false })).toBeUndefined()
   })
 })

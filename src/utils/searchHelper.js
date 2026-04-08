@@ -46,7 +46,10 @@ import { AddMosaicService } from '../services/post-mosaic-service'
 import { router, getPathParams } from '../router'
 import { appendStacHeaderCookies } from '../utils/stacRequest'
 import { serializeQueryableFiltersForUrl } from './urlParamHelper'
-import { STAC_UPLOAD_ERROR_CONTEXT_LABEL } from './stacErrorHelper'
+import {
+  STAC_UPLOAD_ERROR_CONTEXT_LABEL,
+  getStacErrorResult
+} from './stacErrorHelper'
 import { showApplicationAlert } from '../utils/alertHelper'
 
 /**
@@ -90,10 +93,6 @@ export function buildQueryFromFilters(queryableFilters) {
   })
 
   return query
-}
-
-function getStacErrorResult(result) {
-  return result && result.error ? result : undefined
 }
 
 function formatStacErrorMessage(result) {

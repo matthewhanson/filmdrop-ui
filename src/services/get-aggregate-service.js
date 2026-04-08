@@ -86,6 +86,7 @@ export async function AggregateSearchService(
     }
 
     addDataToLayer(gridFromJson, 'searchResultsLayer', options, true)
+    return undefined
   } catch (error) {
     if (error?.name === 'AbortError') {
       return undefined

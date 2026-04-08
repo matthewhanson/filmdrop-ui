@@ -3,6 +3,10 @@ export const STAC_UPLOAD_ERROR_CONTEXT_LABEL =
 
 export const MAX_STAC_ERROR_BODY_CHARS = 32768
 
+export function getStacErrorResult(result) {
+  return result && result.error ? result : undefined
+}
+
 function unquoteIfJsonString(s) {
   const trimmed = s.trim()
   if (trimmed.startsWith('"') && trimmed.endsWith('"') && trimmed.length >= 2) {
