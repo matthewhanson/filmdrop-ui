@@ -12,6 +12,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added a NumericRangeInputs component for numeric fields that supports unbounded, min-only, and max-only queryables.
 - Added unit tests for bbox coordinate rounding/clamping (`mapHelper`) and URL/search param bbox handling (`searchHelper`).
 - Added mosaic search caching metadata to track the last mosaic request and top N item IDs for re-use across searches.
+- Added STAC error normalization helpers (`stacErrorHelper`) and unit tests for normalized HTTP responses and network failures; oversized error bodies are truncated using `MAX_STAC_ERROR_BODY_CHARS`.
+- Added `validateUploadedGeometry` in `searchHelper` and unit tests for upload validation independent of map view and zoom.
+- Added unit tests for normalized error handling in search, aggregate, and mosaic STAC client modules.
+- Added optional `AbortSignal` support on `SearchService`, `fetchTopItemsForMosaic`, `AggregateSearchService`, and `AddMosaicService`;
+  `newSearch` accepts an optional `signal` and forwards it to those calls.
 - Added JavaScript config utilities: `npm run config:lint` and `npm run config:migrate`.
 - Added strict config validation tests for startup hard-fail on legacy config.
 
@@ -22,6 +27,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Item Details field grid: column layout set to `minmax(0, 40%) 1fr`, alignment and padding adjusted for clearer spacing and to avoid overflowing text.
 - Updated mosaic search flow to fetch a small set of top items for comparison before creating a new mosaic, reducing redundant mosaic tiler requests.
 - Prevented `newSearch` from clearing map layers and results when running in mosaic view where an existing mosaic image layer is being reused.
+- Centralized STAC request headers in `buildStacRequestHeaders` (`stacRequest`) for search, aggregate, and mosaic top-items prefetch requests.
+- GeoJSON upload flow: preflight STAC search validates the uploaded geometry; on success the AOI is added to the map and `newSearch` runs; inline `Alert` for normalized errors with scrollable details;
+  modal flex layout, `max-height`, double-submit guard (`submissionInFlightRef`); **Cancel** clears Redux AOI and the draw layer and **aborts** in-flight upload/search requests.
+  **Aborted** requests do not apply search results. A failed post-upload search clears the AOI so it does not drive later queries
+  (geometry may appear briefly before the main search completes). `newSearch` still runs synchronously up to URL/layer setup before the first `await`;
+  cancellation stops network completion and result application, not full URL rollback.
+- STAC client modules: return structured error objects and log with the same `contextLabel` passed into normalization (per-service defaults: search, aggregate, mosaic, mosaic top-items prefetch).
 - Enforced modern config format at runtime; legacy config keys now fail startup with migration guidance.
 - Replaced Python-based config lint/migrate helper workflow with Node CLI scripts.
 - Hardened config migration/lint policy to fail mixed-format configs (`COLLECTIONS_CONFIG` + legacy keys) instead of mutating ambiguous input.
@@ -35,6 +47,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Resolve dependency vulnerabilities: DOMPurify XSS (GHSA-v2wj-7wpq-c8vv), Rollup path
   traversal (GHSA-mw96-cpmx-2vgc); upgrade `dompurify` to ^3.3.2, override `rollup` to ^4.59.0.
 - Fixed repeated mosaic layer recreation on identical mosaic searches by reusing the existing mosaic image layer when the request parameters and top items have not changed.
+- Dismissing the GeoJSON upload modal no longer leaves a staged AOI driving later searches; in-flight fetches are aborted so late completions do not repopulate results after **Cancel**.
+- Non-upload flows do not inherit upload-specific error copy; mosaic prefetch uses a dedicated summary to avoid redundant generic search messaging.
 
 ## v7.1.0-pre - 2026-01-15
 

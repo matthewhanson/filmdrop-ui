@@ -46,6 +46,11 @@ import { AddMosaicService } from '../services/post-mosaic-service'
 import { router, getPathParams } from '../router'
 import { appendStacHeaderCookies } from '../utils/stacRequest'
 import { serializeQueryableFiltersForUrl } from './urlParamHelper'
+import {
+  STAC_UPLOAD_ERROR_CONTEXT_LABEL,
+  getStacErrorResult
+} from './stacErrorHelper'
+import { showApplicationAlert } from '../utils/alertHelper'
 
 /**
  * Convert queryable filters from Redux state into STAC Query Extension format
@@ -90,8 +95,16 @@ export function buildQueryFromFilters(queryableFilters) {
   return query
 }
 
+function formatStacErrorMessage(result) {
+  const detailsText =
+    result.details && result.code
+      ? `${result.code}: ${result.details}`
+      : result.details || ''
+  return detailsText ? `${result.summary}: ${detailsText}` : result.summary
+}
+
 export async function newSearch(options = {}) {
-  const { viewMode: overrideViewMode, preserveItem = false } = options
+  const { viewMode: overrideViewMode, preserveItem = false, signal } = options
 
   // Snapshot all needed Redux state upfront, before any dispatches or URL writes.
   const _state = store.getState().mainSlice
@@ -163,7 +176,7 @@ export async function newSearch(options = {}) {
       return
     }
     store.dispatch(setSearchLoading(true))
-    return newMosaicSearch()
+    return newMosaicSearch(signal)
   }
 
   // Get minimum zoom level for scene/mosaic views
@@ -194,21 +207,42 @@ export async function newSearch(options = {}) {
     const searchScenesParams = buildSearchScenesParams()
     store.dispatch(setSearchType('scene'))
     store.dispatch(setSearchLoading(true))
-    getSearchService.SearchService(searchScenesParams, 'scene')
+    const searchResult = await getSearchService.SearchService(
+      searchScenesParams,
+      'scene',
+      undefined,
+      signal
+    )
+    const normalizedError = getStacErrorResult(searchResult)
+    if (normalizedError) return normalizedError
     return
   } else if (viewMode === 'hex' && includesGeoHex) {
     // User wants hex view - no zoom restriction
     const searchAggregateParams = buildSearchAggregateParams('hex')
     store.dispatch(setSearchLoading(true))
     store.dispatch(setSearchType('hex'))
-    AggregateSearchService(searchAggregateParams, 'hex')
+    const result = await AggregateSearchService(
+      searchAggregateParams,
+      'hex',
+      undefined,
+      signal
+    )
+    const normalizedError = getStacErrorResult(result)
+    if (normalizedError) return normalizedError
     return
   } else if (viewMode === 'grid-code' && includesGridCode) {
     // User wants grid-code view - no zoom restriction
     const searchAggregateParams = buildSearchAggregateParams('grid-code')
     store.dispatch(setSearchType('grid-code'))
     store.dispatch(setSearchLoading(true))
-    AggregateSearchService(searchAggregateParams, 'grid-code')
+    const result = await AggregateSearchService(
+      searchAggregateParams,
+      'grid-code',
+      undefined,
+      signal
+    )
+    const normalizedError = getStacErrorResult(result)
+    if (normalizedError) return normalizedError
     return
   }
 
@@ -217,11 +251,32 @@ export async function newSearch(options = {}) {
     const searchScenesParams = buildSearchScenesParams()
     store.dispatch(setSearchType('scene'))
     store.dispatch(setSearchLoading(true))
-    getSearchService.SearchService(searchScenesParams, 'scene')
+    const searchResult = await getSearchService.SearchService(
+      searchScenesParams,
+      'scene',
+      undefined,
+      signal
+    )
+    const normalizedError = getStacErrorResult(searchResult)
+    if (normalizedError) return normalizedError
   } else {
     store.dispatch(setZoomLevelNeeded(sceneMinZoom))
     store.dispatch(setShowZoomNotice(true))
   }
+}
+
+export async function validateUploadedGeometry(uploadedFeature, signal) {
+  const searchScenesParams = buildSearchScenesParams(undefined, {
+    intersectsGeometry: uploadedFeature.geometry,
+    limit: 1
+  })
+  const searchResult = await getSearchService.SearchService(
+    searchScenesParams,
+    'scene',
+    STAC_UPLOAD_ERROR_CONTEXT_LABEL,
+    signal
+  )
+  return getStacErrorResult(searchResult)
 }
 
 export function clearSearch() {
@@ -290,13 +345,19 @@ function buildSearchScenesParams(gridCodeToSearchIn, options = {}) {
   const collections = _selectedCollection.id
   const _searchGeojsonBoundary =
     store.getState().mainSlice.searchGeojsonBoundary
+  const intersectsGeometry = options.intersectsGeometry
 
   const searchParams = new Map([
     ['datetime', _dateTimeRange],
     ['limit', limit],
     ['collections', collections]
   ])
-  if (_searchGeojsonBoundary) {
+  if (intersectsGeometry) {
+    searchParams.set(
+      'intersects',
+      encodeURIComponent(JSON.stringify(intersectsGeometry))
+    )
+  } else if (_searchGeojsonBoundary) {
     searchParams.set(
       'intersects',
       encodeURIComponent(JSON.stringify(_searchGeojsonBoundary.geometry))
@@ -551,9 +612,25 @@ export function mapGridCodeFromJson(json) {
   }
 }
 
-export function searchGridCodeScenes(gridCodeToSearchIn) {
-  const searchScenesParams = buildSearchScenesParams(gridCodeToSearchIn)
-  getSearchService.SearchService(searchScenesParams, 'grid-code')
+export async function searchGridCodeScenes(gridCodeToSearchIn) {
+  try {
+    const searchScenesParams = buildSearchScenesParams(gridCodeToSearchIn)
+    const result = await getSearchService.SearchService(
+      searchScenesParams,
+      'grid-code'
+    )
+
+    const normalizedError = getStacErrorResult(result)
+    if (normalizedError) {
+      showApplicationAlert(
+        'warning',
+        formatStacErrorMessage(normalizedError),
+        5000
+      )
+    }
+  } catch (error) {
+    showApplicationAlert('warning', 'ERROR: ' + error.message.toString(), 5000)
+  }
 }
 
 export const debounceNewSearch = debounce(() => newSearch(), 300)
@@ -629,7 +706,7 @@ const areTopItemsEqual = (prevIds, nextIds, compareCount) => {
   return true
 }
 
-async function newMosaicSearch() {
+async function newMosaicSearch(signal) {
   const createMosaicBody = buildMosaicCreateBody()
   const signature = getMosaicRequestSignature(createMosaicBody)
   const state = store.getState().mainSlice
@@ -656,12 +733,20 @@ async function newMosaicSearch() {
     })
     const result = await getSearchService.fetchTopItemsForMosaic(
       searchParams,
-      compareCount
+      compareCount,
+      undefined,
+      signal
     )
     topItemIds = result.itemIds
     effectiveCompareCount = result.effectiveLimit
   } catch (error) {
+    if (error?.name === 'AbortError') {
+      store.dispatch(setSearchLoading(false))
+      return
+    }
     console.error('Error fetching top items for mosaic comparison', error)
+    store.dispatch(setSearchLoading(false))
+    return error
   }
 
   const compareWindow = Math.min(effectiveCompareCount, compareCount)
@@ -702,11 +787,20 @@ async function newMosaicSearch() {
   store.dispatch(setSearchResults(null))
   store.dispatch(setShowZoomNotice(false))
 
-  AddMosaicService(requestOptions, {
-    signature,
-    topItemIds,
-    compareCount: compareWindow
-  })
+  const mosaicResult = await AddMosaicService(
+    requestOptions,
+    {
+      signature,
+      topItemIds,
+      compareCount: compareWindow
+    },
+    undefined,
+    signal
+  )
+
+  if (mosaicResult && mosaicResult.error) {
+    return mosaicResult
+  }
 }
 
 const constructMosaicAssetVal = (collection) => {

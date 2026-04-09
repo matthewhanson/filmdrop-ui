@@ -13,6 +13,7 @@ import {
 } from '../components/defaults'
 import {
   newSearch,
+  validateUploadedGeometry,
   buildUrlParamFromBBOX,
   buildSearchScenesParams,
   buildSearchAggregateParams
@@ -20,9 +21,19 @@ import {
 import * as mapHelper from './mapHelper'
 import { AddMosaicService } from '../services/post-mosaic-service'
 import * as getSearchService from '../services/get-search-service'
+import { AggregateSearchService } from '../services/get-aggregate-service'
+import { STAC_UPLOAD_ERROR_CONTEXT_LABEL } from './stacErrorHelper'
+
+const DEFAULT_SEARCH_ERROR_SUMMARY = 'Error Fetching Search Results'
+const DEFAULT_AGGREGATE_ERROR_SUMMARY =
+  'Error Fetching Aggregate Search Results'
 
 vi.mock('../services/post-mosaic-service', () => ({
   AddMosaicService: vi.fn()
+}))
+
+vi.mock('../services/get-aggregate-service', () => ({
+  AggregateSearchService: vi.fn()
 }))
 
 vi.mock('./mapHelper', async () => {
@@ -74,6 +85,7 @@ describe('searchHelper newSearch', () => {
       })
     )
     AddMosaicService.mockReset()
+    AggregateSearchService.mockReset()
     vi.spyOn(getSearchService, 'fetchTopItemsForMosaic').mockReset()
     mapHelper.hasMosaicImageLayer.mockReset()
     mapHelper.hasMosaicImageLayer.mockReturnValue(true)
@@ -90,7 +102,7 @@ describe('searchHelper newSearch', () => {
     expect(AddMosaicService).toHaveBeenCalledTimes(1)
   })
 
-  it('reuses mosaic when top-n items match previous cache', async () => {
+  it('reuses mosaic when signature + compare count + layer all match (first gate)', async () => {
     const itemIds = ['a', 'b', 'c']
     vi.spyOn(getSearchService, 'fetchTopItemsForMosaic').mockResolvedValue({
       itemIds,
@@ -107,14 +119,47 @@ describe('searchHelper newSearch', () => {
       setMosaicCache({
         lastMosaicRequestSignature: firstCacheMetadata.signature,
         lastMosaicTopItemIds: itemIds,
-        // In the app, compareCount is the configured
-        // comparison window size, not the number of
-        // items returned in a given response.
         lastMosaicCompareCount: DEFAULT_MOSAIC_TOP_COMPARE_ITEMS
       })
     )
 
     AddMosaicService.mockClear()
+
+    await newSearch({ viewMode: 'mosaic' })
+
+    expect(AddMosaicService).toHaveBeenCalledTimes(0)
+  })
+
+  it('reuses mosaic when top items match cache even though first gate misses due to compare count (second gate)', async () => {
+    // Only 3 items returned — compareWindow=3, but compareCount (configured max) = 100.
+    // First gate: lastMosaicCompareCount(3) !== compareCount(100) → fails → fetches items.
+    // Second gate: lastMosaicCompareCount(3) === compareWindow(3), layer exists, items match → skips.
+    const itemIds = ['a', 'b', 'c']
+    vi.spyOn(getSearchService, 'fetchTopItemsForMosaic').mockResolvedValue({
+      itemIds,
+      effectiveLimit: itemIds.length
+    })
+
+    await newSearch({ viewMode: 'mosaic' })
+
+    expect(AddMosaicService).toHaveBeenCalledTimes(1)
+
+    const [, firstCacheMetadata] = AddMosaicService.mock.calls[0]
+    // compareCount stored by AddMosaicService is compareWindow (3), not the configured max (100)
+    expect(firstCacheMetadata.compareCount).toBe(itemIds.length)
+
+    store.dispatch(
+      setMosaicCache({
+        lastMosaicRequestSignature: firstCacheMetadata.signature,
+        lastMosaicTopItemIds: itemIds,
+        lastMosaicCompareCount: firstCacheMetadata.compareCount
+      })
+    )
+
+    AddMosaicService.mockClear()
+    // Layer still present; first gate will miss (compareCount 100 ≠ cached 3),
+    // second gate must carry the load.
+    mapHelper.hasMosaicImageLayer.mockReturnValue(true)
 
     await newSearch({ viewMode: 'mosaic' })
 
@@ -191,14 +236,94 @@ describe('searchHelper newSearch', () => {
     expect(cacheMetadata.compareCount).toBe(DEFAULT_MOSAIC_TOP_COMPARE_ITEMS)
   })
 
-  it('still creates mosaic when fetchTopItemsForMosaic rejects (fallback)', async () => {
+  it('returns inline error when fetchTopItemsForMosaic rejects', async () => {
+    const normalizedError = {
+      error: true,
+      status: null,
+      code: null,
+      summary: DEFAULT_SEARCH_ERROR_SUMMARY,
+      details: 'Network error'
+    }
+
     vi.spyOn(getSearchService, 'fetchTopItemsForMosaic').mockRejectedValue(
-      new Error('Network error')
+      normalizedError
+    )
+    const consoleErrorSpy = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {})
+
+    const result = await newSearch({ viewMode: 'mosaic' })
+
+    expect(AddMosaicService).toHaveBeenCalledTimes(0)
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      'Error fetching top items for mosaic comparison',
+      normalizedError
+    )
+    expect(result).toBe(normalizedError)
+  })
+
+  it('returns undefined when fetchTopItemsForMosaic aborts', async () => {
+    const abortError = Object.assign(new Error('Aborted'), {
+      name: 'AbortError'
+    })
+    vi.spyOn(getSearchService, 'fetchTopItemsForMosaic').mockRejectedValue(
+      abortError
     )
 
-    await newSearch({ viewMode: 'mosaic' })
+    const result = await newSearch({ viewMode: 'mosaic' })
 
-    expect(AddMosaicService).toHaveBeenCalledTimes(1)
+    expect(AddMosaicService).toHaveBeenCalledTimes(0)
+    expect(result).toBeUndefined()
+  })
+
+  it('propagates inline error for hex view from AggregateSearchService', async () => {
+    store.dispatch(
+      setSelectedCollectionData({
+        ...mockCollection,
+        aggregations: [{ name: 'centroid_geohex_grid_frequency' }]
+      })
+    )
+
+    const normalizedError = {
+      error: true,
+      status: 400,
+      code: 'BadRequest',
+      summary: DEFAULT_AGGREGATE_ERROR_SUMMARY,
+      details: 'geo coordinates must be numbers'
+    }
+
+    AggregateSearchService.mockResolvedValueOnce(normalizedError)
+
+    const result = await newSearch({ viewMode: 'hex' })
+
+    expect(AggregateSearchService).toHaveBeenCalledTimes(1)
+    expect(AddMosaicService).toHaveBeenCalledTimes(0)
+    expect(result).toBe(normalizedError)
+  })
+
+  it('propagates inline error for grid-code view from AggregateSearchService', async () => {
+    store.dispatch(
+      setSelectedCollectionData({
+        ...mockCollection,
+        aggregations: [{ name: 'grid_code_frequency' }]
+      })
+    )
+
+    const normalizedError = {
+      error: true,
+      status: 400,
+      code: 'BadRequest',
+      summary: DEFAULT_AGGREGATE_ERROR_SUMMARY,
+      details: 'geo coordinates must be numbers'
+    }
+
+    AggregateSearchService.mockResolvedValueOnce(normalizedError)
+
+    const result = await newSearch({ viewMode: 'grid-code' })
+
+    expect(AggregateSearchService).toHaveBeenCalledTimes(1)
+    expect(AddMosaicService).toHaveBeenCalledTimes(0)
+    expect(result).toBe(normalizedError)
   })
 })
 
@@ -299,5 +424,73 @@ describe('searchHelper bbox precision', () => {
       const result = buildSearchAggregateParams('hex')
       expect(result).not.toContain('bbox=')
     })
+  })
+})
+
+describe('validateUploadedGeometry', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks()
+    store.dispatch(
+      setappConfig({
+        STAC_API_URL: 'https://example.com/stac',
+        FETCH_CREDENTIALS: 'same-origin',
+        APP_TOKEN_AUTH_ENABLED: false
+      })
+    )
+    store.dispatch(
+      setSelectedCollectionData({
+        ...mockCollection
+      })
+    )
+  })
+
+  it('calls SearchService with upload-specific error context', async () => {
+    const uploadedFeature = {
+      type: 'Feature',
+      geometry: { type: 'Point', coordinates: [0, 0] },
+      properties: {}
+    }
+    const searchServiceSpy = vi
+      .spyOn(getSearchService, 'SearchService')
+      .mockResolvedValueOnce(undefined)
+
+    const result = await validateUploadedGeometry(uploadedFeature)
+
+    expect(result).toBeUndefined()
+    expect(searchServiceSpy).toHaveBeenCalledWith(
+      expect.stringContaining('intersects='),
+      'scene',
+      STAC_UPLOAD_ERROR_CONTEXT_LABEL,
+      undefined
+    )
+  })
+
+  it('returns normalized error independent of current view mode and zoom', async () => {
+    store.dispatch(
+      setSelectedCollectionData({
+        ...mockCollection,
+        aggregations: [{ name: 'grid_code_frequency' }]
+      })
+    )
+    const uploadedFeature = {
+      type: 'Feature',
+      geometry: { type: 'Point', coordinates: [0, 0] },
+      properties: {}
+    }
+    const normalizedError = {
+      error: true,
+      status: 400,
+      code: 'BadRequest',
+      summary: STAC_UPLOAD_ERROR_CONTEXT_LABEL,
+      details: 'geo coordinates must be numbers'
+    }
+
+    vi.spyOn(getSearchService, 'SearchService').mockResolvedValueOnce(
+      normalizedError
+    )
+
+    const result = await validateUploadedGeometry(uploadedFeature)
+
+    expect(result).toEqual(normalizedError)
   })
 })
