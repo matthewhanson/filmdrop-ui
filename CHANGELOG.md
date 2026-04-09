@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added a NumericRangeInputs component for numeric fields that supports unbounded, min-only, and max-only queryables.
 - Added unit tests for bbox coordinate rounding/clamping (`mapHelper`) and URL/search param bbox handling (`searchHelper`).
 - Added mosaic search caching metadata to track the last mosaic request and top N item IDs for re-use across searches.
+- Added JavaScript config utilities: `npm run config:lint` and `npm run config:migrate`.
+- Added strict config validation tests for startup hard-fail on legacy config.
 
 ### Changed
 
@@ -20,6 +22,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Item Details field grid: column layout set to `minmax(0, 40%) 1fr`, alignment and padding adjusted for clearer spacing and to avoid overflowing text.
 - Updated mosaic search flow to fetch a small set of top items for comparison before creating a new mosaic, reducing redundant mosaic tiler requests.
 - Prevented `newSearch` from clearing map layers and results when running in mosaic view where an existing mosaic image layer is being reused.
+- Enforced modern config format at runtime; legacy config keys now fail startup with migration guidance.
+- Replaced Python-based config lint/migrate helper workflow with Node CLI scripts.
+- Hardened config migration/lint policy to fail mixed-format configs (`COLLECTIONS_CONFIG` + legacy keys) instead of mutating ambiguous input.
+- Updated docs/examples to use canonical `COLLECTIONS_CONFIG.visualizations.default` rendering configuration.
 
 ### Fixed
 

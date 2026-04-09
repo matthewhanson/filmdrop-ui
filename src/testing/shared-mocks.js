@@ -3480,6 +3480,91 @@ export const mockAppConfig = {
   COLLECTIONS: {
     default: 'cop-dem-glo-30'
   },
+  COLLECTIONS_CONFIG: {
+    'sentinel-2-l2a': {
+      visualizations: {
+        default: {
+          assets: ['red', 'green', 'blue'],
+          color_formula: 'Gamma+RGB+3.2+Saturation+0.8+Sigmoidal+RGB+12+0.35'
+        }
+      },
+      mosaicTilerParams: {
+        assets: ['visual']
+      },
+      sceneMinZoom: 7
+    },
+    'landsat-c2-l2': {
+      visualizations: {
+        default: {
+          assets: ['red', 'green', 'blue'],
+          color_formula: 'Gamma+RGB+1.7+Saturation+1.7+Sigmoidal+RGB+15+0.35'
+        }
+      },
+      mosaicTilerParams: {
+        assets: ['red'],
+        color_formula: 'Gamma+R+1.7+Sigmoidal+R+15+0.35'
+      },
+      sceneMinZoom: 7
+    },
+    naip: {
+      visualizations: {
+        default: {
+          assets: ['image'],
+          bidx: '1,2,3'
+        }
+      },
+      mosaicTilerParams: {
+        assets: ['image'],
+        bidx: '1,2,3'
+      },
+      sceneMinZoom: 14
+    },
+    'cop-dem-glo-30': {
+      visualizations: {
+        default: {
+          assets: ['data'],
+          colormap_name: 'terrain',
+          rescale: ['-1000,4000']
+        }
+      },
+      mosaicTilerParams: {
+        assets: ['data'],
+        colormap_name: 'terrain',
+        rescale: ['-1000,4000']
+      },
+      sceneMinZoom: 8
+    },
+    'cop-dem-glo-90': {
+      visualizations: {
+        default: {
+          assets: ['data'],
+          colormap_name: 'terrain',
+          rescale: ['-1000,4000']
+        }
+      },
+      mosaicTilerParams: {
+        assets: ['data'],
+        colormap_name: 'terrain',
+        rescale: ['-1000,4000']
+      },
+      sceneMinZoom: 8
+    },
+    'sentinel-1-grd': {
+      visualizations: {
+        default: {
+          assets: ['vv'],
+          rescale: ['0,250'],
+          colormap_name: 'plasma'
+        }
+      },
+      mosaicTilerParams: {
+        assets: ['vv'],
+        rescale: ['0,250'],
+        colormap_name: 'plasma'
+      },
+      sceneMinZoom: 7
+    }
+  },
   STAC_API_URL: 'https://api-endpoint.example.com',
   API_MAX_ITEMS: 200,
   SCENE_TILER_URL: 'https://titiler.example.com',

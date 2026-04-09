@@ -2,15 +2,13 @@
 
 Complete reference for configuring FilmDrop UI.
 
-## ✅ Backward Compatibility Notice
+## Config Format Requirement
 
-**Your existing configuration files will continue to work without any changes.** FilmDrop UI maintains full backward compatibility with legacy configuration formats.
-Old configs are automatically converted to the new format when your application loads.
+FilmDrop UI requires the modern config format at runtime. Legacy keys are not auto-migrated during app startup.
 
-- **No action required** - Your current setup is not broken
-- **Optional migration** - Migrate to the new format when convenient for better maintainability
-- **Migration tools available** - Use the [migration script](#migration-script) to automatically convert your config
-- **See [Migration Guide](#migration-guide)** - Learn when and why you might want to upgrade
+- Run `npm run config:lint -- public/config/config.json` to validate format
+- Run `npm run config:migrate -- --input public/config/config.json --output public/config/config.json.migrated` to migrate legacy configs
+- Replace your config with the migrated file before starting the app
 
 ---
 
@@ -52,8 +50,8 @@ cache-breaker to prevent stale files.
 
 - JSON-based configuration
 - Runtime loading (no rebuild needed for config changes)
-- Support for both legacy and modern configuration formats
-- Automatic migration for backward compatibility
+- Modern `COLLECTIONS_CONFIG`-based schema
+- CLI-based migration and lint tooling
 
 ## Configuration File Location
 
@@ -158,8 +156,8 @@ cache-breaker to prevent stale files.
 
 ### Legacy Parameters
 
-The following top-level parameters are **deprecated** but still supported for backward
-compatibility. They are automatically converted to `COLLECTIONS_CONFIG` on load.
+The following top-level parameters are **legacy** and require migration before runtime.
+Use `npm run config:migrate` to convert them to `COLLECTIONS_CONFIG`.
 
 | Deprecated Parameter      | Migrated To                              |
 | ------------------------- | ---------------------------------------- |
@@ -845,14 +843,20 @@ configuration files easier to maintain.
 **After:** All collection-specific settings are grouped under `COLLECTIONS_CONFIG`, with each
 collection ID appearing only once.
 
-### Backward Compatibility
+### Runtime Enforcement
 
-**Your existing configuration files will continue to work!** The application automatically
-converts legacy format to the new format on load. However, we recommend migrating to the
-new format for better maintainability.
+Legacy and mixed config formats fail startup. Migrate your config with:
 
-If both formats are present in a config file, `COLLECTIONS_CONFIG` takes precedence, and a
-warning will be logged to the console.
+```bash
+npm run config:migrate -- --input public/config/config.json --output public/config/config.json.migrated
+npm run config:lint -- public/config/config.json.migrated
+```
+
+`config:migrate` also fails on mixed-format inputs (`COLLECTIONS_CONFIG` plus legacy keys).
+Resolve mixed files by either:
+
+1. Migrating a legacy-only source file, or
+2. Manually reconciling values into `COLLECTIONS_CONFIG` and removing legacy keys.
 
 ### Migration Example
 
