@@ -17,18 +17,27 @@ npm run config:migrate -- --input public/config/config.json --dry-run
 npm run config:migrate -- --input public/config/config.json --output public/config/config.json.migrated
 ```
 
+## Config file format (strict JSON)
+
+`config:lint` and `config:migrate` read the file with `JSON.parse` (standard JSON only).
+They do **not** support JSON5, `//` or `/* */` comments, or trailing commas.
+Files saved as UTF-8 with a **BOM** can fail to parse in some editors.
+Use plain UTF-8 without BOM, or preprocess the file before running the CLI.
+
 ## Maintenance: new top-level config keys
 
 When you add a supported top-level key to the app config:
 
-1. Add it to `MODERN_CONFIG_KEYS` in [src/utils/configFormat.js](../src/utils/configFormat.js) (and legacy list if applicable).
+1. Add it to `MODERN_CONFIG_KEYS` in [src/utils/configFormat.mjs](../src/utils/configFormat.mjs) (and legacy list if applicable).
 2. Add its **type** to `TOP_LEVEL_CONFIG_EXPECTED_TYPES` in the same file so `config:lint` stays in sync with the runtime.
 
 The unit test `TOP_LEVEL_CONFIG_EXPECTED_TYPES keys match MODERN and LEGACY union` in [src/utils/configFormat.test.js](../src/utils/configFormat.test.js) fails if those lists diverge.
 
 ## Mixed-format policy
 
-`config:migrate` and `config:lint` fail on mixed format (`COLLECTIONS_CONFIG` plus legacy keys) to prevent silent data loss from ambiguous precedence.
+`config:migrate` and `config:lint` treat as mixed when `COLLECTIONS_CONFIG` is present together
+with legacy keys, or together with a legacy `COLLECTIONS` array.
+That prevents silent data loss from ambiguous precedence.
 
 Use one of these workflows:
 
@@ -54,7 +63,7 @@ Reserved metadata keys (for example `_comment*` and `_DEPRECATED_*`) are exclude
 
 ## Strict Runtime Behavior
 
-Runtime config loading does not auto-migrates legacy keys. Legacy or mixed configs fail at startup with guidance to run `config:migrate`.
+Runtime config loading does not auto-migrate legacy keys. Legacy or mixed configs fail at startup with guidance to run `config:migrate`.
 
 ## References
 

@@ -18,8 +18,9 @@ import { DEFAULT_REL_TYPE_EXCLUDE_LIST } from './defaultLinkGrouping.js'
 import {
   ConfigValidationError,
   detectConfigFormat,
-  getLegacyKeysPresent
-} from './configFormat.js'
+  getLegacyKeysPresent,
+  getMixedFormatLegacySignals
+} from './configFormat.mjs'
 import { store } from '../redux/store'
 import { DoesFaviconExistService } from '../services/get-config-service'
 import { setappName, setreferenceLayers } from '../redux/slices/mainSlice'
@@ -149,6 +150,13 @@ async function loadReferenceLayers() {
 export function normalizeCollectionsConfig(config) {
   if (!config) return config
 
+  if (Array.isArray(config.COLLECTIONS)) {
+    throw new ConfigValidationError(
+      "Legacy COLLECTIONS array format is not supported. Use COLLECTIONS object format with 'include', 'exclude', and optional 'default'.",
+      'LEGACY_CONFIG_NOT_SUPPORTED'
+    )
+  }
+
   const format = detectConfigFormat(config)
   const legacyKeys = getLegacyKeysPresent(config)
   if (format === 'legacy') {
@@ -160,18 +168,12 @@ export function normalizeCollectionsConfig(config) {
     )
   }
   if (format === 'mixed') {
+    const signals = getMixedFormatLegacySignals(config)
     throw new ConfigValidationError(
-      `Mixed configuration format is not supported. Resolve the file to one format before migration: (1) use a legacy-only source file and run npm run config:migrate -- --input public/config/config.json --output public/config/config.json.migrated, or (2) manually reconcile COLLECTIONS_CONFIG and remove legacy keys. Legacy keys found: ${legacyKeys.join(
+      `Mixed configuration format is not supported. Resolve the file to one format before migration: (1) use a legacy-only source file and run npm run config:migrate -- --input public/config/config.json --output public/config/config.json.migrated, or (2) manually reconcile COLLECTIONS_CONFIG and remove legacy keys. Conflicting legacy inputs: ${signals.join(
         ', '
       )}`,
       'MIXED_CONFIG_NOT_SUPPORTED'
-    )
-  }
-
-  if (config.COLLECTIONS && Array.isArray(config.COLLECTIONS)) {
-    throw new ConfigValidationError(
-      "Legacy COLLECTIONS array format is not supported. Use COLLECTIONS object format with 'include', 'exclude', and optional 'default'.",
-      'LEGACY_CONFIG_NOT_SUPPORTED'
     )
   }
 

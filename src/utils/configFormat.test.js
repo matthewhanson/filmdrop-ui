@@ -6,7 +6,7 @@ import {
   detectConfigFormat,
   migrateLegacyConfig,
   getLegacyKeysPresent
-} from './configFormat'
+} from './configFormat.mjs'
 
 describe('configFormat', () => {
   it('TOP_LEVEL_CONFIG_EXPECTED_TYPES keys match MODERN and LEGACY union', () => {
@@ -26,6 +26,28 @@ describe('configFormat', () => {
     expect(detectConfigFormat({ STAC_API_URL: 'https://example.com' })).toBe(
       'unknown'
     )
+  })
+
+  it('detects legacy format when only COLLECTIONS is a legacy array', () => {
+    expect(detectConfigFormat({ COLLECTIONS: ['a'] })).toBe('legacy')
+  })
+
+  it('detects new format when COLLECTIONS is object with COLLECTIONS_CONFIG', () => {
+    expect(
+      detectConfigFormat({
+        COLLECTIONS_CONFIG: {},
+        COLLECTIONS: { include: ['a'] }
+      })
+    ).toBe('new')
+  })
+
+  it('detects mixed when COLLECTIONS_CONFIG and legacy COLLECTIONS array', () => {
+    expect(
+      detectConfigFormat({
+        COLLECTIONS_CONFIG: {},
+        COLLECTIONS: ['a']
+      })
+    ).toBe('mixed')
   })
 
   it('returns present legacy keys', () => {
@@ -74,12 +96,29 @@ describe('configFormat', () => {
     ).toThrow('Mixed configuration format is not supported for migration')
   })
 
+  it('throws for mixed format when COLLECTIONS_CONFIG plus legacy COLLECTIONS array names the array signal', () => {
+    expect(() =>
+      migrateLegacyConfig({
+        COLLECTIONS_CONFIG: { collectionA: {} },
+        COLLECTIONS: ['collectionA']
+      })
+    ).toThrow(/Conflicting legacy inputs:.*COLLECTIONS \(legacy array\)/)
+  })
+
   it('throws for unknown format migration', () => {
     expect(() =>
       migrateLegacyConfig({
         STAC_API_URL: 'https://example.com'
       })
     ).toThrow('Unknown configuration format')
+  })
+
+  it('migrates legacy COLLECTIONS array-only config without unknown format error', () => {
+    const { migratedConfig, format } = migrateLegacyConfig({
+      COLLECTIONS: ['collectionA']
+    })
+    expect(format).toBe('legacy')
+    expect(migratedConfig.COLLECTIONS).toEqual({ include: ['collectionA'] })
   })
 
   it('filters reserved metadata keys from migrated collection ids', () => {

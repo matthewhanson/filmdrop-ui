@@ -7,8 +7,8 @@ import {
   MODERN_CONFIG_KEYS,
   TOP_LEVEL_CONFIG_EXPECTED_TYPES,
   detectConfigFormat,
-  getLegacyKeysPresent
-} from '../src/utils/configFormat.js'
+  getMixedFormatLegacySignals
+} from '../src/utils/configFormat.mjs'
 import { readJsonFile } from './read-json.mjs'
 
 const MIXED_REMEDIATION_MESSAGE =
@@ -47,10 +47,17 @@ function expectedKeysForFormat(format) {
   return new Set(MODERN_CONFIG_KEYS)
 }
 
-function validateTypes(config, expectedKeys) {
+function validateTypes(config, expectedKeys, format) {
   const typeErrors = []
   Object.keys(config).forEach((key) => {
     if (!expectedKeys.has(key) || !(key in TOP_LEVEL_CONFIG_EXPECTED_TYPES)) {
+      return
+    }
+    if (
+      format === 'legacy' &&
+      key === 'COLLECTIONS' &&
+      Array.isArray(config[key])
+    ) {
       return
     }
     const expectedType = TOP_LEVEL_CONFIG_EXPECTED_TYPES[key]
@@ -71,13 +78,10 @@ function lintConfig(filePath, verbose) {
   const format = detectConfigFormat(config)
   const expectedKeys = expectedKeysForFormat(format)
   const extraKeys = Object.keys(config).filter((key) => !expectedKeys.has(key))
-  const typeErrors = validateTypes(config, expectedKeys)
+  const typeErrors = validateTypes(config, expectedKeys, format)
   const missingRequiredKeys = ['STAC_API_URL'].filter((key) => !(key in config))
   const errors = []
 
-  if (format === 'legacy' && !('SEARCH_MIN_ZOOM_LEVELS' in config)) {
-    errors.push("Legacy config requires 'SEARCH_MIN_ZOOM_LEVELS'")
-  }
   if (format === 'mixed') {
     errors.push(MIXED_REMEDIATION_MESSAGE)
   }
@@ -110,12 +114,15 @@ function lintConfig(filePath, verbose) {
         filePath
       )} --dry-run`
     )
+    if (verbose && !('SEARCH_MIN_ZOOM_LEVELS' in config)) {
+      console.log(
+        '[Verbose] Many legacy configs include SEARCH_MIN_ZOOM_LEVELS for search zoom behavior; yours omits it.'
+      )
+    }
   } else if (format === 'mixed') {
     console.log('Mixed format detected.')
-    const legacyKeysPresent = getLegacyKeysPresent(config)
-    if (legacyKeysPresent.length > 0) {
-      console.log(`Legacy keys present: ${legacyKeysPresent.join(', ')}`)
-    }
+    const signals = getMixedFormatLegacySignals(config)
+    console.log(`Conflicting legacy inputs: ${signals.join(', ')}`)
   } else if (format === 'new') {
     console.log('Modern format detected.')
   }

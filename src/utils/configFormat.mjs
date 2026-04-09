@@ -119,19 +119,34 @@ export function detectConfigFormat(config) {
   if (!config || typeof config !== 'object') return 'unknown'
 
   const hasLegacyKeys = LEGACY_CONFIG_KEYS.some((key) => key in config)
+  const hasLegacyCollectionsArray = Array.isArray(config.COLLECTIONS)
   const hasCollectionsConfig =
     'COLLECTIONS_CONFIG' in config &&
     typeof config.COLLECTIONS_CONFIG === 'object'
 
-  if (hasCollectionsConfig && hasLegacyKeys) return 'mixed'
+  if (hasCollectionsConfig && (hasLegacyKeys || hasLegacyCollectionsArray)) {
+    return 'mixed'
+  }
   if (hasCollectionsConfig) return 'new'
-  if (hasLegacyKeys) return 'legacy'
+  if (hasLegacyKeys || hasLegacyCollectionsArray) return 'legacy'
   return 'unknown'
 }
 
 export function getLegacyKeysPresent(config) {
   if (!config || typeof config !== 'object') return []
   return LEGACY_CONFIG_KEYS.filter((key) => key in config)
+}
+
+/**
+ * Human-readable list of legacy inputs that conflict with COLLECTIONS_CONFIG (mixed format).
+ * Includes named legacy keys plus COLLECTIONS when it is a legacy array.
+ */
+export function getMixedFormatLegacySignals(config) {
+  const signals = [...getLegacyKeysPresent(config)]
+  if (Array.isArray(config?.COLLECTIONS)) {
+    signals.push('COLLECTIONS (legacy array)')
+  }
+  return signals
 }
 
 export function isReservedCollectionId(collectionId) {
@@ -160,9 +175,9 @@ export function migrateLegacyConfig(config) {
   }
 
   if (format === 'mixed') {
-    const legacyKeys = getLegacyKeysPresent(migrated)
+    const signals = getMixedFormatLegacySignals(migrated)
     throw new ConfigValidationError(
-      `Mixed configuration format is not supported for migration. Resolve mixed keys before migrating. Legacy keys found: ${legacyKeys.join(
+      `Mixed configuration format is not supported for migration. Resolve mixed keys before migrating. Conflicting legacy inputs: ${signals.join(
         ', '
       )}`,
       'MIXED_CONFIG_NOT_SUPPORTED'

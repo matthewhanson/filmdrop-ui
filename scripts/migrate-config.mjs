@@ -3,17 +3,17 @@
 import fs from 'node:fs'
 import {
   ConfigValidationError,
-  getLegacyKeysPresent,
+  getMixedFormatLegacySignals,
   migrateLegacyConfig,
   detectConfigFormat
-} from '../src/utils/configFormat.js'
+} from '../src/utils/configFormat.mjs'
 import { readJsonFile } from './read-json.mjs'
 
 const MIXED_REMEDIATION_MESSAGE = [
   'Mixed configuration format is not supported.',
   'Resolve the file to one format before migration:',
   '  1) Use a legacy-only source file and run config:migrate, or',
-  '  2) Manually reconcile COLLECTIONS_CONFIG and remove legacy keys.'
+  '  2) Manually reconcile COLLECTIONS_CONFIG: remove legacy keys and/or convert COLLECTIONS from a legacy array to object format (include/exclude/default).'
 ].join('\n')
 
 function printUsage() {
@@ -119,9 +119,9 @@ function main() {
     const format = detectConfigFormat(config)
 
     if (format === 'mixed') {
-      const legacyKeys = getLegacyKeysPresent(config)
+      const signals = getMixedFormatLegacySignals(config)
       throw new ConfigValidationError(
-        `${MIXED_REMEDIATION_MESSAGE}\nLegacy keys found: ${legacyKeys.join(', ')}`,
+        `${MIXED_REMEDIATION_MESSAGE}\nConflicting legacy inputs: ${signals.join(', ')}`,
         'MIXED_CONFIG_NOT_SUPPORTED'
       )
     }

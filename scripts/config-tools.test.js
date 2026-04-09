@@ -51,6 +51,33 @@ describe('config tooling scripts', () => {
     }
   })
 
+  it('lint-config passes for minimal legacy without SEARCH_MIN_ZOOM_LEVELS', () => {
+    const filePath = createTempConfig({
+      STAC_API_URL: 'https://example.com',
+      SCENE_TILER_PARAMS: { collectionA: { assets: ['red'] } }
+    })
+
+    const output = runNodeScript(lintScript, [filePath])
+    expect(output).toContain('Config format: LEGACY')
+    expect(output).toContain('Config is VALID')
+    expect(output).not.toContain(
+      "Legacy config requires 'SEARCH_MIN_ZOOM_LEVELS'"
+    )
+  })
+
+  it('lint-config verbose hints when legacy omits SEARCH_MIN_ZOOM_LEVELS', () => {
+    const filePath = createTempConfig({
+      STAC_API_URL: 'https://example.com',
+      SCENE_TILER_PARAMS: { collectionA: { assets: ['red'] } }
+    })
+
+    const output = runNodeScript(lintScript, ['--verbose', filePath])
+    expect(output).toContain('Config format: LEGACY')
+    expect(output).toContain('Config is VALID')
+    expect(output).toContain('[Verbose]')
+    expect(output).toContain('SEARCH_MIN_ZOOM_LEVELS')
+  })
+
   it('lint-config fails for mixed format', () => {
     const filePath = createTempConfig({
       STAC_API_URL: 'https://example.com',
@@ -64,6 +91,25 @@ describe('config tooling scripts', () => {
       const out = `${error.stdout ?? ''}${error.stderr ?? ''}`
       expect(out).toContain('Config format: MIXED')
       expect(out).toContain('Mixed format is not supported')
+      expect(out).toContain('Conflicting legacy inputs: SCENE_TILER_PARAMS')
+      expect(error.status).toBe(1)
+    }
+  })
+
+  it('lint-config logs legacy COLLECTIONS array in mixed conflicting inputs', () => {
+    const filePath = createTempConfig({
+      STAC_API_URL: 'https://example.com',
+      COLLECTIONS_CONFIG: { collectionA: {} },
+      COLLECTIONS: ['collectionA']
+    })
+    try {
+      runNodeScript(lintScript, [filePath])
+      throw new Error('Expected lint-config to fail')
+    } catch (error) {
+      const out = `${error.stdout ?? ''}${error.stderr ?? ''}`
+      expect(out).toContain(
+        'Conflicting legacy inputs: COLLECTIONS (legacy array)'
+      )
       expect(error.status).toBe(1)
     }
   })
@@ -115,6 +161,26 @@ describe('config tooling scripts', () => {
     } catch (error) {
       const out = `${error.stdout ?? ''}${error.stderr ?? ''}`
       expect(out).toContain('Mixed configuration format is not supported')
+      expect(out).toContain('Conflicting legacy inputs: SCENE_TILER_PARAMS')
+      expect(error.status).toBe(1)
+    }
+  })
+
+  it('migrate-config validate-only lists COLLECTIONS legacy array in mixed signals', () => {
+    const filePath = createTempConfig({
+      STAC_API_URL: 'https://example.com',
+      COLLECTIONS_CONFIG: { collectionA: {} },
+      COLLECTIONS: ['collectionA']
+    })
+    try {
+      runNodeScript(migrateScript, ['--input', filePath, '--validate-only'])
+      throw new Error('Expected migrate-config validate-only to fail')
+    } catch (error) {
+      const out = `${error.stdout ?? ''}${error.stderr ?? ''}`
+      expect(out).toContain(
+        'Conflicting legacy inputs: COLLECTIONS (legacy array)'
+      )
+      expect(out).not.toMatch(/Legacy keys found:\s*$/)
       expect(error.status).toBe(1)
     }
   })

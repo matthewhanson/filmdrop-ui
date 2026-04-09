@@ -151,7 +151,7 @@ See [CONFIGURATION.md](CONFIGURATION.md) for detailed feature configuration.
 
 ### 📦 Config Format Evolution
 
-FilmDrop UI evolved its configuration format to reduce repetition and improve maintainability. Legacy config keys do not auto-migrated at runtime.
+FilmDrop UI evolved its configuration format to reduce repetition and improve maintainability. Legacy config keys are not auto-migrated at runtime.
 Use the config tooling before startup:
 
 - `npm run config:lint -- public/config/config.json`
