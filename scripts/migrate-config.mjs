@@ -8,6 +8,10 @@ import {
   detectConfigFormat
 } from '../src/utils/configFormat.mjs'
 import { readJsonFile } from './read-json.mjs'
+import {
+  printSuggestedMigrateFollowUp,
+  suggestedMigratedOutputPath
+} from './config-cli-suggestions.mjs'
 
 const MIXED_REMEDIATION_MESSAGE = [
   'Mixed configuration format is not supported.',
@@ -138,6 +142,10 @@ function main() {
 
     if (args.dryRun) {
       console.log('DRY-RUN MODE: No files written')
+      printSuggestedMigrateFollowUp({
+        inputPath: args.input,
+        outputPath: suggestedMigratedOutputPath(args.input)
+      })
       console.log('\nMigrated config output:')
       console.log(JSON.stringify(result.migratedConfig, null, 2))
       return

@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 import fs from 'node:fs'
-import path from 'node:path'
 import {
   LEGACY_CONFIG_KEYS,
   MODERN_CONFIG_KEYS,
@@ -10,6 +9,10 @@ import {
   getMixedFormatLegacySignals
 } from '../src/utils/configFormat.mjs'
 import { readJsonFile } from './read-json.mjs'
+import {
+  printSuggestedMigrateFollowUp,
+  suggestedMigratedOutputPath
+} from './config-cli-suggestions.mjs'
 
 const MIXED_REMEDIATION_MESSAGE =
   'Mixed format is not supported. Resolve to legacy-only and migrate, or remove legacy keys and keep only COLLECTIONS_CONFIG.'
@@ -109,11 +112,10 @@ function lintConfig(filePath, verbose) {
 
   if (format === 'legacy') {
     console.log('Backward compatibility: legacy format detected.')
-    console.log(
-      `Suggestion: run migration utility: npm run config:migrate -- --input ${path.basename(
-        filePath
-      )} --dry-run`
-    )
+    printSuggestedMigrateFollowUp({
+      inputPath: filePath,
+      outputPath: suggestedMigratedOutputPath(filePath)
+    })
     if (verbose && !('SEARCH_MIN_ZOOM_LEVELS' in config)) {
       console.log(
         '[Verbose] Many legacy configs include SEARCH_MIN_ZOOM_LEVELS for search zoom behavior; yours omits it.'

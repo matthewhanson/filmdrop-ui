@@ -14,8 +14,12 @@ npm run config:lint -- public/config/config.json
 npm run config:migrate -- --input public/config/config.json --dry-run
 
 # Write migrated config to a new file
-npm run config:migrate -- --input public/config/config.json --output public/config/config.json.migrated
+npm run config:migrate -- --input public/config/config.json --output public/config/config.migrated.json
 ```
+
+## Suggested next commands (lint / dry-run)
+
+When `config:lint` detects a **legacy** config, or after `config:migrate --dry-run`, the CLI prints **Suggested commands (bash/zsh)** using your input path. The suggested output file is **`*.migrated.json`** next to the input (for example `config.json` → `config.migrated.json`). Paths are wrapped in **POSIX single quotes** for pasting into bash, zsh, or **Git Bash**; **cmd.exe** does not treat those quotes the same way, and PowerShell may need different escaping.
 
 ## Config file format (strict JSON)
 

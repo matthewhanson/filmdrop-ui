@@ -4,6 +4,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
+import { quotePosixShellArg } from './shell-quote.mjs'
 
 const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -19,12 +20,28 @@ function createTempConfig(config) {
   return filePath
 }
 
+function createTempConfigInSubdir(config, subPathSegments) {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'filmdrop-config-'))
+  const nested = path.join(tempDir, ...subPathSegments)
+  fs.mkdirSync(nested, { recursive: true })
+  const filePath = path.join(nested, 'config.json')
+  fs.writeFileSync(filePath, JSON.stringify(config, null, 2))
+  return filePath
+}
+
 function runNodeScript(scriptPath, args = []) {
   return execFileSync(process.execPath, [scriptPath, ...args], {
     cwd: repoRoot,
     encoding: 'utf8'
   })
 }
+
+describe('shell-quote', () => {
+  it('escapes single quotes for POSIX shells', () => {
+    expect(quotePosixShellArg("a'b")).toBe("'a'\\''b'")
+    expect(quotePosixShellArg('/tmp/foo')).toBe("'/tmp/foo'")
+  })
+})
 
 describe('config tooling scripts', () => {
   it('lint-config passes for valid modern config', () => {
@@ -60,9 +77,47 @@ describe('config tooling scripts', () => {
     const output = runNodeScript(lintScript, [filePath])
     expect(output).toContain('Config format: LEGACY')
     expect(output).toContain('Config is VALID')
+    expect(output).toContain('Suggested commands (bash/zsh):')
+    expect(output).toContain(filePath)
+    expect(output).toContain('npm run config:migrate -- --input')
+    expect(output).toContain('--dry-run')
+    expect(output).toContain('--output')
+    expect(output).toContain('npm run config:lint --')
+    expect(output).toContain('.migrated.json')
     expect(output).not.toContain(
       "Legacy config requires 'SEARCH_MIN_ZOOM_LEVELS'"
     )
+  })
+
+  it('lint-config legacy suggestions include full path when directory has spaces', () => {
+    const filePath = createTempConfigInSubdir(
+      {
+        STAC_API_URL: 'https://example.com',
+        SCENE_TILER_PARAMS: { collectionA: { assets: ['red'] } }
+      },
+      ['nested with spaces']
+    )
+
+    const output = runNodeScript(lintScript, [filePath])
+    expect(output).toContain('Suggested commands (bash/zsh):')
+    expect(output).toContain(filePath)
+    expect(output).toMatch(/npm run config:migrate -- --input '.+' --dry-run/)
+  })
+
+  it('lint-config legacy suggestions work with apostrophe in directory name', () => {
+    const filePath = createTempConfigInSubdir(
+      {
+        STAC_API_URL: 'https://example.com',
+        SCENE_TILER_PARAMS: { collectionA: { assets: ['red'] } }
+      },
+      ["kid's configs"]
+    )
+
+    const output = runNodeScript(lintScript, [filePath])
+    expect(output).toContain('Suggested commands (bash/zsh):')
+    expect(output).toContain('configs')
+    expect(output).toMatch(/npm run config:migrate -- --input '.+' --dry-run/)
+    expect(output).toMatch(/npm run config:lint -- '.+'/)
   })
 
   it('lint-config verbose hints when legacy omits SEARCH_MIN_ZOOM_LEVELS', () => {
@@ -128,6 +183,15 @@ describe('config tooling scripts', () => {
       '--dry-run'
     ])
     expect(output).toContain('DRY-RUN MODE: No files written')
+    const idxSuggest = output.indexOf('Suggested commands (bash/zsh):')
+    const idxJson = output.indexOf('Migrated config output:')
+    expect(idxSuggest).toBeGreaterThan(-1)
+    expect(idxJson).toBeGreaterThan(-1)
+    expect(idxSuggest).toBeLessThan(idxJson)
+    expect(output.slice(idxSuggest, idxJson)).toContain(filePath)
+    expect(output.slice(idxSuggest, idxJson)).toContain(
+      'npm run config:lint --'
+    )
     expect(output).toContain('"visualizations"')
     expect(output).toContain('"default"')
   })
