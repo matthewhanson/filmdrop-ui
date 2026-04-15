@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added unit tests for normalized error handling in search, aggregate, and mosaic STAC client modules.
 - Added optional `AbortSignal` support on `SearchService`, `fetchTopItemsForMosaic`, `AggregateSearchService`, and `AddMosaicService`;
   `newSearch` accepts an optional `signal` and forwards it to those calls.
+- Added JavaScript config utilities: `npm run config:lint` and `npm run config:migrate`.
+- Added strict config validation tests for startup hard-fail on legacy config.
 
 ### Changed
 
@@ -32,6 +34,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   (geometry may appear briefly before the main search completes). `newSearch` still runs synchronously up to URL/layer setup before the first `await`;
   cancellation stops network completion and result application, not full URL rollback.
 - STAC client modules: return structured error objects and log with the same `contextLabel` passed into normalization (per-service defaults: search, aggregate, mosaic, mosaic top-items prefetch).
+- Enforced modern config format at runtime; legacy config keys now fail startup with migration guidance.
+- Replaced Python-based config lint/migrate helper workflow with Node CLI scripts.
+- Hardened config migration/lint policy to fail mixed-format configs (`COLLECTIONS_CONFIG` + legacy keys) instead of mutating ambiguous input.
+- Updated docs/examples to use canonical `COLLECTIONS_CONFIG.visualizations.default` rendering configuration.
 
 ### Fixed
 
