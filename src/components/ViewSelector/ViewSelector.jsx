@@ -38,10 +38,13 @@ const ViewSelector = () => {
   )
 
   // Check if collection supports hex and grid aggregations
+  // Check for both new (stac-server >= 3.6.0) and old (deprecated) aggregation names
   const supportsHex = useMemo(
     () =>
       selectedCollectionData?.aggregations?.some(
-        (el) => el.name === 'grid_geohex_frequency'
+        (el) =>
+          el.name === 'centroid_geohex_grid_frequency' ||
+          el.name === 'grid_geohex_frequency'
       ) || false,
     [selectedCollectionData]
   )
