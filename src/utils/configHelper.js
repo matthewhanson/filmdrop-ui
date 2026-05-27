@@ -90,31 +90,46 @@ async function parseLayerListConfig(config) {
               )
             }
 
+            const combinedLayerName = `${service.name.replace(
+              / /g,
+              '_'
+            )}_${layer.name.replace(/ /g, '_')}`
+            const common = {
+              combinedLayerName,
+              layerName: layer.name,
+              layerAlias: layer.alias || layer.name,
+              visibility: layer.default_visibility || false,
+              type: service.type
+            }
+
+            if (service.type === 'majortom-grid') {
+              if (!layer.distance_meters) {
+                throw new Error(
+                  `Invalid configuration for majortom-grid layer '${layer.name}': 'distance_meters' is required.`
+                )
+              }
+              return {
+                ...common,
+                distanceMeters: layer.distance_meters,
+                offset: layer.offset || 0,
+                minZoom: layer.min_zoom ?? 8,
+                style: layer.style
+              }
+            }
+
             const validCRS = ['EPSG:4326', 'EPSG:3857']
             const shouldAddLayer = !layer.crs || validCRS.includes(layer.crs)
 
             if (shouldAddLayer) {
               return {
-                combinedLayerName: `${service.name.replace(
-                  / /g,
-                  '_'
-                )}_${layer.name.replace(/ /g, '_')}`,
-                layerName: layer.name,
-                layerAlias: layer.alias || layer.name,
-                visibility: layer.default_visibility || false,
+                ...common,
                 crs: layer.crs || 'EPSG:3857',
-                url: service.url,
-                type: service.type
+                url: service.url
               }
             }
 
             console.error(
-              'Error adding layer: ' +
-                `${service.name.replace(/ /g, '_')}_${layer.name.replace(
-                  / /g,
-                  '_'
-                )}` +
-                ': unsupported crs'
+              'Error adding layer: ' + combinedLayerName + ': unsupported crs'
             )
             return null // Skip adding the layer if error
           })

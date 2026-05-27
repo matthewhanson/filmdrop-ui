@@ -427,6 +427,43 @@ populated.
 
 **Supported CRS:** `EPSG:4326`, `EPSG:3857`
 
+**Supported types:** `wms`, `majortom-grid`
+
+#### MajorTOM grid
+
+A client-rendered vector overlay of the ESA MajorTOM grid. Cells are computed in the
+browser from the current viewport and redrawn on pan/zoom — no tile server required.
+
+```json
+{
+  "LAYER_LIST_SERVICES": [
+    {
+      "name": "MajorTOM",
+      "type": "majortom-grid",
+      "layers": [
+        {
+          "name": "2560m",
+          "alias": "MajorTOM 2560m grid",
+          "default_visibility": false,
+          "distance_meters": 2560,
+          "offset": 0,
+          "min_zoom": 8
+        }
+      ]
+    }
+  ]
+}
+```
+
+Per-layer fields:
+
+- `distance_meters` (required): cell size in meters. The MajorTOM grid is **not**
+  hierarchical — each `distance_meters` value defines an independent flat grid.
+- `offset` (default `0`): grid offset as a fraction of the cell size, `0.0`–`1.0`.
+- `min_zoom` (default `8`): the layer hides itself below this zoom to avoid drawing
+  tens of thousands of cells.
+- `style` (optional): Leaflet path style overrides, e.g. `{ "color": "#888", "weight": 1 }`.
+
 ### COLLECTIONS
 
 FilmDrop UI automatically fetches the full list of collections from your STAC API at
