@@ -19,6 +19,7 @@ import { router, getPathParams } from '../router'
 import { getCollectionConfig } from './configHelper'
 import { appendStacHeaderCookies } from '../utils/stacRequest'
 import { getMapGeometryColors } from './themeHelper'
+import { createMajorTomGridLayer } from './majortomGrid'
 
 const isDev =
   typeof import.meta !== 'undefined' && Boolean(import.meta.env?.DEV)
@@ -940,6 +941,25 @@ function styleFeatures(feature, geojsonLayer) {
   }
 }
 
+function createReferenceLayerInstance(map, refLayer) {
+  if (refLayer.type === 'wms') {
+    return L.tileLayer.wms(refLayer.url, {
+      layers: refLayer.layerName,
+      format: 'image/png',
+      transparent: true,
+      version: '1.1.1',
+      crs: refLayer.crs === 'EPSG:4326' ? L.CRS.EPSG4326 : L.CRS.EPSG3857
+    })
+  }
+  if (refLayer.type === 'majortom-grid') {
+    return createMajorTomGridLayer(map, refLayer)
+  }
+  console.error(
+    'Error adding layer: ' + refLayer.combinedLayerName + ': unsupported type'
+  )
+  return null
+}
+
 export function addReferenceLayersToMap() {
   const map = store.getState().mainSlice.map
   if (map && Object.keys(map).length > 0) {
@@ -950,25 +970,12 @@ export function addReferenceLayersToMap() {
           .mainSlice.referenceLayers.slice()
           .reverse()
         reversedReferenceLayersArr.forEach((refLayer) => {
-          if (refLayer.type !== 'wms') {
-            console.error(
-              'Error adding layer: ' +
-                refLayer.name +
-                ': only wms type supported'
-            )
-            return
-          }
-          const wmsLayer = L.tileLayer.wms(refLayer.url, {
-            layers: refLayer.layerName,
-            format: 'image/png',
-            transparent: true,
-            version: '1.1.1',
-            crs: refLayer.crs === 'EPSG:4326' ? L.CRS.EPSG4326 : L.CRS.EPSG3857
-          })
-          wmsLayer.layer_name = refLayer.combinedLayerName
-          layer.addLayer(wmsLayer)
+          const refLayerInstance = createReferenceLayerInstance(map, refLayer)
+          if (!refLayerInstance) return
+          refLayerInstance.layer_name = refLayer.combinedLayerName
+          layer.addLayer(refLayerInstance)
           if (!refLayer.visibility) {
-            layer.removeLayer(wmsLayer)
+            layer.removeLayer(refLayerInstance)
           }
         })
       }
@@ -999,20 +1006,15 @@ export function toggleReferenceLayerVisibility(combinedLayerNameToToggle) {
           !layersInGroup.includes(combinedLayerNameToToggle) &&
           refLayerToToggle.visibility
         ) {
-          const wmsLayer = L.tileLayer.wms(refLayerToToggle.url, {
-            layers: refLayerToToggle.layerName,
-            format: 'image/png',
-            transparent: true,
-            version: '1.1.1',
-            crs:
-              refLayerToToggle.crs === 'EPSG:4326'
-                ? L.CRS.EPSG4326
-                : L.CRS.EPSG3857
-          })
-          wmsLayer.layer_name = refLayerToToggle.combinedLayerName
-          wmsLayer.bringToBack()
-          layer.addLayer(wmsLayer)
-          wmsLayer.bringToFront()
+          const refLayerInstance = createReferenceLayerInstance(
+            map,
+            refLayerToToggle
+          )
+          if (!refLayerInstance) return
+          refLayerInstance.layer_name = refLayerToToggle.combinedLayerName
+          if (refLayerInstance.bringToBack) refLayerInstance.bringToBack()
+          layer.addLayer(refLayerInstance)
+          if (refLayerInstance.bringToFront) refLayerInstance.bringToFront()
 
           // need this to keep layer order when adding and removing layers
           const layersInGroup = layer.getLayers()
